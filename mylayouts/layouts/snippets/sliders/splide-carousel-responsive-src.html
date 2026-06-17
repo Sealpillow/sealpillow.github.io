@@ -1,0 +1,269 @@
+<!--
+  SLIDER: Splide Carousel — Responsive Sources (srcDesktop / srcMobile)
+  SOURCE: unisex-landing-page-v1.html / unisex-landing-page-v2.html / versality-landing-page.html
+  PATTERN: createSplideSliderCarousel({ sliderId, slides, options })
+  - Images use <picture> + <source media="(max-width:768px)"> for responsive switching
+  - Videos use dual <source> (mobile first) for responsive switching
+  - Per-slide `width` sets li.style.width — use with autoWidth:true for mixed aspect ratios
+  - Falls back to slide.src if srcDesktop is not provided
+  - Two usage examples:
+      1. autoWidth mix (portrait + landscape in same carousel)
+      2. perPage:1 fullwidth (single slide, desktop/mobile swap)
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<style>
+/* Slider Container > Splide > Splide__Track > Splide__List > Splide__Slide */
+.slider-container,
+  .splide,
+  .splide__track,
+  .splide__list,
+  .splide__slide {
+  height: 100%;
+}
+
+/* Slider Container */
+.slider-container {
+  height: 80vw;
+  max-height: 700px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content */
+.slide-content {
+  height: 100%;
+  line-height: 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content > Picture */
+.slide-content picture {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* Slide Content > Img > Video */
+.slide-content img,
+  .slide-content video {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Slide Text */
+.slide-text {
+  padding: 8px 0;
+  text-align: left;
+  width: 100%;
+}
+
+/* Slide Text > H3 */
+.slide-text h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+/* Slide Text > P */
+.slide-text p {
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Splide__Arrows > Splide__Pagination */
+.splide__arrows,
+  .splide__pagination {
+  display: none;
+}
+
+/* Splide__Pagination__Page */
+.splide__pagination__page {
+  outline: none;
+}
+
+/* Splide__Pagination__Page > Focus Visible */
+.splide__pagination__page:focus,
+  .splide__pagination__page:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Splide__Track */
+.splide__track {
+  cursor: grab;
+}
+
+/* Splide__Track */
+.splide__track:active {
+  cursor: grabbing;
+}
+</style>
+
+<!-- SLIDER HTML -->
+<div class="slider-container">
+  <div class="splide" id="carouselSlider1">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      if (slide.width) {
+        li.style.width = slide.width;
+      }
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline>
+            ${slide.srcMobile ? `<source src="${slide.srcMobile}" media="(max-width: 768px)" type="video/mp4">` : ''}
+            <source src="${slide.srcDesktop || slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `
+          <picture>
+            ${slide.srcMobile ? `<source media="(max-width: 768px)" srcset="${slide.srcMobile}">` : ''}
+            <img src="${slide.srcDesktop || slide.src}" alt="${slide.alt || ''}">
+          </picture>
+        `;
+      }
+
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text" style="color:${slide.textcolor || '#333'}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      gap: 5,
+      arrows: false,
+      padding: { left: '0rem', right: '0rem' },
+      breakpoints: {
+        1024: { perPage: 3 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+
+  /* ======== USAGE 1: autoWidth — mixed portrait/landscape slides ======== */
+  createSplideSliderCarousel({
+    sliderId: 'carouselSlider1',
+    slides: [
+      {
+        type: 'image',
+        alt: 'Slide 1',
+        width: '50%',
+        srcDesktop: '../../media/portrait.jpg',
+        srcMobile: '../../media/portrait.jpg',
+        url: '#',
+      },
+      {
+        type: 'video',
+        alt: 'Slide 2',
+        width: '100%',
+        srcDesktop: '../../media/scrub-video-landscape.mp4',
+        srcMobile: '../../media/scrub-video-portrait.mp4',
+        url: '#',
+      },
+      {
+        type: 'image',
+        alt: 'Slide 3',
+        width: '50%',
+        srcDesktop: '../../media/portrait.jpg',
+        srcMobile: '../../media/portrait.jpg',
+        url: '#',
+      },
+    ],
+    options: {
+      autoWidth: true,
+      focus: 'left',
+      pagination: false,
+      arrows: false,
+      breakpoints: {
+        640: { autoWidth: false, perPage: 1 },
+      },
+    },
+  });
+
+  /* ======== USAGE 2: perPage 1 fullwidth — desktop/mobile src swap ======== */
+  /*
+  createSplideSliderCarousel({
+    sliderId: 'carouselSlider2',
+    slides: [
+      {
+        type: 'image',
+        alt: 'Slide 1',
+        srcDesktop: '../../media/landscape.jpg',
+        srcMobile: '../../media/portrait.jpg',
+      },
+      {
+        type: 'video',
+        alt: 'Slide 2',
+        srcDesktop: '../../media/scrub-video-landscape.mp4',
+        srcMobile: '../../media/scrub-video-portrait.mp4',
+      },
+    ],
+    options: {
+      perPage: 1,
+      pagination: true,
+      padding: { left: '0rem', right: '0rem' },
+      breakpoints: {
+        1024: { perPage: 1 },
+        640: { perPage: 1 },
+      },
+    },
+  });
+  */
+
+});
+</script>

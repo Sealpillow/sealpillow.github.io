@@ -1,0 +1,98 @@
+<!--
+  COMPONENT: Section Header + View Toggle Tabs
+  SOURCE: unisex-landing-page-v1.html / unisex-landing-page-v2.html
+  PATTERN: title + body + "View: 2 | 4" tab links
+  - toggleContent() shows/hides #sectionview2 / #sectionview4
+  - Hash-based deep linking: #tab=view2 or #tab=view4
+  - Active link style: black, inactive: #999
+-->
+
+<style>
+/* Section Links */
+.section-links {
+  display: flex;
+  font-family: proxima-nova;
+  font-size: 14px;
+  gap: 20px;
+  justify-content: right;
+  margin-bottom: 1%;
+  margin-right: 5%;
+}
+
+/* Section Links > Link */
+.section-links .link {
+  color: #999999;
+  text-decoration: none;
+}
+
+/* Section Links > Link */
+.section-links .link.active {
+  color: black;
+}
+</style>
+
+<!-- SECTION HEADER -->
+<section class="text-center" style="margin-top: 100px;">
+  <p class="mb-0 p-0 col-md-12" style="font-family:proxima-nova; font-size:30px; width:100%; margin:0 auto; text-align:center; line-height:33px;">
+    Section Title
+  </p>
+  <br>
+  <p class="mb-0 col-md-12 d-none d-lg-block" style="font-family:proxima-nova; font-size:14px; width:80%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+    Desktop body copy goes here.
+  </p>
+  <p class="mb-0 col-md-12 d-block d-lg-none" style="font-family:proxima-nova; font-size:14px; width:80%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+    Mobile body copy goes here.
+  </p>
+  <br><br>
+  <div class="section-links">
+    View:
+    <a href="javascript:void(0);" class="link active" onclick="toggleContent('view2', this)">2</a>
+    <a href="javascript:void(0);" class="link" onclick="toggleContent('view4', this)">4</a>
+  </div>
+</section>
+
+<!-- VIEW 2 CONTENT (default visible) -->
+<div id="sectionview2" style="display: block;">
+  <!-- insert text-slider-split or other content here -->
+</div>
+
+<!-- VIEW 4 CONTENT (hidden by default) -->
+<div id="sectionview4" style="display: none;">
+  <!-- insert multigrid-products or other content here -->
+</div>
+
+<script>
+  function toggleContent(type, element) {
+    document.getElementById('sectionview2').style.display = 'none';
+    document.getElementById('sectionview4').style.display = 'none';
+
+    const allLinks = document.querySelectorAll('.section-links .link');
+    allLinks.forEach(link => link.classList.remove('active'));
+
+    if (type === 'view2') {
+      document.getElementById('sectionview2').style.display = 'block';
+    } else if (type === 'view4') {
+      document.getElementById('sectionview4').style.display = 'block';
+    }
+
+    const clickedText = element.textContent.trim();
+    Array.from(allLinks)
+      .filter(link => link.textContent.trim() === clickedText)
+      .forEach(link => link.classList.add('active'));
+
+    const target = document.getElementById(`section${type}`);
+    if (target) {
+      window.scrollTo({ top: target.offsetTop - 100, behavior: 'smooth' });
+    }
+  }
+
+  /* Hash-based deep linking: page.html#tab=view4 */
+  document.addEventListener('DOMContentLoaded', function () {
+    const params = new URLSearchParams(window.location.hash.replace('#', ''));
+    const tab = params.get('tab');
+    if (tab) {
+      const link = document.querySelector(`.section-links .link[onclick*="${tab}"]`);
+      if (link) toggleContent(tab, link);
+    }
+  });
+</script>

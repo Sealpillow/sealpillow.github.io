@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+
+<style>
+
+html, body {
+    overflow-x: hidden;
+    color: black;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+.page.parallax {
+    padding-top: 0px !important;
+}
+
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+
+/* DESKTOP */
+.pair-image-desktop {
+  width: 100%;
+}
+
+.pair-image-desktop a,
+.pair-image-desktop__item {
+  display: block;
+  width: 50%;
+}
+
+.pair-image-desktop img {
+  width: 100%;
+  display: block;
+}
+
+.split-top-row {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  align-items: center;
+}
+.split-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+  font-family: aktiv-grotesk-extended;
+}
+.split-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* TOP — portrait anchored left at 50% */
+.col-split-offset__top {
+  width: 50%;
+  margin-bottom: 50px;
+}
+
+.col-split-offset__top img {
+  width: 100%;
+  display: block;
+  padding-left: 20%;
+}
+
+/* BOTTOM — text starts from middle, image 30% */
+.col-split-offset__bottom {
+  display: flex;
+  align-items: center;
+}
+
+.col-split-offset__caption {
+  width: 50%;
+  padding-top: 12px;
+}
+
+.col-split-offset__caption p {
+  font-size: 14px;
+  padding-left: 20%; /* pushes text to start from the right edge of the caption block */
+}
+
+.col-split-offset__image {
+  width: 40%;
+  margin-left: auto; /* pushes image to the far right */
+}
+
+.col-split-offset__image img {
+  width: 100%;
+  display: block;
+}
+
+
+/* TOP — portrait anchored left at 50% */
+.col-split-offset__top2 {
+  width: 50%;
+  margin-bottom: 50px;
+  margin-left: auto;
+}
+
+.col-split-offset__top2 img {
+  width: 100%;
+  display: block;
+  padding-right: 20%;
+}
+
+/* BOTTOM — text starts from middle, image 30% */
+.col-split-offset__bottom2 {
+  display: flex;
+  align-items: center;
+}
+
+.col-split-offset__caption2 {
+  width: 50%;
+  padding-top: 12px;
+}
+
+.col-split-offset__caption2 p {
+  font-size: 14px;
+  padding-right: 20%; /* pushes text to start from the right edge of the caption block */
+}
+
+.col-split-offset__image2 {
+  width: 40%;
+  margin-right: auto; /* pushes image to the far right */
+}
+
+.col-split-offset__image2 img {
+  width: 100%;
+  display: block;
+}
+
+
+.flexi-col-image2 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+}
+
+.flexi-col-image-right2 a,
+.flexi-col-image-left2 a {
+    display: block;
+    width: 100%;
+}
+
+.flexi-col-image-right2 {
+    width: 100%;
+}
+
+.flexi-col-image3 {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+
+.flexi-col-image-right3 a,
+.flexi-col-image-left3 a {
+    display: block;
+    width: 100%;
+}
+
+.flexi-col-image-right3 {
+    width: 100%;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .pair-image-desktop,  
+  .split-top-row,  
+  .col-split-offset__top, 
+  .col-split-offset__bottom,
+  .col-split-offset__top2,
+  .col-split-offset__bottom2,
+  .flexi-col-image2,
+  .flexi-col-image3 {
+    display: none;
+  }
+
+}
+
+.img-wrap {
+  position: relative;
+  display: block;
+  max-width: 100%;
+}
+
+.img-wrap img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.split-top-row-mobile {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  align-items: center;
+}
+.split-title-mobile {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+  font-family: aktiv-grotesk-extended;
+}
+.split-desc-mobile {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+
+.flexi-col-image2-mobile  {
+    display: grid;
+    grid-template-rows: 0.5fr 0.5fr;
+    grid-template-columns: none;
+}
+
+.flexi-col-image-left2-mobile {
+    order: 1;
+    width: 50%;
+    justify-self: end;
+}
+.flexi-col-image-right2-mobile {
+    width: 100%;
+    order: 2;
+}
+
+.flexi-col-image3-mobile  {
+    display: grid;
+    grid-template-rows: 0.5fr 0.5fr;
+    grid-template-columns: none;
+}
+
+.flexi-col-image-left3-mobile {
+    order: 1;
+    width: 50%;
+    justify-self: start;
+}
+.flexi-col-image-right3-mobile {
+    width: 100%;
+    order: 2;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- MOBILE -->
+<div class="img-wrap js-vertical-slider d-block d-md-none " style="margin-bottom: 100px;">
+  <a class="js-shop-the-collection" href="$url('Product-Show','pid','PM2-25210273_NVY.FA')$"  data-pid="PM2-25210273_NVY.FA,PM1-65110332_DBW.BU" >
+    <picture>
+      <img src="images/metro-med/metro-med-a1_mobile.jpg"/>
+    </picture>
+  </a>
+</div>
+
+<!-- Mobile: "Metro Med" title + intro description -->
+<div class="split-top-row-mobile d-md-none" style="padding: 0px 10%; margin-bottom:100px;">
+  <p class="split-title-mobile">Metro Med</p>
+
+  <p class="split-desc-mobile">
+    Capturing the essence of metropolitan living, summer hits different
+    with the mercurial energy of a downtown community. Steered by the
+    tempo of transient city lives, the collection delivers silhouettes that
+    reveal both intellectual and emotional depth, reflecting the layered
+    identities of the modern individual.
+  </p>
+</div>
+
+<!-- MOBILE -->
+<div class="img-wrap d-block d-md-none " style="padding: 0px 10%; margin-bottom: 50px;">
+  <picture>
+    <img src="images/metro-med/metro-med-b1_mobile.jpg"/>
+  </picture>
+</div>
+
+
+<div class="flexi-col-image2-mobile d-block d-md-none" style="width: 100%;" >
+    <!-- Top Right side: one small images -->
+    <div class="flexi-col-image-left2-mobile">
+      <a class="js-shop-the-collection" data-pid="PM2-26320222-3_BLK.TU" href="$url('Product-Show','pid','PM2-26320222-3_BLK.TU')$">
+        <picture>
+            <img src="images/metro-med/metro-med-c1_mobile.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+        </picture>      
+      </a>
+    </div>
+
+    <!-- Bottom side: One large image -->
+    <div class="flexi-col-image-right2-mobile" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PM2-26320222-3_NVY.FA,PM1-76210271-2_NVY.DE" href="$url('Product-Show','pid','PM2-26320222-3_NVY.FA')$">
+            <picture>
+                <img src="images/metro-med/metro-med-d1_mobile.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>    
+    </div>
+</div>
+
+
+<div class="d-block d-md-none" style="display: flex; flex-direction: column; align-items: center; padding: 40px;">
+    
+  <!-- Image Section -->
+  <div>
+      <a class="js-shop-the-collection" data-pid="PM2-25210273_NVY.FA" href="$url('Product-Show', 'pid','PM2-25210273_NVY.FA')$">
+          <img src="images/metro-med/metro-med-e1_mobile.jpg" alt="Shoes on white background" style="width: 100%; height: 100%; object-fit: cover;">
+      </a>  
+  </div>
+
+  <!-- Text Section -->
+  <div style="text-align: left; margin: 50px 0;">
+      <p style="font-size: 14px; margin: 0; color: #000;">
+        Elements of utility are refined, translating city-centric influences
+        into modern form while preserving a sense of approachability and
+        fluidity. Denim emerges subtly within the capsule, introducing raw
+        texture and structure that contrast against fluid styling and softened
+        layers.
+      </p>
+  </div>
+
+  <!-- Image Section -->
+  <div>
+    <a class="js-shop-the-collection" data-pid="PM2-25210273_NVY.FA,PM1-65110332_DBW.BU" href="$url('Product-Show', 'pid','PM2-25210273_NVY.FA')$">
+        <img src="images/metro-med/metro-med-f1_mobile.jpg" alt="Shoes on white background" style="width: 100%; height: 100%; object-fit: cover;">
+    </a>  
+  </div>
+
+</div>
+
+
+<!-- MOBILE -->
+<div class="img-wrap d-block d-md-none ">
+  <picture>
+    <img src="images/metro-med/metro-med-g1_mobile.jpg"/>
+  </picture>
+</div>
+
+
+<!-- MOBILE -->
+<div class="img-wrap d-block d-md-none ">
+  <a class="js-shop-the-collection" href="$url('Product-Show','pid','PM1-65110332_DBW.BU')$"  data-pid="PM1-65110332_DBW.BU" >
+    <picture>
+      <img src="images/metro-med/metro-med-h1_mobile.jpg"/>
+    </picture>
+  </a>
+</div>
+
+
+<div class="d-block d-md-none" style="display: flex; flex-direction: column; align-items: center; padding: 40px;">
+    
+  <!-- Image Section -->
+  <div>
+      <a class="js-shop-the-collection" data-pid="PM2-26320222-3_MUL.TU,PM1-85110486_NVY.DE" href="$url('Product-Show', 'pid','PM2-26320222-3_MUL.TU')$">
+          <img src="images/metro-med/metro-med-i1_mobile.jpg" alt="Shoes on white background" style="width: 100%; height: 100%; object-fit: cover;">
+      </a>  
+  </div>
+
+  <!-- Text Section -->
+  <div style="text-align: left; margin: 50px 0;">
+      <p style="font-size: 14px; margin: 0; color: #000;">
+        Balancing contemporary influence with understated sophistication,
+        the narrative is shaped by movement, routine, and the evolving
+        rhythms of city life. Refined tools for everyday function and elevated
+        ease.
+      </p>
+  </div>
+
+  <!-- Image Section -->
+  <div>
+    <a class="js-shop-the-collection" data-pid="PM1-65110332_DBW.BU" href="$url('Product-Show', 'pid','PM1-65110332_DBW.BU')$">
+        <img src="images/metro-med/metro-med-j1_mobile.jpg" alt="Shoes on white background" style="width: 100%; height: 100%; object-fit: cover;">
+    </a>  
+  </div>
+
+</div>
+
+
+<div class="flexi-col-image3-mobile d-block d-md-none" style="width: 100%; margin-bottom: 50px;" >
+    <!--Top Left side: one small images -->
+    <div class="flexi-col-image-left3-mobile">
+      <a class="js-shop-the-collection" data-pid="PM1-86380191-2_NVY.DE" href="$url('Product-Show','pid','PM1-86380191-2_NVY.DE')$">
+        <picture>
+            <img src="images/metro-med/metro-med-k1_mobile.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+        </picture>      
+      </a>
+    </div>
+
+    <!-- Bottom side: One large image -->
+    <div class="flexi-col-image-right3-mobile" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PM2-26320222-3_BLK.TU,PM1-65110332_DBW.BU" href="$url('Product-Show','pid','PM2-26320222-3_BLK.TU')$">
+            <picture>
+                <img src="images/metro-med/metro-med-l1_mobile.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>    
+    </div>
+</div>
+
+<!-- MOBILE -->
+<div class="img-wrap d-block d-md-none " style="padding: 0px 10%; margin-bottom: 50px;">
+  <a class="js-shop-the-collection" href="$url('Product-Show','pid','PM2-26320222-3_MUL.TU')$"  data-pid="PM2-26320222-3_MUL.TU" >
+    <picture>
+      <img src="images/metro-med/metro-med-m1_mobile.jpg"/>
+    </picture>
+  </a>
+</div>
+
+<!-- MOBILE -->
+<div class="img-wrap d-block d-md-none " style="padding: 0px 10%; margin-bottom: 50px;">
+  <a class="js-shop-the-collection" href="$url('Product-Show','pid','PM2-25210274_BLK.TU')$"  data-pid="PM2-25210274_BLK.TU,PM1-85110486_NVY.DE" >
+    <picture>
+      <img src="images/metro-med/metro-med-n1_mobile.jpg"/>
+    </picture>
+  </a>
+</div>
+
+<!-- DESKTOP -->
+<div class="pair-image-desktop d-none d-md-flex js-vertical-slider" style="margin-bottom: 100px;">
+  <a class="js-shop-the-collection" data-pid="PM2-25210273_NVY.FA,PM1-65110332_DBW.BU" href="$url('Product-Show','pid','PM2-25210273_NVY.FA')$">
+    <img src="images/metro-med/metro-med-a1.jpg" alt="Bag">
+  </a>
+  <div class="pair-image-desktop__item">
+    <img src="images/metro-med/metro-med-a2.jpg" alt="Bag">
+  </div>
+</div>
+
+<!-- Desktop: "Metro Med" title + intro description -->
+<div class="split-top-row" style="padding: 0px 20%; margin-bottom:100px;">
+  <p class="split-title">Metro Med</p>
+
+  <p class="split-desc">
+    Capturing the essence of metropolitan living, summer hits different
+    with the mercurial energy of a downtown community. Steered by the
+    tempo of transient city lives, the collection delivers silhouettes that
+    reveal both intellectual and emotional depth, reflecting the layered
+    identities of the modern individual.
+  </p>
+</div>
+
+
+<!-- TOP SECTION: left-anchored portrait -->
+<div class="col-split-offset__top">
+  <a class="js-shop-the-collection" data-pid="PM2-25210273_NVY.FA" href="$url('Product-Show','pid','PM2-25210273_NVY.FA')$">
+    <img src="images/metro-med/metro-med-b1.jpg" alt="Portrait">
+  </a>
+</div>
+
+<!-- BOTTOM SECTION: caption left, image right -->
+<div class="col-split-offset__bottom">
+  <div class="col-split-offset__caption">
+    <p>Elements of utility are refined, translating city-centric influences
+      into modern form while preserving a sense of approachability and
+      fluidity. Denim emerges subtly within the capsule, introducing raw
+      texture and structure that contrast against fluid styling and softened
+      layers.
+    </p>
+  </div>
+  <div class="col-split-offset__image">
+    <a class="js-shop-the-collection" data-pid="PM2-25210273_NVY.FA,PM1-65110332_DBW.BU" href="$url('Product-Show','pid','PM2-25210273_NVY.FA')$">
+      <img src="images/metro-med/metro-med-c1.jpg" alt="Architecture">
+    </a>
+  </div>
+</div>
+
+<div class="flexi-col-image2" style="width: 100%; margin: 100px 0px;" >
+    <!-- Left side: one small images -->
+    <div class="flexi-col-image-left2">
+      <a class="js-shop-the-collection" data-pid="PM2-26320222-3_NVY.FA,PM1-76210271-2_NVY.DE" href="$url('Product-Show','pid','PM2-26320222-3_NVY.FA')$">
+        <img src="images/metro-med/metro-med-d1.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+      </a>
+    </div>
+
+    <!-- Right side: One large image -->
+    <div class="flexi-col-image-right2" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PM2-26320222-3_BLK.TU" href="$url('Product-Show','pid','PM2-26320222-3_BLK.TU')$">
+          <img src="images/metro-med/metro-med-d2.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+        </a>    
+    </div>
+</div>
+
+<!-- DESKTOP -->
+<div class="pair-image-desktop d-none d-md-flex js-vertical-slider" style="margin-bottom: 100px;">
+  <div class="pair-image-desktop__item">
+    <img src="images/metro-med/metro-med-e1.jpg" alt="Bag">
+  </div>
+  <a class="js-shop-the-collection" data-pid="PM1-65110332_DBW.BU" href="$url('Product-Show','pid','PM1-65110332_DBW.BU')$">
+    <img src="images/metro-med/metro-med-e2.jpg" alt="Bag">
+  </a>
+</div>
+
+
+
+<!-- TOP SECTION: left-anchored portrait -->
+<div class="col-split-offset__top2">
+  <a class="js-shop-the-collection" data-pid="PM2-26320222-3_MUL.TU,PM1-85110486_NVY.DE" href="$url('Product-Show','pid','PM2-26320222-3_MUL.TU')$">
+    <img src="images/metro-med/metro-med-f1.jpg" alt="Portrait">
+  </a>
+</div>
+
+<!-- BOTTOM SECTION: caption left, image right -->
+<div class="col-split-offset__bottom2">
+  <div class="col-split-offset__image2">
+    <a class="js-shop-the-collection" data-pid="PM1-65110332_DBW.BU" href="$url('Product-Show','pid','PM1-65110332_DBW.BU')$">
+      <img src="images/metro-med/metro-med-g1.jpg" alt="Architecture">
+    </a>
+  </div>
+  <div class="col-split-offset__caption2">
+    <p>
+      Balancing contemporary influence with understated sophistication,
+      the narrative is shaped by movement, routine, and the evolving
+      rhythms of city life. Refined tools for everyday function and elevated
+      ease.
+    </p>
+  </div>
+  
+</div>
+
+
+<div class="flexi-col-image3" style="width: 100%; margin: 100px 0px;" >
+    <!-- Left side: one small images -->
+    <div class="flexi-col-image-left3">
+      <a class="js-shop-the-collection" data-pid="PM2-26320222-3_MUL.TU" href="$url('Product-Show','pid','PM2-26320222-3_MUL.TU')$">
+        <img src="images/metro-med/metro-med-h1.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+      </a>
+    </div>
+
+    <!-- Right side: One large image -->
+    <div class="flexi-col-image-right3" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PM2-26320222-3_BLK.TU,PM1-65110332_DBW.BU" href="$url('Product-Show','pid','PM2-26320222-3_BLK.TU')$">
+          <img src="images/metro-med/metro-med-h2.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+        </a>    
+    </div>
+</div>
+
+<!-- DESKTOP -->
+<div class="pair-image-desktop d-none d-md-flex js-vertical-slider" style="margin-bottom: 100px;">
+  <a class="js-shop-the-collection" data-pid="PM1-86380191-2_NVY.DE" href="$url('Product-Show','pid','PM1-86380191-2_NVY.DE')$">
+    <img src="images/metro-med/metro-med-i1.jpg" alt="Bag">
+  </a>
+  <a class="js-shop-the-collection" data-pid="PM2-25210274_BLK.TU,PM1-85110486_NVY.DE" href="$url('Product-Show','pid','PM2-25210274_BLK.TU')$">
+    <img src="images/metro-med/metro-med-i2.jpg" alt="Bag">
+  </a>
+
+</div>
+
+<!-- Publish Content -->
+<div class="publish-content" style = "padding-top: 50px; padding-left: 40px;">
+    <span style="font-size: 18px;">
+        Published on 29 May 2026
+        <br><br>
+        <a href="$url('Search-Show','cgid','pmnewarrivals')$">
+            SHOP MEN'S NEW ARRIVALS
+        </a> &gt;
+    </span>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  document.querySelectorAll('.js-tab-link').forEach(link => {
+    const tab    = link.dataset.tab;
+    const subtab = link.dataset.subtab;
+    const page   = link.dataset.page;
+
+    if (!tab || !page) return;
+
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const countryCode = pathParts[0];
+
+    let hash = `#tab=${tab}`;
+    if (subtab) hash += `&subtab=${subtab}`;
+
+    link.href = `/${countryCode}/${page}.html${hash}`;
+  });
+
+});
+</script>
+
+</body>
+
+</html>

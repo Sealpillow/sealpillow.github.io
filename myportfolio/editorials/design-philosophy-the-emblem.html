@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+        /* ----------------------------------------------------
+   GLOBAL RESET & BASE
+---------------------------------------------------- */
+html, body {
+    overflow-x: hidden;
+    color: black;
+    text-wrap: pretty;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+.page.parallax {
+    padding-top: 0px !important;
+}
+
+
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+
+/* Utility */
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ----------------------------------------------------
+   VIDEO BLOCK
+---------------------------------------------------- */
+    .video-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  background: #000;
+}
+
+video {
+  width: 100%;
+  display: block;
+  background: #000;
+}
+video:focus, 
+.controls button:focus {
+    outline: none;
+}
+
+video {
+    clip-path: fill-box;
+  }
+  
+.controls {
+  position: absolute;
+  bottom: 1rem;
+  width: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.controls button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.controls button img {
+  display: block;
+}
+.icon-play, .icon-pause {
+  width: 12px;
+  height: 24px;
+}
+.icon-mute, .icon-unmute {
+  width: 12px;
+  height: 12px;
+}
+.controls .mute {
+  transform: translateY(-1.5px); /* tweak: -1px to -4px */
+}
+/* play / pause icons */
+.icon-pause { display: none; }
+.play.is-playing .icon-play { display: none; }
+.play.is-playing .icon-pause { display: inline; }
+.play.is-paused .icon-play {display: inline;}
+.play.is-paused .icon-pause {display: none;}
+
+.timeline {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* SMOOTH PROGRESS BAR */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  background: white;
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+
+/* invisible seek input */
+.seek {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ----------------------------------------------------
+   IMAGE BLOCKS
+---------------------------------------------------- */
+.image-content,
+.image-content2 {
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.image-content img {
+    width: 50%;
+    max-width: 100%;
+}
+
+.image-content2 img {
+    width: 100%;
+}
+
+/* ----------------------------------------------------
+   LEFT TEXT + SWIPER LAYOUT
+---------------------------------------------------- */
+.img-left-text {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.img-left-text .text-block {
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.swiper-block {
+    position: relative;
+    width: 50%;
+    height: 100%;
+}
+
+.slider-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content img,
+  .slide-content video {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Text below each slide image, outside the image */
+  .slide-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10;
+  }
+  .slide-text h3 {
+    font-size: 14px;
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+  .slide-text p {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  /* Hide arrows & pagination */
+  .splide__arrows,
+  .splide__pagination { display: block; }
+
+  .splide__track { cursor: grab; }
+  .splide__track:active { cursor: grabbing; }
+
+  /* Center the Pagination */
+.splide__pagination {
+  display: flex;
+  justify-content: center;  /* This will center the pagination */
+  position: absolute; /* Make it positionable */
+  bottom: 10px;  /* Adjust this value to place the pagination where you want */
+  width: 100%; /* Make sure it spans across the entire slider width */
+  z-index: 10; /* Ensure it's above the slides */
+  transition: none !important;  /* Disable transition effects */
+}
+/* Pagination Circles in Splide */
+.splide__pagination__page {
+    width: 28px;
+    height: 4px;
+    border-radius: 0;
+    opacity: 0.3;
+    background: #999999;  /* Lighter color */
+    margin: 0 4px !important;
+    transform: none !important;  /* Prevent any transformation (like scaling) */
+}
+
+/* Active Pagination Item */
+.splide__pagination__page.is-active {
+    opacity: 1;
+    background: #000; /* Darker color when active */
+}
+/* ----------------------------------------------------
+   RESPONSIVENESS
+---------------------------------------------------- */
+@media (max-width: 767px) {
+    .img-left-text .text-block,
+    .img-left-text .swiper-block {
+        width: 100%;
+        padding-bottom: 0;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="video-wrapper js-vertical-slider">
+  <div class="video-media-container">
+    <!-- Video Background (Desktop) -->
+    <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/the-emblem/dp-icon-a1.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Mobile Video -->
+    <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/the-emblem/dp-icon-a1_mobile.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="controls">
+      <button class="play is-playing">
+        <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+        <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+      </button>
+
+      <div class="timeline">
+        <div class="progressBar">
+          <div class="progressFill"></div>
+        </div>
+        <input class="seek" type="range" value="0" min="0" step="0.01">
+      </div>
+
+      <button class="mute">
+        <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+        <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+      </button>
+    </div>
+  </div>
+</div>
+    
+    <!-- Web -->
+    <section class="d-lg-block d-none d-md-none">
+        <div class="position-relative text-center" style ="margin: 100px 0px;">
+            <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; width:100%; margin: 0 auto; font-size:14px; text-align: center; line-height:33px;">
+                The Emblem
+            </p>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                The emblem is more than a symbol; it is the distilled expression of our ethos<br>
+                of connecting the wearer to the brand’s commitment to self-expression and infinite<br>
+                possibility. It is the intersection where modern design meets lasting craft.
+            </p>
+        </div>
+    </section>
+    <!-- Mobile -->
+    <section class="d-block d-md-none d-md-block d-none d-lg-none">
+        <div class="text-center" style ="margin: 100px 0px;">
+            <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; width:100%; margin: 0 auto; font-size:14x; text-align: center;line-height:33px;">
+                The Emblem
+            </p>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center;font-weight: 400;  line-height:normal;">
+                The emblem is more than a symbol;<br>
+                it is the distilled expression of our<br>
+                ethos of connecting the wearer to<br>
+                the brand’s commitment to self-<br>
+                expression and infinite possibility. It<br>
+                is the intersection where modern<br>
+                design meets lasting craft.
+            </p>
+        </div>
+    </section>
+
+
+    <picture>
+        <img alt="" class="d-md-block d-none" src="images/design-philosophy/the-emblem/dp-icon-b1.gif?$staticlink$" 
+            style="width: 50%; display: block; margin: auto;"/>
+        <img alt="" class="d-block d-md-none" src="images/design-philosophy/the-emblem/dp-icon-b1.gif?$staticlink$" 
+            style="width: 100%; display: block;"/>
+    </picture>
+
+
+    <!-- Web -->
+    <section class="d-lg-block d-none d-md-none">
+        <div class="position-relative text-center" style ="margin-top: 100px;">
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+              Meticulously balanced to signify equality and modern luxury, prominent parallel lines<br>
+              represent a constantly evolving brand that corresponds directly with its community,<br>
+              while a subtly placed infinity symbol expresses limitless creative possibilities<br>
+              for the future.
+            </p>
+        </div>
+    </section>
+    <!-- Mobile -->
+    <section class="d-block d-md-none d-md-block d-none d-lg-none">
+        <div class="text-center" style ="margin-top: 100px;">
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center;font-weight: 400;  line-height:normal;">
+              Meticulously balanced to signify equality<br>
+              and modern luxury, prominent parallel lines<br>
+              represent a constantly evolving brand that<br>
+              corresponds directly with its community,<br>
+              while a subtly placed infinity symbol expresses<br>
+              limitless creative possibilities for the future.
+            </p>
+        </div>
+    </section>
+
+    <picture>
+        <img alt="" class="d-md-block d-none" src="images/design-philosophy/the-emblem/dp-icon-c1.webp?$staticlink$" 
+            style="width: 100%; display: block; margin-top: 100px;"/>
+        <img alt="" class="d-block d-md-none" src="images/design-philosophy/the-emblem/dp-icon-c1-mobile.webp?$staticlink$" 
+            style="width: 100%; display: block; margin-top: 100px;"/>
+    </picture>
+
+
+    <section class="img-left-text" style ="margin: 50px 0px;">
+        <!-- SWIPER BLOCK -->
+        <div class="swiper-block">
+            <div class="slider-container">
+                <div class="splide" id="carouselExploreSlider1">
+                    <div class="splide__track">
+                        <ul class="splide__list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEFT TEXT BLOCK -->
+        <div class="text-block">
+            <div class="inner-text">
+                <!-- Web -->
+                <p class="d-md-block d-none mb-0 p-0 col-md-12 " style="font-family:proxima-nova; width:100%; margin: 0 auto; font-size:14px; text-align: center; line-height:33px;">
+                    Emblem Evolution
+                </p>
+                <!-- Mobile -->
+                <p class="d-block d-md-none mb-0 p-0 col-md-12 " style="font-family:proxima-nova; width:100%; margin: 50px auto 0; font-size:14px; text-align: center; line-height:33px;">
+                    Emblem Evolution
+                </p>
+                <!-- Web -->
+                <p class="d-md-block d-none mb-0" style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                    Far from static, the emblem integrates<br>
+                    seamlessly into the life of our designs. Its<br>
+                    evolution is characterized by its adaptation<br>
+                    across various forms, maintaining its core<br>
+                    identity while shifting in medium and motif.    
+                </p>
+                <!-- Mobile -->
+                <p class="d-block d-md-none mb-0" style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                    Far from static, the emblem integrates<br>
+                    seamlessly into the life of our designs.<br>
+                    Its evolution is characterized by its<br>
+                    adaptation across various forms,<br>
+                    maintaining its core identity while<br>
+                    shifting in medium and motif.
+                </p>
+            </div>
+        </div>
+    </section>
+
+<div class="video-wrapper ">
+  <div class="video-media-container">
+    <!-- Video Background (Desktop) -->
+    <video class="video d-md-block d-none" style="margin-top: 100px;" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/the-emblem/dp-icon-e1.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Mobile Video -->
+    <video class="video d-md-none d-block" style="margin-top: 100px;" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/the-emblem/dp-icon-e1_mobile.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="controls">
+      <button class="play is-playing">
+        <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+        <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+      </button>
+
+      <div class="timeline">
+        <div class="progressBar">
+          <div class="progressFill"></div>
+        </div>
+        <input class="seek" type="range" value="0" min="0" step="0.01">
+      </div>
+
+      <button class="mute">
+        <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+        <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+      </button>
+    </div>
+  </div>
+</div>
+    <!-- Web -->
+    <section class="d-lg-block d-none d-md-none">
+        <div class="position-relative text-center" style ="margin: 100px 0px;">
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center;font-weight: 400;  line-height:normal;">
+                At its core, this signature embodies the individual who embraces self-expression, a gestation of<br>
+                ideas and elements that brings out the wearer’s personal style. Born of and rooted in the sheer joy<br>
+                of creativity and assured individuality, it is woven in every design: to empower and be free.
+            </p>
+        </div>
+    </section>
+    <!-- Mobile -->
+    <section class="d-block d-md-none d-md-block d-none d-lg-none">
+        <div class="text-center" style ="margin: 100px 0px;">
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center;font-weight: 400;  line-height:normal;">
+                At its core, this signature embodies the individual who<br>
+                embraces self-expression, a gestation of ideas and<br>
+                elements that brings out the wearer’s personal style.<br>
+                Born of and rooted in the sheer joy of creativity and<br>
+                assured individuality, it is woven in every design: to<br>
+                empower and be free.
+            </p>
+        </div>
+    </section>
+
+
+    <p class="mt-3 mt-md-3 text-center text-md-left w-full ml-3" style="font-size: 30px; font-family: 'proxima-nova';">
+        Shop The Collection
+    </p>
+
+    <!-- Web -->
+    <div class="image-content2 d-md-flex d-none">
+        <a href="$url('Search-Show', 'cgid', 'pmnewarrivals')$"> 
+            <img src="images/design-philosophy/the-emblem/dp-icon-f1.webp?$staticlink$" alt="Bag">
+        </a>
+        <a href="$url('Search-Show', 'cgid', 'pwnewarrivals')$">   
+            <img src="images/design-philosophy/the-emblem/dp-icon-f2.webp?$staticlink$" alt="Bag">
+        </a>
+    </div>
+
+    <!-- Mobile -->
+    <div class="container-fluid d-block d-md-none px-0">
+        <!-- Top Image -->
+        <a href="$url('Search-Show', 'cgid', 'pmnewarrivals')$">  
+            <img 
+            src="images/design-philosophy/the-emblem/dp-icon-f1-mobile.webp?$staticlink$" 
+            alt="Top Image" 
+            class="img-fluid w-100"
+            />
+        </a>
+        <a href="$url('Search-Show', 'cgid', 'pwnewarrivals')$"> 
+            <!-- Bottom Image -->
+            <img 
+            src="images/design-philosophy/the-emblem/dp-icon-f2-mobile.webp?$staticlink$" 
+            alt="Bottom Image" 
+            class="img-fluid w-100"
+            />
+        </a>
+    </div>
+
+<script>
+function initVideoControls(scope = document) {
+
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+
+    const videos = container.querySelectorAll('.video');
+    if (!videos.length) return;
+
+    // Use the visible video (desktop/mobile)
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    // Set default volume
+    video.volume = 0.2;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+    const iconMute = container.querySelector('.icon-mute');
+    const iconUnmute = container.querySelector('.icon-unmute');
+
+    if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
+
+    // Remove any existing event listeners by cloning the buttons
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newMuteBtn = muteBtn.cloneNode(true);
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+    // Update references to the new buttons
+    const freshPlayBtn = container.querySelector('.play');
+    const freshMuteBtn = container.querySelector('.mute');
+    const freshIconMute = container.querySelector('.icon-mute');
+    const freshIconUnmute = container.querySelector('.icon-unmute');
+
+    // PLAY / PAUSE
+    freshPlayBtn.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        freshPlayBtn.classList.add('is-playing');
+        freshPlayBtn.classList.remove('is-paused');
+      } else {
+        video.pause();
+        freshPlayBtn.classList.add('is-paused');
+        freshPlayBtn.classList.remove('is-playing');
+      }
+    });
+
+    // MUTE
+    freshMuteBtn.addEventListener('click', () => {
+      video.muted = !video.muted;
+      freshIconMute.style.display = video.muted ? 'block' : 'none';
+      freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+    });
+
+    // PROGRESS UPDATE
+    video.addEventListener('timeupdate', () => {
+      const progress = video.currentTime / video.duration;
+      progressFill.style.transform = `scaleX(${progress})`;
+      seek.value = progress * 100;
+    });
+
+    // SEEK
+    seek.addEventListener('input', () => {
+      const percent = seek.value / 100;
+      video.currentTime = percent * video.duration;
+    });
+
+  });
+}
+
+// INIT ON PAGE LOAD
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+    function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      // Media
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline>
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}" ">`;
+      }
+
+      // Wrap in anchor
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      // Text below image (outside anchor)
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text" style="color:${slide.textcolor}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      gap: 5,
+      arrows: false,
+      padding: { left: '0rem', right: '6rem' },
+      breakpoints: {
+        1024: { perPage: 3 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+   
+
+    createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider1',
+    slides: [
+        { type: 'image', src: "images/design-philosophy/the-emblem/dp-icon-d1.webp?$staticlink$", alt: "Slide 1" },
+        { type: 'image', src: "images/design-philosophy/the-emblem/dp-icon-d2.webp?$staticlink$", alt: "Slide 2" },
+        { type: 'image', src: "images/design-philosophy/the-emblem/dp-icon-d3.webp?$staticlink$", alt: "Slide 3" },
+        { type: 'image', src: "images/design-philosophy/the-emblem/dp-icon-d4.webp?$staticlink$", alt: "Slide 4" }
+    ],
+    options: {
+      perPage: 1,
+      drag: true,
+      breakpoints: {
+        1024: { perPage: 1 },
+        640: { perPage: 1 },
+      },
+      pagination: true,
+      padding: { left: '0rem', right: '0rem' },
+      autoplay: true,
+      interval: 3000, // 3 seconds
+    }
+    });
+
+});
+</script>
+
+</body>
+
+</html>

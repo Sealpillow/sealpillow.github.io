@@ -1,0 +1,47 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* Video Wrap */
+.video-wrap {
+  background: #000;
+  display: block;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Video Wrap > Video */
+.video-wrap video {
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+</style>
+
+<div class="video-wrap js-vertical-slider">
+    <!-- Video Background (Desktop) -->
+    <video class="d-md-block d-none" id="myVideoDesktop" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="../../media/landscape_video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Mobile Video -->
+    <video class="d-md-none d-block" id="myVideoMobile" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="../../media/portrait_video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <!-- Slide Info with overlapping text -->
+    <div class="slide-info" style="position: absolute; bottom: 13px; left: 0;margin-left: 18px;">
+        <h5 style="color:white; margin-bottom: 5px">A NEW DIMENSION</h5>
+        <div class="discover-more" style="color:white;">
+            Discover more
+        </div>
+    </div>
+    <!-- Clickable overlay -->
+    <a href="$url('Page-Show', 'cid', 'a-new-dimension-this-fall-with-jatte')$"
+        data-content-analytic='{"contentId":"homepage-parallax-banner","contentType":"asset","itemId":"homepage-parallax-banner","link":"images/homepage/2025/13aug25/a1.jpg?$staticlink$","text":"Homepage Parallax Banner Desktop"}'
+        style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;text-decoration:none;">
+    </a>
+</div>

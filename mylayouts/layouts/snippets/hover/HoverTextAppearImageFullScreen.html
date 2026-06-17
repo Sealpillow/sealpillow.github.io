@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* P */
+p {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* Hover Box */
+.hover-box {
+  color: blue;
+  cursor: pointer;
+  position: relative;
+  z-index: 1001;
+}
+
+/* Hover Image */
+.hover-image {
+  display: none;
+  height: 100%;
+  left: 50%;
+  object-fit: cover;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  z-index: 1000;
+}
+
+/* Hover Box > Hover Image */
+.hover-box:hover + .hover-image {
+  display: block;
+}
+</style>
+</head>
+<body>
+  <p>
+    Hover this 
+    <span class="hover-box">word</span>
+    <img class="hover-image" src="https://picsum.photos/800/600?random=3" alt="Example image">
+    to reveal an image.
+  </p>
+</body>
+</html>

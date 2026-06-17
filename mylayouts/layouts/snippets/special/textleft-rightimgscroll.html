@@ -1,0 +1,241 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+/* Html > Body */
+html, body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Folder Header */
+.folder-header {
+  display: none;
+  visibility: hidden;
+}
+
+/* Folder_Post > Folder Container > Container */
+.folder_post .folder-container .container {
+  display: none;
+}
+
+/* Page > Parallax */
+.page.parallax {
+  padding-top: 0px !important;
+}
+
+/* Root */
+:root {
+  --header-height: 0px;
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  margin-top: var(--header-height);
+}
+
+/* Left Panel */
+.left-panel {
+  align-items: center;
+  background: #111;
+  box-sizing: border-box;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--header-height));
+  justify-content: center;
+  padding: 60px 40px;
+  position: sticky;
+  top: var(--header-height);
+  width: 35%;
+}
+
+/* Left Panel > H2 */
+.left-panel h2 {
+  font-size: 32px;
+  margin-bottom: 30px;
+}
+
+/* Image List */
+.image-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Image List > Li */
+.image-list li {
+  cursor: pointer;
+  font-size: 18px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Image List > Li */
+.image-list li:hover {
+  opacity: 1;
+  transform: translateX(6px);
+}
+
+/* Right Panel */
+.right-panel {
+  background: #f5f5f5;
+  box-sizing: border-box;
+  padding: 40px;
+  width: 65%;
+}
+
+/* Image Container */
+.image-container {
+  align-items: center;
+  display: flex;
+  height: 50vh;
+  justify-content: center;
+  margin: 40px 0px;
+  overflow: visible;
+  position: relative;
+}
+
+/* Image Container > Img */
+.image-container img {
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+  width: 50%;
+}
+
+/* Image Container > Img */
+.image-container.active img {
+  outline: 3px solid #000;
+  transition: outline 0.3s;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Layout */
+  .layout {
+    flex-direction: column;
+    margin-top: 0;
+  }
+
+  /* Left Panel */
+  .left-panel {
+    height: auto;
+    position: relative;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Right Panel */
+  .right-panel {
+    padding: 20px;
+    width: 100%;
+  }
+
+  /* Image Container */
+  .image-container {
+    align-items: center;
+    display: flex;
+    height: auto;
+    justify-content: center;
+    margin: 0;
+    overflow: visible;
+    position: relative;
+    width: 100vw;
+  }
+}
+
+/* Image List > Li */
+.image-list li.active {
+  color: #fff;
+  font-weight: 600;
+  opacity: 1;
+  transform: translateX(6px);
+}
+</style>
+
+
+    <div class="layout">
+
+    <!-- Left: list of image names -->
+    <div class="left-panel">
+        <h2>Looks</h2>
+        <ul class="image-list">
+        <li data-target="img1">Look 01 - Evening Gown</li>
+        <li data-target="img2">Look 02 - Tailored Suit</li>
+        <li data-target="img3">Look 03 - Silk Dress</li>
+        <li data-target="img4">Look 04 - Statement Coat</li>
+        <li data-target="img5">Look 05 - Casual Wear</li>
+        </ul>
+    </div>
+
+    <!-- Right: images with scroll-scale effect -->
+    <div class="right-panel">
+        <div class="image-container" id="img1"><img src="https://picsum.photos/800/1000?1" alt="Look 01"></div>
+        <div class="image-container" id="img2"><img src="https://picsum.photos/800/1000?2" alt="Look 02"></div>
+        <div class="image-container" id="img3"><img src="https://picsum.photos/800/1000?3" alt="Look 03"></div>
+        <div class="image-container" id="img4"><img src="https://picsum.photos/800/1000?4" alt="Look 04"></div>
+        <div class="image-container" id="img5"><img src="https://picsum.photos/800/1000?5" alt="Look 05"></div>
+    </div>
+    </div>
+
+    <script>
+    const items = document.querySelectorAll('.image-list li');
+    const blocks = document.querySelectorAll('.image-container');
+    const images = document.querySelectorAll('.image-container img');
+
+    // Hover → scroll to image (keep this)
+    items.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+        const targetId = item.getAttribute('data-target');
+        const targetEl = document.getElementById(targetId);
+
+        if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        });
+    });
+
+    function updateActiveStates() {
+        const centerY = window.innerHeight / 2;
+        let closestBlock = null;
+        let closestDistance = Infinity;
+
+        images.forEach((img, index) => {
+        const rect = img.getBoundingClientRect();
+        const imgCenterY = rect.top + rect.height / 2;
+        const distance = Math.abs(centerY - imgCenterY);
+
+        // scale effect
+        let scale = Math.cos((distance / centerY) * (Math.PI / 2));
+        scale = Math.max(0.5, scale);
+        img.style.transform = `scale(${scale})`;
+
+        // find closest image to center
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestBlock = blocks[index];
+        }
+        });
+
+        // clear active states
+        blocks.forEach(b => b.classList.remove('active'));
+        items.forEach(i => i.classList.remove('active'));
+
+        // activate matching image + text
+        if (closestBlock) {
+        closestBlock.classList.add('active');
+        const id = closestBlock.id;
+        document.querySelector(`.image-list li[data-target="${id}"]`)
+            ?.classList.add('active');
+        }
+    }
+
+    window.addEventListener('scroll', updateActiveStates);
+    window.addEventListener('resize', updateActiveStates);
+
+    updateActiveStates();
+    </script>
+

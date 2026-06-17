@@ -1,0 +1,339 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  COMPONENT: Text + Slider Split — v2 (50/50, nested slider in text column)
+  SOURCE: unisex-landing-page-v2.html
+  PATTERN: .text-left-slider-right — big slider (50%) left | text column (50%) right
+  - Text column contains: heading + small inner slider + body text + link
+  - Big left slider: autoWidth, portrait(100%) + landscape video(100%), pagination dots
+  - Small right slider: autoWidth, portrait(50%) + landscape video(100%), custom SVG arrows
+  - Pagination: rectangular pill (28x4px), per-slide active color override (black slide 1, white slide 2)
+  - Text block background: #FAFAFA, left-aligned text, padding 10% 3%
+-->
+
+<!-- CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<style>
+/* Text Left Slider Right */
+.text-left-slider-right {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* Text Left Slider Right > Text Block */
+.text-left-slider-right .text-block {
+  background: #FAFAFA;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  justify-content: center;
+  padding: 10% 3%;
+  text-align: left;
+  width: 50%;
+}
+
+/* Slider Block */
+.slider-block {
+  height: auto;
+  position: relative;
+  width: 50%;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Text Left Slider Right */
+  .text-left-slider-right {
+    gap: 100px;
+  }
+
+  /* Text Left Slider Right > Text Block > Slider Block */
+  .text-left-slider-right .text-block,
+    .text-left-slider-right .slider-block {
+    width: 100%; padding-bottom: 0;
+  }
+}
+
+/* Slider Container > Splide > Splide__Track > Splide__List > Splide__Slide */
+.slider-container,
+  .splide,
+  .splide__track,
+  .splide__list,
+  .splide__slide {
+  height: 100%;
+}
+
+/* Slide Content */
+.slide-content {
+  width: 100%; height: 100%;
+}
+
+/* Slide Content > Picture > Img > Video */
+.slide-content picture,
+  .slide-content img,
+  .slide-content video {
+  clip-path: fill-box;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Splide__Arrows */
+.splide__arrows {
+  display: none;
+}
+
+/* Splide__Pagination */
+.splide__pagination {
+  display: block;
+}
+
+/* Splide__Pagination */
+.splide__pagination {
+  bottom: 20px !important;
+  display: flex;
+  justify-content: right;
+  position: absolute;
+  right: 2.5rem;
+  transition: none !important;
+  width: 100%;
+  z-index: 10;
+}
+
+/* Splide__Pagination__Page */
+.splide__pagination__page {
+  background: #999999;
+  border: none !important;
+  border-radius: 0;
+  height: 4px;
+  margin: 0 4px !important;
+  opacity: 0.3;
+  outline: none;
+  transform: none !important;
+  width: 28px;
+}
+
+/* Splide__Pagination__Page > Focus Visible */
+.splide__pagination__page:focus,
+  .splide__pagination__page:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Splide__Pagination__Page > Is Active */
+.splide__pagination__page.is-active {
+  opacity: 1;
+}
+
+/* Carouselslider1 > Splide__Pagination > Li > Nth Child > 1 > Splide__Pagination__Page > Is Active */
+#carouselSlider1 .splide__pagination li:nth-child(1) .splide__pagination__page.is-active {
+  background: black !important;
+}
+
+/* Carouselslider1 > Splide__Pagination > Li > Nth Child > 2 > Splide__Pagination__Page > Is Active */
+#carouselSlider1 .splide__pagination li:nth-child(2) .splide__pagination__page.is-active {
+  background: white !important;
+}
+
+/* Splide__Arrow */
+.splide__arrow {
+  background: none;
+  border: none;
+  color: black;
+  font-size: 32px;
+  font-weight: bold;
+  height: auto;
+  padding: 0 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+}
+
+/* Splide__Arrow  Prev */
+.splide__arrow--prev {
+  left: -50px;
+}
+
+/* Splide__Arrow  Next */
+.splide__arrow--next {
+  right: -50px;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Splide__Arrow  Prev */
+  .splide__arrow--prev {
+    left: 5px;
+  }
+
+  /* Splide__Arrow  Next */
+  .splide__arrow--next {
+    right: 5px;
+  }
+}
+
+/* Splide__Track */
+.splide__track {
+  cursor: grab;
+}
+
+/* Splide__Track */
+.splide__track:active {
+  cursor: grabbing;
+}
+</style>
+
+<!-- SECTION: Big slider left / Text + small slider right -->
+<section class="text-left-slider-right">
+
+  <!-- BIG LEFT SLIDER -->
+  <div class="slider-block">
+    <div class="slider-container">
+      <div class="splide" id="carouselSlider1">
+        <div class="splide__track">
+          <ul class="splide__list"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN: text + small slider -->
+  <div class="text-block">
+    <p style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:left; font-weight:400; line-height:normal;">
+      Section Heading
+    </p>
+
+    <!-- SMALL INNER SLIDER -->
+    <div class="slider-container">
+      <div class="splide" id="carouselSlider2">
+        <div class="splide__track">
+          <ul class="splide__list"></ul>
+        </div>
+        <div class="splide__arrows">
+          <button class="splide__arrow splide__arrow--prev">
+            <svg width="24" height="24" viewBox="0 0 24 24">
+              <path d="M15 18l-6-6 6-6" stroke="black" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="splide__arrow splide__arrow--next">
+            <svg width="24" height="24" viewBox="0 0 24 24">
+              <path d="M9 6l6 6-6 6" stroke="black" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEXT BELOW INNER SLIDER -->
+    <div class="inner-text">
+      <p class="d-md-block d-none mb-0" style="font-family:proxima-nova; font-size:14px; text-align:left; font-weight:400; line-height:normal;">
+        Body copy goes here. Lorem ipsum is simply dummy text of the printing industry.
+      </p>
+      <br><br>
+      <a href="$url('Page-Show','cid','page-id')$" style="text-decoration:underline; color:#999;" target="_blank">
+        Discover More
+      </a>
+    </div>
+  </div>
+
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+      if (slide.width) li.style.width = slide.width;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline>
+            ${slide.srcMobile ? `<source src="${slide.srcMobile}" media="(max-width: 768px)" type="video/mp4">` : ''}
+            <source src="${slide.srcDesktop || slide.src}" type="video/mp4">
+          </video>`;
+      } else {
+        mediaHtml = `
+          <picture>
+            ${slide.srcMobile ? `<source media="(max-width: 768px)" srcset="${slide.srcMobile}">` : ''}
+            <img src="${slide.srcDesktop || slide.src}" alt="${slide.alt || ''}">
+          </picture>`;
+      }
+
+      let content = slide.url ? `<a href="${slide.url}">${mediaHtml}</a>` : mediaHtml;
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'left',
+      gap: 5,
+      autoWidth: true,
+      breakpoints: { 640: { autoWidth: false, perPage: 1 } },
+      ...options,
+    }).mount();
+  }
+
+  /* ======== BIG LEFT SLIDER — perPage 1, pagination on ======== */
+  createSplideSliderCarousel({
+    sliderId: 'carouselSlider1',
+    slides: [
+      {
+        type: 'image', alt: 'Slide 1', width: '100%',
+        srcDesktop: '../../media/portrait.jpg',
+        srcMobile: '../../media/portrait.jpg',
+        url: "$url('Product-Show','pid','PRODUCT-ID')$",
+      },
+      {
+        type: 'video', alt: 'Slide 2', width: '100%',
+        srcDesktop: '../../media/scrub-video-landscape.mp4',
+        srcMobile:  '../../media/scrub-video-portrait.mp4',
+        url: "$url('Product-Show','pid','PRODUCT-ID')$",
+      },
+    ],
+    options: { pagination: true, arrows: false },
+  });
+
+  /* ======== SMALL RIGHT SLIDER — mixed widths, arrows on ======== */
+  createSplideSliderCarousel({
+    sliderId: 'carouselSlider2',
+    slides: [
+      {
+        type: 'image', alt: 'Slide 1', width: '50%',
+        srcDesktop: '../../media/portrait.jpg',
+        srcMobile: '../../media/portrait.jpg',
+        url: "$url('Product-Show','pid','PRODUCT-ID')$",
+      },
+      {
+        type: 'video', alt: 'Slide 2', width: '100%',
+        srcDesktop: '../../media/scrub-video-landscape.mp4',
+        srcMobile:  '../../media/scrub-video-landscape.mp4',
+        url: "$url('Product-Show','pid','PRODUCT-ID')$",
+      },
+      {
+        type: 'image', alt: 'Slide 3', width: '50%',
+        srcDesktop: '../../media/portrait.jpg',
+        srcMobile: '../../media/portrait.jpg',
+        url: "$url('Product-Show','pid','PRODUCT-ID')$",
+      },
+    ],
+    options: { pagination: false, arrows: true },
+  });
+
+});
+</script>

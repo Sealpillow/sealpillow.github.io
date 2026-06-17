@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --cream: #f5f0e8;
+    --bone: #ede8dc;
+    --ink: #1a1714;
+    --charcoal: #2e2a26;
+    --gold: #b89a6a;
+    --muted: #7a7268;
+    --rule: rgba(26, 23, 20, 0.12);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bone); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 0; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--charcoal); }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(245, 240, 232, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 56px;
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .nav-link {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--gold);
+  }
+
+  .nav-count {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .site-header {
+    position: relative;
+    padding: 80px 60px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-bottom: 1px solid var(--rule);
+    animation: fadeDown 1.2s ease both;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+
+  .site-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    line-height: 0.9;
+    color: var(--ink);
+  }
+
+  .site-title em {
+    font-style: italic;
+    color: var(--charcoal);
+  }
+
+  .header-rule {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 36px auto 24px;
+  }
+
+  .site-subtitle {
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .intro-panel {
+    padding: 28px 60px 0;
+    animation: fadeUp 1s ease 0.15s both;
+  }
+
+  .intro-shell {
+    border: 1px solid var(--rule);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(10px);
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  }
+
+  .intro-copy,
+  .intro-meta {
+    padding: 28px 32px;
+  }
+
+  .intro-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-right: 1px solid var(--rule);
+  }
+
+  .section-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .intro-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+
+  .intro-text {
+    max-width: 58ch;
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    line-height: 1.9;
+    color: var(--charcoal);
+  }
+
+  .intro-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 22px;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .meta-kicker {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .meta-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .meta-note {
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .grid-wrapper {
+    padding: 36px 60px 60px;
+    animation: fadeUp 1s ease 0.3s both;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .project-card {
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+  }
+
+  .project-card:hover {
+    box-shadow: 0 20px 60px rgba(26, 23, 20, 0.14);
+    transform: translateY(-3px);
+    z-index: 2;
+  }
+
+  .card-index {
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .project-card:hover .card-index {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .iframe-wrap {
+    position: relative;
+    width: 100%;
+    height: 480px;
+    overflow: hidden;
+  }
+
+  .preview-frame {
+    width: 200%;
+    height: 200%;
+    border: none;
+    transform: scale(0.5);
+    transform-origin: top left;
+    pointer-events: none;
+    display: block;
+    transition: filter 0.5s ease;
+  }
+
+  .iframe-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(245, 240, 232, 0.04) 12%, rgba(245, 240, 232, 0.64) 100%);
+    transition: opacity 0.4s ease;
+  }
+
+  .project-card:hover .iframe-veil {
+    opacity: 0;
+  }
+
+  .project-card:hover .preview-frame {
+    filter: saturate(1.02) contrast(1.02);
+  }
+
+  .card-footer {
+    padding: 20px 24px 22px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    background: #fff;
+  }
+
+  .card-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    color: var(--ink);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-url {
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-url:hover {
+    color: var(--ink);
+  }
+
+  .feature-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .feature-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .feature-tag--media {
+    border: 1px solid #b88d3b;
+    background: #fff4dd;
+    color: #7d5a12;
+  }
+
+  .feature-tag--layout {
+    border: 1px solid #7f776b;
+    background: #f0ebe3;
+    color: #4f473d;
+  }
+
+  .feature-tag--interaction {
+    border: 1px solid #b56a2f;
+    background: #fff0e3;
+    color: #8a4313;
+  }
+
+  .feature-tag--logic {
+    border: 1px solid #647856;
+    background: #edf5e8;
+    color: #3f5333;
+  }
+
+  .feature-tag--story {
+    border: 1px solid #9e5a4a;
+    background: #fbe9e4;
+    color: #743626;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    color: var(--muted);
+  }
+
+  .btn-icon:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(184, 154, 106, 0.06);
+  }
+
+  .btn-icon svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .btn-open {
+    padding: 0 18px;
+    height: 36px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink);
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .btn-open:hover {
+    background: var(--ink);
+    color: var(--cream);
+  }
+
+  .project-card:focus-visible,
+  .btn-icon:focus-visible,
+  .btn-open:focus-visible,
+  .nav-link:focus-visible,
+  .footer-about:focus-visible,
+  .lb-btn:focus-visible {
+    outline: 1px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(20, 18, 15, 0.96);
+    flex-direction: column;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .lightbox.active {
+    display: flex;
+  }
+
+  .lightbox-header {
+    flex-shrink: 0;
+    height: 64px;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .lightbox-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: var(--cream);
+    font-style: italic;
+  }
+
+  .lightbox-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .lb-btn {
+    padding: 8px 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .lb-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .lb-btn.close {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .lb-btn.close:hover {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+  }
+
+  .fullscreen-frame {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: white;
+  }
+
+  .site-footer {
+    border-top: 1px solid var(--rule);
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+
+  .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .footer-about {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-about:hover {
+    color: var(--ink);
+  }
+
+  .footer-count {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .project-card:nth-child(1) { animation: fadeUp 0.6s ease 0.1s both; }
+  .project-card:nth-child(2) { animation: fadeUp 0.6s ease 0.15s both; }
+  .project-card:nth-child(3) { animation: fadeUp 0.6s ease 0.2s both; }
+  .project-card:nth-child(4) { animation: fadeUp 0.6s ease 0.25s both; }
+  .project-card:nth-child(5) { animation: fadeUp 0.6s ease 0.3s both; }
+  .project-card:nth-child(6) { animation: fadeUp 0.6s ease 0.35s both; }
+  .project-card:nth-child(7) { animation: fadeUp 0.6s ease 0.4s both; }
+  .project-card:nth-child(8) { animation: fadeUp 0.6s ease 0.45s both; }
+  .project-card:nth-child(n+9) { animation: fadeUp 0.6s ease 0.5s both; }
+
+  @media (max-width: 768px) {
+    .site-header { padding: 50px 24px 40px; }
+    .nav-bar { padding: 0 24px; }
+    .nav-left { gap: 20px; }
+    .intro-panel { padding: 24px 24px 0; }
+    .intro-shell { grid-template-columns: 1fr; }
+    .intro-copy { border-right: none; border-bottom: 1px solid var(--rule); }
+    .intro-copy, .intro-meta { padding: 22px 20px; }
+    .grid-wrapper { padding: 24px; }
+    .projects-grid { grid-template-columns: 1fr; gap: 2px; }
+    .card-footer { flex-direction: column; align-items: flex-start; }
+    .card-actions { width: 100%; justify-content: space-between; }
+    .site-footer { padding: 30px 24px; flex-direction: column; gap: 12px; text-align: center; }
+    .lightbox-header {
+      height: auto;
+      min-height: 64px;
+      padding: 16px 20px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .lightbox-controls { width: 100%; flex-wrap: wrap; }
+    .footer-right { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav-bar">
+  <div class="nav-left">
+    <span class="nav-logo">Portfolio</span>
+    <div class="nav-links">
+      <a href="../about.html" class="nav-link">About</a>
+      <a href="./" class="nav-link active">Work</a>
+    </div>
+  </div>
+  <span class="nav-count" id="navCount"></span>
+</nav>
+
+<header class="site-header">
+  <div class="eyebrow">Selected Works</div>
+  <h1 class="site-title">My <em>Portfolio</em></h1>
+  <div class="header-rule"></div>
+  <p class="site-subtitle">A curated collection of HTML projects</p>
+</header>
+
+<section class="intro-panel" aria-label="Portfolio overview">
+  <div class="intro-shell">
+    <div class="intro-copy">
+      <span class="section-label">Overview</span>
+      <h2 class="intro-heading">Selected HTML work across campaign pages, editorial layouts, and user-facing digital builds.</h2>
+      <p class="intro-text">
+        This portfolio brings together a curated set of front-end work that reflects my experience in responsive layout, multimedia presentation,
+        interaction patterns, and implementation detail. The selection includes projects that vary in format and complexity, from campaign storytelling
+        pages to more feature-driven digital experiences.
+      </p>
+    </div>
+    <div class="intro-meta">
+      <div class="meta-item">
+        <span class="meta-kicker">Format</span>
+        <span class="meta-value">HTML</span>
+        <span class="meta-note">Independent pages</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-kicker">Focus</span>
+        <span class="meta-value">Editorial</span>
+        <span class="meta-note">Brand storytelling</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-kicker">View</span>
+        <span class="meta-value">Grid</span>
+        <span class="meta-note">Quick comparison</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-kicker">Access</span>
+        <span class="meta-value">Preview</span>
+        <span class="meta-note">Fullscreen or new tab</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="grid-wrapper">
+  <div class="projects-grid" id="projectsGrid"></div>
+</main>
+
+<footer class="site-footer">
+  <span class="footer-mark">Portfolio - Selected Works</span>
+  <div class="footer-right">
+    <a href="../about.html" class="footer-about">About Me -></a>
+    <span class="footer-count" id="footerCount"></span>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-header">
+    <span class="lightbox-title" id="lightboxTitle"></span>
+    <div class="lightbox-controls">
+      <button class="lb-btn" id="lbNewTab" type="button">Open in New Tab -></button>
+      <button class="lb-btn close" type="button" onclick="closeLightbox()">Close</button>
+    </div>
+  </div>
+  <iframe class="fullscreen-frame" id="lightboxFrame" title="Project preview"></iframe>
+</div>
+
+<script>
+  const projects = [
+    {
+      title: "Material Story",
+      file: "editorials/material-story.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Swiper", type: "interaction" },
+        { label: "Dropdown", type: "interaction" },
+        { label: "Editorial Layout", type: "layout" }
+      ]
+    },
+    {
+      title: "Design Philosophy - Demi",
+      file: "editorials/design-philosophy-demi.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Swiper", type: "interaction" },
+        { label: "Dropdown", type: "interaction" },
+        { label: "Responsive Layout", type: "layout" },
+        { label: "Art Direction", type: "story" }
+      ]
+    },
+    {
+      title: "Versatility in One - III",
+      file: "editorials/versatility-in-one-v3.html",
+      live: "",
+      features: [
+        { label: "Multimedia", type: "media" },
+        { label: "Nested Dropdowns", type: "interaction" },
+        { label: "Responsive Positioning", type: "layout" },
+        { label: "Layout System", type: "layout" }
+      ]
+    },
+    {
+      title: "The Art of Perspective",
+      file: "editorials/the-art-of-perspective-season-that-remembers.html",
+      live: "",
+      features: [
+        { label: "Video Sequence", type: "media" },
+        { label: "Hover Composition", type: "interaction" },
+        { label: "Positioning", type: "layout" },
+        { label: "Storytelling", type: "story" }
+      ]
+    },
+    {
+      title: "In Conversation - Carlotta Scholz",
+      file: "editorials/in-conversation-with-carlotta-scholz.html",
+      live: "",
+      features: [
+        { label: "Interview Format", type: "story" },
+        { label: "Splide", type: "interaction" },
+        { label: "Slider Build", type: "interaction" },
+        { label: "Mobile Adaptation", type: "layout" }
+      ]
+    },
+    {
+      title: "Meet the Pedro Sidekicks",
+      file: "editorials/meet-the-pedro-sidekicks.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Mixed Media", type: "media" },
+        { label: "Responsive Layout", type: "layout" },
+        { label: "Editorial Flow", type: "story" }
+      ]
+    },
+    {
+      title: "ARI SG Exclusive - Spirit of the Island",
+      file: "editorials/ari-sg-exclusive-spirit-of-the-island.html",
+      live: "",
+      features: [
+        { label: "Scroll Video", type: "media" },
+        { label: "Fixed Positioning", type: "layout" },
+        { label: "Desktop-Mobile Variants", type: "layout" },
+        { label: "Art Direction", type: "story" }
+      ]
+    },
+    {
+      title: "Spring '26 - The New Cult Classic",
+      file: "editorials/spring-26-the-new-cult-classic.html",
+      live: "",
+      features: [
+        { label: "Campaign Layout", type: "layout" },
+        { label: "Responsive Sections", type: "layout" },
+        { label: "Side-by-Side Composition", type: "layout" },
+        { label: "Editorial Story", type: "story" }
+      ]
+    },
+    {
+      title: "Of Myth and Memory - LNY 26",
+      file: "editorials/of-myth-and-memory-lny-26.html",
+      live: "",
+      features: [
+        { label: "Narrative Layout", type: "layout" },
+        { label: "Responsive Composition", type: "layout" },
+        { label: "Image Sequencing", type: "story" },
+        { label: "Campaign Story", type: "story" }
+      ]
+    },
+    {
+      title: "Design Philosophy",
+      file: "editorials/design-philosophy.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Dropdown", type: "interaction" },
+        { label: "Editorial Layout", type: "layout" }
+      ]
+    },
+    {
+      title: "Design Philosophy - Horseprint",
+      file: "editorials/design-philosophy-horseprint.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Dropdown", type: "interaction" },
+        { label: "Art Direction", type: "story" }
+      ]
+    },
+    {
+      title: "Design Philosophy - Jatte",
+      file: "editorials/design-philosophy-jatte.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Dropdown", type: "interaction" },
+        { label: "Hover", type: "interaction" }
+      ]
+    },
+    {
+      title: "Design Philosophy - Novo",
+      file: "editorials/design-philosophy-novo.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Dropdown", type: "interaction" },
+        { label: "Hover", type: "interaction" }
+      ]
+    },
+    {
+      title: "Design Philosophy - The Emblem",
+      file: "editorials/design-philosophy-the-emblem.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Art Direction", type: "story" }
+      ]
+    },
+    {
+      title: "Echoes of Glamour",
+      file: "editorials/echoes-of-glamour.html",
+      live: "",
+      features: [
+        { label: "Splide", type: "interaction" },
+        { label: "Campaign Layout", type: "layout" },
+        { label: "Editorial Story", type: "story" }
+      ]
+    },
+    {
+      title: "Gifts for Her",
+      file: "editorials/gifts-for-her.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Hover", type: "interaction" },
+        { label: "Editorial Layout", type: "layout" }
+      ]
+    },
+    {
+      title: "Gifts for Him",
+      file: "editorials/gifts-for-him.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Hover", type: "interaction" },
+        { label: "Editorial Layout", type: "layout" }
+      ]
+    },
+    {
+      title: "Pedro Opens at Grand Indonesia",
+      file: "editorials/pedro-opens-at-grand-indonesia.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Campaign Layout", type: "layout" },
+        { label: "Brand Story", type: "story" }
+      ]
+    },
+    {
+      title: "Summer - Demi Pastel Edition",
+      file: "editorials/summer-demi-pastel-edition.html",
+      live: "",
+      features: [
+        { label: "Scroll Animation", type: "interaction" },
+        { label: "Editorial Layout", type: "layout" },
+        { label: "Campaign Story", type: "story" }
+      ]
+    },
+    {
+      title: "Versatility in One - IV",
+      file: "editorials/versality-in-one-v4.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Dropdown", type: "interaction" },
+        { label: "Responsive Layout", type: "layout" }
+      ]
+    },
+    {
+      title: "Versatility in One - I",
+      file: "editorials/versatility-in-one-v1.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Dropdown", type: "interaction" },
+        { label: "Hover", type: "interaction" }
+      ]
+    },
+    {
+      title: "Versatility in One - II",
+      file: "editorials/versatility-in-one-v2.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Splide", type: "interaction" },
+        { label: "Dropdown", type: "interaction" },
+        { label: "Hover", type: "interaction" }
+      ]
+    },
+    {
+      title: "Winter Textures of Thought",
+      file: "editorials/winter-textures-of-thought.html",
+      live: "",
+      features: [
+        { label: "Splide", type: "interaction" },
+        { label: "Scroll Animation", type: "interaction" },
+        { label: "Editorial Layout", type: "layout" },
+        { label: "Campaign Story", type: "story" }
+      ]
+    },
+    {
+      title: "Tom Butterworth on Materiality",
+      file: "editorials/tom-butterworth-on-materiality.html",
+      live: "",
+      features: [
+        { label: "Scroll Animation", type: "interaction" },
+        { label: "Interview Format", type: "story" },
+        { label: "Editorial Layout", type: "layout" }
+      ]
+    },
+    {
+      title: "The Splash - Summer '26",
+      file: "editorials/the-splash-summer26.html",
+      live: "",
+      features: [
+        { label: "Scroll Animation", type: "interaction" },
+        { label: "Campaign Layout", type: "layout" },
+        { label: "Editorial Story", type: "story" }
+      ]
+    },
+    {
+      title: "On the Move with Jones Backpack",
+      file: "editorials/on-the-move-with-jones-backpack.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Hover", type: "interaction" },
+        { label: "Scroll Animation", type: "interaction" },
+        { label: "Product Story", type: "story" }
+      ]
+    },
+    {
+      title: "Future in Hand",
+      file: "editorials/future-in-hand.html",
+      live: "",
+      features: [
+        { label: "Video", type: "media" },
+        { label: "Hover", type: "interaction" },
+        { label: "Scroll Animation", type: "interaction" },
+        { label: "Campaign Layout", type: "layout" }
+      ]
+    },
+    {
+      title: "Metro Med",
+      file: "editorials/metro-med.html",
+      live: "",
+      features: [
+        { label: "Scroll Animation", type: "interaction" },
+        { label: "Editorial Layout", type: "layout" },
+        { label: "Product Story", type: "story" }
+      ]
+    },
+    {
+      title: "Customer Care",
+      file: "editorials/customer-care.html",
+      live: "",
+      features: [
+        { label: "Dropdown", type: "interaction" },
+        { label: "Hover", type: "interaction" },
+        { label: "Utility Layout", type: "layout" }
+      ]
+    }
+  ];
+
+  function openLightbox(index) {
+    const project = projects[index];
+    document.getElementById('lightboxTitle').textContent = project.title;
+    document.getElementById('lightboxFrame').src = project.file;
+    document.getElementById('lbNewTab').onclick = () => window.open(project.file, '_blank');
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.getElementById('lightboxFrame').src = '';
+    document.body.style.overflow = '';
+  }
+
+  function renderProjects() {
+    const grid = document.getElementById('projectsGrid');
+    const count = projects.length;
+    document.getElementById('navCount').textContent = `${count} Projects`;
+    document.getElementById('footerCount').textContent = `${count} Works`;
+
+    projects.forEach((project, index) => {
+      const num = String(index + 1).padStart(2, '0');
+      const card = document.createElement('article');
+      card.className = 'project-card';
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `Open preview for ${project.title}`);
+
+      card.addEventListener('click', () => openLightbox(index));
+      card.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openLightbox(index);
+        }
+      });
+
+      const liveLink = project.live
+        ? `<a class="card-url" href="${project.live}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${project.live.replace(/^https?:\/\//, '')}</a>`
+        : `<span class="card-url">Local preview</span>`;
+      const featureTags = (project.features || [])
+        .map(feature => {
+          const type = feature.type || 'layout';
+          const label = feature.label || '';
+          return `<span class="feature-tag feature-tag--${type}">${label}</span>`;
+        })
+        .join('');
+
+      card.innerHTML = `
+        <span class="card-index">${num}</span>
+        <div class="iframe-wrap">
+          <iframe class="preview-frame" src="${project.file}" loading="lazy" tabindex="-1" title="${project.title}"></iframe>
+          <div class="iframe-veil" aria-hidden="true"></div>
+        </div>
+        <div class="card-footer">
+          <div class="card-title-wrap">
+            <span class="card-title">${project.title}</span>
+            <div class="card-meta">
+              ${liveLink}
+              <div class="feature-tags">${featureTags}</div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-icon" type="button" aria-label="Open ${project.title} in fullscreen preview" onclick="event.stopPropagation(); openLightbox(${index})">
+              <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            </button>
+            <button class="btn-open" type="button" onclick="event.stopPropagation(); window.open('${project.file}', '_blank')">Open -></button>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+  }
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      closeLightbox();
+    }
+  });
+
+  document.getElementById('lightbox').addEventListener('click', event => {
+    if (event.target.id === 'lightbox') {
+      closeLightbox();
+    }
+  });
+
+  renderProjects();
+</script>
+</body>
+</html>

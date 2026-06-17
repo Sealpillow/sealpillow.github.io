@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+/* ----------------------------------------------------
+  GLOBAL RESET & BASE
+  ---------------------------------------------------- */
+  html, body {
+      overflow-x: hidden;
+      color: black;
+      text-wrap: pretty;
+      height: auto;
+      margin: 0;
+      padding: 0;
+  }
+  .page.parallax {
+      padding-top: 0px !important;
+  }
+
+
+
+  /* Hide folder headers (SiteGenesis leftover) */
+  .folder-header,
+  .folder_post .folder-container .container {
+      display: none !important;
+  }
+  /* Redirect links container in a single row */
+  .section-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px; /* Space between the links */
+      font-size: 14px;
+      font-family: proxima-nova;
+  }
+  /* Default link style */
+  .section-links .link {
+    color: #999999;
+    text-decoration: none;
+  }
+
+  /* Active link style */
+  .section-links .link.active {
+    color: black;
+  }
+
+/* Utility */
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+  /* ----------------------------------------------------
+  VIDEO BLOCK
+  ---------------------------------------------------- */
+.video-wrapper {
+    position: relative;
+    display: block;
+    max-width: 100%;
+    background: #000;
+}
+.video-media-container video {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+  }
+
+video:focus, 
+.controls button:focus {
+    outline: none;
+}
+  video, image {
+    clip-path: fill-box; 
+  }
+.controls {
+  position: absolute;
+  bottom: 1rem;
+  width: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.controls button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.controls button img {
+  display: block;
+}
+.icon-play, .icon-pause {
+  width: 12px;
+  height: 24px;
+}
+.icon-mute, .icon-unmute {
+  width: 12px;
+  height: 12px;
+}
+.controls .mute {
+  transform: translateY(-1.5px); /* tweak: -1px to -4px */
+}
+/* play / pause icons */
+.icon-pause { display: none; }
+.play.is-playing .icon-play { display: none; }
+.play.is-playing .icon-pause { display: inline; }
+.play.is-paused .icon-play {display: inline;}
+.play.is-paused .icon-pause {display: none;}
+
+.timeline {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+/* SMOOTH PROGRESS BAR */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  background: white;
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+
+/* invisible seek input */
+.seek {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+  /* ----------------------------------------------------
+  IMAGE BLOCKS
+  ---------------------------------------------------- */
+
+  /* Style each video */
+  .video-container video,
+  .video-container2 video {
+    width: 50%;            /* Video takes up 50% of the width */
+    height: auto;          /* Maintain aspect ratio */
+    display: block;        /* Remove inline gaps */
+    margin: 0 auto;
+    clip-path: fill-box; 
+  }
+
+  .video-container {
+    display: flex;
+    width: 100%;             /* Container takes 80% of the width */
+    height: auto;           /* Maintain aspect ratio */
+    margin: 0 auto;
+  }
+
+  .video-container2 {
+    display: flex;
+    width: 100%;            /* Container takes 100% of the width */
+    height: auto;           /* Maintain aspect ratio */
+    margin: 0 auto;
+  }
+
+  /* ----------------------------------------------------
+  LEFT TEXT + SWIPER LAYOUT
+  ---------------------------------------------------- */
+
+  .img-left-text {
+      display: flex;
+      align-items: center;
+  }
+
+  .img-left-text .image-block,
+  .img-left-text .text-block {
+      flex: 1;
+  }
+
+  /* Mobile: stack vertically */
+@media (max-width: 767px) {
+    .img-left-text {
+        flex-direction: column;
+    }
+
+}
+
+/* Nested Dropdown Header */
+.nested-dropdown {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center; /* This will vertically center the arrow and text */
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: proxima-nova;
+  font-weight: 500;
+  padding: 14px;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Dropdown Content */
+.nested-dropdown-content {
+  display: none;
+  text-align: left;
+  padding-bottom: 10px;
+}
+
+.nested-item {
+  font-size: 14.2px;
+  font-family: proxima-nova;
+  padding: 14px;
+  cursor: pointer;
+  color: #000;
+  align-items: flex-start;
+}
+
+.nested-item.active {
+  color: #000;
+  font-weight: 500;
+  display: none;
+}
+
+/* Media Query for Mobile */
+@media screen and (max-width: 767px) {
+  .section-links {
+    justify-content: center; /* Center on mobile */
+  }
+  
+  .nested-dropdown{
+    justify-content: center; /* Center nested dropdown on mobile */
+  }
+  .nested-dropdown-content{
+    text-align: center;
+  }
+}
+
+/* Arrow */
+.arrow {
+  width: 14px;
+  transition: transform 0.3s ease;
+  display: block;  /* Ensure it is treated as a block element for alignment */
+}
+
+.arrow.rotate {
+  transform: rotate(180deg);
+}
+.video-container2 img {
+  width: 50%;           /* image fills the link */
+  height: auto;
+  display: block;        /* remove inline gaps */
+  margin: 0 auto;
+}
+.video-container2 {
+  display: flex;
+  width: 100%;              /* Each image takes 50% of the width */
+  height: auto;            /* Maintain aspect ratio */
+  margin: 0 auto;
+}
+.video-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Desktop styles */
+.equal-height-container {
+  display: flex;
+  align-items: stretch;
+}
+
+.media-wrapper {
+  flex: 1;
+  display: flex;
+}
+
+.slider-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content img,
+  .slide-content video {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Text below each slide image, outside the image */
+  .slide-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10;
+  }
+  .slide-text h3 {
+    font-size: 14px;
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+  .slide-text p {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  /* Hide arrows & pagination */
+  .splide__arrows,
+  .splide__pagination { display: none; }
+
+  .splide__track { cursor: grab; }
+  .splide__track:active { cursor: grabbing; }
+
+  /* Style each image */
+  .horsebit-container1 img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .horsebit-container1 {
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .horsebit-container1 a {
+    position: relative;
+    flex: 1;
+    display: block;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .responsive-image1 {
+    width: 70%;
+    margin: 100px auto;
+    display: block;
+  }
+
+  @media (min-width: 768px) {
+    .responsive-image1 {
+      width: 20%;
+    }
+  }
+ /* Style each image */
+.side-by-side-3-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.side-by-side-3-container {
+  display: flex;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.side-by-side-3-container a {
+  position: relative;
+  flex: 1;
+  display: block;
+  text-align: center; /* Align text centered below image */
+  text-decoration: none;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Add text styles */
+.side-by-side-3-text-container {
+  color: black; /* Change to black for visibility */
+  font-family: 'proxima-nova';
+  line-height: normal;
+  padding: 10px 0; /* Adjust padding for spacing */
+}
+
+
+.side-by-side-3-text-container .side-by-side-3-bottom-text {
+  font-size: 20px;
+  text-align: left;
+  padding-left: 5%;
+}
+
+@media (max-width: 767px) {
+  .side-by-side-3-text-container .side-by-side-3-bottom-text{
+    text-align: center;
+    padding: 5%;
+  }
+  
+}
+
+/* Mobile styles */
+.mobile-container a {
+  position: relative;
+  display: block;
+  text-align: center; /* Align text centered below image */
+  text-decoration: none;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="video-wrapper js-vertical-slider">
+    <div class="video-media-container">
+        <!-- Video Background (Desktop) -->
+        <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+            style="width: 100%; object-fit: cover;">
+            <source src="images/versatility-in-one/main-a1.mp4?$staticlink$" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Mobile Video -->
+        <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+            style="width: 100%; object-fit: cover;">
+            <source src="images/versatility-in-one/main-a1_mobile.mp4?$staticlink$" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="controls">
+          <button class="play is-playing">
+              <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+              <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+          </button>
+
+          <div class="timeline">
+              <div class="progressBar">
+              <div class="progressFill"></div>
+              </div>
+              <input class="seek" type="range" value="0" min="0" step="0.01">
+          </div>
+
+          <button class="mute">
+              <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+              <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+          </button>
+        </div>
+    </div>
+</div>
+
+<section class="text-center" style="margin: 100px 0px;">
+    <!-- Versatility Text -->
+    <p class="mb-0 p-0 col-md-12" style="font-family:proxima-nova; font-size:14px; width:100%; margin: 0 auto; text-align: center; line-height:33px;">
+        Versatility In One
+    </p>
+    <br>
+    <!-- Desktop Version -->
+    <p class="mb-0 col-md-12 d-none d-lg-block" style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+        Proportions, materials, and construction work in balance, blending structure and ease.<br>
+        Crafted to move effortlessly between settings, the composition remains consistent yet ever adaptable.<br>
+        A single design language, translated into many expressions.
+    </p>
+    <!-- Mobile Version -->
+    <p class="mb-0 col-md-12 d-block d-lg-none" style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+        Proportions, materials, and construction<br>
+        work in balance, blending structure and<br>
+        ease. Crafted to move effortlessly<br>
+        between settings, the composition<br>
+        remains consistent yet ever adaptable.<br>
+        A single design language, translated into many expressions.
+    </p>
+    
+    <br><br>
+    <div class="section-links">
+        <a href="javascript:void(0);" class="link active" onclick="toggleContent('multiwaystyling', this)">MULTI-WAY STYLING</a>
+        <a href="javascript:void(0);" class="link" onclick="toggleContent('travel', this)">TRAVEL</a>
+    </div>
+</section>
+
+<!-- The MULTI-WAY STYLING Section -->
+<div id="sectionmultiwaystyling"  style="display: block;">
+  
+  <!-- Nested Dropdown -->
+  <div class="nested-dropdown" onclick="toggleNestedDropdown(this)">
+    <span class="nested-title">HORSEBIT SHOULDER BAG - RED</span>
+    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+  <div class="nested-dropdown-content">
+
+    <div class="nested-item active" onclick="selectNested('horsebit-shoulder-bag-red', this)">HORSEBIT SHOULDER BAG - RED</div>
+    <div class="nested-item" onclick="selectNested('horsebit-shoulder-bag-black', this)">HORSEBIT SHOULDER BAG - BLACK</div>
+    <div class="nested-item" onclick="selectNested('slouchy-two-way-carry-backpack', this)">SLOUCHY TWO-WAY CARRY BACKPACK</div>
+  </div>
+
+  <!-- Horsebit Shoulder Bag Red -->  
+  <div id="horsebit-shoulder-bag-red" style="display:block;">
+    <div class="horsebit-container1 d-md-flex d-none">
+      <!-- Top Image -->
+      <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+          <img alt="Top Image"  class="img-fluid w-100" loading="lazy"
+              src="images/versatility-in-one/multi-way-styling/horsebit-red-b1.webp?$staticlink$"/>
+      </a>
+    </div>
+
+    <div class="container-fluid d-block d-md-none px-0 mobile-container">
+        <!-- Top Image -->
+        <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+            <img alt="Top Image"  class="img-fluid w-100" loading="lazy"
+                src="images/versatility-in-one/multi-way-styling/horsebit-red-b1_mobile.webp?$staticlink$"/>
+        </a>
+    </div>
+    <!-- Web -->
+    <section class="d-lg-block d-none d-md-none">
+        <div class="position-relative text-center" style ="margin: 100px 0px;">
+            <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto;  text-align: center; line-height:33px;">
+                Horsebit Shoulder Bag
+            </p>
+            <br>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Softly structured, the bag adapts to how it is carried. The horsebit hardware can link or separate,<br>
+                allowing the form to shift quietly. In red, the silhouette shifts with movement, warm and present.
+            </p>
+            <br><br>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Three-way Styling: Handheld, Shoulder, Crossbody
+            </p>
+        </div>
+    </section>
+
+    <!-- Mobile -->
+    <section class="d-block d-md-none d-md-block d-none d-lg-none">
+        <div class="text-center" style ="margin: 100px 0px;">
+            <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto; text-align: center;line-height:33px;">
+                Horsebit Shoulder Bag
+            </p>
+            <br>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Softly structured, the bag adapts to how<br>
+                it is carried. The horsebit hardware can<br>
+                link or separate, allowing theform to<br>
+                shift quietly. In red, the silhouette<br>
+                shifts with movement,warm and present.
+            </p>
+            <br><br>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Three-way Styling: Handheld, Shoulder, Crossbody
+            </p>
+        </div>
+    </section>
+
+    <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+        <img src="images/versatility-in-one/multi-way-styling/horsebit-red-c1.webp?$staticlink$" alt="Example Image"class="responsive-image1" loading="lazy">
+    </a>
+    <div class="video-wrapper">
+        <div class="video-media-container">
+            <!-- Video Background (Desktop) -->
+            <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+                style="width: 100%; object-fit: cover;">
+                <source src="images/versatility-in-one/multi-way-styling/horsebit-red-d1.mp4?$staticlink$" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <!-- Mobile Video -->
+            <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+                style="width: 100%; object-fit: cover;">
+                <source src="images/versatility-in-one/multi-way-styling/horsebit-red-d1_mobile.mp4?$staticlink$" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="controls">
+              <button class="play is-playing">
+                  <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+                  <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+              </button>
+
+              <div class="timeline">
+                  <div class="progressBar">
+                  <div class="progressFill"></div>
+                  </div>
+                  <input class="seek" type="range" value="0" min="0" step="0.01">
+              </div>
+
+              <button class="mute">
+                  <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+                  <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+              </button>
+            </div>
+        </div>
+    </div>
+    <p class="mt-6 mt-md-6 text-center text-md-left w-full ml-3" style="font-size: 30px; font-family: 'proxima-nova';">
+        Three-Way Styling
+    </p>
+    <div class="side-by-side-3-container d-md-flex d-none">
+        <!-- Left Image -->
+        <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+            <img src="images/versatility-in-one/multi-way-styling/horsebit-red-e1.webp?$staticlink$" alt="Bag">
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Shoulder</div>
+            </div>
+        </a>
+        <!-- Middle Image -->
+        <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+            <img src="images/versatility-in-one/multi-way-styling/horsebit-red-e2.webp?$staticlink$" alt="Bag">
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Handheld</div>
+            </div>
+        </a>
+        <!-- Right Image -->
+        <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+            <img src="images/versatility-in-one/multi-way-styling/horsebit-red-e3.webp?$staticlink$" alt="Bag">
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Crossbody</div>
+            </div>
+        </a>
+        </div>
+
+        <div class="container-fluid d-block d-md-none px-0 mobile-container">
+            <!-- Top Image -->
+            <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+                <img 
+                src="images/versatility-in-one/multi-way-styling/horsebit-red-e1.webp?$staticlink$" 
+                alt="Top Image" 
+                class="img-fluid w-100"
+                />
+                <div class="side-by-side-3-text-container">
+                <div class="side-by-side-3-bottom-text">Shoulder</div>
+                </div>
+            </a>
+            <!-- Middle Image -->
+            <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+                <img 
+                src="images/versatility-in-one/multi-way-styling/horsebit-red-e2.webp?$staticlink$" 
+                alt="Top Image" 
+                class="img-fluid w-100"
+                />
+                <div class="side-by-side-3-text-container">
+                <div class="side-by-side-3-bottom-text">Handheld</div>
+                </div>
+            </a>
+            <!-- Bottom Image -->
+            <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+                <img 
+                src="images/versatility-in-one/multi-way-styling/horsebit-red-e3.webp?$staticlink$" 
+                alt="Bottom Image" 
+                class="img-fluid w-100"
+                />
+                <div class="side-by-side-3-text-container">
+                <div class="side-by-side-3-bottom-text">Crossbody</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+
+  <!-- Horsebit Shoulder Bag Black -->   
+  <div id="horsebit-shoulder-bag-black" style="display:none;">
+    <div class="horsebit-container1 d-md-flex d-none">
+      <!-- Top Image -->
+      <a href="$url('Product-Show', 'pid','PW2-75210189_BLACK')$">
+          <img alt="Top Image"  class="img-fluid w-100" loading="lazy"
+              src="images/versatility-in-one/multi-way-styling/horsebit-black-b1.webp?$staticlink$"/>
+      </a>
+    </div>
+
+    <div class="container-fluid d-block d-md-none px-0 mobile-container">
+        <!-- Top Image -->
+        <a href="$url('Product-Show', 'pid','PW2-75210189_BLACK')$">
+            <img alt="Top Image"  class="img-fluid w-100" loading="lazy"
+                src="images/versatility-in-one/multi-way-styling/horsebit-black-b1_mobile.webp?$staticlink$"/>
+        </a>
+    </div>
+    <!-- Web -->
+    <section class="d-lg-block d-none d-md-none">
+        <div class="position-relative text-center" style ="margin: 100px 0px;">
+            <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto;  text-align: center; line-height:33px;">
+                Horsebit Shoulder Bag
+            </p>
+            <br>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+              Composed and measured, black shifts subtly as the horsebit detail is detached. Lines and<br>
+              contours reveal themselves differently with movement and perspective.
+            </p>
+            <br><br>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Three-way Styling: Handheld, Shoulder, Crossbody
+            </p>
+        </div>
+    </section>
+
+    <!-- Mobile -->
+    <section class="d-block d-md-none d-md-block d-none d-lg-none">
+        <div class="text-center" style ="margin: 100px 0px;">
+            <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto; text-align: center;line-height:33px;">
+                Horsebit Shoulder Bag
+            </p>
+            <br>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+              Composed and measured, black shifts subtly as the<br>
+              horsebit detail is detached. Lines and contours reveal<br>
+              themselves differently with movement and perspective.  
+            </p>
+            <br><br>
+            <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Three-way Styling: Handheld, Shoulder, Crossbody
+            </p>
+        </div>
+    </section>
+
+    <a href="$url('Product-Show', 'pid','PW2-75210189_BLACK')$">
+        <img src="images/versatility-in-one/multi-way-styling/horsebit-black-c1.webp?$staticlink$" alt="Example Image"class="responsive-image1" loading="lazy">
+    </a>
+    <div class="video-wrapper">
+        <div class="video-media-container">
+            <!-- Video Background (Desktop) -->
+            <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+                style="width: 100%; object-fit: cover;">
+                <source src="images/versatility-in-one/multi-way-styling/horsebit-black-d1.mp4?$staticlink$" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <!-- Mobile Video -->
+            <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+                style="width: 100%; object-fit: cover;">
+                <source src="images/versatility-in-one/multi-way-styling/horsebit-black-d1_mobile.mp4?$staticlink$" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="controls">
+              <button class="play is-playing">
+                  <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+                  <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+              </button>
+
+              <div class="timeline">
+                  <div class="progressBar">
+                  <div class="progressFill"></div>
+                  </div>
+                  <input class="seek" type="range" value="0" min="0" step="0.01">
+              </div>
+
+              <button class="mute">
+                  <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+                  <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+              </button>
+            </div>
+        </div>
+    </div>
+    <p class="mt-6 mt-md-6 text-center text-md-left w-full ml-3" style="font-size: 30px; font-family: 'proxima-nova';">
+        Three-Way Styling
+    </p>
+    <div class="side-by-side-3-container d-md-flex d-none">
+        <!-- Left Image -->
+        <a href="$url('Product-Show', 'pid','PW2-75210189_BLACK')$">
+            <img src="images/versatility-in-one/multi-way-styling/horsebit-black-e1.webp?$staticlink$" alt="Bag">
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Shoulder</div>
+            </div>
+        </a>
+        <!-- Middle Image -->
+        <a href="$url('Product-Show', 'pid','PW2-75210189_BLACK')$">
+            <img src="images/versatility-in-one/multi-way-styling/horsebit-black-e2.webp?$staticlink$" alt="Bag">
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Crossbody</div>
+            </div>
+        </a>
+        <!-- Right Image -->
+        <a href="$url('Product-Show', 'pid','PW2-75210189_BLACK')$">
+            <img src="images/versatility-in-one/multi-way-styling/horsebit-black-e3.webp?$staticlink$" alt="Bag">
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Handheld</div>
+            </div>
+        </a>
+        </div>
+
+        <div class="container-fluid d-block d-md-none px-0 mobile-container">
+          <!-- Top Image -->
+          <a href="$url('Product-Show', 'pid','PW2-75210189_BLACK')$">
+              <img 
+              src="images/versatility-in-one/multi-way-styling/horsebit-black-e1.webp?$staticlink$" 
+              alt="Top Image" 
+              class="img-fluid w-100"
+              />
+              <div class="side-by-side-3-text-container">
+              <div class="side-by-side-3-bottom-text">Shoulder</div>
+              </div>
+          </a>
+          <!-- Middle Image -->
+          <a href="$url('Product-Show', 'pid','PW2-75210189_BLACK')$">
+              <img 
+              src="images/versatility-in-one/multi-way-styling/horsebit-black-e2.webp?$staticlink$" 
+              alt="Top Image" 
+              class="img-fluid w-100"
+              />
+              <div class="side-by-side-3-text-container">
+              <div class="side-by-side-3-bottom-text">Crossbody</div>
+              </div>
+          </a>
+          <!-- Bottom Image -->
+          <a href="$url('Product-Show', 'pid','PW2-75210189_BLACK')$">
+              <img 
+              src="images/versatility-in-one/multi-way-styling/horsebit-black-e3.webp?$staticlink$" 
+              alt="Bottom Image" 
+              class="img-fluid w-100"
+              />
+              <div class="side-by-side-3-text-container">
+              <div class="side-by-side-3-bottom-text">Handheld</div>
+              </div>
+          </a>
+        </div>
+    </div>
+
+
+    <!-- Slouchy Two-Way Carry Backpack --> 
+    <div id="slouchy-two-way-carry-backpack" style="display:none;">
+      <div class="horsebit-container1 d-md-flex d-none">
+        <!-- Top Image -->
+        <a href="$url('Product-Show', 'pid','PW2-85060009-1_BLK.FA')$">
+            <img alt="Top Image"  class="img-fluid w-100" loading="lazy"
+                src="images/versatility-in-one/multi-way-styling/slouchy-bag-b1.webp?$staticlink$"/>
+        </a>
+      </div>
+
+      <div class="container-fluid d-block d-md-none px-0 mobile-container">
+          <!-- Top Image -->
+          <a href="$url('Product-Show', 'pid','PW2-85060009-1_BLK.FA')$">
+              <img alt="Top Image"  class="img-fluid w-100" loading="lazy"
+                  src="images/versatility-in-one/multi-way-styling/slouchy-bag-b1_mobile.webp?$staticlink$"/>
+          </a>
+      </div>
+      <!-- Web -->
+      <section class="d-lg-block d-none d-md-none">
+          <div class="position-relative text-center" style ="margin: 100px 0px;">
+              <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto;  text-align: center; line-height:33px;">
+                  Slouchy Two-Way Carry Backpack
+              </p>
+              <br>
+              <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Cinched or opened, the backpack transforms in volume while holding its shape where it matters.<br>
+                Slouch and structure coexist naturally, letting the form respond to use and context with ease.
+              </p>
+              <br><br>
+              <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Two-way Styling: Backpack, Shoulder
+              </p>
+          </div>
+      </section>
+
+      <!-- Mobile -->
+      <section class="d-block d-md-none d-md-block d-none d-lg-none">
+          <div class="text-center" style ="margin: 100px 0px;">
+              <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto; text-align: center;line-height:33px;">
+                  Slouchy Two-Way Carry Backpack
+              </p>
+              <br>
+              <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Cinched or opened, the backpack transforms in volume while holding its shape where it matters.<br>
+                Slouch and structure coexist naturally, letting the form respond to use and context with ease.
+              </p>
+              <br><br>
+              <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+                Two-way Styling: Backpack, Shoulder
+              </p>
+          </div>
+      </section>
+
+      <a href="$url('Product-Show', 'pid','PW2-85060009-1_BLK.FA')$">
+          <img src="images/versatility-in-one/multi-way-styling/slouchy-bag-c1.webp?$staticlink$" alt="Example Image"class="responsive-image1" loading="lazy">
+      </a>
+      <div class="video-wrapper">
+          <div class="video-media-container">
+              <!-- Video Background (Desktop) -->
+              <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+                  style="width: 100%; object-fit: cover;">
+                  <source src="images/versatility-in-one/multi-way-styling/slouchy-bag-d1.mp4?$staticlink$" type="video/mp4">
+                  Your browser does not support the video tag.
+              </video>
+
+              <!-- Mobile Video -->
+              <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+                  style="width: 100%; object-fit: cover;">
+                  <source src="images/versatility-in-one/multi-way-styling/slouchy-bag-d1_mobile.mp4?$staticlink$" type="video/mp4">
+                  Your browser does not support the video tag.
+              </video>
+              <div class="controls">
+                <button class="play is-playing">
+                    <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+                    <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+                </button>
+
+                <div class="timeline">
+                    <div class="progressBar">
+                    <div class="progressFill"></div>
+                    </div>
+                    <input class="seek" type="range" value="0" min="0" step="0.01">
+                </div>
+
+                <button class="mute">
+                    <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+                    <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+                </button>
+              </div>
+          </div>
+      </div>
+      <p class="mt-6 mt-md-6 text-center text-md-left w-full ml-3" style="font-size: 30px; font-family: 'proxima-nova';">
+          Two-Way Styling
+      </p>
+      <div class="side-by-side-3-container d-md-flex d-none">
+        <!-- Left Image -->
+        <a href="$url('Product-Show', 'pid','PW2-85060009-1_BLK.FA')$">
+            <img src="images/versatility-in-one/multi-way-styling/slouchy-bag-e1.webp?$staticlink$" alt="Bag">
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Backpack</div>
+            </div>
+        </a>
+        <!-- Right Image -->
+        <a href="$url('Product-Show', 'pid','PW2-85060009-1_BLK.FA')$">
+            <img src="images/versatility-in-one/multi-way-styling/slouchy-bag-e2.webp?$staticlink$" alt="Bag">
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Shoulder</div>
+            </div>
+        </a>
+      </div>
+
+      <div class="container-fluid d-block d-md-none px-0 mobile-container">
+        <!-- Top Image -->
+        <a href="$url('Product-Show', 'pid','PW2-85060009-1_BLK.FA')$">
+            <img 
+            src="images/versatility-in-one/multi-way-styling/slouchy-bag-e1_mobile.webp?$staticlink$" 
+            alt="Top Image" 
+            class="img-fluid w-100"
+            />
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Backpack</div>
+            </div>
+        </a>
+        <!-- Bottom Image -->
+        <a href="$url('Product-Show', 'pid','PW2-85060009-1_BLK.FA')$">
+            <img 
+            src="images/versatility-in-one/multi-way-styling/slouchy-bag-e2_mobile.webp?$staticlink$" 
+            alt="Bottom Image" 
+            class="img-fluid w-100"
+            />
+            <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Shoulder</div>
+            </div>
+        </a>
+      </div>
+    </div>
+
+
+  </div>
+
+</div>
+
+
+
+
+
+<!-- The Travel Section -->
+<div id="sectiontravel" style="display: none;">
+
+  <!-- Dropdown (Desktop and Mobile) -->
+  <div class="nested-dropdown">
+    <span class="nested-title">TRAVEL</span>
+  </div>
+  <!-- Nested Dropdown 
+  <div class="nested-dropdown" onclick="toggleNestedDropdown(this)">
+    <span class="nested-title">TRAVEL</span>
+    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+  <div class="nested-dropdown-content">
+    <div class="nested-item active" onclick="selectNested('travel1', this)">Travel 1</div>
+    <div class="nested-item" onclick="selectNested('travel2', this)">Travel 2</div>
+  </div> -->
+  <div id="travel1" style="display:block;">
+    <section style="align-items:center; display:flex; flex-wrap:wrap;">
+
+      <!-- DESKTOP: HORIZONTAL LAYOUT -->
+      <div class="d-none d-md-flex" style="width:100%; height:100%;">
+
+        <!-- LEFT: IMAGE (50%) -->
+        <div style="flex:0 0 50%; max-width:50%; padding:0; height:100%;">
+          <img src="images/versatility-in-one/travel/travel-b1.webp?$staticlink$" alt="Grano Leather"  loading="lazy"
+            style="width:100%; height:100%; object-fit:cover;">
+        </div>
+
+        <!-- RIGHT: VIDEO TOP + TEXT BELOW, CENTERED WITH EVEN PADDING -->
+        <div style="flex:0 0 50%; max-width:50%; display:flex; flex-direction:column; padding: 5%; justify-content:center; box-sizing:border-box;">
+
+          <!-- TOP VIDEO -->
+          <div style="width:80%; flex:1; display:flex; margin: 0 auto;" >
+            <video playsinline autoplay loop muted
+                  style="width:100%; height:100%; object-fit:contain;">
+              <source src="images/versatility-in-one/travel/travel-b2.mp4?$staticlink$" type="video/mp4">
+            </video>
+          </div>
+
+          <!-- BOTTOM TEXT -->
+          <div style="width: 100%; flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
+            <p class="mb-0"
+              style="font-family:proxima-nova; font-size:14px; font-weight:400; line-height:normal;">
+              More than just a collection, PEDRO’s Travel Series sparks a desire to explore with<br>
+              essentials crafted for moments of identity in transit and transience. Combining<br>
+              timeless aesthetics with cutting-edge functionality, each piece is built to last and<br>
+              adapt, whether for spontaneous city escapes or long-distance adventures. From<br>
+              versatile bags to sleek footwear, the collection offers travel companions designed<br>
+              for comfort, durability, and style—ready to take you wherever the road leads.
+            </p>
+          </div>
+
+        </div>
+
+        
+
+      </div>
+
+
+      <!-- MOBILE: VERTICAL LAYOUT -->
+      <div class="d-block d-md-none" style="width:100%; display:flex; flex-direction:column;">
+        <!-- IMAGE (Full width) -->
+        <div style="width:100%; height:50vh;">
+          <img src="images/versatility-in-one/travel/travel-b1.webp?$staticlink$" alt="Grano Leather" loading="lazy"
+              style="width:100%; height:100%; object-fit:cover;">
+        </div>
+
+        <!-- VIDEO (Full width) -->
+        <div style="width:100%; height:50vh;">
+          <video playsinline autoplay loop muted
+                style="width:100%; height:100%; object-fit:contain;">
+            <source src="images/versatility-in-one/travel/travel-b2.mp4?$staticlink$" type="video/mp4">
+          </video>
+        </div>
+
+        <!-- TEXT (Full width) -->
+        <div style="padding:30px; text-align:center; width:100%; margin: 0px auto 100px;">
+          <p class="mb-0"
+            style="font-family:proxima-nova; font-size:14px; font-weight:400; line-height:normal; margin-bottom:40px;">
+            More than just a collection, PEDRO’s Travel<br>
+            Series sparks adesire to explore with essentials<br>
+            crafted for moments of identity in transit <br>
+            and transience. Combining timeless aesthetics with <br>
+            cutting-edge functionality, each piece is built <br>
+            to last and adapt, whether for spontaneous city<br>
+            escapes or long-distance adventures. From versatile<br>
+            bags to sleek footwear, the collection offers travel<br>
+            companions designed for comfort, durability, and<br>
+            style—ready to take you wherever the road leads.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section style="align-items:center; display:flex; flex-wrap:wrap;">
+      <!-- DESKTOP: HORIZONTAL LAYOUT -->
+      <div class="d-none d-md-flex" style="width:100%; height:100%;">
+
+        <!-- LEFT: VIDEO TOP + TEXT BELOW, CENTERED WITH EVEN PADDING -->
+        <div style="flex:0 0 50%; max-width:50%; display:flex; flex-direction:column; justify-content:center; padding:10%; box-sizing:border-box;">
+
+          <!-- TOP VIDEO -->
+          <div style="width:80%; flex:1; display:flex; margin: 0 auto;" >
+            <video playsinline autoplay loop muted
+                  style="width:100%; height:100%; object-fit:contain;">
+              <source src="images/versatility-in-one/travel/travel-c1.mp4?$staticlink$" type="video/mp4">
+            </video>
+          </div>
+
+          <!-- BOTTOM TEXT -->
+          <div style="width: 100%; flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
+            <p class="mb-0"
+              style="font-family:proxima-nova; font-size:20px; font-weight:400; line-height:normal;">
+              Speaking to the spirit of exploration,<br>
+              one of the greatest virtues and character<br>
+              traits of the human mind.<br>
+            </p>
+          </div>
+        
+
+        </div>
+
+        <!-- RIGHT: IMAGE (50%) -->
+        <div style="flex:0 0 50%; max-width:50%; padding:0; height:100%;">
+          <video playsinline autoplay loop muted
+                style="width:100%; height:100%; object-fit:cover;">
+            <source src="images/versatility-in-one/travel/travel-c2.mp4?$staticlink$" type="video/mp4">
+          </video>
+        </div>
+
+      </div>
+
+
+      <!-- MOBILE: VERTICAL LAYOUT -->
+      <div class="d-block d-md-none" style="width:100%; display:flex; flex-direction:column;">
+        <!-- IMAGE (Full width) -->
+        <div style="width:100%; height:50vh;">
+          <video playsinline autoplay loop muted
+                style="width:100%; height:100%; object-fit:cover;">
+            <source src="images/versatility-in-one/travel/travel-c2.mp4?$staticlink$" type="video/mp4">
+          </video>
+        </div>
+
+        <!-- VIDEO (Full width) -->
+        <div style="width:100%;">
+          <video playsinline autoplay loop muted
+                style="width:60%; height:100%; object-fit:cover; margin: 100px auto 0px;">
+            <source src="images/versatility-in-one/travel/travel-c1.mp4?$staticlink$" type="video/mp4">
+          </video>
+        </div>
+
+        <!-- TEXT (Full width) -->
+        <div style="padding:30px; text-align:center; width:100%; margin: 0px auto 100px;">
+          <p class="mb-0"
+            style="font-family:proxima-nova; font-size:14px; font-weight:400; line-height:normal; margin-bottom:40px;">
+            Speaking to the spirit of exploration,<br>
+            one of the greatest virtues and character<br>
+            traits of the human mind.<br>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <p id="shopcollection" class="mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 35px; font-family: 'proxima-nova';">
+        Shop The Collection
+    </p>
+
+    <div class="slider-container">
+        <div class="splide" id="carouselExploreSlider1">
+            <div class="splide__track">
+                <ul class="splide__list"></ul>
+            </div>
+        </div>
+    </div>
+          
+
+    <div class="spacer"><div class="py-lg-4 mb-xl-1 py-xl-4 py-4"></div> </div>
+
+    <p class="mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 30px; font-family: 'proxima-nova';">
+      As Seen On
+    </p>
+
+    <section class="img-left-text" style="align-items:center;">
+      <!-- IMAGE BLOCK (LEFT) -->
+      <div class="image-block">
+          <!-- Web -->
+          <img src="images/versatility-in-one/travel/travel-e1.webp?$staticlink$" alt="Grano Leather" 
+          style="width:100%; height:100%; object-fit:contain;" loading="lazy">
+          <!-- Mobile -->
+      </div>
+
+
+      <!-- TEXT BLOCK (RIGHT) -->
+      <div class="text-block" >
+        <div class="inner-text">
+          <!-- Desktop title -->
+          <p class="d-md-block d-none mb-0 p-0 col-md-12" 
+            style="font-family:proxima-nova; width:100%; font-size:14px; margin:0 auto; text-align:center; line-height:33px;">
+            Adam Gallagher
+          </p>
+
+          <!-- Mobile title -->
+          <p class="d-block d-md-none mb-0 p-0 col-md-12 " 
+            style="font-family:proxima-nova; width:100%; font-size:14px; text-align:center; line-height:33px; margin:100px auto 0px;">
+            Adam Gallagher
+          </p>
+
+          <!-- Desktop body -->
+          <p class="d-md-block d-none mb-0" 
+            style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+            A seasoned traveller, Gallagher’s global perspective<br>
+            and commitment to thoughtful design perfectly align<br>
+            with PEDRO’s vision of balancing practicality and<br>
+            sophistication. Crafted to be staples for any journey<br>
+            and more than just a capsule, the collection comprises<br>
+            items for every travel need, designed to be used now<br>
+            and for many years to come—a constant in the ever-<br>
+            infinite search for the unexpected.
+          </p>
+
+          <!-- Mobile body -->
+          <p class="d-block d-md-none" 
+            style="font-family:proxima-nova; font-size:20px; width:100%; text-align:center; font-weight:400; line-height:normal;">
+              A seasoned traveller, Gallagher’s global<br>
+              perspective and commitment to<br>
+              thoughtful design perfectly align with<br>
+              PEDRO’s vision of balancing practicality<br>
+              and sophistication. Crafted to be<br>
+              staples for any journey and more than<br>
+              just a capsule, the collection comprises<br>
+              items for every travel need, designed<br>
+              to be used now and for many years to <br>
+              come—a constant in the ever-infinite<br>
+              search for the unexpected.
+            </p>
+          <br>
+          <!-- Desktop body -->
+          <a class="d-md-block d-none mb-0"  href="$url('Page-Show', 'cid', 'hardy-companion')$"
+            style="font-family:proxima-nova; font-size:14px; width:100%; margin:0 auto; text-align:center; font-weight:400; text-decoration: underline; line-height:normal;">
+            Discover The Full Story Here
+          </a>
+
+          <!-- Mobile body -->
+          <a class="d-block d-md-none " href="$url('Product-Show', 'pid','hardy-companion')$" 
+            style="font-family:proxima-nova; font-size:14px; width:100%; margin:0px auto 100px; text-align:center; font-weight:400; text-decoration: underline; line-height:normal;">
+              Discover The Full Story Here
+          </a>
+
+        </div>
+      </div>
+
+    </section>
+  </div>
+</div>
+
+
+
+
+<script>
+function initVideoControls(scope = document) {
+
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+
+    const videos = container.querySelectorAll('.video');
+    if (!videos.length) return;
+
+    // Use the visible video (desktop/mobile)
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    // Set default volume
+    video.volume = 0.2;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+    const iconMute = container.querySelector('.icon-mute');
+    const iconUnmute = container.querySelector('.icon-unmute');
+
+    if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
+
+    // Remove any existing event listeners by cloning the buttons
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newMuteBtn = muteBtn.cloneNode(true);
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+    // Update references to the new buttons
+    const freshPlayBtn = container.querySelector('.play');
+    const freshMuteBtn = container.querySelector('.mute');
+    const freshIconMute = container.querySelector('.icon-mute');
+    const freshIconUnmute = container.querySelector('.icon-unmute');
+
+    // PLAY / PAUSE
+    freshPlayBtn.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        freshPlayBtn.classList.add('is-playing');
+        freshPlayBtn.classList.remove('is-paused');
+      } else {
+        video.pause();
+        freshPlayBtn.classList.add('is-paused');
+        freshPlayBtn.classList.remove('is-playing');
+      }
+    });
+
+    // MUTE
+    freshMuteBtn.addEventListener('click', () => {
+      video.muted = !video.muted;
+      freshIconMute.style.display = video.muted ? 'block' : 'none';
+      freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+    });
+
+    // PROGRESS UPDATE
+    video.addEventListener('timeupdate', () => {
+      const progress = video.currentTime / video.duration;
+      progressFill.style.transform = `scaleX(${progress})`;
+      seek.value = progress * 100;
+    });
+
+    // SEEK
+    seek.addEventListener('input', () => {
+      const percent = seek.value / 100;
+      video.currentTime = percent * video.duration;
+    });
+
+  });
+}
+
+// INIT ON PAGE LOAD
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
+
+
+<script>
+  function toggleContent(type, element) {
+    
+    // Hide both content sections
+    document.getElementById('sectiontravel').style.display = 'none';
+    document.getElementById('sectionmultiwaystyling').style.display = 'none';
+    
+    // Remove 'active' class from ALL links in both sections
+    const allLinks = document.querySelectorAll('.section-links .link');
+    allLinks.forEach(link => link.classList.remove('active'));
+
+    // Show the selected content
+    if (type === 'travel') {
+      document.getElementById('sectiontravel').style.display = 'block';
+    } else if (type === 'multiwaystyling') {
+      document.getElementById('sectionmultiwaystyling').style.display = 'block';
+    }
+
+    // Add 'active' class to ALL links with the same text/type
+    const clickedText = element.textContent.trim();
+    const matchingLinks = Array.from(allLinks).filter(link => 
+      link.textContent.trim() === clickedText
+    );
+    
+    matchingLinks.forEach(link => link.classList.add('active'));
+
+    // Smooth scroll to target
+    const target = document.getElementById(`section${type}`);
+    if (target) {
+      window.scrollTo({
+        top: target.offsetTop - 100, // Adjust this value (e.g., 100px) based on your needs
+        behavior: "smooth"
+    });
+    }
+  }
+  /* DROPDOWN TOGGLE */
+    function toggleNestedDropdown(el) {
+    const content = el.nextElementSibling;
+    const arrow = el.querySelector('.arrow');
+
+    const isOpen = content.style.display === "block";
+    content.style.display = isOpen ? "none" : "block";
+    arrow.classList.toggle("rotate", !isOpen);
+    }
+
+    /* SELECT DROPDOWN ITEM */
+    function selectNested(type, element) {
+
+
+      const parentSection = element.closest('[id^="section"]');
+
+      // Hide only nested content inside current section
+      parentSection.querySelectorAll('div[id]').forEach(el => {
+        if (el.id && el.id !== parentSection.id) {
+          el.style.display = 'none';
+        }
+      });
+
+      // Show selected
+      const selected = document.getElementById(type);
+      if (selected) selected.style.display = 'block';
+
+      // Update active state
+      parentSection.querySelectorAll('.nested-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      element.classList.add('active');
+
+      // Update dropdown title
+      const title = parentSection.querySelector('.nested-title');
+      if (title) {
+        title.textContent = element.textContent;
+      }
+
+      // Optional: update URL hash
+      const currentTab = parentSection.id.replace('section','');
+      window.location.hash = `tab=${currentTab}&subtab=${type}`;
+    }
+  
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const params = new URLSearchParams(
+    window.location.hash.replace('#', '')
+  );
+
+  const tab    = params.get('tab');
+  const subtab = params.get('subtab');
+
+  /* ---------- OPEN MAIN TAB ---------- */
+  if (tab) {
+    const link = document.querySelector(
+      `.section-links .link[onclick*="${tab}"]`
+    );
+
+    if (link) {
+      toggleContent(tab, link);
+    }
+  }
+
+  /* ---------- OPEN NESTED TAB ---------- */
+  if (subtab) {
+    setTimeout(() => {
+      const nestedItem = document.querySelector(
+        `.nested-item[onclick*="${subtab}"]`
+      );
+
+      if (nestedItem) {
+        selectNested(subtab, nestedItem);
+      }
+    }, 300); // wait for parent tab to render
+  }
+
+});
+</script>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+    function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      // Media
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline">
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}" ">`;
+      }
+
+      // Wrap in anchor
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      // Text below image (outside anchor)
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text" style="color:${slide.textcolor}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      gap: 5,
+      arrows: false,
+      pagination: false,
+      padding: { left: '0rem', right: '6rem' },
+      breakpoints: {
+        1024: { perPage: 3 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+   
+    createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider1',
+    slides: [
+    { type: 'image', src: "images/versatility-in-one/travel/travel-d1.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320225_BLACK')$"},
+        { type: 'image', src: "images/versatility-in-one/travel/travel-d2.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320225_TAUPE')$"},
+        { type: 'image', src: "images/versatility-in-one/travel/travel-d3.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320243_BLACK')$"},
+        { type: 'image', src: "images/versatility-in-one/travel/travel-d4.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320243_TAUPE')$"},
+        { type: 'image', src: "images/versatility-in-one/travel/travel-d5.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320219_BLACK')$"},
+        { type: 'image', src: "images/versatility-in-one/travel/travel-d6.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320219_TAUPE')$"},
+        { type: 'image', src: "images/versatility-in-one/travel/travel-d7.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320218_BLACK')$"},
+        { type: 'image', src: "images/versatility-in-one/travel/travel-d8.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320218_TAUPE')$"},
+        { type: 'image', src: "images/versatility-in-one/travel/travel-d9.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM1-76210253_BLACK')$"},
+        { type: 'image', src: "images/versatility-in-one/travel/travel-d10.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM1-76210253_TAUPE')$"}
+    ],
+    options: {
+      perPage: 3,
+    }
+  });
+
+
+});
+</script>
+
+</body>
+
+</html>

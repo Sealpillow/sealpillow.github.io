@@ -1,0 +1,171 @@
+<!--
+  SLIDER: Splide Carousel — Drag Free, No Pagination
+  SOURCE: design-philosophy-demi.html / design-philosophy-jatte.html / design-philosophy-horseprint.html
+  PATTERN: createSplideSliderCarousel({ sliderId, slides, options })
+  - Loop mode, free drag
+  - No arrows, no pagination
+  - Supports images, videos, optional URL links, optional analytics data-attr, optional text overlay
+  - Default: 3 per page desktop, 1 mobile
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<style>
+/* Slider Container */
+.slider-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content */
+.slide-content {
+  line-height: 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content > Img > Video */
+.slide-content img,
+  .slide-content video {
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Slide Text */
+.slide-text {
+  bottom: 20px;
+  left: 20px;
+  position: absolute;
+  z-index: 10;
+}
+
+/* Slide Text > H3 */
+.slide-text h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+/* Slide Text > P */
+.slide-text p {
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Splide__Arrows > Splide__Pagination */
+.splide__arrows,
+  .splide__pagination {
+  display: none;
+}
+
+/* Splide__Track */
+.splide__track {
+  cursor: grab;
+}
+
+/* Splide__Track */
+.splide__track:active {
+  cursor: grabbing;
+}
+</style>
+
+<!-- SLIDER HTML -->
+<div class="slider-container">
+  <div class="splide" id="carouselSlider1">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline>
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}">`;
+      }
+
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text" style="color:${slide.textcolor || '#fff'}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      gap: 5,
+      arrows: false,
+      pagination: false,
+      padding: { left: '0rem', right: '6rem' },
+      breakpoints: {
+        1024: { perPage: 3 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+
+  /* ======== USAGE ======== */
+  createSplideSliderCarousel({
+    sliderId: 'carouselSlider1',
+    slides: [
+      { type: 'video', src: '../../media/scrub-video-landscape.mp4', alt: 'Slide 1', url: '#', analytics: 'content-id-1' },
+      { type: 'image', src: '../../media/landscape.jpg', alt: 'Slide 2', url: '#' },
+      { type: 'video', src: '../../media/scrub-video-landscape.mp4' },
+      { type: 'image', src: '../../media/landscape.jpg', alt: 'Slide 3', title: 'Title', description: 'Desc', textcolor: '#fff' },
+    ],
+    options: {
+      perPage: 3,
+    }
+  });
+
+});
+</script>

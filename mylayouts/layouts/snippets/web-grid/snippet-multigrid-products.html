@@ -1,0 +1,96 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  COMPONENT: Multigrid Product Grid
+  SOURCE: unisex-landing-page-v1.html / unisex-landing-page-v2.html
+  PATTERN: JS-rendered product cards, separate desktop/mobile containers
+  - Desktop: 4 per row (d-md-block d-none)
+  - Mobile: 2 per row (d-block d-md-none)
+  - Each card: anchor > img, uses js-shop-the-collection + data-pid
+  - renderProducts(containerId, isMobile) renders into #productsContainerDesktop / Mobile
+-->
+
+<style>
+/* Multigrid > Row */
+.multigrid .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+/* Multigrid > Item */
+.multigrid .item {
+  box-sizing: border-box;
+  width: calc(25% - 10px);
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Multigrid > Item */
+  .multigrid .item {
+    width: calc(50% - 10px);
+  }
+}
+
+/* Multigrid */
+.multigrid {
+  margin-bottom: 100px;
+  width: 100%;
+}
+
+/* Multigrid > Img */
+.multigrid img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+</style>
+
+<!-- DESKTOP GRID (hidden on mobile) -->
+<div class="multigrid d-md-block d-none" style="width: 100%;">
+  <div class="row g-2 justify-content-center" id="productsContainerDesktop"></div>
+</div>
+
+<!-- MOBILE GRID (hidden on desktop) -->
+<div class="multigrid d-block d-md-none" style="width: 100%;">
+  <div class="row g-2 justify-content-center" id="productsContainerMobile"></div>
+</div>
+
+<script>
+  const products = [
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", productID: "PW2-75210163-16_L.YELL", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", productID: "PW2-75210163-16_L.YELL", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", productID: "PW2-75210163-16_L.YELL", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", productID: "PW2-75210163-16_L.YELL", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", productID: "PW2-75210163-16_L.YELL", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", productID: "PW2-75210163-16_L.YELL", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", productID: "PW2-75210163-16_L.YELL", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", productID: "PW2-75210163-16_L.YELL", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+  ];
+
+
+  function productCardTemplate(product, isMobile) {
+    const imageSrc = isMobile ? product.imageMobile : product.imageDesktop;
+    return `
+      <div class="item px-0">
+        <div class="d-flex justify-content-center">
+          <a data-pid="${product.productID}"
+             href="${product.link}"
+             class="js-shop-the-collection"
+             data-collection-popup-url="$url('Page-CollectionProductsPopup')$">
+            <img alt="${product.name}" class="w-100 img-fluid" src="${imageSrc}">
+          </a>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderProducts(containerId, isMobile = false) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = products.map(p => productCardTemplate(p, isMobile)).join('');
+  }
+
+  renderProducts('productsContainerDesktop', false);
+  renderProducts('productsContainerMobile', true);
+</script>

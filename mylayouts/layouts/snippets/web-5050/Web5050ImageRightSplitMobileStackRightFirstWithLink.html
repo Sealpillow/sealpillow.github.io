@@ -1,0 +1,82 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Flexi Col Image */
+.flexi-col-image {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Flexi Col Image Right2 */
+.flexi-col-image-right2 {
+  margin-left: auto;
+  width: 80%;
+}
+
+/* Flexi Col Image Left2 > Img */
+.flexi-col-image-left2 img {
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Flexi Col Image Right2 > Img */
+.flexi-col-image-right2 img {
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Flexi Col Image */
+  .flexi-col-image {
+    display: grid;
+    gap: 40px;
+    grid-template-columns: none;
+    grid-template-rows: 0.5fr 0.5fr;
+  }
+
+  /* Flexi Col Image Right2 */
+  .flexi-col-image-right2 {
+    order: 1;
+    width: 100%;
+  }
+
+  /* Flexi Col Image Left2 */
+  .flexi-col-image-left2 {
+    order: 2;
+  }
+}
+</style>
+
+<div class="flexi-col-image" style="align-items: center; width: 100%;">
+
+    <!-- Left side: One large image -->
+    <div class="flexi-col-image-left2">
+        <a class="js-shop-the-collection" data-pid="PM2-26320277_BLACK,PM1-85110483_BLACK" href="$url('Product-Show', 'pid','PM2-26320277_BLACK')$">
+            <picture>
+                <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                <img src="../../media/portrait.jpg" alt="Shoes on white background" >
+            </picture>
+        </a> 
+    </div>
+
+    <!-- Right side: Two smaller images stacked -->
+    <div class="flexi-col-image-right2" style="display: grid; grid-template-columns: 1fr 1fr;">
+        <div>
+        <a class="js-shop-the-collection" data-pid="PM1-85110483_BLACK" href="$url('Product-Show', 'pid','PM1-85110483_BLACK')$">
+            <picture>
+                <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                <img src="../../media/portrait.jpg" alt="Shoes on white background" >
+            </picture>
+        </a> 
+        </div>
+        <div>
+        <a class="js-shop-the-collection" data-pid="PM2-26320277_BLACK" href="$url('Product-Show', 'pid','PM2-26320277_BLACK')$">
+            <picture>
+                <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                <img src="../../media/portrait.jpg" alt="Shoes on white background" >
+            </picture>
+        </a> 
+        </div>
+    </div>
+
+</div>

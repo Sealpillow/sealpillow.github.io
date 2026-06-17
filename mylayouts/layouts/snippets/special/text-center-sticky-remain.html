@@ -1,0 +1,88 @@
+
+<style>
+/* Scroll Sticky Text */
+.scroll-sticky-text {
+  left: 50%;
+  pointer-events: none;
+  position: fixed;
+  text-align:center;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 50;
+}
+
+/* Sticky Desktop */
+.sticky-desktop {
+  font-family: aktiv-grotesk-extended;
+  font-size: 20px;
+}
+
+/* Sticky Mobile */
+.sticky-mobile {
+  font-family: aktiv-grotesk-extended;
+  font-size: 15px;
+  width:80%;
+}
+</style>
+
+<div class="scroll-sticky-text">
+
+    <!-- Desktop -->
+    <div class="sticky-desktop d-none d-lg-block" id="scrollStickyTextDesktop">
+        THE DEMI Pastel Edition
+    </div>
+
+    <!-- Mobile -->
+    <div class="sticky-mobile d-block d-lg-none" id="scrollStickyTextMobile">
+        THE DEMI Pastel Edition
+    </div>
+
+</div>
+
+
+
+<div class="mypage scroll-trigger" data-text="Form" data-color="#555">
+
+</div>
+
+    
+<div class="mypage scroll-trigger" data-text="Expression" data-color="#000">
+    
+</div>
+
+</section>
+
+<script>
+const stickyDesktop = document.getElementById("scrollStickyTextDesktop");
+const stickyMobile = document.getElementById("scrollStickyTextMobile");
+
+const triggers = document.querySelectorAll(".scroll-trigger");
+
+const observer = new IntersectionObserver((entries)=>{
+
+    entries.forEach(entry=>{
+
+        if(entry.isIntersecting){
+
+            const text = entry.target.dataset.text;
+            const color = entry.target.dataset.color;
+
+            if(text){
+                stickyDesktop.textContent = text;
+                stickyMobile.textContent = text;
+            }
+
+            if(color){
+                stickyDesktop.style.color = color;
+                stickyMobile.style.color = color;
+            }
+
+        }
+
+    });
+
+},{ threshold:0.6 });
+
+triggers.forEach(trigger => observer.observe(trigger));
+
+</script>

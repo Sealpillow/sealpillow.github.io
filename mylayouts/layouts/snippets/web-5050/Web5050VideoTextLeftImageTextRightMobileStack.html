@@ -1,0 +1,145 @@
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+  <style>
+/* Equal Height Container */
+.equal-height-container {
+  align-items: stretch;
+  display: flex;
+}
+
+/* Equal Height Column */
+.equal-height-column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+/* Equal Height Content */
+.equal-height-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: flex-start;
+  margin: 0 auto;
+  padding: 20px 5%;
+  width: 80%;
+}
+
+/* Equal Height Content > P */
+.equal-height-content p {
+  margin: 0 0 15px;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Equal Height Content */
+  .equal-height-content {
+    padding: 20px 15px;
+    text-align: center;
+  }
+}
+
+/* Equal Height Content > Last Child */
+.equal-height-content > :last-child {
+  margin-bottom: auto;
+}
+
+/* Equal Height Wrapper */
+.equal-height-wrapper {
+  display: flex;
+  flex: 1;
+}
+
+/* Equal Height Wrapper > Video > Img */
+.equal-height-wrapper video,
+    .equal-height-wrapper img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+</style>
+
+
+
+<!-- DESKTOP VIEW -->
+<div class="d-none d-md-block w-100">
+  <div class="equal-height-container">
+    
+    <!-- VIDEO COLUMN -->
+    <div class="equal-height-column">
+      <div class="equal-height-wrapper">
+        <div class="w-100 d-none d-md-block" style="padding: 100% 0 0 0; position: relative;">
+            <!-- Replacing iframe with <video> -->
+            <video playsinline autoplay loop muted
+                   style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+              <source src="../../media/landscape_video.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+        </div>
+      </div>
+      <div class="equal-height-content">
+        <p style="font-size: 20px;">A Belief Carried Throughout</p>
+        <p style="font-size: 14px;">
+          At the core of Jatte is a belief in intention. No overstyling, no excess. Just clarity in design
+          and confidence in material. When everything has a purpose, nothing needs to shout.
+        </p>
+      </div>
+    </div>
+
+    <!-- IMAGE COLUMN -->
+    <div class="equal-height-column">
+      <div class="equal-height-wrapper">
+        <img src="../../media/portrait.jpg" alt="Jatte Vibe">
+      </div>
+      <div class="equal-height-content">
+        <p style="font-size: 20px;">The Jatte Vibe</p>
+        <p style="font-size: 14px;">
+          Made for the ones who dress without trying. Effortless but never accidental. On the move,
+          in the know, always one beat ahead. This is their go-to, and now it’s yours too.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- MOBILE VIEW -->
+<div class="d-block d-md-none w-100">
+
+  <!-- VIDEO SECTION -->
+  <div class="mb-4">
+    <div style="padding:0 100% 0 0; position:relative; padding-bottom: 100%;"> <!-- 16:9 -->
+      <!-- Replacing iframe with <video> -->
+      <video playsinline autoplay loop muted
+             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+        <source src="../../media/landscape_video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+    <div class="equal-height-content text-center">
+      <p style="font-size: 20px;">A Belief Carried Throughout</p>
+      <p style="font-size: 14px;">
+        At the core of Jatte is a belief in intention. No overstyling, no excess. Just clarity in design
+        and confidence in material. When everything has a purpose, nothing needs to shout.
+      </p>
+    </div>
+  </div>
+
+  <!-- IMAGE SECTION -->
+  <div>
+    <img src="../../media/portrait.jpg" alt="Jatte Vibe" class="img-fluid w-100">
+    <div class="equal-height-content text-center">
+      <p style="font-size: 20px;">The Jatte Vibe</p>
+      <p style="font-size: 14px;">
+        Made for the ones who dress without trying. Effortless but never accidental. On the move,
+        in the know, always one beat ahead. This is their go-to, and now it’s yours too.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+

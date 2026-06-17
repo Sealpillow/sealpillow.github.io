@@ -1,0 +1,153 @@
+  <style>
+/* Body */
+body {
+  overflow-x: hidden;
+}
+
+/* Zoom Section */
+.zoom-section {
+  position: relative;
+}
+
+/* Sticky Wrapper */
+.sticky-wrapper {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+}
+
+/* Zoom Image */
+.zoom-image {
+  position: relative;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+
+/* Zoom Image > Img */
+.zoom-image img {
+  border-radius: 8px;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Section Label */
+.section-label {
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+  font-size: 16px;
+  left: 50%;
+  opacity: 0.7;
+  padding: 8px 18px;
+  position: absolute;
+  top: 40px;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+</style>
+
+<!-- SECTION 1 -->
+<div class="zoom-section" id="zoom-section-0" style="height:250vh">
+  <div class="sticky-wrapper">
+    <div class="section-label">Portrait – Zoom Out</div>
+    <div class="zoom-image" id="zoom-image-0" style="width:300px;height:400px;">
+      <img src="../../media/landscape.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2 -->
+<div class="zoom-section" id="zoom-section-1" style="height:400vh">
+  <div class="sticky-wrapper">
+    <div class="section-label">Landscape – Zoom In</div>
+    <div class="zoom-image" id="zoom-image-1" style="width:600px;height:400px;">
+      <img src="../../media/landscape.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="zoom-section" id="zoom-section-2" style="height:300vh">
+  <div class="sticky-wrapper">
+    <div class="section-label">Square – Zoom Out</div>
+    <div class="zoom-image" id="zoom-image-2" style="width:400px;height:400px;">
+      <img src="../../media/landscape.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4 -->
+<div class="zoom-section" id="zoom-section-3" style="height:500vh">
+  <div class="sticky-wrapper">
+    <div class="section-label">Tall – Zoom In</div>
+    <div class="zoom-image" id="zoom-image-3" style="width:250px;height:450px;">
+      <img src="../../media/landscape.jpg">
+    </div>
+  </div>
+</div>
+
+
+<script>
+const config = [
+  { zoomIn:false, zoomOverflow:1.1 },
+  { zoomIn:true,  zoomOverflow:1.2 },
+  { zoomIn:false, zoomOverflow:1.05 },
+  { zoomIn:true,  zoomOverflow:1.3 }
+];
+
+function easeOutCubic(x) {
+  return 1 - Math.pow(1 - x, 3);
+}
+
+function calculateProgress(section) {
+  const rect = section.getBoundingClientRect();
+  const sectionHeight = section.offsetHeight;
+  const viewportHeight = window.innerHeight;
+
+  if (rect.top > 0) return 0;
+  if (rect.bottom < viewportHeight) return 1;
+
+  const scrolled = -rect.top;
+  const scrollable = sectionHeight - viewportHeight;
+  return Math.min(Math.max(scrolled / scrollable, 0), 1);
+}
+
+function updateZoom(i) {
+  const section = document.getElementById(`zoom-section-${i}`);
+  const imageEl = document.getElementById(`zoom-image-${i}`);
+  if (!section || !imageEl) return;
+
+  const img = imageEl.querySelector("img");
+  const cfg = config[i];
+  const progress = easeOutCubic(calculateProgress(section));
+
+  const baseW = imageEl.offsetWidth;
+  const baseH = imageEl.offsetHeight;
+
+  const fullScale = Math.max(
+    window.innerWidth / baseW,
+    window.innerHeight / baseH
+  ) * cfg.zoomOverflow;
+
+  const scale = cfg.zoomIn
+    ? 1 + (fullScale - 1) * progress
+    : fullScale - (fullScale - 1) * progress;
+
+  imageEl.style.transform = `scale(${scale})`;
+  img.style.borderRadius = `${cfg.zoomIn ? 8 * (1 - progress) : 8 * progress}px`;
+}
+
+function updateAll() {
+  config.forEach((_, i) => updateZoom(i));
+}
+
+window.addEventListener("scroll", updateAll);
+window.addEventListener("resize", updateAll);
+updateAll();
+</script>

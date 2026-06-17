@@ -1,0 +1,99 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Flexi Col Image2 */
+.flexi-col-image2 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
+
+/* Flexi Col Image Left2 > A > Flexi Col Image Right2 */
+.flexi-col-image-left2 a,
+.flexi-col-image-right2 a {
+  display: block;
+  width: 100%;
+}
+
+/* Flexi Col Image Left2 > Img > Flexi Col Image Right2 */
+.flexi-col-image-left2 img,
+.flexi-col-image-right2 img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Flexi Col Image2 Mobile */
+.flexi-col-image2-mobile {
+  display: grid;
+  grid-template-rows: 0.5fr 0.5fr;
+}
+
+/* Flexi Col Image Left2 Mobile */
+.flexi-col-image-left2-mobile {
+  justify-self: end;
+  order: 1;
+  width: 50%;
+}
+
+/* Flexi Col Image Left2 Mobile > Img */
+.flexi-col-image-left2-mobile img {
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Flexi Col Image Right2 Mobile */
+.flexi-col-image-right2-mobile {
+  order: 2;
+  width: 100%;
+}
+
+/* Flexi Col Image Right2 Mobile > Img */
+.flexi-col-image-right2-mobile img {
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Flexi Col Image2 */
+  .flexi-col-image2 {
+    display: none;
+  }
+}
+
+/* Desktop — min-width: 769px */
+@media (min-width: 769px) {
+  /* Flexi Col Image2 Mobile */
+  .flexi-col-image2-mobile {
+    display: none;
+  }
+}
+</style>
+
+<!-- Desktop: 2/3 left large + 1/3 right small -->
+<div class="flexi-col-image2" style="margin: 100px 0;">
+    <div class="flexi-col-image-left2">
+        <a class="js-shop-the-collection" data-pid="PM2-26320222-3_NVY.FA,PM1-76210271-2_NVY.DE" href="$url('Product-Show','pid','PM2-26320222-3_NVY.FA')$">
+            <img src="../../media/landscape.jpg" alt="">
+        </a>
+    </div>
+    <div class="flexi-col-image-right2">
+        <a class="js-shop-the-collection" data-pid="PM2-26320222-3_BLK.TU" href="$url('Product-Show','pid','PM2-26320222-3_BLK.TU')$">
+            <img src="../../media/landscape.jpg" alt="">
+        </a>
+    </div>
+</div>
+
+<!-- Mobile: top = small image right-aligned at 50%, bottom = large image full-width -->
+<div class="flexi-col-image2-mobile" style="margin: 100px 0;">
+    <div class="flexi-col-image-left2-mobile">
+        <a class="js-shop-the-collection" data-pid="PM2-26320222-3_BLK.TU" href="$url('Product-Show','pid','PM2-26320222-3_BLK.TU')$">
+            <img src="../../media/landscape.jpg" alt="">
+        </a>
+    </div>
+    <div class="flexi-col-image-right2-mobile">
+        <a class="js-shop-the-collection" data-pid="PM2-26320222-3_NVY.FA,PM1-76210271-2_NVY.DE" href="$url('Product-Show','pid','PM2-26320222-3_NVY.FA')$">
+            <img src="../../media/landscape.jpg" alt="">
+        </a>
+    </div>
+</div>

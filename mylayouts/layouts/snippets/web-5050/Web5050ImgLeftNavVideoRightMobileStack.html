@@ -1,0 +1,240 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Wrap */
+.wrap {
+  display: grid;
+  grid-template-areas:
+      "img nav"
+      "img media"
+      "img caption";
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Area Img */
+.area-img {
+  display: flex;
+  flex-direction: column;
+  grid-area: img;
+}
+
+/* Area Img > Img */
+.area-img img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+/* Imgtext Box */
+.imgtext-box {
+  margin-top: 10px;
+  text-align: right;
+}
+
+/* Imgtext Box > P */
+.imgtext-box p {
+  color: #555;
+  font-family: proxima-nova, sans-serif;
+  font-size: 8px;
+  font-style: italic;
+  line-height: 1.75;
+}
+
+/* Area Nav */
+.area-nav {
+  grid-area: nav;
+}
+
+/* Area Media */
+.area-media {
+  grid-area: media; margin: 0 auto; width: 60%;
+}
+
+/* Area Caption */
+.area-caption {
+  grid-area: caption; margin: 0 auto; width: 60%;
+}
+
+/* Nav */
+.nav {
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+
+/* Nav Item */
+.nav-item {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+/* Nav Item > Bracket */
+.nav-item .bracket {
+  color: #999;
+  font-size: 11px;
+  transition: color 0.2s;
+}
+
+/* Nav Item > Label */
+.nav-item .label {
+  color: #999;
+  font-family: baskerville;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+/* Nav Item > Label > Bracket */
+.nav-item.active .label,
+.nav-item.active .bracket {
+  color: #1a1a1a; font-weight: 500;
+}
+
+/* Nav Item > Label > Bracket */
+.nav-item:hover .label,
+.nav-item:hover .bracket {
+  color: #1a1a1a;
+}
+
+/* Media Box */
+.media-box {
+  min-height: 320px; overflow: hidden;
+}
+
+/* Media Box > Video > Img */
+.media-box video,
+.media-box img {
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Caption Box > P */
+.caption-box p {
+  color: #555;
+  font-family: "Nothing You Could Do", cursive;
+  font-size: 10px;
+  line-height: 1.75;
+}
+
+/* Mobile — max-width: 640px */
+@media (max-width: 640px) {
+  /* Wrap */
+  .wrap {
+    display: block;
+  }
+
+  /* Area Nav */
+  .area-nav {
+    padding: 2.5rem 0 25px 10%;
+  }
+
+  /* Area Media */
+  .area-media {
+    margin: 50px auto;
+  }
+
+  /* Area Caption */
+  .area-caption {
+    margin: 0 auto;
+  }
+
+  /* Area Imgtext */
+  .area-imgtext {
+    margin: 0 auto 100px auto; text-align: center;
+  }
+}
+</style>
+
+<!-- Cursive font for captions (load in page <head> if not already present) -->
+<!-- <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet"> -->
+
+<div class="wrap" style="margin-bottom: 100px;">
+
+    <!-- LEFT: product image + credit text -->
+    <div class="area-img">
+        <a class="js-shop-the-collection" data-pid="PM2-26320159-6_NVY.DE" href="$url('Product-Show','pid','PM2-26320159-6_NVY.DE')$">
+            <img src="../../media/portrait.jpg" alt="">
+        </a>
+        <div class="imgtext-box">
+            <p>Inspiration images courtesy of @kennethsbw</p>
+        </div>
+    </div>
+
+    <!-- RIGHT NAV: numbered tab list — each item points to a video + caption -->
+    <div class="area-nav">
+        <div class="nav">
+
+            <div class="nav-item active"
+                data-video="../../media/landscape_video.mp4"
+                data-caption="One of my favourite reminders in life to keep learning, keep growing, but stay flexible enough to let things unfold naturally. Just like water, we move with the currents, adapting, shifting, and finding our own rhythm. And just like a wave, every swell is shaped by flow. Trust it, ride it, grow with it.">
+                <span class="bracket">[01]</span>
+                <span class="label">Grow With The Flow</span>
+            </div>
+
+            <div class="nav-item"
+                data-video="../../media/landscape_video.mp4"
+                data-caption="I'm a big believer in doing what you love. Life's short, and it doesn't always have to be about chasing the next thing. Sometimes it's just sitting on a park bench, watching the world go by, doodling, or penning down random thoughts instead of getting caught up in the rat race.">
+                <span class="bracket">[02]</span>
+                <span class="label">Do What You Love</span>
+            </div>
+
+            <div class="nav-item"
+                data-video="../../media/landscape_video.mp4"
+                data-caption="I chose to illustrate a runner because fitness has always been a big part of my life. He's holding a packet of teh-C, my go-to hawker drink. Running past the shophouses, a nod not just to Singapore's heritage but also to mine.">
+                <span class="bracket">[03]</span>
+                <span class="label">Move At Your Own Pace</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- RIGHT MEDIA: video/image swap target -->
+    <div class="area-media">
+        <div class="media-box">
+            <video id="main-video" autoplay muted loop playsinline>
+                <source src="../../media/landscape_video.mp4" type="video/mp4">
+            </video>
+            <img id="main-img" src="" alt="" style="display: none;">
+        </div>
+    </div>
+
+    <!-- RIGHT CAPTION: text swap target -->
+    <div class="area-caption">
+        <div class="caption-box">
+            <p id="main-caption">
+                One of my favourite reminders in life to keep learning, keep growing, but stay flexible enough to let things unfold naturally. Just like water, we move with the currents, adapting, shifting, and finding our own rhythm. And just like a wave, every swell is shaped by flow. Trust it, ride it, grow with it.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+(function () {
+    var navItems = document.querySelectorAll('.nav-item');
+    var video    = document.getElementById('main-video');
+    var mainImg  = document.getElementById('main-img');
+    var caption  = document.getElementById('main-caption');
+
+    navItems.forEach(function (item) {
+        item.addEventListener('click', function () {
+            navItems.forEach(function (n) { n.classList.remove('active'); });
+            item.classList.add('active');
+
+            if (item.dataset.img) {
+                video.style.display   = 'none';
+                mainImg.style.display = 'block';
+                mainImg.src           = item.dataset.img;
+            } else {
+                mainImg.style.display = 'none';
+                video.style.display   = 'block';
+                video.src             = item.dataset.video;
+                video.load();
+            }
+
+            caption.innerHTML = item.dataset.caption;
+        });
+    });
+})();
+</script>

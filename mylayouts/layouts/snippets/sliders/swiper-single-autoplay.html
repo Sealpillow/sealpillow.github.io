@@ -1,0 +1,88 @@
+<!--
+  SLIDER: Swiper.js — Single Slide with Autoplay
+  SOURCE: winter-textures-of-thought.html
+  PATTERN: Static HTML slides + new Swiper('#id', config)
+  - 1 slide per view, no gap
+  - Autoplay: 4s delay, 2s transition speed, continuous (disableOnInteraction: false)
+  - Slides are written directly in HTML (not JS-generated)
+  - Supports desktop/mobile image switching via <picture>/<source> or separate img tags
+  - Grab cursor, loop
+-->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+<style>
+/* Base Swiper Container */
+.base-swiper-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Swiper Slide */
+.swiper-slide {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  position: relative;
+}
+
+/* Swiper Slide > Img > Video */
+.swiper-slide img,
+  .swiper-slide video {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Slide Text */
+.slide-text {
+  bottom: 10px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  left: 10px;
+  position: absolute;
+}
+</style>
+
+<!-- SLIDER HTML — slides written directly in markup -->
+<div class="base-swiper-container" id="slider3">
+  <div class="swiper-wrapper">
+
+    <div class="swiper-slide">
+      <a href="#">
+        <img src="../../media/landscape.jpg" alt="Slide 1">
+      </a>
+    </div>
+
+    <div class="swiper-slide">
+      <a href="#">
+        <img src="../../media/landscape.jpg" alt="Slide 2">
+      </a>
+    </div>
+
+    <div class="swiper-slide">
+      <a href="#">
+        <img src="../../media/landscape.jpg" alt="Slide 3">
+      </a>
+      <div class="slide-text">Optional caption</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const swiper3 = new Swiper('#slider3', {
+    loop: true,
+    slidesPerView: 1,
+    spaceBetween: 0,
+    grabCursor: true,
+    autoplay: {
+      delay: 4000,
+      disableOnInteraction: false,
+      speed: 2000,
+    }
+  });
+</script>

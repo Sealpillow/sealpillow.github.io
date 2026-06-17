@@ -1,0 +1,115 @@
+<style>
+/* Scroll Sticky Text */
+.scroll-sticky-text {
+  left: 50%;
+  pointer-events: none;
+  position: fixed;
+  text-align: center;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+}
+
+/* Scroll Sticky Text > Is Final */
+.scroll-sticky-text.is-final {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Final Section */
+.final-section {
+  overflow: hidden;
+  position: relative;
+}
+
+/* Sticky Desktop > Demi */
+.sticky-desktop .demi {
+  font-family: aktiv-grotesk-extended !important;
+  font-weight: 500 !important;
+}
+
+/* Sticky Desktop > Pastel */
+.sticky-desktop .pastel {
+  font-family: aktiv-grotesk-extended !important;
+  font-weight: 300 !important;
+}
+
+/* Sticky Desktop */
+.sticky-desktop {
+  font-size: 20px;
+}
+
+/* Sticky Mobile */
+.sticky-mobile {
+  display:none;
+}
+</style>
+<div class="page-wrapper" style="position: relative;">
+
+    <div class="scroll-sticky-text">
+        <!-- Desktop -->
+        <div class="sticky-desktop d-none d-lg-block" id="scrollStickyTextDesktop">
+            <span class="demi"></span><span class="pastel"></span>
+        </div>
+
+        <!-- Mobile 
+        <div class="sticky-mobile d-block d-lg-none" id="scrollStickyTextMobile">
+            <span class="demi">THE DEMI</span><span class="pastel">Pastel Edition</span>
+        </div>-->
+
+    </div>
+
+    <div class="scroll-trigger" data-text1="THE DEMI" data-text2="Pastel Edition" data-color1="black" data-color2="black">
+        
+    </div>
+
+    <!-- all your existing sections -->
+    <div class="final-section scroll-trigger" data-text1="THE DEMI" data-text2="Pastel Edition" data-color1="black" data-color2="black">
+        
+    </div>
+</div>
+
+
+<script>
+    const stickyDesktop = document.getElementById("scrollStickyTextDesktop");
+    const stickyWrapper = document.querySelector(".scroll-sticky-text");
+    //const stickyMobile = document.getElementById("scrollStickyTextMobile");
+
+    const triggers = document.querySelectorAll(".scroll-trigger");
+
+    const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+
+        if (entry.isIntersecting) {
+            const text1 = entry.target.dataset.text1;
+            const text2 = entry.target.dataset.text2;
+            const color1 = entry.target.dataset.color1;
+            const color2 = entry.target.dataset.color2;
+
+            if (text1 && text2) {
+                stickyDesktop.innerHTML = `<span class="demi" style="color:${color1}">${text1}</span>&nbsp;&nbsp;&nbsp;<span class="pastel" style="color:${color2}">${text2}</span>`;
+            }
+
+            if (entry.target.classList.contains("final-section")) {
+                stickyWrapper.classList.add("is-final");
+                entry.target.appendChild(stickyWrapper);
+            } else {
+                stickyWrapper.classList.remove("is-final");
+                document.body.appendChild(stickyWrapper);
+            }
+
+        } else {
+            // ← ADD THIS: when final-section leaves view (scrolling back up)
+            if (entry.target.classList.contains("final-section")) {
+                stickyWrapper.classList.remove("is-final");
+                document.body.appendChild(stickyWrapper);
+            }
+        }
+
+    });
+}, { threshold: 0.7 });
+
+    triggers.forEach(trigger => observer.observe(trigger));
+</script>

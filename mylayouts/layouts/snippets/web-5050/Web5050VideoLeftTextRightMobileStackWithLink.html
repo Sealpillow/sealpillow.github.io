@@ -1,0 +1,95 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* Img Left Text Right */
+.img-left-text-right {
+  align-items: center;
+  display: flex;
+}
+
+/* Img Left Text Right > Image Block */
+.img-left-text-right .image-block {
+  flex: 1;
+  order: 1;
+}
+
+/* Img Left Text Right > Text Block */
+.img-left-text-right .text-block {
+  flex: 1;
+  order: 2;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Img Left Text Right */
+  .img-left-text-right {
+    flex-direction: column;
+  }
+
+  /* Img Left Text Right > Image Block */
+  .img-left-text-right .image-block {
+    order: 1;
+  }
+
+  /* Img Left Text Right > Text Block */
+  .img-left-text-right .text-block {
+    order: 2;
+  }
+}
+</style>
+
+<section class="img-left-text-right" style="align-items:center;">
+
+    <!-- VIDEO BLOCK (LEFT) -->
+    <div class="image-block">
+        <a href="$url('Product-Show', 'pid', 'PW2-75210182_BROWN')$">
+            <video loading="lazy" width="100%" height="auto" style="display:block;" playsinline autoplay loop muted>
+                <!-- Desktop video -->
+                <source src="../../media/landscape_video.mp4" media="(min-width: 768px)" type="video/mp4">
+                <!-- Mobile video -->
+                <source  src="../../media/landscape_video.mp4" media="(max-width: 767px)" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </a>
+    </div>
+
+    <!-- TEXT BLOCK (RIGHT) -->
+    <div class="text-block">
+        <div class="inner-text">
+
+            <!-- Desktop title -->
+            <p class="d-md-block d-none mb-0 p-0 col-md-12" 
+            style="font-family:proxima-nova; width:100%; margin:0 auto; font-size:14px; text-align:center; line-height:33px;">
+                Design and Form
+            </p>
+
+            <!-- Mobile title -->
+            <p class="d-block d-md-none mb-0 p-0 col-md-12 " 
+                style="font-family:proxima-nova; width:100%; font-size:14px; text-align:center; line-height:33px; margin:100px auto 0px;">
+                Design and Form
+            </p>
+
+            <!-- Desktop body -->
+            <p class="d-md-block d-none mb-0" 
+            style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+                Soft structure and thoughtful detailing lends to a<br>
+                distinctive profile while subtle detailing keeps the<br>
+                look refined. Intuitive in hand, the design is<br>
+                streamlined, balanced and made to sit comfortably.
+            </p>
+
+            <!-- Mobile body -->
+            <p class="d-block d-md-none" 
+            style="font-family:proxima-nova; font-size:20px; width:100%; margin:0px auto 100px; text-align:center; font-weight:400; line-height:normal;">
+                Soft structure and thoughtful<br>
+                detailing lends to a distinctive<br>
+                profile while subtle detailing keeps<br>
+                the look refined. Intuitive in hand,<br>
+                the design is streamlined,<br>
+                balanced and made to sit comfortably.
+            </p>
+
+        </div>
+    </div>
+
+</section>

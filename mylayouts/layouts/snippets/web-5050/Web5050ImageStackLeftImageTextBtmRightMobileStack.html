@@ -1,0 +1,125 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Split Section V1 */
+.split-section-v1 {
+  display:grid;
+  grid-template-columns: 0.5fr 0.5fr;
+}
+
+/* Split Section V1 > A */
+.split-section-v1 a {
+  display: block;
+}
+
+/* Split Section V1 > Split Left > Img */
+.split-section-v1 .split-left img {
+  height: 100%;
+  object-fit:cover;
+  width:100%;
+}
+
+/* Split Section V1 > Split Left */
+.split-section-v1 .split-left {
+  display:grid;
+  grid-template-rows: 1fr 1fr;
+}
+
+/* Split Section V1 > Split Right */
+.split-section-v1 .split-right {
+  display:grid;
+  grid-template-rows: 1fr 1fr;
+}
+
+/* Split Section V1 > Right Top > Img */
+.split-section-v1 .right-top img {
+  object-fit:cover;
+  width:100%;
+}
+
+/* Split Section V1 > Right Top */
+.split-section-v1 .right-top {
+  display: block;
+  margin-left: auto;
+  width: 40%;
+}
+
+/* Split Section V1 > Right Bottom */
+.split-section-v1.right-bottom {
+  display:flex;
+  flex-direction:column;
+  justify-content:end;
+  margin-bottom: 5%;
+  padding: 0 10% 0 20%;
+}
+
+/* Split Section V1 > Right Bottom > A */
+.split-section-v1 .right-bottom a {
+  text-decoration: underline;
+}
+
+/* Split Section V1 > Right Bottom > H2 */
+.split-section-v1 .right-bottom h2 {
+  margin-bottom:15px;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width:768px) {
+  /* Split Section V1 */
+  .split-section-v1 {
+    grid-template-columns:1fr;
+  }
+
+  /* Split Section V1 > Split Right */
+  .split-section-v1 .split-right {
+    grid-template-rows:auto auto;
+  }
+
+  /* Split Section V1 > Right Bottom */
+  .split-section-v1 .right-bottom {
+    padding:30px;
+  }
+}
+</style>
+<div class="split-section-v1">
+
+    <!-- LEFT LARGE IMAGE -->
+    <div class="split-left">
+        <a href="your-link-here.html">
+            <picture>
+                <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                <img src="../../media/portrait.jpg" alt="">
+            </picture>
+        </a>
+
+        <a href="your-link-here.html">
+            <picture>
+                <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                <img src="../../media/portrait.jpg" alt="">
+            </picture>
+        </a>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="split-right">
+
+        <!-- TOP SMALL IMAGE -->
+        <div class="right-top">
+            <a href="your-link-here.html">
+                <picture>
+                    <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                    <img src="../../media/portrait.jpg" alt="">
+                </picture>
+            </a>
+        </div>
+
+        <!-- BOTTOM TEXT -->
+        <div class="right-bottom">
+            <p>
+                This is the description text area. You can place any content here
+                such as paragraphs, links, or buttons.
+            </p>
+        </div>
+
+    </div>
+
+</div>

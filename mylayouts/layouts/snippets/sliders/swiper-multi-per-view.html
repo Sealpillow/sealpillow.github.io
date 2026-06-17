@@ -1,0 +1,160 @@
+<!--
+  SLIDER: Swiper.js — Multi-Per-View Grab Carousel
+  SOURCE: versatility-in-one-v1.html / versatility-in-one-v2.html
+  PATTERN: generateSlides(slides, wrapperId) + new Swiper('#id', config)
+  - 3.5 slides visible on desktop, 1.5 on mobile
+  - Grab cursor, loop, no autoplay
+  - generateSlides() supports: image, video, hover-image, link, text caption
+  - disableClick: skips wrapping in <a>
+  - disableHover: skips rendering hover image
+-->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+<style>
+/* Base Swiper Container */
+.base-swiper-container {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Swiper Slide > Img > Video */
+.swiper-slide img,
+  .swiper-slide video {
+  display: block;
+  height: auto;
+  object-fit: contain;
+  width: 100%;
+}
+
+/* Swiper Slide */
+.swiper-slide {
+  align-items: center;
+  justify-content: center;
+}
+
+/* Swiper Slide > Hover Img */
+.swiper-slide .hover-img {
+  display: none;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+/* Swiper Slide > Main Img */
+.swiper-slide:hover .main-img {
+  opacity: 0;
+}
+
+/* Swiper Slide > Hover Img */
+.swiper-slide:hover .hover-img {
+  display: block;
+}
+
+/* Swiper Slide */
+.swiper-slide {
+  position: relative;
+}
+
+/* Slide Text */
+.slide-text {
+  bottom: 10px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  left: 10px;
+  position: absolute;
+}
+</style>
+
+<!-- SLIDER HTML -->
+<div class="base-swiper-container" id="slider1">
+  <div class="swiper-wrapper" id="swiper-wrapper1"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function generateSlides(slides, wrapperId, disableClick = false, disableHover = false) {
+    const wrapper = document.getElementById(wrapperId);
+
+    slides.forEach(slide => {
+      const slideEl = document.createElement('div');
+      slideEl.classList.add('swiper-slide');
+
+      let anchor = null;
+      if (!disableClick && slide.link) {
+        anchor = document.createElement('a');
+        anchor.href = slide.link;
+      }
+
+      if (slide.type === 'video') {
+        const video = document.createElement('video');
+        video.src = slide.src;
+        video.autoplay = true;
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.controls = false;
+
+        if (anchor) { anchor.appendChild(video); slideEl.appendChild(anchor); }
+        else { slideEl.appendChild(video); }
+
+      } else {
+        const img = document.createElement('img');
+        img.src = slide.src;
+        img.alt = slide.alt || '';
+        img.classList.add('main-img');
+        img.loading = 'lazy';
+
+        if (anchor) { anchor.appendChild(img); slideEl.appendChild(anchor); }
+        else { slideEl.appendChild(img); }
+
+        if (!disableHover && slide.hoverSrc) {
+          const hoverImg = document.createElement('img');
+          hoverImg.src = slide.hoverSrc;
+          hoverImg.alt = slide.alt || '';
+          hoverImg.classList.add('hover-img');
+
+          if (anchor) { anchor.appendChild(hoverImg); }
+          else { slideEl.appendChild(hoverImg); }
+        }
+      }
+
+      if (slide.text) {
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('slide-text');
+        contentDiv.innerHTML = slide.text;
+        slideEl.appendChild(contentDiv);
+      }
+
+      wrapper.appendChild(slideEl);
+    });
+  }
+
+  /* ======== USAGE ======== */
+  const slides1 = [
+    { type: 'video', src: '../../media/scrub-video-landscape.mp4', alt: 'Slide 1', link: '#' },
+    { type: 'image', src: '../../media/landscape.jpg', alt: 'Slide 2', link: '#' },
+    { type: 'video', src: '../../media/scrub-video-landscape.mp4', alt: 'Slide 3', link: '#', hoversrc: '../../media/landscape.jpg' },
+    { type: 'video', src: '../../media/scrub-video-landscape.mp4', text: 'Caption Text' },
+    { type: 'image', src: '../../media/landscape.jpg', alt: 'Slide 4', link: '#' },
+  ];
+
+  generateSlides(slides1, 'swiper-wrapper1', false, true);
+
+  const swiper1 = new Swiper('#slider1', {
+    loop: true,
+    slidesPerView: 3.5,
+    spaceBetween: 5,
+    grabCursor: true,
+    breakpoints: {
+      1024: { slidesPerView: 3.5 },
+      640:  { slidesPerView: 1.5 },
+      320:  { slidesPerView: 1.5 },
+    },
+  });
+
+});
+</script>

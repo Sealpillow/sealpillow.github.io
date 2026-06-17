@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+  /* ----------------------------------------------------
+  GLOBAL RESET & BASE
+  ---------------------------------------------------- */
+  html, body {
+      overflow-x: hidden;
+      color: black;
+      text-wrap: pretty;
+      height: auto;
+      margin: 0;
+      padding: 0;
+  }
+  .page.parallax {
+      padding-top: 0px !important;
+  }
+
+  /* Hide folder headers (SiteGenesis leftover) */
+  .folder-header,
+  .folder_post .folder-container .container {
+      display: none !important;
+  }
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    background: #000;
+  }
+
+  video {
+    width: 100%;
+    display: block;
+    background: #000;
+  }
+  video:focus, 
+  .controls button:focus {
+      outline: none;
+  }
+  a {
+    color: black;
+  }
+  img,
+  video {
+    clip-path: fill-box; 
+}
+  .controls {
+    position: absolute;
+    bottom: 1rem;
+    width: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center; /* Optional: centers the items horizontally within the container */
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .controls button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .controls button img {
+    display: block;
+  }
+  .icon-play, .icon-pause {
+    width: 12px;
+    height: 24px;
+  }
+  .icon-mute, .icon-unmute {
+    width: 12px;
+    height: 12px;
+  }
+  .controls .mute {
+    transform: translateY(-1.5px); /* tweak: -1px to -4px */
+  }
+  /* play / pause icons */
+  .icon-pause { display: none; }
+  .play.is-playing .icon-play { display: none; }
+  .play.is-playing .icon-pause { display: inline; }
+  .play.is-paused .icon-play {display: inline;}
+  .play.is-paused .icon-pause {display: none;}
+
+  .timeline {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+
+  /* SMOOTH PROGRESS BAR */
+  .progressBar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progressFill {
+    height: 100%;
+    width: 100%;
+    background: white;
+    transform: scaleX(0);
+    transform-origin: left;
+    will-change: transform;
+  }
+
+  /* invisible seek input */
+  .seek {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .dropdown1 {
+    cursor: pointer;
+    padding: 14px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .dropdown1-content {
+    display: none;
+    padding: 15px;
+  }
+
+  .dropdown1-content a {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+  }
+
+  .arrow.rotate {
+      transform: rotate(180deg);
+  }
+
+  .arrow {
+      width: 1em;
+      height: 1em;
+      transition: transform 0.3s ease;
+  }
+
+
+  /* Ensure mobile version of the dropdown is shown in center */
+  @media (max-width: 767px) {
+    .dropdown1,
+    .dropdown1-content {
+        text-align: center;
+    }
+  }
+  .img-left-text-right {
+      display: flex;
+      align-items: center;
+  }
+
+  /* Desktop layout: image left, text right */
+  .img-left-text-right .image-block {
+      order: 1;
+      flex: 1;
+  }
+
+  .img-left-text-right .text-block {
+      order: 2;
+      flex: 1;
+  }
+
+  /* Mobile: stack with image on top */
+  @media (max-width: 767px) {
+      .img-left-text-right {
+          flex-direction: column;
+      }
+
+      .img-left-text-right .image-block {
+          order: 1;
+      }
+
+      .img-left-text-right .text-block {
+          order: 2;
+      }
+  }
+  .img-right-text-left {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Desktop layout: image left, text right */
+  .img-right-text-left .image-block {
+    order: 2;
+    flex: 1;
+  }
+
+  .img-right-text-left .text-block {
+    order: 1;
+    flex: 1;
+  }
+
+  /* Mobile: stack with image on top */
+  @media (max-width: 767px) {
+    .img-right-text-left {
+        flex-direction: column;
+    }
+
+    .img-right-text-left .image-block {
+        order: 1;
+    }
+
+    .img-right-text-left .text-block {
+        order: 2;
+    }
+  }
+  .equal-height-container {
+    display: flex;
+    align-items: stretch;
+    }
+
+    .equal-height-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    }
+
+    /* Desktop text styles */
+  .equal-height-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Keeps content at the top */
+    padding: 20px 5%; /* Padding for spacing inside */
+    width: 80%;
+  }
+
+  .equal-height-content p {
+    margin: 0 0 15px; /* Adds space between paragraphs */
+  }
+
+  /* Mobile text styles */
+  @media (max-width: 768px) {
+    .equal-height-content {
+      padding: 20px 15px; /* Reduce padding on mobile */
+      text-align: center; /* Center text on mobile */
+      width: 100%;
+    }
+  }
+
+  /* This creates space below all content */
+  .equal-height-content > :last-child {
+  margin-bottom: auto;
+  }
+  
+
+  .equal-height-wrapper {
+    flex: 1;
+    display: flex;
+  }
+
+  .equal-height-wrapper video,
+  .equal-height-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hover-half-section {
+    width: 100%;
+  }
+
+  .hover-half-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .hover-half-block {
+    position: relative;
+    flex: 1 1 48%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+
+  .hover-half-block img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.4s ease;
+  }
+
+  .hover-half-block .hover-img {
+    opacity: 0;
+    z-index: 2;
+  }
+
+  .hover-half-block:hover .hover-img {
+    opacity: 1;
+  }
+
+  .hover-half-block:hover .default-img {
+    opacity: 0;
+  }
+
+  .hover-half-caption {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    z-index: 3;
+    color: black
+  }
+
+
+  /* Mobile */
+  @media (max-width: 767px) {
+    .hover-half-block {
+      flex: 1 1 100%;
+      gap: 0px;
+    }
+    .hover-half-grid {
+      gap: 0px;
+    }
+    
+  }
+
+.slider-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content img,
+  .slide-content video {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Text below each slide image, outside the image */
+  .slide-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10;
+  }
+  .slide-text h3 {
+    font-size: 14px;
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+  .slide-text p {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  /* Hide arrows & pagination */
+  .splide__arrows,
+  .splide__pagination { display: none; }
+
+  .splide__track { cursor: grab; }
+  .splide__track:active { cursor: grabbing; }
+  
+</style>
+</head>
+
+<body>
+
+<div class="video-wrapper js-vertical-slider">
+  <div class="video-media-container">
+    <!-- Video Background (Desktop) -->
+    <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/jatte/a1.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Mobile Video -->
+    <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/jatte/a1-mobile.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="controls">
+      <button class="play is-playing">
+        <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+        <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+      </button>
+
+      <div class="timeline">
+        <div class="progressBar">
+          <div class="progressFill"></div>
+        </div>
+        <input class="seek" type="range" value="0" min="0" step="0.01">
+      </div>
+
+      <button class="mute">
+        <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+        <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Web -->
+<section class="d-lg-block d-none d-md-none">
+    <div class="position-relative text-center" style ="margin: 100px 0px;">
+        <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto;  text-align: center; line-height:33px;">
+            The Jatte
+        </p>
+        <br>
+        <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+          Adaptable silhouettes confident in presence, moving with you through moods,<br>
+          seasons, and scenes. With form, texture, and detail finely tuned,<br>
+          Jatte is the new core essential: a wardrobe anchor with edge.
+        </p>
+        <br><br>
+        <a href="$url('Search-Show', 'cgid', 'pwjattebag-anchor')$" style="text-decoration: underline;"  target="_blank" >
+            Shop The Collection
+        </a>
+    </div>
+</section>
+
+<!-- Mobile -->
+<section class="d-block d-md-none d-md-block d-none d-lg-none">
+    <div class="text-center" style ="margin: 100px 0px;">
+        <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto; text-align: center;line-height:33px;">
+            The Jatte
+        </p>
+        <br>
+        <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center;font-weight: 400;  line-height:normal;">
+          Adaptable silhouettes confident in presence, moving with you through moods,<br>
+          seasons, and scenes. With form, texture, and detail finely tuned,<br>
+          Jatte is the new core essential: a wardrobe anchor with edge.
+        </p>
+        <br><br>
+        <a href="$url('Search-Show', 'cgid', 'pwjattebag-anchor')$" style="text-decoration: underline;"  target="_blank" >
+            Shop The Collection
+        </a>
+    </div>
+</section>
+
+<!-- Dropdown (Desktop and Mobile) -->
+<div class="dropdown1 d-block" onclick="toggleDropdown()">
+  <span style="font-size:14px;font-weight:500;">JATTE</span>
+  <svg id="arrow-icon" xmlns="http://www.w3.org/2000/svg" class="arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+  </svg>
+</div>
+
+<!-- Dropdown Content (Shared for Desktop & Mobile) -->
+<div class="dropdown1-content" id="dropdown1-content">
+  <a href="#shopcollection" style="font-size:14px;font-weight:500;">SHOP THE COLLECTION</a>
+</div>
+
+<section class="img-left-text-right" style="align-items:center;">
+
+    <!-- IMAGE BLOCK (LEFT) -->
+    <div class="image-block">
+        
+      <a href="$url('Product-Show', 'pid', 'PW2-75210182_BROWN')$"> 
+        <img src="images/design-philosophy/jatte/b1.webp?$staticlink$" alt="Jatte Vibe" class="img-fluid w-100">
+      </a>
+    </div>
+
+    <!-- TEXT BLOCK (RIGHT) -->
+    <div class="text-block" >
+        <div class="inner-text">
+
+            <!-- Desktop title -->
+            <p class="d-md-block d-none mb-0 p-0 col-md-12" 
+            style="font-family:proxima-nova; width:100%; margin:0 auto; font-size:14px; text-align:center; line-height:33px;">
+                Design and Form
+            </p>
+
+            <!-- Mobile title -->
+            <p class="d-block d-md-none mb-0 p-0 col-md-12 " 
+                style="font-family:proxima-nova; width:100%; font-size:14px; text-align:center; line-height:33px; margin:100px auto 0px;">
+                Design and Form
+            </p>
+
+            <!-- Desktop body -->
+            <p class="d-md-block d-none mb-0" 
+              style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+              Sculptural Without Being Stiff, Fluid Without Feeling Loose.<br>
+              Each Curve Is Intentional, Each Edge Considered,<br>
+              Creating Silhouettes That Feel Less Designed and More Discovered.
+
+            </p>
+
+            <!-- Mobile body -->
+            <p class="d-block d-md-none" 
+            style="font-family:proxima-nova; font-size:20px; width:100%; margin:0px auto 100px; text-align:center; font-weight:400; line-height:normal;">
+              Sculptural Without Being Stiff, Fluid Without Feeling Loose.<br>
+              Each Curve Is Intentional, Each Edge Considered,<br>
+              Creating Silhouettes That Feel Less Designed and More Discovered.
+            </p>
+
+        </div>
+    </div>
+
+</section>
+
+<section class="img-right-text-left" style="align-items:center;">
+
+    <!-- TEXT BLOCK (LEFT) -->
+    <div class="text-block" >
+        <div class="inner-text">
+
+            <!-- Desktop title -->
+            <p class="d-md-block d-none mb-0 p-0 col-md-12" 
+              style="font-family:proxima-nova; width:100%; margin:0 auto; font-size:14px; text-align:center; line-height:33px;">
+                Hardware
+            </p>
+
+            <!-- Mobile title -->
+            <p class="d-block d-md-none mb-0 p-0 col-md-12 " 
+                style="font-family:proxima-nova; width:100%; font-size:14px; text-align:center; line-height:33px; margin:100px auto 0px;">
+                Hardware
+            </p>
+
+            <!-- Desktop body -->
+            <p class="d-md-block d-none mb-0" 
+            style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+              The Code That Holds the Collection Together:<br>
+              Clean, Consistent, and Present Across All Variations.<br>
+              A Unifying Element That Signals Jatte’s Signature,<br>
+              the Sliding Mechanism Moves Seamlessly. No Snags, No Fuss.
+
+            </p>
+
+            <!-- Mobile body -->
+            <p class="d-block d-md-none" 
+            style="font-family:proxima-nova; font-size:20px; width:100%; margin:0px auto 100px; text-align:center; font-weight:400; line-height:normal;">
+              The Code That Holds the Collection Together:<br>
+              Clean, Consistent, and Present Across All Variations.<br>
+              A Unifying Element That Signals Jatte’s Signature,<br>
+              the Sliding Mechanism Moves Seamlessly. No Snags, No Fuss.
+            </p>
+
+        </div>
+    </div>
+
+    <!-- IMAGE BLOCK (RIGHT) -->
+    <div class="image-block">
+      <video playsinline auto autoplay loop muted
+          style="width: 100%; object-fit: cover;">
+          <source src="images/design-philosophy/jatte/c1.mp4?$staticlink$" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>    
+
+    </div>
+
+</section>
+
+
+<!-- DESKTOP VIEW -->
+<div class="d-none d-md-block w-100">
+  <div class="equal-height-container">
+    
+    <!-- VIDEO COLUMN -->
+    <div class="equal-height-column">
+      <div class="equal-height-wrapper">
+        <div class="w-100 d-none d-md-block" style="padding: 100% 0 0 0; position: relative;">
+            <!-- Replacing iframe with <video> -->
+            <video playsinline autoplay loop muted
+                   style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+              <source src="images/design-philosophy/jatte/d1.mp4?$staticlink$" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+        </div>
+      </div>
+      <div class="equal-height-content">
+        <p style="font-size: 20px;">A Belief Carried Throughout</p>
+        <p style="font-size: 14px;">
+          At the core of Jatte is a belief in intention. No overstyling, no excess. Just clarity in design
+          and confidence in material. When everything has a purpose, nothing needs to shout.
+        </p>
+      </div>
+    </div>
+
+    <!-- IMAGE COLUMN -->
+    <div class="equal-height-column">
+      <div class="equal-height-wrapper">
+        <img src="images/design-philosophy/jatte/d2.webp?$staticlink$" alt="Jatte Vibe">
+      </div>
+      <div class="equal-height-content">
+        <p style="font-size: 20px;">The Jatte Vibe</p>
+        <p style="font-size: 14px;">
+          Made for the ones who dress without trying. Effortless but never accidental. On the move,
+          in the know, always one beat ahead. This is their go-to, and now it’s yours too.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- MOBILE VIEW -->
+<div class="d-block d-md-none w-100">
+
+  <!-- VIDEO SECTION -->
+  <div class="mb-4">
+    <div style="padding:0 100% 0 0; position:relative; padding-bottom: 100%;"> <!-- 16:9 -->
+      <!-- Replacing iframe with <video> -->
+      <video playsinline autoplay loop muted
+             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/jatte/d1.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+    <div class="equal-height-content text-center">
+      <p style="font-size: 20px;">A Belief Carried Throughout</p>
+      <p style="font-size: 14px;">
+        At the core of Jatte is a belief in intention. No overstyling, no excess. Just clarity in design
+        and confidence in material. When everything has a purpose, nothing needs to shout.
+      </p>
+    </div>
+  </div>
+
+  <!-- IMAGE SECTION -->
+  <div>
+    <img src="images/design-philosophy/jatte/d2.webp?$staticlink$" alt="Jatte Vibe" class="img-fluid w-100">
+    <div class="equal-height-content text-center">
+      <p style="font-size: 20px;">The Jatte Vibe</p>
+      <p style="font-size: 14px;">
+        Made for the ones who dress without trying. Effortless but never accidental. On the move,
+        in the know, always one beat ahead. This is their go-to, and now it’s yours too.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<div class="spacer"><div class="py-lg-4 mb-xl-1 py-xl-4 py-4"></div> </div>
+
+<p id="shopcollection" class="mt-5 mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 35px; font-family: 'proxima-nova';">
+  Shop The Collection
+</p>
+
+<div class="slider-container">
+  <div class="splide" id="carouselExploreSlider1">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<p id="discoverstories" class="mt-5 mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 35px; font-family: 'proxima-nova';">
+    Discover Stories
+</p>
+
+<section class="hover-half-section">
+    <div class="hover-half-grid">
+        <!-- Story 1 -->
+        <div class="hover-half-block">
+          <a href="$url('Page-Show','cid','a-new-dimension-this-fall-with-jatte')$">
+            <img src="images/design-philosophy/jatte/f1.webp?$staticlink$" class="default-img d-none d-md-block" alt="The Jatte Living">
+            <img src="images/design-philosophy/jatte/f1-2.webp?$staticlink$" class="hover-img d-none d-md-block" alt="The Jatte Living Hover">
+            <img src="images/design-philosophy/jatte/f1-2.webp?$staticlink$" class="d-block d-md-none" alt="The Jatte Living Mobile">
+            <div class="hover-half-caption">A New Dimension</div>
+          </a>
+        </div>
+
+        <!-- Story 2 -->
+        <div class="hover-half-block">
+          <a href="$url('Page-Show','cid','the-jatte-living')$">
+            <img src="images/design-philosophy/jatte/f2.webp?$staticlink$" class="default-img d-none d-md-block" alt="The Jatte Living">
+            <img src="images/design-philosophy/jatte/f2-2.webp?$staticlink$" class="hover-img d-none d-md-block" alt="The Jatte Living Hover">
+            <img src="images/design-philosophy/jatte/f2-2.webp?$staticlink$" class="d-block d-md-none" alt="The Jatte Living Mobile">
+            <div class="hover-half-caption">The Jatte Living</div>
+          </a>
+        </div>
+    </div>
+</section>
+
+
+<p id="asseenon" class="mt-5 mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 35px; font-family: 'proxima-nova';">
+  As Seen On
+</p>
+
+<div class="slider-container">
+  <div class="splide" id="carouselExploreSlider2">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- Publish Content -->
+<div class="publish-content" style = "padding-top:3rem; padding-left: 40px;">
+    <span style="font-size: 18px;">
+        Published on 18 August 2025
+        <br><br>
+        <a href="$url('Search-Show','cgid','pwnewarrivals')$">SHOP WOMEN'S NEW ARRIVALS</a> &gt;
+        <br>
+        <a href="$url('Search-Show','cgid','pmnewarrivals')$">SHOP MEN'S NEW ARRIVALS</a> &gt;
+    </span>
+</div> 
+
+<script>
+  function toggleDropdown() {
+    const content = document.getElementById("dropdown1-content");
+    const arrow = document.getElementById("arrow-icon");
+
+    const isOpen = content.style.display === "block";
+    content.style.display = isOpen ? "none" : "block";
+    arrow.classList.toggle("rotate", !isOpen);
+  }
+</script>
+
+<script>
+function initVideoControls(scope = document) {
+
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+
+    const videos = container.querySelectorAll('.video');
+    if (!videos.length) return;
+
+    // Use the visible video (desktop/mobile)
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    // Set default volume
+    video.volume = 0.2;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+    const iconMute = container.querySelector('.icon-mute');
+    const iconUnmute = container.querySelector('.icon-unmute');
+
+    if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
+
+    // Remove any existing event listeners by cloning the buttons
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newMuteBtn = muteBtn.cloneNode(true);
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+    // Update references to the new buttons
+    const freshPlayBtn = container.querySelector('.play');
+    const freshMuteBtn = container.querySelector('.mute');
+    const freshIconMute = container.querySelector('.icon-mute');
+    const freshIconUnmute = container.querySelector('.icon-unmute');
+
+    // PLAY / PAUSE
+    freshPlayBtn.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        freshPlayBtn.classList.add('is-playing');
+        freshPlayBtn.classList.remove('is-paused');
+      } else {
+        video.pause();
+        freshPlayBtn.classList.add('is-paused');
+        freshPlayBtn.classList.remove('is-playing');
+      }
+    });
+
+    // MUTE
+    freshMuteBtn.addEventListener('click', () => {
+      video.muted = !video.muted;
+      freshIconMute.style.display = video.muted ? 'block' : 'none';
+      freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+    });
+
+    // PROGRESS UPDATE
+    video.addEventListener('timeupdate', () => {
+      const progress = video.currentTime / video.duration;
+      progressFill.style.transform = `scaleX(${progress})`;
+      seek.value = progress * 100;
+    });
+
+    // SEEK
+    seek.addEventListener('input', () => {
+      const percent = seek.value / 100;
+      video.currentTime = percent * video.duration;
+    });
+
+  });
+}
+
+// INIT ON PAGE LOAD
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
+
+<script>
+    function toggleDropdown1() {
+        const content = document.getElementById("dropdown1-content");
+        const arrow = document.getElementById("arrow-icon");
+
+        const isOpen = content.style.display === "block";
+        content.style.display = isOpen ? "none" : "block";
+        arrow.classList.toggle("rotate", !isOpen);
+    }
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      // Media
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline loading="lazy">
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}" loading="lazy">`;
+      }
+
+      // Wrap in anchor
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      // Text below image (outside anchor)
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text" style="color:${slide.textcolor}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      gap: 5,
+      arrows: false,
+      pagination: false,
+      padding: { left: '0rem', right: '6rem' },
+      breakpoints: {
+        1024: { perPage: 2 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+
+  createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider1',
+    slides: [
+        { type: 'image', src: "images/design-philosophy/jatte/e1.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210161-5_BROWN')$"},
+      { type: 'image', src: "images/design-philosophy/jatte/e2.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210182_BROWN')$"},
+      { type: 'image', src: "images/design-philosophy/jatte/e3.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210161_BLACK')$"},
+      { type: 'image', src: "images/design-philosophy/jatte/e4.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210161_CHALK')$"},
+      { type: 'image', src: "images/design-philosophy/jatte/e5.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210161-4_BROWN')$"},
+      { type: 'image', src: "images/design-philosophy/jatte/e6.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210161-4_L.YELL')$"},
+      { type: 'image', src: "images/design-philosophy/jatte/e7.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210161-2_SILVER')$"}
+  ],
+    options: {
+      perPage: 3,
+    }
+  });
+
+  createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider2',
+    slides: [
+      { type: 'image', src: "images/design-philosophy/jatte/g1.webp?$staticlink$", alt: 'Slide 3'},
+      { type: 'image', src: "images/design-philosophy/jatte/g2.webp?$staticlink$", alt: 'Slide 3'},
+      { type: 'image', src: "images/design-philosophy/jatte/g3.webp?$staticlink$", alt: 'Slide 3'},
+      { type: 'image', src: "images/design-philosophy/jatte/g4.webp?$staticlink$", alt: 'Slide 3'},
+      { type: 'image', src: "images/design-philosophy/jatte/g5.webp?$staticlink$", alt: 'Slide 3'},
+      { type: 'image', src: "images/design-philosophy/jatte/g6.webp?$staticlink$", alt: 'Slide 3'},
+      { type: 'image', src: "images/design-philosophy/jatte/g7.webp?$staticlink$", alt: 'Slide 3'},
+      { type: 'image', src: "images/design-philosophy/jatte/g8.webp?$staticlink$", alt: 'Slide 3'},
+      { type: 'image', src: "images/design-philosophy/jatte/g9.webp?$staticlink$", alt: 'Slide 3'}
+  ],
+    options: {
+      perPage: 6,
+    }
+  });
+
+});
+</script>
+
+</body>
+
+</html>

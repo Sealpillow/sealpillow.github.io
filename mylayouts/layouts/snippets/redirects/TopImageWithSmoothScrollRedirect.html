@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maxi vs Micro</title>
+    <style>
+/* Body > H1 > H2 > P */
+body, h1, h2, p {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Overview Section */
+.overview-section {
+  height: 400px;
+  position: relative;
+  width: 100%;
+}
+
+/* Overview Image */
+.overview-image {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Redirect Links */
+.redirect-links {
+  color: black;
+  font-size: 1.5em;
+  font-weight: bold;
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+/* Redirect Links > A */
+.redirect-links a {
+  color: black;
+  display: block;
+  margin: 10px 0;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+/* Redirect Links > A */
+.redirect-links a:hover {
+  color: #007BFF;
+}
+
+/* Bag Content */
+.bag-content {
+  background-color: #f9f9f9;
+  display: none;
+  margin-top: 20px;
+  padding: 20px;
+}
+
+/* Bag Content > H2 */
+.bag-content h2 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+/* Bag Content > P */
+.bag-content p {
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<!-- Overview Section -->
+<section class="overview-section">
+    <img src="https://picsum.photos/800/600?random=3" alt="Overview Image" class="overview-image">
+
+    <div class="redirect-links">
+        <!-- Normal Text Links -->
+        <a href="javascript:void(0);" onclick="toggleContent('maxi')">Discover Demi Maxi</a>
+        <a href="javascript:void(0);" onclick="toggleContent('micro')">Discover Demi Micro</a>
+    </div>
+</section>
+
+<!-- Maxi Content Section -->
+<div id="sectionmaxi" class="bag-content" style="display: block;">
+    <h2>Demi Maxi Details</h2>
+    <p>Our Demi Maxi bag combines elegance and functionality. Perfect for those who need extra space without compromising on style. Made from premium materials, this bag is ideal for daily use or special occasions. </p>
+    <p>Its spacious interior provides ample room for all your essentials, and its sleek exterior makes it a fashion-forward choice.</p>
+</div>
+
+<!-- Micro Content Section -->
+<div id="sectionmicro" class="bag-content">
+    <h2>Demi Micro Details</h2>
+    <p>The Demi Micro bag is a compact, trendy choice for those who prefer a smaller silhouette. Despite its size, it carries all the essential details of the Demi collection, offering both style and practicality. </p>
+    <p>Designed for those who need only the essentials, this bag features a convenient and minimalist design, perfect for on-the-go lifestyles.</p>
+</div>
+
+<!-- JavaScript -->
+<script>
+    function toggleContent(type) {
+        // Hide both content sections initially
+        document.getElementById('sectionmaxi').style.display = 'none';
+        document.getElementById('sectionmicro').style.display = 'none';
+
+        // Show the selected content based on the 'type' passed
+        if (type === 'maxi') {
+            document.getElementById('sectionmaxi').style.display = 'block';
+        } else if (type === 'micro') {
+            document.getElementById('sectionmicro').style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>

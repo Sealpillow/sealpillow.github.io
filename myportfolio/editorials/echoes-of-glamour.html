@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+  <link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- BootStrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<style>
+    body,
+    html {
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+        /*background-color: #e8e8e8;*/
+        color: black;
+        text-wrap: pretty;
+        height:auto;
+    }
+    .folder-header {
+        visibility: hidden;
+        display: none;
+    }
+    .folder_post .folder-container .container {
+      display: none;
+    }
+
+    a {
+        color: black;
+    }
+    /* Style each image */
+    .image-container img {
+      width: 100%;           /* image fills the link */
+      height: auto;
+      display: block;        /* remove inline gaps */
+    }
+    
+    .image-container2 {
+        width: 65%;              /* Each image takes 50% of the width */
+        height: auto;            /* Maintain aspect ratio */
+        margin: 0 auto;
+    }
+
+
+    /* Style each image */
+    .image-container2 img {
+        width: 100%;           /* image fills the link */
+        height: auto;
+        display: block;        /* remove inline gaps */
+        margin: 0 auto;
+    }
+  
+    .base-swiper-container {
+      width: 100%;
+      position: relative;
+    }
+    .page.parallax {
+        padding-top: 0px !important;
+    }
+    .swiper-slide img,
+    .swiper-slide video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .swiper-slide {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .slide-text {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    }
+    @media (min-width: 350px) {
+    .responsive-image {
+      width: 25%;
+      margin: 100px auto;
+      display: block;
+    }
+  }
+    @media (max-width: 768px) {
+      .responsive-image {
+        width: 90%;
+      }
+    }
+
+
+.collection_modal {
+    display: flex;
+    flex-direction: column;  /* This would stack the children vertically */
+    transition: transform 0.5s ease-in-out;
+}
+body.bs-modal_body_fix {position:relative;}
+
+        
+  </style>
+</head>
+
+<body>
+
+<!-- Web -->
+<div class="image-container d-md-flex d-none js-vertical-slider">
+  <!--left-->
+  <a class="js-shop-the-collection" data-pid="PW2-75210187_SILVER" href="$url('Product-Show', 'pid','PW2-75210187_SILVER')$" > 
+    <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-a1.webp?$staticlink$" alt="Bag">
+  </a>
+  <!--right-->
+  <a class="js-shop-the-collection" data-pid="PW1-25580405-1_PEWTER,PW2-75210187_SILVER" href="$url('Product-Show', 'pid','PW1-25580405-1_PEWTER')$"> 
+    <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-a2.webp?$staticlink$" alt="Bag">
+  </a>
+</div>
+
+<!-- Mobile -->
+<div class="image-container d-block d-md-none js-vertical-slider">
+  <a class="js-shop-the-collection" data-pid="PW2-75210187_SILVER" href="$url('Product-Show', 'pid','PW2-75210187_SILVER')$" > 
+    <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-a1-mobile.webp?$staticlink$" alt="Bag">
+  </a>
+</div>
+
+
+<div class="folder_post-template_one">
+    <!-- Web -->
+    <!-- Block 1: Text + Images Layout -->
+    <div class="container-fluid d-md-flex d-none px-0" style="margin: 100px auto; width: 90%; position: relative;">
+      <!-- Left Text Section (anchored left) -->
+      <div style="width: 35%; padding-right: 40px; position: absolute; left: 0; top: 0; text-align: left;">
+        <h5 style="font-size: 30px; font-weight: 500;">Echoes<br>of Glamour</h5>
+        <p style="font-size: 13px; line-height: 1.6; color: #333;">
+          This season, celebration takes on a new<br>form, measured in gesture and assured in<br>expression. 
+          We’re kicking things into<br>gear, not just in the way we celebrate but<br>in how we choose to show up. 
+          Polished<br>in attitude yet striking in its finer details,<br>the collection revisits dressing up with 
+          a<br>contemporary point of view, with glamour<br>reinterpreted through statement<br>materials in tasteful cuts and finishes. 
+          An<br>invitation to elevate the moment, with<br>pieces designed to bring a sense of<br>opulence to the everyday.
+        </p>
+      </div>
+
+      <!-- web -->
+      <!-- Centered Image Section -->
+      <div style="width: 30%; margin: 0 auto; text-align: center;">
+        <!-- Top Image -->
+        <a class="js-shop-the-collection" data-pid="PM2-25210266_BLACK" href="$url('Product-Show', 'pid','PM2-25210266_BLACK')$">
+          <img loading ="lazy"
+            src="images/echoes-of-glamour/echoes-of-glamour-b1.webp?$staticlink$"
+            alt="Top Image"
+            class="img-fluid w-100 mb-3"
+          />
+        </a>
+
+        <!-- Bottom Image -->
+        <a class="js-shop-the-collection" data-pid="PM2-25210266_BLACK" href="$url('Product-Show', 'pid','PM2-25210266_BLACK')$">
+          <img loading ="lazy"
+            src="images/echoes-of-glamour/echoes-of-glamour-c1.webp?$staticlink$"
+            alt="Bottom Image"
+            class="img-fluid w-100"
+          />
+        </a>
+      </div>
+    </div>
+
+   
+
+    <!-- Web -->
+    <div class="image-container d-md-flex d-none">
+      <!--left-->
+      <a class="js-shop-the-collection" data-pid="PW2-65210011_BLACK" href="$url('Product-Show', 'pid','PW2-65210011_BLACK')$" > 
+        <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-d1.webp?$staticlink$" alt="Bag">
+      </a>
+      <!--right-->
+      <a class="js-shop-the-collection" data-pid="PW2-65210011_BLACK" href="$url('Product-Show', 'pid','PW2-65210011_BLACK')$"> 
+        <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-d2.webp?$staticlink$" alt="Bag">
+      </a>
+    </div>
+
+    <!-- Web -->
+    <div class="image-container2 d-md-flex d-none" style ="gap:15%; margin-top: 100px;">
+      <!--left-->
+      <a class="js-shop-the-collection" data-pid="PM2-45210236_NAVY,PM1-46600211_BLACK" href="$url('Product-Show', 'pid','PM2-45210236_NAVY')$"> 
+        <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-e1.webp?$staticlink$" alt="Bag">
+      </a>
+      <!--right-->
+      <a class="js-shop-the-collection" data-pid="PW2-76390138-1_SILVER" href="$url('Product-Show', 'pid','PW2-76390138-1_SILVER')$">   
+        <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-e2.webp?$staticlink$" alt="Bag">
+      </a>
+    </div>
+
+    <!-- Web -->
+    <!--full image-->
+    <div class="image-container d-md-flex d-none">
+      <a class="js-shop-the-collection" data-pid="PW2-75210187_SILVER,PW1-25580405-1_PEWTER" href="$url('Product-Show', 'pid','PW2-75210187_SILVER')$"> 
+        <picture style="display: block; width: 100%; margin-top: 100px;">
+            <source media="(max-width: 767px)" srcset="images/echoes-of-glamour/echoes-of-glamour-f1-mobile.webp?$staticlink$">
+            <img loading ="lazy" 
+                src="images/echoes-of-glamour/echoes-of-glamour-f1.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: auto; display: block;"
+            />
+        </picture>
+      </a>
+    </div>
+
+    <!-- Web -->
+    <div class="container-fluid d-md-block d-none px-0" style="width:25%; margin: 100px auto" >
+      <!-- Top Image -->
+      <a class="js-shop-the-collection" data-pid="PW1-25580405-1_PEWTER" href="$url('Product-Show', 'pid','PW1-25580405-1_PEWTER')$"> 
+        <img loading ="lazy" 
+          src="images/echoes-of-glamour/echoes-of-glamour-g1.webp?$staticlink$" 
+          alt="Top Image" 
+          class="img-fluid w-100 mb-3"
+        />
+      </a>
+      <!-- Bottom Image -->
+      <a class="js-shop-the-collection" data-pid="PW1-26480098_PEWTER" href="$url('Product-Show', 'pid','PW1-26480098_PEWTER')$"> 
+        <img loading ="lazy" 
+          src="images/echoes-of-glamour/echoes-of-glamour-h1.webp?$staticlink$" 
+          alt="Bottom Image" 
+          class="img-fluid w-100"
+        />
+      </a>
+    </div>
+
+    <!-- Web -->
+    <div class="image-container d-md-flex d-none" style="margin: 100px auto">
+      <a class="js-shop-the-collection" data-pid="PM2-25210266_BLACK" href="$url('Product-Show', 'pid','PM2-25210266_BLACK')$" > 
+        <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-i1.webp?$staticlink$" alt="Bag">
+      </a>
+    </div>
+
+    <!-- Web -->
+    <div class="image-container2 d-md-flex d-none" style ="gap:15%; margin-top: 100px;">
+      <!--left-->
+      <a class="js-shop-the-collection" data-pid="PW2-75210187_SILVER,PW1-25580405-1_PEWTER" href="$url('Product-Show', 'pid','PW2-75210187_SILVER')$"> 
+        <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-j1.webp?$staticlink$" alt="Bag">
+      </a>
+      <!--right-->
+      <a class="js-shop-the-collection" data-pid="PM1-46600211_BLACK,PM2-25210266_BLACK" href="$url('Product-Show', 'pid','PM1-46600211_BLACK')$">   
+        <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-j2.webp?$staticlink$" alt="Bag">
+      </a>
+    </div>
+
+    <!-- Web -->
+    <div class="image-container d-md-flex d-none" style="margin: 100px auto">
+      <a class="js-shop-the-collection" data-pid="PM2-45210236_NAVY,PW2-75210187_SILVER"  href="$url('Product-Show', 'pid','PM2-45210236_NAVY')$" > 
+        <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-k1.webp?$staticlink$" alt="Bag">
+      </a>
+    </div>
+
+  <!-- Web -->
+    <div class="container-fluid d-md-block d-none px-0" style="width:25%; margin: 100px auto" >
+      <!-- Top Image -->
+      <a class="js-shop-the-collection" data-pid="PM2-25210266_BLACK" href="$url('Product-Show', 'pid','PM2-25210266_BLACK')$"> 
+        <img loading ="lazy" 
+          src="images/echoes-of-glamour/echoes-of-glamour-l1.webp?$staticlink$" 
+          alt="Top Image" 
+          class="img-fluid w-100 mb-3"
+        />
+      </a>
+      <!-- Bottom Image -->
+      <a class="js-shop-the-collection" data-pid="PW1-66480121_BLACK,PW2-65210011_BLACK" href="$url('Product-Show', 'pid','PW1-66480121_BLACK')$"> 
+        <img loading ="lazy" 
+          src="images/echoes-of-glamour/echoes-of-glamour-m1.webp?$staticlink$" 
+          alt="Bottom Image" 
+          class="img-fluid w-100"
+        />
+      </a>
+    </div>
+
+  <!-- mobile -->
+<section class="block-1 d-block d-md-none">
+    <div style="margin: 0 auto; text-align: left; max-width: 70%;">
+        <h5 style="font-size: 20px; font-weight: 500; margin-top: 50px;">
+            Echoes<br>of Glamour<br><br>
+        </h5>
+
+        <p style="font-family: proxima-nova; font-size: 14px; font-weight: 400; 
+                  line-height: normal; margin-top: 10px; text-align: left;">
+            This season, celebration takes on a new form, measured in gesture and assured in expression.
+            We’re kicking things into gear, not just in the way we celebrate but in how we choose to show up.
+            Polished in attitude yet striking in its finer details, the collection revisits dressing up with
+            a contemporary point of view, with glamour reinterpreted through statement materials in tasteful
+            cuts and finishes. An invitation to elevate the moment, with pieces designed to bring a sense of
+            opulence to the everyday.
+        </p>
+    </div>
+</section>
+<!-- mobile -->
+
+  <div class="container-fluid d-block d-md-none px-0" style ="margin-top: 50px;">
+    <!-- Top Image -->
+    <a class="js-shop-the-collection" data-pid="PM2-45210236_NAVY,PM1-46600211_BLACK,PW2-76390138-1_SILVER" href="$url('Product-Show', 'pid','PM2-45210236_NAVY')$">  
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-e1.webp?$staticlink$" 
+        alt="Top Image" 
+        class="img-fluid w-100"
+      />
+    </a>
+    <a class="js-shop-the-collection" data-pid="PW2-76390138-1_SILVER" href="$url('Product-Show', 'pid','PW2-76390138-1_SILVER')$"> 
+      <!-- Bottom Image -->
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-e2.webp?$staticlink$" 
+        alt="Bottom Image" 
+        class="img-fluid w-100"
+      />
+    </a>
+  </div>
+
+  <!-- Mobile -->
+  <div class="container-fluid d-block d-md-none px-0" style="width:85%; margin: 50px auto" >
+    <!-- Top Image -->
+    <a class="js-shop-the-collection" data-pid="PM2-25210266_BLACK" href="$url('Product-Show', 'pid','PM2-25210266_BLACK')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-d1-mobile.webp?$staticlink$" 
+        alt="Top Image" 
+        class="img-fluid w-100 mb-4"
+      />
+    </a>
+    <!-- Bottom Image -->
+    <a class="js-shop-the-collection" data-pid="PM2-25210266_BLACK,PM1-46600211_BLACK"  href="$url('Product-Show', 'pid','PM2-25210266_BLACK')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-e1-mobile.webp?$staticlink$" 
+        alt="Bottom Image" 
+        class="img-fluid w-100 mb-4"
+      />
+    </a>
+
+    <!-- Bottom Image -->
+    <a class="js-shop-the-collection" data-pid="PM2-25210266_BLACK" href="$url('Product-Show', 'pid','PM2-25210266_BLACK')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-f1-mobile.webp?$staticlink$" 
+        alt="Bottom Image" 
+        class="img-fluid w-100"
+      />
+    </a>
+  </div>
+
+  <!-- Mobile -->
+  <div class="image-container d-block d-md-none">
+    <a class="js-shop-the-collection" data-pid="PW2-65210011_BLACK" href="$url('Product-Show', 'pid','PW2-65210011_BLACK')$" > 
+      <img loading ="lazy" src="images/echoes-of-glamour/echoes-of-glamour-g1-mobile.webp?$staticlink$" alt="Bag">
+    </a>
+  </div>
+  <!-- Mobile -->
+  <div class="container-fluid d-block d-md-none px-0" style="width:85%; margin: 50px auto" >
+    <!-- Top Image -->
+    <a class="js-shop-the-collection" data-pid="PW1-25580405-1_PEWTER" href="$url('Product-Show', 'pid','PW1-25580405-1_PEWTER')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-h1-mobile.webp?$staticlink$" 
+        alt="Top Image" 
+        class="img-fluid w-100 mb-4"
+      />
+    </a>
+    <!-- Bottom Image -->
+    <a class="js-shop-the-collection" data-pid="PW1-26480098_PEWTER" href="$url('Product-Show', 'pid','PW1-26480098_PEWTER')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-i1-mobile.webp?$staticlink$" 
+        alt="Bottom Image" 
+        class="img-fluid w-100"
+      />
+    </a>
+  </div>
+
+  <!-- Mobile -->
+  <div class="container-fluid d-block d-md-none px-0">
+    <a class="js-shop-the-collection" data-pid="PM2-45210236_NAVY,PW2-75210187_SILVER" href="$url('Product-Show', 'pid','PM2-45210236_NAVY')$">
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-j1-mobile.webp?$staticlink$" 
+        alt="Top Image" 
+        class="img-fluid w-100"
+      />
+    </a>
+  </div>
+
+
+
+  <!-- Mobile -->
+  <div class="container-fluid d-block d-md-none px-0" style="width:85%; margin: 50px auto" >
+    <!-- Top Image -->
+    <a class="js-shop-the-collection" data-pid="PM2-25210266_BLACK"  href="$url('Product-Show', 'pid','PM2-25210266_BLACK')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-k1-mobile.webp?$staticlink$" 
+        alt="Top Image" 
+        class="img-fluid w-100 mb-4"
+      />
+    </a>
+    <!-- Bottom Image -->
+    <a class="js-shop-the-collection" data-pid="PW1-66480121_BLACK,PW2-65210011_BLACK" href="$url('Product-Show', 'pid','PW1-66480121_BLACK')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-l1-mobile.webp?$staticlink$" 
+        alt="Bottom Image" 
+        class="img-fluid w-100"
+      />
+    </a>
+  </div>
+  <!-- Mobile -->
+  <div class="container-fluid d-block d-md-none px-0" style="width:100%; margin: 50px auto" >
+    <!-- Top Image -->
+    <a class="js-shop-the-collection" data-pid="PW2-75210187_SILVER" href="$url('Product-Show', 'pid','PW2-75210187_SILVER')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-m1-mobile.webp?$staticlink$" 
+        alt="Top Image" 
+        class="img-fluid w-100"
+      />
+    </a>
+    <!-- Bottom Image -->
+    <a class="js-shop-the-collection" data-pid="PW1-25580405-1_PEWTER,PW2-75210187_SILVER" href="$url('Product-Show', 'pid','PW1-25580405-1_PEWTER')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-n1-mobile.webp?$staticlink$" 
+        alt="Bottom Image" 
+        class="img-fluid w-100"
+      />
+    </a>
+  </div>
+
+  <!-- Mobile -->
+  <div class="container-fluid d-block d-md-none px-0" style="width:85%; margin: 50px auto" >
+    <!-- Top Image -->
+    <a class="js-shop-the-collection" data-pid="PW2-75210187_SILVER,PW1-25580405-1_PEWTER" href="$url('Product-Show', 'pid','PW2-75210187_SILVER')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-o1-mobile.webp?$staticlink$" 
+        alt="Top Image" 
+        class="img-fluid w-100 mb-4"
+      />
+    </a>
+    <!-- Bottom Image -->
+    <a class="js-shop-the-collection" data-pid="PM2-25210266_BLACK,PM1-46600211_BLACK" href="$url('Product-Show', 'pid','PM1-46600211_BLACK')$"> 
+      <img loading ="lazy" 
+        src="images/echoes-of-glamour/echoes-of-glamour-p1-mobile.webp?$staticlink$" 
+        alt="Bottom Image" 
+        class="img-fluid w-100"
+      />
+    </a>
+  </div>
+
+    <!-- Footer Section -->
+    <div class="" style="width: 100%; padding: 0; margin: 0;">
+      <br><br>
+      <!-- Text Container for published date -->
+      <div class="text" style="font-size: 18px; padding-left: 2%;">
+          Published on 17 Nov 2025
+      </div>
+      <br>
+      <!-- Link for Shop Section -->
+      <a href="$url('Search-Show','cgid','pwnewarrivals')$" 
+          style="display: block; text-decoration:underline; padding-left: 2%; font-size: 18px; ">
+          SHOP WOMEN'S NEW ARRIVALS>
+      </a>
+      <a href="$url('Search-Show','cgid','pmnewarrivals')$" 
+          style="display: block; text-decoration:underline; padding-left: 2%; font-size: 18px; ">
+          SHOP MEN'S NEW ARRIVALS>
+      </a>
+    </div>
+  </section>
+</div>
+
+</body>
+
+</html>

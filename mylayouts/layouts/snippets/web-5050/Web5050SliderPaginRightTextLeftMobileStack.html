@@ -1,0 +1,281 @@
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+
+
+<style>
+/* Text Left Slider Right */
+.text-left-slider-right {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* Text Left Slider Right > Text Block */
+.text-left-slider-right .text-block {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 50%;
+}
+
+/* Slider Block */
+.slider-block {
+  height: auto;
+  position: relative;
+  width: 50%;
+}
+
+/* Slider Container */
+.slider-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content */
+.slide-content {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content > Img > Video */
+.slide-content img,
+  .slide-content video {
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Slide Text */
+.slide-text {
+  bottom: 20px;
+  left: 20px;
+  position: absolute;
+  z-index: 10;
+}
+
+/* Slide Text > H3 */
+.slide-text h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+/* Slide Text > P */
+.slide-text p {
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Splide__Arrows > Splide__Pagination */
+.splide__arrows,
+  .splide__pagination {
+  display: block;
+}
+
+/* Splide__Track */
+.splide__track {
+  cursor: grab;
+}
+
+/* Splide__Track */
+.splide__track:active {
+  cursor: grabbing;
+}
+
+/* Splide__Pagination */
+.splide__pagination {
+  bottom: 10px;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  transition: none !important;
+  width: 100%;
+  z-index: 10;
+}
+
+/* Splide__Pagination__Page */
+.splide__pagination__page {
+  background: #999999;
+  border-radius: 0;
+  height: 4px;
+  margin: 0 4px !important;
+  opacity: 0.3;
+  transform: none !important;
+  width: 28px;
+}
+
+/* Splide__Pagination__Page > Is Active */
+.splide__pagination__page.is-active {
+  background: #000;
+  opacity: 1;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Text Left Slider Right > Text Block > Slider Block */
+  .text-left-slider-right .text-block,
+    .text-left-slider-right .slider-block {
+    padding-bottom: 0;
+    width: 100%;
+  }
+}
+</style>
+
+
+
+<section class="text-left-slider-right" style ="margin: 100px 0px;">
+  <!-- LEFT TEXT BLOCK -->
+  <div class="text-block">
+    <div class="inner-text">
+      <!-- Web -->
+      <p class="d-md-block d-none mb-0 p-0 col-md-12 " style="font-family:proxima-nova; width:100%; font-size:14px; text-align: center; line-height:33px;">
+          Emblem Evolution
+      </p>
+      <!-- Mobile -->
+      <p class="d-block d-md-none mb-0 p-0 col-md-12 " style="font-family:proxima-nova; width:100%; font-size:14px; text-align: center; line-height:33px;">
+          Emblem Evolution
+      </p>
+      <!-- Web -->
+      <p class="d-md-block d-none mb-0" style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+          Far from static, the emblem integrates<br>
+          seamlessly into the life of our designs. Its<br>
+          evolution is characterized by its adaptation<br>
+          across various forms, maintaining its core<br>
+          identity while shifting in medium and motif.    
+      </p>
+      <!-- Mobile -->
+      <p class="d-block d-md-none mb-0" style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+          Far from static, the emblem integrates<br>
+          seamlessly into the life of our designs.<br>
+          Its evolution is characterized by its<br>
+          adaptation across various forms,<br>
+          maintaining its core identity while<br>
+          shifting in medium and motif.
+      </p>
+    </div>
+  </div>
+
+  <!-- SWIPER BLOCK -->
+  <div class="slider-block">
+    <div class="slider-container">
+      <div class="splide" id="carouselExploreSlider1">
+        <div class="splide__track">
+          <ul class="splide__list"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+    function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      // Media
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline">
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}" ">`;
+      }
+
+      // Wrap in anchor
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      // Text below image (outside anchor)
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text" style="color:${slide.textcolor}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      gap: 5,
+      arrows: false,
+      breakpoints: {
+        1024: { perPage: 3 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+   
+
+    createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider1',
+    slides: [
+        { type: 'image', src: "../../media/portrait.jpg", alt: "Slide 1" },
+        { type: 'image', src: "../../media/portrait.jpg", alt: "Slide 2" },
+        { type: 'image', src: "../../media/portrait.jpg", alt: "Slide 3" },
+        { type: 'image', src: "../../media/portrait.jpg", alt: "Slide 4" }
+    ],
+
+    options: {
+      perPage: 1,
+      drag: true,
+      breakpoints: {
+        1024: { perPage: 1 },
+        640: { perPage: 1 },
+      },
+      pagination: true,
+      autoplay: true,
+      interval: 3000, // 3 seconds
+    }
+    });
+
+});
+
+</script>

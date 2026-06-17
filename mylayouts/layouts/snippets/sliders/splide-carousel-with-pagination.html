@@ -1,0 +1,194 @@
+<!--
+  SLIDER: Splide Carousel — With Rectangular Pagination Dots
+  SOURCE: design-philosophy-the-emblem.html
+  PATTERN: createSplideSliderCarousel({ sliderId, slides, options })
+  - Same drag-free carousel as splide-carousel-drag-free.html
+  - Key difference: pagination is VISIBLE with custom rectangular (28x4px) pill dot style
+  - Pagination positioned absolute at bottom of slider
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<style>
+/* Slider Container */
+.slider-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content */
+.slide-content {
+  line-height: 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content > Img > Video */
+.slide-content img,
+  .slide-content video {
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Slide Text */
+.slide-text {
+  bottom: 20px;
+  left: 20px;
+  position: absolute;
+  z-index: 10;
+}
+
+/* Splide__Arrows > Splide__Pagination */
+.splide__arrows,
+  .splide__pagination {
+  display: block;
+}
+
+/* Splide__Pagination */
+.splide__pagination {
+  bottom: 10px;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  transition: none !important;
+  width: 100%;
+  z-index: 10;
+}
+
+/* Splide__Pagination__Page */
+.splide__pagination__page {
+  background: #999999;
+  border-radius: 0;
+  height: 4px;
+  margin: 0 4px !important;
+  opacity: 0.3;
+  outline: none;
+  transform: none !important;
+  width: 28px;
+}
+
+/* Splide__Pagination__Page > Focus Visible */
+.splide__pagination__page:focus,
+  .splide__pagination__page:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Splide__Pagination__Page > Is Active */
+.splide__pagination__page.is-active {
+  background: #000;
+  opacity: 1;
+}
+
+/* Splide__Track */
+.splide__track {
+  cursor: grab;
+}
+
+/* Splide__Track */
+.splide__track:active {
+  cursor: grabbing;
+}
+</style>
+
+<!-- SLIDER HTML -->
+<div class="slider-container">
+  <div class="splide" id="carouselSliderPagination">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline>
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}">`;
+      }
+
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text" style="color:${slide.textcolor || '#fff'}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 0,
+      perPage: 3,
+      gap: 5,
+      arrows: false,
+      /* pagination is NOT disabled here — CSS above shows it */
+      padding: { left: '0rem', right: '6rem' },
+      breakpoints: {
+        1024: { perPage: 3 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+
+  /* ======== USAGE ======== */
+  createSplideSliderCarousel({
+    sliderId: 'carouselSliderPagination',
+    slides: [
+      { type: 'video', src: '../../media/scrub-video-landscape.mp4', alt: 'Slide 1' },
+      { type: 'image', src: '../../media/landscape.jpg', alt: 'Slide 2' },
+      { type: 'video', src: '../../media/scrub-video-landscape.mp4', alt: 'Slide 3' },
+      { type: 'image', src: '../../media/landscape.jpg', alt: 'Slide 4' },
+    ],
+    options: {
+      perPage: 1,
+      padding: { left: '0rem', right: '0rem' },
+    }
+  });
+
+});
+</script>

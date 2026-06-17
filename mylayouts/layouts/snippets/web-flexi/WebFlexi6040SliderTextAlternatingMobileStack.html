@@ -1,0 +1,272 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  COMPONENT: Text + Slider Split — v1 (60/40, alternating)
+  SOURCE: unisex-landing-page-v1.html
+  PATTERN: .text-left-slider-right flex row, 60% slider / 40% text
+  - Alternates: slider-left/text-right then text-left/slider-right
+  - Full-width .img-wrap clickable image between sections
+  - Slider: autoWidth, mixed portrait(45%) + landscape video(90%), no pagination, no arrows
+  - Slider CSS: height:100% chain, object-fit:cover, clip-path:fill-box
+-->
+
+<!-- CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<style>
+/* Text Left Slider Right */
+.text-left-slider-right {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* Text Left Slider Right > Text Block */
+.text-left-slider-right .text-block {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 40%;
+}
+
+/* Slider Block */
+.slider-block {
+  height: auto;
+  position: relative;
+  width: 60%;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Text Left Slider Right */
+  .text-left-slider-right {
+    gap: 100px;
+  }
+
+  /* Text Left Slider Right > Text Block > Slider Block */
+  .text-left-slider-right .text-block,
+    .text-left-slider-right .slider-block {
+    width: 100%;
+  }
+}
+
+/* Slider Container > Splide > Splide__Track > Splide__List > Splide__Slide */
+.slider-container,
+  .splide,
+  .splide__track,
+  .splide__list,
+  .splide__slide {
+  height: 100%;
+}
+
+/* Slide Content */
+.slide-content {
+  width: 100%; height: 100%;
+}
+
+/* Slide Content > Picture > Img > Video */
+.slide-content picture,
+  .slide-content img,
+  .slide-content video {
+  clip-path: fill-box;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Splide__Arrows > Splide__Pagination */
+.splide__arrows,
+  .splide__pagination {
+  display: none;
+}
+
+/* Splide__Pagination__Page > Focus Visible */
+.splide__pagination__page:focus,
+  .splide__pagination__page:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Splide__Track */
+.splide__track {
+  cursor: grab;
+}
+
+/* Splide__Track */
+.splide__track:active {
+  cursor: grabbing;
+}
+
+/* Img Wrap */
+.img-wrap {
+  position: relative; display: block; max-width: 100%;
+}
+
+/* Img Wrap > Img */
+.img-wrap img {
+  width: 100%; height: auto; display: block; object-fit: cover;
+}
+</style>
+
+<!-- FULL-WIDTH IMAGE -->
+<div class="img-wrap">
+  <a href="$url('Product-Show','pid','PRODUCT-ID')$">
+    <picture>
+      <img class="d-md-block d-none" src="../../media/landscape.jpg" alt="">
+      <img class="d-block d-md-none" src="../../media/landscape.jpg" alt="">
+    </picture>
+  </a>
+</div>
+
+<!-- SECTION 1: Slider left / Text right -->
+<section class="text-left-slider-right" style="margin: 100px 0;">
+  <div class="slider-block">
+    <div class="slider-container">
+      <div class="splide" id="carouselSlider1">
+        <div class="splide__track">
+          <ul class="splide__list"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-block">
+    <div class="inner-text">
+      <p class="d-md-block d-none mb-0 p-0" style="font-family:proxima-nova; font-size:14px; text-align:center; line-height:33px;">
+        Eyebrow Text
+      </p>
+      <p class="d-md-block d-none mb-0" style="font-family:proxima-nova; font-size:20px; text-align:center; font-weight:400; line-height:normal;">
+        Desktop body copy.<br>Second line here.
+      </p>
+      <p class="d-block d-md-none mb-0" style="font-family:proxima-nova; font-size:20px; text-align:center; font-weight:400; line-height:normal;">
+        Mobile body copy.
+      </p>
+      <br><br>
+      <a href="$url('Page-Show','cid','page-id')$" style="text-decoration:underline;" target="_blank">
+        Discover More
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FULL-WIDTH IMAGE -->
+<div class="img-wrap">
+  <a href="$url('Product-Show','pid','PRODUCT-ID')$">
+    <picture>
+      <img class="d-md-block d-none" src="../../media/landscape.jpg" alt="">
+      <img class="d-block d-md-none" src="../../media/landscape.jpg" alt="">
+    </picture>
+  </a>
+</div>
+
+<!-- SECTION 2: Text left / Slider right -->
+<section class="text-left-slider-right" style="margin: 100px 0;">
+  <div class="text-block">
+    <div class="inner-text">
+      <p class="d-md-block d-none mb-0 p-0" style="font-family:proxima-nova; font-size:14px; text-align:center; line-height:33px;">
+        Eyebrow Text
+      </p>
+      <p class="d-md-block d-none mb-0" style="font-family:proxima-nova; font-size:20px; text-align:center; font-weight:400; line-height:normal;">
+        Desktop body copy.<br>Second line here.
+      </p>
+      <p class="d-block d-md-none mb-0" style="font-family:proxima-nova; font-size:20px; text-align:center; font-weight:400; line-height:normal;">
+        Mobile body copy.
+      </p>
+      <br><br>
+      <a href="$url('Page-Show','cid','page-id')$" style="text-decoration:underline;" target="_blank">
+        Discover More
+      </a>
+    </div>
+  </div>
+  <div class="slider-block">
+    <div class="slider-container">
+      <div class="splide" id="carouselSlider2">
+        <div class="splide__track">
+          <ul class="splide__list"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+      if (slide.width) li.style.width = slide.width;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline>
+            ${slide.srcMobile ? `<source src="${slide.srcMobile}" media="(max-width: 768px)" type="video/mp4">` : ''}
+            <source src="${slide.srcDesktop || slide.src}" type="video/mp4">
+          </video>`;
+      } else {
+        mediaHtml = `
+          <picture>
+            ${slide.srcMobile ? `<source media="(max-width: 768px)" srcset="${slide.srcMobile}">` : ''}
+            <img src="${slide.srcDesktop || slide.src}" alt="${slide.alt || ''}">
+          </picture>`;
+      }
+
+      let content = slide.url
+        ? `<a href="${slide.url}">${mediaHtml}</a>`
+        : mediaHtml;
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'left',
+      gap: 5,
+      arrows: false,
+      autoWidth: true,
+      breakpoints: { 640: { autoWidth: false, perPage: 1 } },
+      ...options,
+    }).mount();
+  }
+
+  /* ======== USAGE ======== */
+  const sharedSlides = [
+    {
+      type: 'image', alt: 'Slide 1', width: '45%',
+      srcDesktop: '../../media/portrait.jpg',
+      srcMobile: '../../media/portrait.jpg',
+      url: "$url('Product-Show','pid','PRODUCT-ID')$",
+    },
+    {
+      type: 'video', alt: 'Slide 2', width: '90%',
+      srcDesktop: '../../media/scrub-video-landscape.mp4',
+      srcMobile:  '../../media/scrub-video-portrait.mp4',
+      url: "$url('Product-Show','pid','PRODUCT-ID')$",
+    },
+    {
+      type: 'image', alt: 'Slide 3', width: '45%',
+      srcDesktop: '../../media/portrait.jpg',
+      srcMobile: '../../media/portrait.jpg',
+      url: "$url('Product-Show','pid','PRODUCT-ID')$",
+    },
+  ];
+
+  createSplideSliderCarousel({ sliderId: 'carouselSlider1', slides: sharedSlides });
+  createSplideSliderCarousel({ sliderId: 'carouselSlider2', slides: sharedSlides });
+
+});
+</script>

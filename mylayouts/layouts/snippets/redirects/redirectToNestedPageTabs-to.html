@@ -1,0 +1,255 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Section Links */
+.section-links {
+  display: flex;
+  font-family: proxima-nova;
+  font-size: 14px;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Section Links > Link */
+.section-links .link {
+  color: #999999;
+  text-decoration: none;
+}
+
+/* Section Links > Link */
+.section-links .link.active {
+  color: black;
+}
+
+/* Nested Dropdown */
+.nested-dropdown {
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  cursor: pointer;
+  display: flex;
+  font-family: proxima-nova;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 8px;
+  justify-content: flex-start;
+  padding: 14px;
+}
+
+/* Nested Dropdown Content */
+.nested-dropdown-content {
+  display: none;
+  padding-bottom: 10px;
+  text-align: left;
+}
+
+/* Nested Item */
+.nested-item {
+  align-items: flex-start;
+  color: #000;
+  cursor: pointer;
+  font-family: proxima-nova;
+  font-size: 14px;
+  padding: 14px;
+}
+
+/* Nested Item */
+.nested-item.active {
+  color: #000;
+  display: none;
+  font-weight: 500;
+}
+
+/* Mobile — max-width: 767px */
+@media screen and (max-width: 767px) {
+  /* Section Links */
+  .section-links {
+    justify-content: center;
+  }
+
+  /* Nested Dropdown */
+  .nested-dropdown {
+    justify-content: center;
+  }
+}
+
+/* Arrow */
+.arrow {
+  display: block;
+  transition: transform 0.3s ease;
+  width: 14px;
+}
+
+/* Arrow > Rotate */
+.arrow.rotate {
+  transform: rotate(180deg);
+}
+</style>
+
+<section class="text-center" style="margin: 100px 0px;">
+    <!-- Versatility Text -->
+    <p class="mb-0 p-0 col-md-12" style="font-family:proxima-nova; font-size:14px; width:100%; margin: 0 auto; text-align: center; line-height:33px;">
+        Versatility In One
+    </p>
+    
+    <div class="section-links">
+        <a href="javascript:void(0);" class="link active" onclick="toggleContent('multiwaystyling', this)">MULTI-WAY STYLING</a>
+        <a href="javascript:void(0);" class="link" onclick="toggleContent('travel', this)">TRAVEL</a>
+    </div>
+</section>
+
+
+<!-- The MULTI-WAY STYLING Section -->
+<div id="sectionmultiwaystyling"  style="display: block;">
+  
+  <!-- Nested Dropdown -->
+  <div class="nested-dropdown" onclick="toggleNestedDropdown(this)">
+    <span class="nested-title">HORSEBIT SHOULDER BAG - RED</span>
+    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+  <div class="nested-dropdown-content">
+    <div class="nested-item active" onclick="selectNested('horsebit-shoulder-bag-red', this)">HORSEBIT SHOULDER BAG - RED</div>
+    <div class="nested-item" onclick="selectNested('horsebit-shoulder-bag-black', this)">HORSEBIT SHOULDER BAG - BLACK</div>
+  </div>
+
+  <!-- Nested Content -->
+  <div id="horsebit-shoulder-bag-red" style="display:block;">
+    red bag
+  </div>
+  <div id="horsebit-shoulder-bag-black" style="display:none;">
+    black bag
+  </div>
+
+</div>
+
+<!-- The Travel Section -->
+<div id="sectiontravel" style="display: none;">
+  <!-- Nested Content -->
+  <div id="travel1" style="display:block;">
+    red bag
+  </div>
+  <div id="travel2" style="display:none;">
+    black bag
+  </div>
+</div>
+
+
+<script>
+  function toggleContent(type, element) {
+    
+    // Hide both content sections
+    document.getElementById('sectiontravel').style.display = 'none';
+    document.getElementById('sectionmultiwaystyling').style.display = 'none';
+
+    // Remove 'active' class from ALL links in both sections
+    const allLinks = document.querySelectorAll('.section-links .link');
+    allLinks.forEach(link => link.classList.remove('active'));
+
+    // Show the selected content
+    if (type === 'travel') {
+      document.getElementById('sectiontravel').style.display = 'block';
+    } else if (type === 'multiwaystyling') {
+      document.getElementById('sectionmultiwaystyling').style.display = 'block';
+    }
+
+    // Add 'active' class to ALL links with the same text/type
+    const clickedText = element.textContent.trim();
+    const matchingLinks = Array.from(allLinks).filter(link => 
+      link.textContent.trim() === clickedText
+    );
+    
+    matchingLinks.forEach(link => link.classList.add('active'));
+
+    // Smooth scroll to target
+    const target = document.getElementById(`section${type}`);
+    if (target) {
+      window.scrollTo({
+        top: target.offsetTop - 100, // Adjust this value (e.g., 100px) based on your needs
+        behavior: "smooth"
+    });
+    }
+  }
+  /* DROPDOWN TOGGLE */
+    function toggleNestedDropdown(el) {
+    const content = el.nextElementSibling;
+    const arrow = el.querySelector('.arrow');
+
+    const isOpen = content.style.display === "block";
+    content.style.display = isOpen ? "none" : "block";
+    arrow.classList.toggle("rotate", !isOpen);
+    }
+
+    /* SELECT DROPDOWN ITEM */
+    function selectNested(type, element) {
+
+
+      const parentSection = element.closest('[id^="section"]');
+
+      // Hide only nested content inside current section
+      parentSection.querySelectorAll('div[id]').forEach(el => {
+        if (el.id && el.id !== parentSection.id) {
+          el.style.display = 'none';
+        }
+      });
+
+      // Show selected
+      const selected = document.getElementById(type);
+      if (selected) selected.style.display = 'block';
+
+      // Update active state
+      parentSection.querySelectorAll('.nested-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      element.classList.add('active');
+
+      // Update dropdown title
+      const title = parentSection.querySelector('.nested-title');
+      if (title) {
+        title.textContent = element.textContent;
+      }
+
+      // Optional: update URL hash
+      const currentTab = parentSection.id.replace('section','');
+      window.location.hash = `tab=${currentTab}&subtab=${type}`;
+    }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const params = new URLSearchParams(
+    window.location.hash.replace('#', '')
+  );
+
+  const tab    = params.get('tab');
+  const subtab = params.get('subtab');
+
+  /* ---------- OPEN MAIN TAB ---------- */
+  if (tab) {
+    const link = document.querySelector(
+      `.section-links .link[onclick*="${tab}"]`
+    );
+
+    if (link) {
+      toggleContent(tab, link);
+    }
+  }
+
+  /* ---------- OPEN NESTED TAB ---------- */
+  if (subtab) {
+    setTimeout(() => {
+      const nestedItem = document.querySelector(
+        `.nested-item[onclick*="${subtab}"]`
+      );
+
+      if (nestedItem) {
+        selectNested(subtab, nestedItem);
+      }
+    }, 300); // wait for parent tab to render
+  }
+
+});
+</script>
+

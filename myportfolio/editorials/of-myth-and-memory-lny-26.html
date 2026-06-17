@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+<link rel="preload" as="style" href="https://use.typekit.net/jwn1ofo.css" onload="this.rel='stylesheet'">
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+    /* ----------------------------------------------------
+    GLOBAL RESET & BASE
+    ---------------------------------------------------- */
+    html, body {
+        overflow-x: hidden;
+        color: black;
+        text-wrap: pretty;
+        height: auto;
+        margin: 0;
+        padding: 0;
+    }
+    .page.parallax {
+        padding-top: 0px !important;
+    }
+
+    /* Limit width on big screens (stop giant stretching) */
+    a {
+      color: black;
+    }
+
+    /* Hide folder headers (SiteGenesis leftover) */
+    .folder-header,
+    .folder_post .folder-container .container {
+        display: none !important;
+    }
+/* Style each image */
+  .side-by-side-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .side-by-side-container {
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .side-by-side-container a {
+    position: relative;
+    flex: 1;
+    display: block;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Mobile styles */
+  .mobile-container a {
+    position: relative;
+    display: block;
+  }
+
+  .flexi-layout {
+    margin: 0 auto;
+    padding-top: 4rem;
+    padding-right: 2rem;
+    padding-bottom: 4rem;
+    padding-left: 4rem;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    grid-template-areas:
+      "text imageLarge"
+      "product imageLarge"
+      ". bottom";
+    gap: 6rem;
+  }
+
+  .flexi-text-block {
+    grid-area: text;
+    max-width: 100%;
+  }
+
+  .flexi-text-block h2 {
+    font-size: 40px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    font-family: "aktiv-grotesk-extended";
+  }
+
+  .flexi-text-block p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .flexi-caption {
+    display: block;
+    margin-bottom: 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+
+  .flexi-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .flexi-image-large {
+    grid-area: imageLarge;
+    padding-right: 10%;
+  }
+
+  .flexi-image-product {
+    position: relative;
+    grid-area: product;
+    width: 55%;
+  }
+
+  .flexi-image-bottom {
+    grid-area: bottom;
+    grid-column: 1 / -1;   /* span full grid width */
+    justify-self: center; /* center horizontally */
+    width: 30%;
+  }
+
+  /* ------------------ MOBILE ------------------ */
+
+  @media (max-width: 768px) {
+    .flexi-layout {
+      grid-template-columns: 1fr;
+      grid-template-areas:  /* Order items using class */
+        "text"
+        "imageLarge"
+        "product"
+        "bottom";
+      gap: 2.5rem;
+      padding: 3rem 1.5rem;
+    }
+    .flexi-text-block h2{
+        text-align: center;
+    }
+    .flexi-text-block p {
+      text-align: center;
+    }
+    .flexi-text-block {
+      max-width: 100%;
+    }
+
+    .flexi-image-product,
+    .flexi-image-bottom {
+      max-width: 100%;
+    }
+      
+    .flexi-image-product {
+      padding-right: 30%; /* Move it to the full width, or adjust as needed */
+      width:100%;
+    }
+    .flexi-image-large {
+      grid-area: imageLarge;
+      padding-right: 0%;
+    }
+    .flexi-image-bottom {
+      padding-left: 30%; /* Move it to the full width, or adjust as needed */
+      width:100%;
+    }
+  }
+  .flex-collage {
+    margin: 0 auto;
+    /*padding: 0rem 2rem;*/
+    display: grid;
+    grid-template-columns: repeat(25, 1fr); /* Updated to 25 columns */
+    grid-auto-rows: auto;
+    row-gap: 4rem;
+  }
+
+  /* All images */
+  .flex-collage img {
+    width: 100%;
+    display: block;
+  }
+
+  /* HERO – full width breakout */
+  .flex-hero {
+    grid-column: 1 / -1;
+  }
+
+  /* Mid section (centered horizontally) */
+  .flex-mid {
+    grid-column: 10 / 17; /* Adjusted for 25 columns */
+  }
+
+  /* Left dominant image */
+  .flex-left-large {
+    grid-column: 4 / 13; /* Adjusted for 25 columns */
+  }
+  .flex-right-large {
+    grid-column: 14 / 23; /* Adjusted for 25 columns */
+  }
+  /* Small detail */
+  .flex-small-detail {
+    grid-column: 14 / 18; /* Adjusted for 25 columns */
+  }
+
+  /* Right-small image (move higher) */
+  .flex-right-small {
+    grid-column: 15 / 23; /* Adjusted for 25 columns */
+    margin-top: -8rem; /* Move the right-small image higher */
+  }
+
+  /* Bottom centered */
+  .flex-bottom {
+    grid-column: 10 / 17; /* Adjusted for 25 columns */
+  }
+
+  /* ---------------- MOBILE ---------------- */
+  @media (max-width: 768px) {
+    .flex-collage {
+      grid-template-columns: 1fr;
+      row-gap: 3rem;
+    }
+
+    .flex-collage > div {
+      grid-column: 1 / -1;
+    }
+
+    /* Reorder items using the 'order' property */
+    .flex-hero {
+      order: 1; /* Ensure the hero image stays on top */
+    }
+    .flex-right-large {
+      order: 1;
+    }
+    .flex-mid {
+      order: 2;
+      padding: 0rem 2rem
+    }
+
+    .flex-small-detail {
+      order: 3;
+      padding-left: 30%; /* Move it to the full width, or adjust as needed */
+      padding-right: 2rem;
+    }
+
+    .flex-left-large {
+      order: 4;
+      padding-right: 30%; /* Move it to the full width, or adjust as needed */
+      padding-left: 2rem;
+    }
+
+    .flex-right-small {
+      order: 5;
+      margin-top: 0rem; /* Move the right-small image higher */
+      padding-left: 30%; /* Move it to the full width, or adjust as needed */
+      padding-right: 2rem;
+    }
+
+    .flex-bottom {
+      order: 6;
+      padding: 0rem 2rem
+    }
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="side-by-side-container d-md-flex d-none js-vertical-slider">
+  <!-- Left Image -->
+  <a class="js-shop-the-collection" data-pid="PW2-35210023_DK.BRW" href="$url('Product-Show', 'pid','PW2-35210023_DK.BRW')$">
+    <img src="images/of-myth-and-memory-lny-26/lny-editorial_01.webp?$staticlink$" alt="Bag">
+  </a>
+  <!-- Right Image -->
+  <a class="js-shop-the-collection" data-pid="PM2-26320271-1_DBW.PO,PM1-56380048_MHGNY" href="$url('Product-Show', 'pid','PM2-26320271-1_DBW.PO')$">
+    <img src="images/of-myth-and-memory-lny-26/lny-editorial_02.webp?$staticlink$" alt="Bag">
+  </a>
+</div>
+
+<div class="container-fluid d-block d-md-none px-0 mobile-container js-vertical-slider">
+  <!-- Bottom Image -->
+  <a class="js-shop-the-collection" data-pid="PW2-35210023_DK.BRW" href="$url('Product-Show', 'pid','PW2-35210023_DK.BRW')$">
+    <img 
+    src="images/of-myth-and-memory-lny-26/lny-editorial_01.webp?$staticlink$" 
+    alt="Bottom Image" 
+    class="img-fluid w-100"/>
+  </a>
+  <!-- Top Image -->
+  <a class="js-shop-the-collection" data-pid="PM2-26320271-1_DBW.PO,PM1-56380048_MHGNY" href="$url('Product-Show', 'pid','PM2-26320271-1_DBW.PO')$">
+    <img 
+    src="images/of-myth-and-memory-lny-26/lny-editorial_02.webp?$staticlink$" 
+    alt="Top Image" 
+    class="img-fluid w-100"/>
+  </a>
+</div>
+
+
+<div class="flexi-layout">
+  <!-- Text block -->
+  <div class="flexi-text-block">
+    <h2>
+      Of Myth<br>
+      And Memory
+    </h2>
+    <p class="d-md-block d-none">
+      Inspired by the Year of the Horse, PEDRO welcomes the Lunar New Year <br>
+      with a sense of awakening, bridging ancestral heritage with the visceral<br>
+      pulse of the modern world. An exploration of freedom and belonging,<br>
+      the narrative is reimagined as an ethereal journey, where tradition is<br>
+      reinterpreted through a modern lens.
+    </p>
+    <p class="d-block d-md-none" style="text-align: center;">
+      Inspired by the Year of the Horse, PEDRO welcomes<br>
+      the Lunar New Year with a sense of awakening,<br>
+      bridging ancestral heritage with the visceral pulse of<br>
+      the modern world. An exploration of freedom and<br>
+      belonging, the narrative is reimagined as an<br>
+      ethereal journey, where tradition is reinterpreted<br>
+      through a modern lens.
+    </p>
+    
+  </div>
+  
+  <!-- Top right image -->
+  <div class="flexi-image flexi-image-large">
+    <span class="flexi-caption d-block d-md-none" style="text-align: center;">LUNAR NEW YEAR 2026</span>
+    <a class="js-shop-the-collection" data-pid="PW2-75210188_RED" href="$url('Product-Show', 'pid','PW2-75210188_RED')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_03.webp?$staticlink$" alt="Model holding red bag">
+    </a>
+  </div>
+
+
+  <!-- Left product image -->
+  <div class="flexi-image flexi-image-product">
+    <span class="flexi-caption d-md-block d-none">LUNAR NEW YEAR 2026</span>
+    <a class="js-shop-the-collection" data-pid="PW2-75210188-1_DBW.PO" href="$url('Product-Show', 'pid','PW2-75210188-1_DBW.PO')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_04.webp?$staticlink$" alt="Bag flatlay">
+    </a>  
+  </div>
+
+  <!-- Bottom centered image -->
+  <div class="flexi-image flexi-image-bottom">
+    <a class="js-shop-the-collection" data-pid="PW2-75210151-10_DBW.PO" href="$url('Product-Show', 'pid','PW2-75210151-10_DBW.PO')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_05.webp?$staticlink$" alt="Model with shoulder bag">
+    </a>
+  </div>
+</div>
+
+<div class="side-by-side-container d-md-flex d-none">
+  <!-- Left Image -->
+  <a class="js-shop-the-collection" data-pid="PM2-26320271-1_DBW.PO" href="$url('Product-Show', 'pid','PM2-26320271-1_DBW.PO')$">
+    <img src="images/of-myth-and-memory-lny-26/lny-editorial_06.webp?$staticlink$" alt="Bag">
+  </a>
+  <!-- Right Image -->
+  <a class="js-shop-the-collection" data-pid="PM1-85110485-2_DBW.PO" href="$url('Product-Show', 'pid','PM1-85110485-2_DBW.PO')$">
+    <img src="images/of-myth-and-memory-lny-26/lny-editorial_07.webp?$staticlink$" alt="Bag">
+  </a>
+</div>
+
+<div class="container-fluid d-block d-md-none px-0 mobile-container">
+    <!-- Bottom Image -->
+    <a class="js-shop-the-collection" data-pid="PM2-26320271-1_DBW.PO" href="$url('Product-Show', 'pid','PM2-26320271-1_DBW.PO')$">
+      <img 
+      src="images/of-myth-and-memory-lny-26/lny-editorial_06.webp?$staticlink$" 
+      alt="Bottom Image" 
+      class="img-fluid w-100"/>
+    </a>
+    <!-- Top Image -->
+    <a class="js-shop-the-collection" data-pid="PM1-85110485-2_DBW.PO" href="$url('Product-Show', 'pid','PM1-85110485-2_DBW.PO')$">
+      <img 
+      src="images/of-myth-and-memory-lny-26/lny-editorial_07.webp?$staticlink$" 
+      alt="Top Image" 
+      class="img-fluid w-100"/>
+    </a>
+</div>
+
+<p class="d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 50px auto; padding-left:50px; text-align: left; font-weight: 400; line-height:normal;">
+  Defined by equestrian-inspired influences and contemporary precision, the collection forms a tactile dialogue between nature and design.<br>
+  Earthy tones echo the depth of open terrain, while materiality remains deliberate, with the warmth of calf hair offering a refined contrast<br>
+  to polished leathers and hardware that honours a legacy of craftsmanship.
+
+</p>
+
+<p class="d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 50px auto; text-align: center; font-weight: 400; line-height:normal;">
+  Defined by equestrian-inspired influences and<br>
+  contemporary precision, the collection forms a<br>
+  tactile dialogue between nature and design.<br>
+  Earthy tones echo the depth of open terrain,<br>
+  while materiality remains deliberate, with the<br>
+  warmth of calf hair offering a refined contrast<br>
+  to polished leathers and hardware that honours<br>
+  a legacy of craftsmanship.
+</p>
+
+
+<div class="flex-collage">
+
+  <!-- HERO -->
+  <div class="item flex-hero">
+    <a class="js-shop-the-collection" data-pid="PW2-35210023_DK.BRW,PM2-26320271-1_DBW.PO" href="$url('Product-Show', 'pid','PW2-35210023_DK.BRW')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_08.webp?$staticlink$" alt="">
+    </a>
+  </div>
+
+  <!-- MID -->
+  <div class="item flex-mid">
+    <a class="js-shop-the-collection" data-pid="PW2-75210188_RED,PW2-75210188-1_DBW.PO,PW2-75210188_BLACK" href="$url('Product-Show', 'pid','PW2-75210188_RED')$">
+    <img src="images/of-myth-and-memory-lny-26/lny-editorial_09.webp?$staticlink$" alt="">
+    </a>
+  </div>
+
+  <!-- LEFT LARGE -->
+  <div class="item flex-left-large">
+    <a class="js-shop-the-collection" data-pid="PW2-75210188-1_DBW.PO,PW1-25580418_BLACK" href="$url('Product-Show', 'pid','PW2-75210188-1_DBW.PO')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_10.webp?$staticlink$" alt="">
+    </a>
+  </div>
+
+  <!-- SMALL DETAIL -->
+  <div class="item flex-small-detail">
+    <a class="js-shop-the-collection" data-pid="PW1-66600007-6_DBW.PO" href="$url('Product-Show', 'pid','PW1-66600007-6_DBW.PO')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_11.webp?$staticlink$" alt="">
+    </a>
+  </div>
+
+  <!-- RIGHT SMALL -->
+  <div class="item flex-right-small">
+    <a class="js-shop-the-collection" data-pid="PW1-25580418_BLACK" href="$url('Product-Show', 'pid','PW1-25580418_BLACK')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_12.webp?$staticlink$" alt="">
+    </a>
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="item flex-bottom">
+    <a class="js-shop-the-collection" data-pid="PM2-26320274_NAVY,PM1-76210283_NAVY" href="$url('Product-Show', 'pid','PM2-26320274_NAVY')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_13.webp?$staticlink$" alt="">
+    </a>
+  </div>
+
+</div>
+
+
+<div class="side-by-side-container d-md-flex d-none" style="margin-top:50px">
+  <!-- Left Image -->
+    <a class="js-shop-the-collection" data-pid="PW2-75210151-10_DBW.PO" href="$url('Product-Show', 'pid','PW2-75210151-10_DBW.PO')$">
+    <img src="images/of-myth-and-memory-lny-26/lny-editorial_14.webp?$staticlink$" alt="Bag">
+  </a>
+  <!-- Right Image -->
+    <a class="js-shop-the-collection" data-pid="PW2-75210188-1_DBW.PO" href="$url('Product-Show', 'pid','PW2-75210188-1_DBW.PO')$">
+    <img src="images/of-myth-and-memory-lny-26/lny-editorial_15.webp?$staticlink$" alt="Bag">
+  </a>
+</div>
+
+<div class="container-fluid d-block d-md-none px-0 mobile-container" style="margin-top:50px">
+    <!-- Bottom Image -->
+    <a class="js-shop-the-collection" data-pid="PW2-75210188-1_DBW.PO" href="$url('Product-Show', 'pid','PW2-75210188-1_DBW.PO')$">
+        <img 
+        src="images/of-myth-and-memory-lny-26/lny-editorial_14.webp?$staticlink$" 
+        alt="Bottom Image" 
+        class="img-fluid w-100"/>
+    </a>
+    <!-- Top Image -->
+    <a class="js-shop-the-collection" data-pid="PW2-75210188-1_DBW.PO" href="$url('Product-Show', 'pid','PW2-75210188-1_DBW.PO')$">
+        <img 
+        src="images/of-myth-and-memory-lny-26/lny-editorial_15.webp?$staticlink$" 
+        alt="Top Image" 
+        class="img-fluid w-100"/>
+    </a>
+</div>
+
+<p class="d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 50px auto; padding-left:50px; text-align: left; font-weight: 400; line-height:normal;">
+  Through layered textures and symbolic motifs, the collection shapes a narrative of enduring strength, honouring the spirit of the horse:<br>
+  a presence that is at once assured, instinctive and free.
+</p>
+
+<p class="d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 50px auto; text-align: center; font-weight: 400; line-height:normal;">
+  Through layered textures and symbolic motifs, the<br>
+  collection shapes a narrative of enduring strength,<br>
+  honouring the spirit of the horse: a presence that<br>
+  is at once assured, instinctive and free.
+</p>
+
+
+
+<div class="flex-collage">
+
+  <!-- RIGHT LARGE -->
+  <div class="item flex-right-large">
+    <a class="js-shop-the-collection" data-pid="PW2-35210023_DK.BRW,PW1-66220040-1_DBW.PO" href="$url('Product-Show', 'pid','PW2-35210023_DK.BRW')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_16.webp?$staticlink$" alt="">
+    </a>
+  </div>
+
+  <!-- MID SMALL -->
+  <div class="item flex-mid">
+    <a class="js-shop-the-collection" data-pid="PM2-26320271-1_DBW.PO" href="$url('Product-Show', 'pid','PM2-26320271-1_DBW.PO')$">
+      <img src="images/of-myth-and-memory-lny-26/lny-editorial_17.webp?$staticlink$" alt="">
+    </a>  
+  </div>
+
+</div>
+
+<!-- Publish Content -->
+<div class="publish-content" style = "padding-top:3rem; padding-left: 40px;">
+    <span style="font-size: 18px;">
+        Published on 12 January 2026
+        <br><br>
+        <a href="$url('Search-Show','cgid','pwnewarrivals')$">SHOP WOMEN'S NEW ARRIVALS</a> &gt;
+        <br>
+        <a href="$url('Search-Show','cgid','pmnewarrivals')$">SHOP MEN'S NEW ARRIVALS</a> &gt;
+    </span>
+</div> 
+
+
+
+</body>
+
+</html>

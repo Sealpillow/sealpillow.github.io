@@ -1,0 +1,99 @@
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<style>
+/* Pair Container */
+.pair-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+}
+
+/* Pair Container Item */
+.pair-container-item {
+  display: block;
+  position: relative;
+  text-align: center;
+  width: 50%;
+}
+
+/* Pair Container Item > Img */
+.pair-container-item img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Pair Container Text */
+.pair-container-text {
+  color: black;
+  font-family: 'proxima-nova';
+  line-height: normal;
+  padding: 10px 0;
+}
+
+/* Pair Container Top */
+.pair-container-top {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Pair Container Bottom */
+.pair-container-bottom {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Pair Container Item > Pair Container Bottom */
+.pair-container-item:hover .pair-container-bottom {
+  text-decoration: underline;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Pair Container Item */
+  .pair-container-item {
+    width: 100%;
+  }
+
+  /* Item 1 */
+  .item-1 {
+    order: 2;
+  }
+
+  /* Item 2 */
+  .item-2 {
+    order: 1;
+  }
+}
+</style>
+
+<div class="pair-container">
+  <!-- Item 1 -->
+  <a href="$url('Product-Show', 'pid','PW2-46390030_TAUPE')$" class="pair-container-item item-1">
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="../../media/portrait.jpg">
+      <!-- Desktop Image -->
+      <img src="../../media/portrait.jpg" alt="Bag" loading="lazy">
+    </picture>
+    <div class="pair-container-text">
+      <div class="pair-container-top">Left Text 1</div>
+      <div class="pair-container-bottom">Left Text 2</div>
+    </div>
+  </a>
+
+  <!-- Item 2 -->
+  <a href="$url('Product-Show', 'pid','PM2-26390004_DK.TAU')$" class="pair-container-item item-2">
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="../../media/portrait.jpg">
+      <!-- Desktop Image -->
+      <img src="../../media/portrait.jpg" alt="Bag" loading="lazy">
+    </picture>
+    <div class="pair-container-text">
+      <div class="pair-container-top">Right Text 1</div>
+      <div class="pair-container-bottom">Right Text 2</div>
+    </div>
+  </a>
+</div>

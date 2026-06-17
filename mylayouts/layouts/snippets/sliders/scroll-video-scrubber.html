@@ -1,0 +1,129 @@
+<!--
+  SLIDER: Scroll-Driven Video Scrubber
+  SOURCE: ari-sg-exclusive-spirit-of-the-island.html
+  PATTERN: Scroll position scrubs video.currentTime
+  - Container is 300vh tall; video is fixed while scrubbing
+  - Video is fixed (position: fixed) while scrollY is within the container
+  - After the end of the container, wrapper becomes position: absolute bottom: 0
+  - Responsive source switching: desktop vs mobile MP4 via matchMedia
+  - Uses requestAnimationFrame for smooth scrub performance
+  - No controls — fully scroll-driven
+-->
+
+<style>
+/* Video Container */
+.video-container {
+  height: 300vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Video Scroll Wrapper */
+.video-scroll-wrapper {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  width: 100%;
+  will-change: transform;
+}
+
+/* Video Scroll Wrapper > Is Fixed */
+.video-scroll-wrapper.is-fixed {
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  transform: translate3d(0, 0, 0);
+  z-index: 10;
+}
+
+/* Video Scroll Wrapper > Is Released */
+.video-scroll-wrapper.is-released {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+/* Video Scroll Wrapper > Video */
+.video-scroll-wrapper video {
+  height: 100vh;
+  object-fit: cover;
+  width: 100%;
+}
+</style>
+
+<!-- VIDEO SCRUBBER -->
+<div class="video-container" id="videoContainer">
+  <div class="video-scroll-wrapper" id="videoScrollWrapper">
+    <!-- No <source> tags — JS sets src based on viewport width -->
+    <video id="scrollVideo" muted playsinline preload="auto"></video>
+  </div>
+</div>
+
+<script>
+const video = document.getElementById('scrollVideo');
+const container = document.getElementById('videoContainer');
+const wrapper = document.getElementById('videoScrollWrapper');
+
+let isScrolling = false;
+let lastScrollY = 0;
+
+/* Responsive source: swap desktop/mobile MP4 */
+const mq = window.matchMedia('(max-width: 767px)');
+
+function setVideoSource(e) {
+  video.src = e.matches
+    ? '../../media/scrub-video-portrait.mp4'      /* replace with actual mobile video path */
+    : '../../media/scrub-video-landscape.mp4';    /* replace with actual desktop video path */
+  video.load();
+}
+
+setVideoSource(mq);
+mq.addEventListener('change', setVideoSource);
+
+/* Start listening to scroll once metadata is loaded */
+video.addEventListener('loadedmetadata', () => {
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+});
+
+function onScroll() {
+  const scrollY = window.scrollY;
+  if (Math.abs(scrollY - lastScrollY) < 1) return;
+
+  if (!isScrolling) {
+    window.requestAnimationFrame(() => {
+      updateVideoProgress();
+      isScrolling = false;
+    });
+    isScrolling = true;
+  }
+
+  lastScrollY = scrollY;
+}
+
+function updateVideoProgress() {
+  const start = container.offsetTop;
+  const end = start + container.offsetHeight - window.innerHeight;
+  const scrollY = window.scrollY;
+
+  let progress = (scrollY - start) / (end - start);
+  progress = Math.max(0, Math.min(1, progress));
+
+  if (scrollY >= start && scrollY <= end) {
+    wrapper.classList.add('is-fixed');
+    wrapper.classList.remove('is-released');
+  } else if (scrollY > end) {
+    wrapper.classList.remove('is-fixed');
+    wrapper.classList.add('is-released');
+  } else {
+    wrapper.classList.remove('is-fixed', 'is-released');
+  }
+
+  if (video.duration) {
+    video.currentTime = progress * video.duration;
+  }
+}
+</script>

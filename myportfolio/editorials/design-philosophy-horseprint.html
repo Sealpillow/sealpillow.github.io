@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+  /* ----------------------------------------------------
+  GLOBAL RESET & BASE
+  ---------------------------------------------------- */
+  body,
+  html {
+      overflow-x: hidden; /* Hide horizontal scrollbar */
+      /*background-color: #e8e8e8;*/
+      text-wrap: pretty;
+      height:auto; /* make the pedro banner visible at the top when scrolling*/
+  }
+  .page.parallax {
+      padding-top: 0px !important;
+  }
+
+  /* Hide folder headers (SiteGenesis leftover) */
+  .folder-header,
+  .folder_post .folder-container .container {
+      display: none !important;
+  }
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  a{
+    color:black;
+  }
+  img,
+  video {
+    clip-path: fill-box; 
+  }
+  .controls {
+    position: absolute;
+    bottom: 1rem;
+    width: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center; /* Optional: centers the items horizontally within the container */
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .controls button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+  }
+
+.controls button img {
+  display: block;
+}
+.controls button:focus {
+    outline: none;
+}
+.icon-play, .icon-pause {
+  width: 12px;
+  height: 24px;
+}
+.icon-mute, .icon-unmute {
+  width: 12px;
+  height: 12px;
+}
+.controls .mute {
+  transform: translateY(-1.5px); /* tweak: -1px to -4px */
+}
+/* play / pause icons */
+.icon-pause { display: none; }
+.play.is-playing .icon-play { display: none; }
+.play.is-playing .icon-pause { display: inline; }
+.play.is-paused .icon-play {display: inline;}
+.play.is-paused .icon-pause {display: none;}
+
+.timeline {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+  /* SMOOTH PROGRESS BAR */
+  .progressBar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progressFill {
+    height: 100%;
+    width: 100%;
+    background: white;
+    transform: scaleX(0);
+    transform-origin: left;
+    will-change: transform;
+  }
+
+  /* invisible seek input */
+  .seek {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .dropdown1 {
+    cursor: pointer;
+    padding: 14px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .dropdown1-content {
+    display: none;
+    padding: 15px;
+  }
+
+  .dropdown1-content a {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+  }
+
+  .arrow.rotate {
+      transform: rotate(180deg);
+  }
+
+  .arrow {
+      width: 1em;
+      height: 1em;
+      transition: transform 0.3s ease;
+  }
+  #shopcollection {
+    scroll-margin-top: 60px; /* Desktop scroll margin */
+  }
+
+  /* Ensure mobile version of the dropdown is shown in center */
+  @media (max-width: 767px) {
+    .dropdown1,
+    .dropdown1-content {
+        text-align: center;
+    }
+  }
+  .img-left-text-right {
+      display: flex;
+      align-items: center;
+  }
+
+  /* Desktop layout: image left, text right */
+  .img-left-text-right .image-block {
+      order: 1;
+      flex: 1;
+  }
+
+  .img-left-text-right .text-block {
+      order: 2;
+      flex: 1;
+  }
+
+  /* Mobile: stack with image on top */
+  @media (max-width: 767px) {
+      .img-left-text-right {
+          flex-direction: column;
+      }
+
+      .img-left-text-right .image-block {
+          order: 1;
+      }
+
+      .img-left-text-right .text-block {
+          order: 2;
+      }
+  }
+  .img-right-text-left {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Desktop layout: image left, text right */
+  .img-right-text-left .image-block {
+    order: 2;
+    flex: 1;
+  }
+
+  .img-right-text-left .text-block {
+    order: 1;
+    flex: 1;
+  }
+
+  /* Mobile: stack with image on top */
+  @media (max-width: 767px) {
+    .img-right-text-left {
+        flex-direction: column;
+    }
+
+    .img-right-text-left .image-block {
+        order: 1;
+    }
+
+    .img-right-text-left .text-block {
+        order: 2;
+    }
+  }
+
+   .side-by-side-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 auto;
+}
+
+.side-by-side-block img,
+.side-by-side-block video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Remove default link styles */
+.side-by-side-block {
+  text-decoration: none;
+}
+
+/* Mobile: stack images */
+@media (max-width: 768px) {
+  .side-by-side-layout {
+    grid-template-columns: 1fr;
+  }
+  /* Default order for desktop: Left image first, Right image second */
+  .side-by-side-block:first-child {
+    order: 1;
+  }
+  .side-by-side-block:nth-child(2) {
+    order: 2;
+  }
+}
+
+.slider-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content img,
+  .slide-content video {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Text below each slide image, outside the image */
+  .slide-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10;
+  }
+  .slide-text h3 {
+    font-size: 14px;
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+  .slide-text p {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  /* Hide arrows & pagination */
+  .splide__arrows,
+  .splide__pagination { display: none; }
+
+  .splide__track { cursor: grab; }
+  .splide__track:active { cursor: grabbing; }
+  
+</style>
+</head>
+
+<body>
+
+<div class="video-wrapper js-vertical-slider">
+  <div class="video-media-container">
+    <!-- Video Background (Desktop) -->
+    <video class="video d-md-block d-none" playsinline autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/horseprint/horse-print-curated_01.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Mobile Video -->
+    <video class="video d-md-none d-block" playsinline autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/horseprint/horse-print-curated-mobile_01.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="controls">
+      <button class="play is-playing">
+        <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+        <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+      </button>
+
+      <div class="timeline">
+        <div class="progressBar">
+          <div class="progressFill"></div>
+        </div>
+        <input class="seek" type="range" value="0" min="0" step="0.01">
+      </div>
+
+      <button class="mute">
+        <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+        <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Web -->
+<section class="d-lg-block d-none d-md-none">
+    <div class="position-relative text-center" style ="margin: 100px 0px;">
+        <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:30px; width:100%; margin: 0 auto;  text-align: center; line-height:33px;">
+          Horse print
+        </p>
+        <br>
+        <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+          Created for the Year of the Horse, the motif reimagines a symbol long associated with momentum and progress.<br>
+          Rooted in heritage but designed for the present, it embodies continuity and evolution, reinterpreted for contemporary life.
+        </p>
+    </div>
+</section>
+
+<!-- Mobile -->
+<section class="d-block d-md-none d-md-block d-none d-lg-none">
+    <div class="text-center" style ="margin: 100px 0px;">
+        <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:30px; width:100%; margin: 0 auto; text-align: center;line-height:33px;">
+          Horse print
+        </p>
+        <br>
+        <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center;font-weight: 400;  line-height:normal;">
+          Created for the Year of the Horse, the motif reimagines a<br>
+          symbol long associated with momentum and progress.<br>
+          Rooted in heritage but designed for the present,<br>
+          it embodies continuity and evolution, reinterpreted<br>
+          for contemporary life.
+        </p>
+    </div>
+</section>
+
+<!-- Dropdown (Desktop and Mobile) -->
+<div class="dropdown1 d-block" onclick="toggleDropdown()">
+  <span style="font-size:14px;font-weight:500;">HORSE PRINT</span>
+  <svg id="arrow-icon" xmlns="http://www.w3.org/2000/svg" class="arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+  </svg>
+</div>
+
+<!-- Dropdown Content (Shared for Desktop & Mobile) -->
+<div class="dropdown1-content" id="dropdown1-content">
+  <a href="#shopcollection" style="font-size:14px;font-weight:500;">SHOP THE COLLECTION</a>
+</div>
+
+<section class="img-left-text-right" style="align-items:center;">
+    <!-- IMAGE BLOCK (LEFT) -->
+    <div class="image-block">
+        <a href="$url('Product-Show', 'pid', 'PW2-75940008-8_RED')$"> 
+            <img loading="lazy" src="images/design-philosophy/horseprint/horse-print-curated_02.webp?$staticlink$"
+                alt="Spotlight Moments" style="width:100%; height:auto; display:block;">
+        </a>
+    </div>
+    <!-- TEXT BLOCK (RIGHT) -->
+    <div class="text-block" >
+        <div class="inner-text">
+
+            <!-- Desktop title -->
+            <p class="d-md-block d-none mb-0 p-0 col-md-12" 
+            style="font-family:proxima-nova; width:100%; margin:0 auto; font-size:14px; text-align:center; line-height:33px;">
+                Design and Print
+            </p>
+
+            <!-- Mobile title -->
+            <p class="d-block d-md-none mb-0 p-0 col-md-12 " 
+                style="font-family:proxima-nova; width:100%; font-size:14px; text-align:center; line-height:33px; margin:100px auto 0px;">
+                Design and Print
+            </p>
+
+            <!-- Desktop body -->
+            <p class="d-md-block d-none mb-0" 
+              style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+              Inspired by the natural dynamism of the horse,<br>
+              the design is translated into a modern,<br>
+              directional graphic language. The result is<br>
+              a print that feels alive yet composed,<br>
+              familiar yet distinctly modern.<br>
+            </p>
+            <!-- Mobile body -->
+            <p class="d-block d-md-none" 
+            style="font-family:proxima-nova; font-size:20px; width:80%; margin:0px auto 100px; text-align:center; font-weight:400; line-height:normal;">
+              Inspired by the natural dynamism
+              of the horse, the design is
+              translated into a modern,
+              directional graphic language.
+              The result is a print that feels
+              alive yet composed, familiar yet
+              distinctly modern.
+            </p>
+
+        </div>
+    </div>
+
+</section>
+
+
+<div class="side-by-side-layout">
+  <!-- Left image with link -->
+  <a href="$url('Product-Show', 'pid', 'PW5-56390001_MULTI')$" class="side-by-side-block">
+    <img 
+      src="images/design-philosophy/horseprint/horse-print-curated_03.webp?$staticlink$" 
+      alt="Top Image" />
+  </a>
+
+  <!-- Right image without link -->
+  <div class="side-by-side-block">
+    <video playsinline autoplay muted loop >
+      <source src="images/design-philosophy/horseprint/horse-print-curated_04.mp4?$staticlink$" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div>
+
+
+
+<section class="img-left-text-right" style="align-items:center;">
+    <!-- IMAGE BLOCK (LEFT) -->
+    <div class="image-block">
+      <video playsinline autoplay loop muted
+        style="width: 100%;object-fit: cover;">
+        <source src="images/design-philosophy/horseprint/horse-print-curated_05.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+    <!-- TEXT BLOCK (RIGHT) -->
+    <div class="text-block" >
+        <div class="inner-text">
+
+            <!-- Desktop title -->
+            <p class="d-md-block d-none mb-0 p-0 col-md-12" 
+            style="font-family:proxima-nova; width:100%; margin:0 auto; font-size:14px; text-align:center; line-height:33px;">
+                Hardware
+            </p>
+
+            <!-- Mobile title -->
+            <p class="d-block d-md-none mb-0 p-0 col-md-12 " 
+                style="font-family:proxima-nova; width:100%; font-size:14px; text-align:center; line-height:33px; margin:0px auto 0px;">
+                Hardware
+            </p>
+
+            <!-- Desktop body -->
+            <p class="d-md-block d-none mb-0" 
+              style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+              Reimagined as hardware, the horse becomes<br>
+              a small moment of delight. Rounded lines and<br>
+              a polished finish give it an approachable<br>
+              character, drawing the eye and balancing<br>
+              playfulness with considered craftsmanship.
+            </p>
+
+            <!-- Mobile body -->
+            <p class="d-block d-md-none" 
+            style="font-family:proxima-nova; font-size:20px; width:80%; margin:0px auto 100px; text-align:center; font-weight:400; line-height:normal;">
+              Reimagined as hardware, the horse
+              becomes a small moment of
+              delight. Rounded lines and a
+              polished finish give it an
+              approachable character, drawing
+              the eye and balancing playfulness
+              with considered craftsmanship.
+            </p>
+
+        </div>
+    </div>
+
+</section>
+
+
+<p id="shopcollection" class="mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 30px; font-family: 'proxima-nova'; margin-top: 100px;">
+  Shop The Collection
+</p>
+
+<div class="slider-container">
+  <div class="splide" id="carouselExploreSlider1">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function toggleDropdown() {
+    const content = document.getElementById("dropdown1-content");
+    const arrow = document.getElementById("arrow-icon");
+
+    const isOpen = content.style.display === "block";
+    content.style.display = isOpen ? "none" : "block";
+    arrow.classList.toggle("rotate", !isOpen);
+  }
+</script>
+
+<script>
+function initVideoControls(scope = document) {
+
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+
+    const videos = container.querySelectorAll('.video');
+    if (!videos.length) return;
+
+    // Use the visible video (desktop/mobile)
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    // Set default volume
+    video.volume = 0.2;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+    const iconMute = container.querySelector('.icon-mute');
+    const iconUnmute = container.querySelector('.icon-unmute');
+
+    if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
+
+    // Remove any existing event listeners by cloning the buttons
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newMuteBtn = muteBtn.cloneNode(true);
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+    // Update references to the new buttons
+    const freshPlayBtn = container.querySelector('.play');
+    const freshMuteBtn = container.querySelector('.mute');
+    const freshIconMute = container.querySelector('.icon-mute');
+    const freshIconUnmute = container.querySelector('.icon-unmute');
+
+    // PLAY / PAUSE
+    freshPlayBtn.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        freshPlayBtn.classList.add('is-playing');
+        freshPlayBtn.classList.remove('is-paused');
+      } else {
+        video.pause();
+        freshPlayBtn.classList.add('is-paused');
+        freshPlayBtn.classList.remove('is-playing');
+      }
+    });
+
+    // MUTE
+    freshMuteBtn.addEventListener('click', () => {
+      video.muted = !video.muted;
+      freshIconMute.style.display = video.muted ? 'block' : 'none';
+      freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+    });
+
+    // PROGRESS UPDATE
+    video.addEventListener('timeupdate', () => {
+      const progress = video.currentTime / video.duration;
+      progressFill.style.transform = `scaleX(${progress})`;
+      seek.value = progress * 100;
+    });
+
+    // SEEK
+    seek.addEventListener('input', () => {
+      const percent = seek.value / 100;
+      video.currentTime = percent * video.duration;
+    });
+
+  });
+}
+
+// INIT ON PAGE LOAD
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
+
+<script>
+    function toggleDropdown1() {
+        const content = document.getElementById("dropdown1-content");
+        const arrow = document.getElementById("arrow-icon");
+
+        const isOpen = content.style.display === "block";
+        content.style.display = isOpen ? "none" : "block";
+        arrow.classList.toggle("rotate", !isOpen);
+    }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      // Media
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline loading="lazy">
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}" loading="lazy">`;
+      }
+
+      // Wrap in anchor
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      // Text below image (outside anchor)
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text" style="color:${slide.textcolor}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      gap: 5,
+      arrows: false,
+      pagination: false,
+      padding: { left: '0rem', right: '6rem' },
+      breakpoints: {
+        1024: { perPage: 2 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+
+  createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider1',
+    slides: [
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_07.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210163-13_RED')$", description:"Demi Bag", textcolor: "black"},
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_08.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-65060007-5_RED')$", description:"Seren Bowling Bag", textcolor: "black"},
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_09.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW5-56390001_MULTI')$", description:"Satin Horse Scarf", textcolor: "black"},
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_10.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95940015_RED')$", description:"Horse Charm Leather Pouch", textcolor: "black"},
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_11.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95940015_DK.BRW')$", description:"Horse Charm Leather Pouch", textcolor: "black"},
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_12.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95940016_BEIGE')$", description:"Horse Charm Leather Card Holder", textcolor: "black"},
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_13.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95940016_DK.BRW')$", description:"Horse Charm Leather Card Holder", textcolor: "black"},
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_14.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95210019_CHALK')$", description:"Horse Leather Charm", textcolor: "black"},
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_15.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95210019_L.TAUP')$", description:"Horse Leather Charm", textcolor: "black"},
+      { type: 'image', src: "images/design-philosophy/horseprint/horse-print-curated_06.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-15060012-3_RED')$", description:"Dana Leather Bucket Bag", textcolor: "black"},
+  ],
+    options: {
+      perPage: 3,
+    }
+  });
+
+});
+</script>
+
+</body>
+
+</html>
+

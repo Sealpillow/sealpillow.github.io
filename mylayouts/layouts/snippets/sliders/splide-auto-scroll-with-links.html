@@ -1,0 +1,162 @@
+<!--
+  SLIDER: Splide Auto-Scroll — With Links & Analytics Support
+  SOURCE: gifts-for-her.html / gifts-for-him.html
+  PATTERN: createSplideExploreSlider({ sliderId, slides, options })
+  - Continuous auto-scroll (speed: 1), pauses on hover
+  - Supports: URL links, data-content-analytic tracking, text overlays
+  - REQUIRES: @splidejs/splide-extension-auto-scroll CDN
+  - splide.mount(window.splide.Extensions) — uses Extensions mount
+  - Default: 3 per page desktop, 2 mobile
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js"></script>
+
+<style>
+/* Slider Container */
+.slider-container {
+  margin: 30px 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content */
+.slide-content {
+  line-height: 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Slide Content > Img > Video */
+.slide-content img,
+  .slide-content video {
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Slide Text */
+.slide-text {
+  bottom: 0;
+  left: 20px;
+  position: absolute;
+  z-index: 10;
+}
+
+/* Splide__Arrows > Splide__Pagination */
+.splide__arrows,
+  .splide__pagination {
+  display: none;
+}
+
+/* Splide__Track */
+.splide__track {
+  cursor: grab;
+}
+
+/* Splide__Track */
+.splide__track:active {
+  cursor: grabbing;
+}
+</style>
+
+<!-- SLIDER HTML -->
+<div class="slider-container">
+  <div class="splide" id="autoScrollSlider">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideExploreSlider({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline loading="lazy">
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}" loading="lazy">`;
+      }
+
+      if (slide.title || slide.description) {
+        mediaHtml += `
+          <div class="slide-text" style="color:${slide.textColor || '#fff'}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      if (slide.url) {
+        if (slide.analytics) {
+          wrapper.innerHTML = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          wrapper.innerHTML = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        wrapper.innerHTML = mediaHtml;
+      }
+
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 0,
+      perPage: 3,
+      gap: 5,
+      autoScroll: {
+        speed: 1,
+        pauseOnHover: true,
+        pauseOnFocus: false,
+      },
+      arrows: false,
+      pagination: false,
+      breakpoints: {
+        1024: { perPage: 2 },
+        640: { perPage: 2 },
+      },
+      ...options,
+    });
+
+    splide.mount(window.splide.Extensions);
+  }
+
+  /* ======== USAGE ======== */
+  createSplideExploreSlider({
+    sliderId: 'autoScrollSlider',
+    slides: [
+      { type: 'video', src: '../../media/scrub-video-landscape.mp4', url: '#', analytics: 'content-id-1', description: 'BAGS', textColor: 'black' },
+      { type: 'image', src: '../../media/landscape.jpg', url: '#', analytics: 'content-id-2', description: 'SHOES', textColor: 'black' },
+      { type: 'video', src: '../../media/scrub-video-landscape.mp4', url: '#', description: 'ACCESSORIES', textColor: 'black' },
+      { type: 'image', src: '../../media/landscape.jpg', url: '#', analytics: 'content-id-4', description: 'CLOTHING', textColor: 'black' },
+    ],
+    options: {
+      perPage: 3,
+    }
+  });
+
+});
+</script>

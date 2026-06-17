@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+/* ----------------------------------------------------
+  GLOBAL RESET & BASE
+  ---------------------------------------------------- */
+  html, body {
+      overflow-x: hidden;
+      color: black;
+      text-wrap: pretty;
+      height: auto;
+      margin: 0;
+      padding: 0;
+  }
+  .page.parallax {
+      padding-top: 0px !important;
+  }
+
+  /* Limit width on big screens (stop giant stretching) */
+  .page-wrapper,
+  body {
+      max-width: 1500px;
+      margin: 0 auto;
+  }
+
+  /* Hide folder headers (SiteGenesis leftover) */
+  .folder-header,
+  .folder_post .folder-container .container {
+      display: none !important;
+  }
+  /* Redirect links container in a single row */
+  .section-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px; /* Space between the links */
+      font-size: 14px;
+      font-family: proxima-nova;
+  }
+  /* Default link style */
+  .section-links .link {
+    color: #999999;
+    text-decoration: none;
+  }
+
+  /* Active link style */
+  .section-links .link.active {
+    color: black;
+  }
+
+  /* Utility */
+  .img-fluid {
+      max-width: 100%;
+      height: auto;
+      display: block;
+  }
+
+  /* ----------------------------------------------------
+  VIDEO BLOCK
+  ---------------------------------------------------- */
+  .video-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  background: #000;
+}
+
+video {
+  width: 100%;
+  display: block;
+  background: #000;
+}
+video:focus, 
+.controls button:focus {
+    outline: none;
+}
+  video {
+    clip-path: fill-box; 
+  }
+.controls {
+  position: absolute;
+  bottom: 1rem;
+  width: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.controls button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.controls button img {
+  display: block;
+}
+.icon-play, .icon-pause {
+  width: 12px;
+  height: 24px;
+}
+.icon-mute, .icon-unmute {
+  width: 12px;
+  height: 12px;
+}
+.controls .mute {
+  transform: translateY(-1.5px); /* tweak: -1px to -4px */
+}
+/* play / pause icons */
+.icon-pause { display: none; }
+.play.is-playing .icon-play { display: none; }
+.play.is-playing .icon-pause { display: inline; }
+.play.is-paused .icon-play {display: inline;}
+.play.is-paused .icon-pause {display: none;}
+
+.timeline {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* SMOOTH PROGRESS BAR */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  background: white;
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+
+/* invisible seek input */
+.seek {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+  /* ----------------------------------------------------
+  IMAGE BLOCKS
+  ---------------------------------------------------- */
+  .image-content {
+      display: flex;
+      width: 100%;
+      margin: 0 auto;
+  }
+
+  .image-content img {
+      width: 50%;
+      max-width: 100%;
+  }
+
+  .img-left-text-right {
+      display: flex;
+      align-items: center;
+  }
+
+  /* Desktop layout: image left, text right */
+  .img-left-text-right .image-block {
+      order: 1;
+      flex: 1;
+  }
+
+  .img-left-text-right .text-block {
+      order: 2;
+      flex: 1;
+  }
+
+  /* Mobile: stack with image on top */
+  @media (max-width: 767px) {
+      .img-left-text-right {
+          flex-direction: column;
+      }
+
+      .img-left-text-right .image-block {
+          order: 1;
+      }
+
+      .img-left-text-right .text-block {
+          order: 2;
+      }
+  }
+  .img-right-text-left {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Desktop layout: image left, text right */
+  .img-right-text-left .image-block {
+    order: 2;
+    flex: 1;
+  }
+
+  .img-right-text-left .text-block {
+    order: 1;
+    flex: 1;
+  }
+
+  /* Mobile: stack with image on top */
+  @media (max-width: 767px) {
+    .img-right-text-left {
+        flex-direction: column;
+    }
+
+    .img-right-text-left .image-block {
+        order: 1;
+    }
+
+    .img-right-text-left .text-block {
+        order: 2;
+    }
+  }
+
+
+  .dropdown1 {
+    cursor: pointer;
+    padding: 14px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* Ensure mobile version of the dropdown is shown in center */
+  @media (max-width: 767px) {
+    .dropdown1 {
+      text-align: center;
+    }
+  }
+
+
+  /* Desktop styles */
+  .equal-height-container {
+  display: flex;
+  align-items: stretch;
+  gap:5px;
+  }
+
+  .equal-height-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+  }
+
+  .para-spacing {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start; /* Changed from space-between */
+  }
+
+  /* This creates space below all content */
+  .para-spacing > :last-child {
+  margin-bottom: auto;
+  }
+
+  .media-wrapper {
+    flex: 1;
+    display: flex;
+  }
+
+  .media-wrapper iframe,
+  .media-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+.slider-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content img,
+  .slide-content video {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Text below each slide image, outside the image */
+  .slide-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10;
+  }
+  .slide-text h3 {
+    font-size: 14px;
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+  .slide-text p {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  /* Hide arrows & pagination */
+  .splide__arrows,
+  .splide__pagination { display: none; }
+
+  .splide__track { cursor: grab; }
+  .splide__track:active { cursor: grabbing; }
+
+</style>
+</head>
+
+<body>
+
+<div class="video-wrapper js-vertical-slider">
+  <div class="video-media-container">
+    <!-- Video Background (Desktop) -->
+    <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/material-story/grano/core-grano-a1.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Mobile Video -->
+    <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/material-story/grano/core-grano-a1-mobile.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="controls">
+      <button class="play is-playing">
+        <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+        <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+      </button>
+
+      <div class="timeline">
+        <div class="progressBar">
+          <div class="progressFill"></div>
+        </div>
+        <input class="seek" type="range" value="0" min="0" step="0.01">
+      </div>
+
+      <button class="mute">
+        <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+        <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Web -->
+<section class="d-lg-block d-none d-md-none">
+  <div class="position-relative text-center" style ="margin: 100px 0px;">
+      <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:30px; width:100%; margin: 0 auto;  text-align: center; line-height:33px;">
+          Material Story
+      </p>
+      <br>
+      <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+        Material lies at the heart of every creation. Each texture tells its own story, chosen not with perfection in mind, but with character,<br>
+        in the way it evolves, adapts, and gathers traces of life along the way.
+
+      </p>
+      <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+        Distinct in execution, our process is deliberate and shaped by precision and sensitivity. A celebration of craftsmanship,<br>
+        enriched by thoughtful details. What endures is not only the quality itself, but the life it takes on.
+      </p>
+      
+      <br><br>
+      <div class="section-links">
+        <a href="javascript:void(0);" class="link active" onclick="toggleContent('grano', this)">GRANO</a>
+        <a href="javascript:void(0);" class="link" onclick="toggleContent('calfhair', this)">CALFHAIR</a>
+      </div>
+  </div>
+</section>
+
+<!-- Mobile -->
+<section class="d-block d-md-none d-md-block d-none d-lg-none">
+  <div class="text-center" style ="margin: 100px 0px;">
+      <p class="mb-0 p-0 col-md-12 " style="font-family:proxima-nova; font-size:30px; width:100%; margin: 0 auto; text-align: center;line-height:33px;">
+        Material Story
+      </p>
+      <br>
+      <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+        Material lies at the heart of every creation. Each texture<br>
+        tells its own story, chosen not with perfection in mind, but<br>
+        with character, in the way it evolves, adapts, and gathers<br>
+        traces of life along the way.
+      </p>
+      <br>
+      <p class="mb-0 col-md-12 " style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+        Distinct in execution, our process is deliberate and shaped<br>
+        by precision and sensitivity. A celebration of craftsmanship,<br>
+        enriched by thoughtful details. What endures is not only the<br>
+        quality itself, but the life it takes on.
+      </p>
+      <br><br>
+      <div class="section-links">
+        <a href="javascript:void(0);" class="link active" onclick="toggleContent('grano', this)">GRANO</a>
+        <a href="javascript:void(0);" class="link" onclick="toggleContent('calfhair', this)">CALFHAIR</a>
+      </div>
+  </div>
+</section>
+
+  
+
+
+<!-- The Grano Section -->
+<div id="sectiongrano" style="display: block;">
+
+  <!-- Dropdown (Desktop and Mobile) -->
+  <div class="dropdown1 d-block">
+    <span style="font-size:14px;font-weight:500;">GRANO</span>
+  </div>
+
+  <section class="img-left-text-right" style="align-items:center;">
+    <!-- IMAGE BLOCK (LEFT) -->
+    <div class="image-block">
+      <!-- Web -->
+      <video class="d-md-block d-none" id="myVideoDesktop" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/material-story/grano/core-grano-b1.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <!-- Mobile -->
+      <video class="d-block d-md-none" id="myVideoDesktop" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/material-story/grano/core-grano-b1.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+    <!-- TEXT BLOCK (RIGHT) -->
+    <div class="text-block" >
+      <div class="inner-text">
+
+        <!-- Desktop title -->
+        <p class="d-md-block d-none mb-0 p-0 col-md-12" 
+          style="font-family:proxima-nova; width:100%; font-size:14px; margin:0 auto; text-align:center; line-height:33px;">
+          Material Philosophy
+        </p>
+
+        <!-- Mobile title -->
+        <p class="d-block d-md-none mb-0 p-0 col-md-12 " 
+          style="font-family:proxima-nova; width:100%; font-size:14px; text-align:center; line-height:33px; margin:100px auto 0px;">
+          Material Philosophy
+        </p>
+
+        <!-- Desktop body -->
+        <p class="d-md-block d-none mb-0" 
+          style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+          Defined by precision and tactility. Grano is our<br>
+          new signature leather, a refined grain that<br>
+          balances structure with softness. Each hide is<br>
+          carefully selected to preserve its organic<br>
+          texture, ensuring a finish that feels both<br>
+          elevated and effortless.
+        </p>
+
+        <!-- Mobile body -->
+        <p class="d-block d-md-none" 
+        style="font-family:proxima-nova; font-size:20px; width:100%; margin:0px auto 100px; text-align:center; font-weight:400; line-height:normal;">
+          Defined by precision and tactility.<br>
+          Grano is our new signature leather,<br>
+          a refined grain that balances<br>
+          structure with softness. Each hide<br>
+          is carefully selected to preserve its<br>
+          organic texture, ensuring a finish<br>
+          that feels both elevated and effortless.
+
+        </p>
+
+      </div>
+    </div>
+
+  </section>
+
+  <div class="spacer"><div class="py-lg-4 mb-xl-1 py-xl-4 py-4"></div> </div>
+
+  <p class="mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 30px; font-family: 'proxima-nova';">
+    Our Craftsmanship
+  </p>
+
+  <!--  DESKTOP VIEW -->
+  <div class="d-none d-md-block w-100">
+      <div class="equal-height-container">
+          
+          <!-- IMAGE COLUMN -->
+          <div class="equal-height-column">
+              <div class="media-wrapper">
+                  <img src="images/material-story/grano/core-grano-c1.webp?$staticlink$" alt="Jatte Vibe">
+              </div>
+              <div class="para-spacing pt-4 pl-5">
+                  <p style="font-size: 20px;">Curated In Color</p>
+                  <p style="font-size: 14px;">
+                    Each tone is developed to complement the leather’s natural<br>
+                    depth, offering a palette that feels grounded yet contemporary.
+                  </p>
+              </div>
+          </div>
+
+          <!-- IMAGE COLUMN -->
+          <div class="equal-height-column">
+              <div class="media-wrapper">
+                  <img src="images/material-story/grano/core-grano-c2.webp?$staticlink$" alt="Jatte Vibe">
+              </div>
+              <div class="para-spacing pt-4  pl-5">
+                  <p style="font-size: 20px;">Made To Last</p>
+                  <p style="font-size: 14px;">
+                    Made with care, our leather is treated through a slow, considered<br>
+                    process that enhances both durability and feel.
+                  </p>
+              </div>
+          </div>
+
+          <!-- IMAGE COLUMN -->
+          <div class="equal-height-column">
+              <div class="media-wrapper">
+                  <img src="images/material-story/grano/core-grano-c3.webp?$staticlink$" alt="Jatte Vibe">
+              </div>
+              <div class="para-spacing pt-4  pl-5">
+                  <p style="font-size: 20px;">Ages With Character</p>
+                  <p style="font-size: 14px;">
+                    Like a companion that grows with you, Grano matures over time,<br>
+                    deepening in tone and becoming uniquely yours.
+                  </p>
+              </div>
+          </div>
+
+      </div>
+  </div>
+
+  <!--  MOBILE VIEW -->
+  <div class="d-block d-md-none w-100">
+
+      <!-- IMAGE SECTION -->
+      <div class="mb-4">
+          <img src="images/material-story/grano/core-grano-c1.webp?$staticlink$" alt="Jatte Vibe" class="img-fluid w-100">
+          <div class="para-spacing text-center" style="margin: 100px auto">
+            <p style="font-size: 20px;">Curated In Color</p>
+            <p style="font-size: 14px;">
+              Each tone is developed to complement the<br>
+              leather’s natural depth, offering a palette that<br>
+              feels grounded yet contemporary.
+            </p>
+          </div>
+      </div>
+
+      <!-- IMAGE SECTION -->
+      <div class="mb-4">
+          <img src="images/material-story/grano/core-grano-c2.webp?$staticlink$" alt="Jatte Vibe" class="img-fluid w-100">
+          <div class="para-spacing text-center" style="margin: 100px auto">
+            <p style="font-size: 20px;">Made To Last</p>
+            <p style="font-size: 14px;">
+              Made with care, our leather is treated through a slow,<br>
+              considered process that enhances both durability and feel.
+            </p>
+          </div>
+      </div>
+
+      <div class="mb-4">
+          <img src="images/material-story/grano/core-grano-c3.webp?$staticlink$" alt="Jatte Vibe" class="img-fluid w-100">
+          <div class="para-spacing text-center" style="margin: 100px auto">
+            <p style="font-size: 20px;">Ages With Character</p>
+            <p style="font-size: 14px;">
+              Like a companion that grows with you, Grano matures over<br>
+              time, deepening in tone and becoming uniquely yours.
+            </p>
+          </div>
+      </div>
+
+  </div>
+
+
+  <!--full image-->
+  <div class="d-md-flex d-none" style="margin-top: 100px;">
+    <a href="$url('Product-Show', 'pid','PM2-26390004_BLACK')$" style="display: block; width: 100%; overflow: hidden;">
+        <picture style="display: block; width: 100%;">
+            <source media="(max-width: 767px)" srcset="images/material-story/grano/core-grano-d1.webp?$staticlink$">
+            <img loading="lazy" 
+                src="images/material-story/grano/core-grano-d1.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: auto; display: block; margin: 0; padding: 0;" 
+            />
+        </picture>
+    </a>
+  </div>
+
+
+  <!-- Full image -->
+  <div class="d-block d-md-none" style="margin-top: 100px;">
+      <a href="$url('Product-Show', 'pid','PM2-26390004_BLACK')$" style="display: block; width: 100%; overflow: hidden; text-decoration: none;">
+          <picture style="display: block; width: 100%; ">
+              <source media="(max-width: 767px)" srcset="images/material-story/grano/core-grano-d1_mobile.webp?$staticlink$">
+              <img loading="lazy" 
+                  src="images/material-story/grano/core-grano-d1.webp?$staticlink$" 
+                  alt="Bag" 
+                  style="width: 100%; height: auto; display: block; margin: 0; padding: 0;" 
+              />
+          </picture>
+      </a>
+  </div>
+
+
+  <div class="spacer"><div class="py-lg-4 mb-xl-1 py-xl-4 py-4"></div> </div>
+
+  <p id="shopcollection" class="mt-5 mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 35px; font-family: 'proxima-nova';">
+      Shop The Collection
+  </p>
+
+  <div class="slider-container">
+      <div class="splide" id="carouselExploreSlider1">
+          <div class="splide__track">
+              <ul class="splide__list"></ul>
+          </div>
+      </div>
+  </div>
+</div>
+<div id="sectioncalfhair"  style="display: none;">
+  <!-- Dropdown (Desktop and Mobile) -->
+  <div class="dropdown1 d-block">
+    <span style="font-size:14px;font-weight:500;">CALFHAIR</span>
+  </div>
+  <section class="img-left-text-right" style="align-items:center;">
+    <!-- IMAGE BLOCK (LEFT) -->
+    <div class="image-block">
+      <a href="$url('Product-Show', 'pid', 'PW2-35210023_DK.BRW')$"> 
+        <video playsinline auto autoplay loop muted
+          style="width: 100%; object-fit: cover;">
+          <source src="images/material-story/calfhair/seasonal-ponyhair-b1.mp4?$staticlink$" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </a>
+    </div>
+
+    <!-- TEXT BLOCK (RIGHT) -->
+    <div class="text-block" >
+      <div class="inner-text">
+
+        <!-- Desktop title -->
+        <p class="d-md-block d-none mb-0 p-0 col-md-12" 
+        style="font-family:proxima-nova; width:100%; margin:0 auto; font-size:14px; text-align:center; line-height:33px;">
+          Material Philosophy
+        </p>
+
+        <!-- Mobile title -->
+        <p class="d-block d-md-none mb-0 p-0 col-md-12 " 
+          style="font-family:proxima-nova; width:100%; font-size:14px; text-align:center; line-height:33px; margin:100px auto 0px;">
+          Material Philosophy
+        </p>
+
+        <!-- Desktop body -->
+        <p class="d-md-block d-none mb-0" 
+        style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+          Chosen for its natural variation, the material is<br>
+          defined by its texture, bringing depth and<br>
+          warmth. Subtle variation gives each piece its<br>
+          own presence, distinctive in character.
+
+        </p>
+
+        <!-- Mobile body -->
+        <p class="d-block d-md-none" 
+        style="font-family:proxima-nova; font-size:20px; width:100%; margin:0px auto 100px; text-align:center; font-weight:400; line-height:normal;">
+          Chosen for its natural variation, the<br>
+          material is defined by its texture,<br>
+          bringing depth and warmth. Subtle<br>
+          variation gives each piece its own<br>
+          presence, distinctive in character.
+        </p>
+
+      </div>
+    </div>
+
+  </section>
+  <section class="img-right-text-left" style="align-items:center;">
+    <!-- TEXT BLOCK (LEFT) -->
+    <div class="text-block" >
+      <div class="inner-text">
+
+        <!-- Desktop title -->
+        <p class="d-md-block d-none mb-0 p-0 col-md-12" 
+        style="font-family:proxima-nova; width:100%; margin:0 auto; font-size:14px; text-align:center; line-height:33px;">
+          Zodiac Connection
+        </p>
+
+        <!-- Mobile title -->
+        <p class="d-block d-md-none mb-0 p-0 col-md-12 " 
+          style="font-family:proxima-nova; width:100%; font-size:14px; text-align:center; line-height:33px; margin:100px auto 0px;">
+          Zodiac Connection
+        </p>
+
+        <!-- Desktop body -->
+        <p class="d-md-block d-none mb-0" 
+        style="font-family:proxima-nova; font-size:20px; width:100%; margin:0 auto; text-align:center; font-weight:400; line-height:normal;">
+          In celebration of the Year of the Horse, the<br>
+          material's spirited energy and individuality echo<br>
+          the zodiac's strength and elegance, marking<br>
+          the season with a spritely charm.
+
+        </p>
+
+        <!-- Mobile body -->
+        <p class="d-block d-md-none" 
+        style="font-family:proxima-nova; font-size:20px; width:100%; margin:0px auto 100px; text-align:center; font-weight:400; line-height:normal;">
+          In celebration of the Year of the Horse,<br>
+          the material's spirited energy and<br>
+          individuality echo the zodiac's strength<br>
+          and elegance, marking the season<br>
+          with a spritely charm.
+
+        </p>
+
+      </div>
+    </div>
+    <!-- IMAGE BLOCK (RIGHT) -->
+    <div class="image-block">
+      <a href="$url('Product-Show', 'pid', 'PM2-26320271-1_DBW.PO')$">
+        <video playsinline auto autoplay loop muted
+          style="width: 100%; object-fit: cover;">
+          <source src="images/material-story/calfhair/seasonal-ponyhair-c1.mp4?$staticlink$" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </a>
+    </div>
+
+  </section>
+
+  <p id="shopcollection" class="mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 35px; font-family: 'proxima-nova';">
+      Shop The Collection
+  </p>
+
+  <div class="slider-container">
+      <div class="splide" id="carouselExploreSlider2">
+          <div class="splide__track">
+              <ul class="splide__list"></ul>
+          </div>
+      </div>
+  </div>
+  
+</div>
+
+
+
+<script>
+function initVideoControls(scope = document) {
+
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+
+    const videos = container.querySelectorAll('.video');
+    if (!videos.length) return;
+
+    // Use the visible video (desktop/mobile)
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    // Set default volume
+    video.volume = 0.2;
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+    const iconMute = container.querySelector('.icon-mute');
+    const iconUnmute = container.querySelector('.icon-unmute');
+
+    if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
+
+    // Remove any existing event listeners by cloning the buttons
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newMuteBtn = muteBtn.cloneNode(true);
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+    // Update references to the new buttons
+    const freshPlayBtn = container.querySelector('.play');
+    const freshMuteBtn = container.querySelector('.mute');
+    const freshIconMute = container.querySelector('.icon-mute');
+    const freshIconUnmute = container.querySelector('.icon-unmute');
+
+    // PLAY / PAUSE
+    freshPlayBtn.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        freshPlayBtn.classList.add('is-playing');
+        freshPlayBtn.classList.remove('is-paused');
+      } else {
+        video.pause();
+        freshPlayBtn.classList.add('is-paused');
+        freshPlayBtn.classList.remove('is-playing');
+      }
+    });
+
+    // MUTE
+    freshMuteBtn.addEventListener('click', () => {
+      video.muted = !video.muted;
+      freshIconMute.style.display = video.muted ? 'block' : 'none';
+      freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+    });
+
+    // PROGRESS UPDATE
+    video.addEventListener('timeupdate', () => {
+      const progress = video.currentTime / video.duration;
+      progressFill.style.transform = `scaleX(${progress})`;
+      seek.value = progress * 100;
+    });
+
+    // SEEK
+    seek.addEventListener('input', () => {
+      const percent = seek.value / 100;
+      video.currentTime = percent * video.duration;
+    });
+
+  });
+}
+
+// INIT ON PAGE LOAD
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
+
+<script>
+function toggleContent(type, element) {
+
+  // Hide both content sections
+  document.getElementById('sectiongrano').style.display = 'none';
+  document.getElementById('sectioncalfhair').style.display = 'none';
+
+  // Remove 'active' class from ALL links in both sections
+  const allLinks = document.querySelectorAll('.section-links .link');
+  allLinks.forEach(link => link.classList.remove('active'));
+
+  // Show the selected content
+  if (type === 'grano') {
+    document.getElementById('sectiongrano').style.display = 'block';
+  } else if (type === 'calfhair') {
+    document.getElementById('sectioncalfhair').style.display = 'block';
+  }
+
+  // Add 'active' class to ALL links with the same text/type
+  const clickedText = element.textContent.trim();
+  const matchingLinks = Array.from(allLinks).filter(link => 
+    link.textContent.trim() === clickedText
+  );
+  
+  matchingLinks.forEach(link => link.classList.add('active'));
+
+  // Smooth scroll to target
+  const target = document.getElementById(`section${type}`);
+  if (target) {
+    window.scrollTo({
+      top: target.offsetTop - 100, // Adjust this value (e.g., 100px) based on your needs
+      behavior: "smooth"
+  });
+  }
+}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const params = new URLSearchParams(
+    window.location.hash.replace('#', '')
+  );
+
+  const tab = params.get('tab');
+
+  const link = document.querySelector(
+    `.section-links .link[onclick*="${tab}"]`
+  );
+
+  if (link) {
+    toggleContent(tab, link);
+  }
+
+});
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+    function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+        
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      // Media
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline">
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}" ">`;
+      }
+
+      // Wrap in anchor
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      // Text below image (outside anchor)
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text" style="color:${slide.textcolor}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      gap: 5,
+      arrows: false,
+      pagination: false,
+      padding: { left: '0rem', right: '6rem' },
+      breakpoints: {
+        1024: { perPage: 3 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+   
+
+    createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider1',
+    slides: [
+        { type: 'image', src: "images/material-story/grano/core-grano-e1.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-46390030_BLACK')$"},
+      { type: 'image', src: "images/material-story/grano/core-grano-e2.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26390004_DK.TAU')$"},
+      { type: 'image', src: "images/material-story/grano/core-grano-e3.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320217-4_BLACK')$"},
+      { type: 'image', src: "images/material-story/grano/core-grano-e4.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210163-11_GREY')$"},
+      { type: 'image', src: "images/material-story/grano/core-grano-e5.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95210012_CHALK')$"},
+      { type: 'image', src: "images/material-story/grano/core-grano-e6.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210180-1_DK.TAU')$"},
+      { type: 'image', src: "images/material-story/grano/core-grano-e7.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95210017_LT.BLU')$"}
+    ],
+    options: {
+      perPage: 3,
+    }
+    });
+
+
+    createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider2',
+    slides: [
+        { type: 'image', src: "images/material-story/calfhair/seasonal-ponyhair-d1.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95940013-4_DBW.PO')$"},
+        { type: 'image', src: "images/material-story/calfhair/seasonal-ponyhair-d2.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW1-66220040-1_DBW.PO')$"},
+        { type: 'image', src: "images/material-story/calfhair/seasonal-ponyhair-d3.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-35210023_DK.BRW')$"},
+        { type: 'image', src: "images/material-story/calfhair/seasonal-ponyhair-d4.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210188-1_DBW.PO')$"},
+        { type: 'image', src: "images/material-story/calfhair/seasonal-ponyhair-d5.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM1-85110485-2_DBW.PO')$"},
+        { type: 'image', src: "images/material-story/calfhair/seasonal-ponyhair-d6.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PM2-26320271-1_DBW.PO')$"},
+        { type: 'image', src: "images/material-story/calfhair/seasonal-ponyhair-d7.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW1-66600007-6_DBW.PO')$"},
+        { type: 'image', src: "images/material-story/calfhair/seasonal-ponyhair-d8.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW2-75210151-10_DBW.PO')$"},
+        { type: 'image', src: "images/material-story/calfhair/seasonal-ponyhair-d9.webp?$staticlink$", alt: 'Slide 3',url:"$url('Product-Show', 'pid', 'PW4-95940015_DK.BRW')$"}
+    ],
+    options: {
+      perPage: 3,
+    }
+    });
+
+
+
+});
+</script>
+
+</body>
+
+</html>

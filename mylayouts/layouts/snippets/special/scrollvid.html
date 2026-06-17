@@ -1,0 +1,141 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<style>
+/* Video Container */
+.video-container {
+  height: 300vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Video Wrapper */
+.video-wrapper {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  width: 100%;
+  will-change: transform;
+}
+
+/* Video Wrapper > Is Fixed */
+.video-wrapper.is-fixed {
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  transform: translate3d(0, 0, 0);
+  z-index: 10;
+}
+
+/* Video Wrapper > Is Released */
+.video-wrapper.is-released {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+/* Video Wrapper > Video */
+.video-wrapper video {
+  height: auto;
+  width: 100%;
+}
+
+/* Video Bottom Text */
+.video-bottom-text {
+  background: #fff;
+  padding-top: 40px;
+  position: relative;
+  z-index: 20;
+}
+</style>
+
+<!-- reencode video for seekability -->
+<!-- ffmpeg -i orchid-test.mp4 -g 1 -keyint_min 1 -sc_threshold 0 -crf 26 -preset fast -an orchid-test-seekable.mp4 -->
+<div class="video-container" id="videoContainer">
+    <div class="video-wrapper" id="videoWrapper">
+        <!-- No <source> tags — JS will set src directly -->
+        <video id="scrollVideo" muted playsinline preload="auto"></video>
+    </div>
+</div>
+<!-- BOTTOM TEXT SECTION -->
+<div class="video-bottom-text">
+    <div class="video-bottom-inner">
+        <h2 class="video-bottom-title">Your Title Here</h2>
+        <p class="video-bottom-desc">
+            This is your description text. You can talk about the collection,
+            concept, or anything you want to highlight after the video experience.
+        </p>
+    </div>
+</div>
+
+<script>
+const video = document.getElementById('scrollVideo');
+const container = document.getElementById('videoContainer');
+const wrapper = document.getElementById('videoWrapper');
+
+let isScrolling = false;
+let lastScrollY = 0;
+let videoProgress = 0;
+
+// --- Source switching ---
+const mq = window.matchMedia('(max-width: 767px)');
+
+function setVideoSource(e) {
+    video.src = e.matches
+        ? '../../media/scrub-video-portrait.mp4'
+        : '../../media/scrub-video-landscape.mp4';
+    video.load();
+}
+
+setVideoSource(mq);
+mq.addEventListener('change', setVideoSource);
+
+// --- Scroll scrubbing ---
+video.addEventListener('loadedmetadata', () => {
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+});
+
+function onScroll() {
+    const scrollY = window.scrollY;
+
+    if (Math.abs(scrollY - lastScrollY) < 1) return;
+
+    if (!isScrolling) {
+        window.requestAnimationFrame(() => {
+            updateVideoProgress();
+            isScrolling = false;
+        });
+        isScrolling = true;
+    }
+
+    lastScrollY = scrollY;
+}
+
+function updateVideoProgress() {
+    const start = container.offsetTop;
+    const end = start + container.offsetHeight - window.innerHeight;
+    const scrollY = window.scrollY;
+
+    let progress = (scrollY - start) / (end - start);
+    progress = Math.max(0, Math.min(1, progress));
+
+    if (scrollY >= start && scrollY <= end) {
+        wrapper.classList.add('is-fixed');
+        wrapper.classList.remove('is-released');
+    } else if (scrollY > end) {
+        wrapper.classList.remove('is-fixed');
+        wrapper.classList.add('is-released');
+    } else {
+        wrapper.classList.remove('is-fixed', 'is-released');
+    }
+
+    if (video.duration) {
+        video.currentTime = progress * video.duration;
+    }
+}
+</script>

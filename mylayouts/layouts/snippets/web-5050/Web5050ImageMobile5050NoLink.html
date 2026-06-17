@@ -1,0 +1,66 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Pair Container > Img */
+.pair-container img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Pair Container */
+.pair-container {
+  display: flex;
+  gap: 15px;
+  margin: 0 auto;
+  width: 80%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Pair Container */
+  .pair-container {
+    display: flex;
+    margin: 0 auto;
+    width: 80%;
+  }
+
+  /* Pair Container > Img */
+  .pair-container img {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+
+  /* Pair Container > Img > Last Child */
+  .pair-container img:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Pair Container > Img > First Child */
+  .pair-container img:first-child {
+    order: 2;
+  }
+
+  /* Pair Container > Img > Last Child */
+  .pair-container img:last-child {
+    order: 1;
+  }
+}
+</style>
+
+
+
+<div class="pair-container d-md-flex">
+  <picture>
+    <!-- Mobile version (smaller image) -->
+    <source src="../../media/portrait.jpg" alt="Bag" media="(max-width: 768px)">
+    <!-- Web version (larger image) -->
+    <img src="../../media/portrait.jpg" alt="Bag">
+  </picture>
+  <picture>
+    <!-- Mobile version (smaller image) -->
+    <source src="../../media/portrait.jpg" alt="Bag" media="(max-width: 768px)">
+    <!-- Web version (larger image) -->
+    <img src="../../media/portrait.jpg" alt="Bag">
+  </picture>
+</div>

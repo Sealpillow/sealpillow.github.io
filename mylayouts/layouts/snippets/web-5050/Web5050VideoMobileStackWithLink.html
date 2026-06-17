@@ -1,0 +1,55 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Video Container */
+.video-container {
+  display: flex;
+  gap: 15px;
+  margin: 0 auto;
+  width: 80%;
+}
+
+/* Video Container > Video */
+.video-container video {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Video Container */
+  .video-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* Video Container > Video */
+  .video-container video {
+    width: 100%;
+  }
+}
+</style>
+
+<div class="video-container">
+  <!-- First Video with link -->
+  <a href="$url('Product-Show', 'pid', 'PW2-75210182_BROWN')$">
+    <video playsinline autoplay loop muted>
+      <!-- Desktop video -->
+      <source src="../../media/landscape_video.mp4" media="(min-width: 768px)" type="video/mp4">
+      <!-- Mobile video -->
+      <source src="../../media/landscape_video.mp4" media="(max-width: 767px)" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </a>
+
+  <!-- Second Video with link -->
+  <a href="$url('Product-Show', 'pid', 'PW2-75210182_BROWN')$">
+    <video playsinline autoplay loop muted>
+      <!-- Desktop video -->
+      <source src="../../media/landscape_video.mp4" media="(min-width: 768px)" type="video/mp4">
+      <!-- Mobile video -->
+      <source src="../../media/landscape_video.mp4" media="(max-width: 767px)" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </a>
+</div>

@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<link rel="stylesheet" href="https://use.typekit.net/xgw5xpr.css">
+
+<style>
+/* CSS STYLES */
+html, body {
+    overflow-x: hidden;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+a,
+.btn-link {
+    color: black;
+}
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+
+.imgoverlayfaq {
+    position: relative;
+    text-align: left;
+    color: white;
+    font-weight: bold;
+}
+
+.bottom-left {
+    position: absolute;
+    bottom: 8px;
+    left: 16px;
+}
+
+.container .nav {
+    justify-content: center;
+}
+.container {
+    max-width: none !important;
+    width: 80%;
+    padding-right: 0px; 
+    padding-left: 0px;
+}
+.cms .nav-faq-link.active, .cms .nav-faq-link:hover {
+    border-bottom: none;
+    text-decoration: underline;
+}
+
+.membership-table-list {
+    list-style-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSI3Ljk5NSI+PHBhdGggZD0iTTAgNC45OTRsMS0xLjAwOEwzIDZsNi02IDEgMS03IDd6Ii8+PC9zdmc+");
+    padding-left: 20px;
+}
+
+.tab-content {
+    margin-top: 20px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.show {
+    display: block;
+}
+
+.title-header{
+    font-weight: bold;
+    margin-top: 60px
+}
+@media (max-width: 768px) {
+    .title-header{
+        margin-top: 40px
+    }
+}
+
+.accordion-body {
+    padding: 10px 15px;
+}
+.accordion-body ul,
+.accordion-body ol{
+    padding-left: 20px;
+}
+.accordion-body a{
+    text-decoration: underline;
+}
+.accordion-title {
+    font-weight: bold;
+}
+
+/* Add CSS for rotating the arrow when the accordion is expanded */
+.accordion-heading {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.accordion-heading .icon-arrow {
+    transition: transform 0.3s ease;
+    margin-right: 10px;
+}
+
+.accordion-heading.collapsed .icon-arrow {
+    transform: rotate(90deg) !important; /* Default (closed) position */
+}
+
+.accordion-heading:not(.collapsed) .icon-arrow {
+    transform: rotate(180deg); /* Rotate the arrow when expanded */
+}
+
+.faq-search-wrapper {
+    width: 80%;
+    margin: 10px auto;
+}
+
+@media (max-width: 768px) {
+    .faq-search-wrapper {
+        width: 95%;
+    }
+}
+
+.faq-search-wrapper .nav-tabs {
+    display: flex;
+    justify-content: space-between; /* even space between tabs */
+    flex-wrap: wrap;               /* wrap to next line on small screens */
+}
+.faq-search-wrapper .nav-category {
+    padding-left: 0;
+    padding-right: 0;
+    /* flex: 1;            optional: make tabs equal width */
+    text-align: center; /* center the text inside each tab */
+}
+.faq-search-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.faq-search-item:hover {
+    background: #fafafa;
+}
+
+.faq-search-title {
+    font-weight: 600;
+}
+
+.faq-search-tab {
+    font-size: 12px;
+    color: #777;
+    margin-top: 4px;
+}
+
+.faq-search-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.faq-search-input input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    font-family: "proxima-nova", sans-serif;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: none; /* No transition effect */
+}
+
+.faq-search-input input:focus {
+    border: 1px solid #ccc; /* Keep the border the same on focus */
+    outline: none; /* Remove the default focus outline */
+}
+.search-icon {
+    position: absolute;
+    left: 15px;
+    width: 18px;
+    height: 18px;
+    fill: #999;
+    pointer-events: none;
+}
+
+hr {
+    margin-top: 1.5rem; 
+}
+
+@media (max-width: 991px) {
+.returns-table {
+    table-layout: auto !important;
+}
+.returns-table tbody,
+.returns-table tbody tr {
+    display: block;
+    width: 100%;
+}
+.returns-table tbody tr td {
+    display: block;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+}
+</style>
+</head>
+
+<body>
+
+
+<div class="cms" id="top">
+    <div class="imgoverlayfaq">
+        <img style="width:100%;" src="images/customer-care/Customer-Care-2732 x 900.webp?$staticlink$">
+        <div class="bottom-left">
+            <h2 style="color:black;">Customer Care</h2>
+        </div>
+    </div>
+    <div class="faq-search-wrapper">
+        <div class="faq-search-input">
+            <svg class="search-icon" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+
+            <input
+                type="text"
+                id="faqSearchInput"
+                onkeyup="filterExistingFAQs()"
+                placeholder="Search our FAQ..."
+            >
+        </div>
+
+        <!-- your existing elements stay right here -->
+        <!-- Results counter -->
+        <div id="results-counter" style="display:none; color: #666; padding:12px; font-size: 14px;">
+            <span id="results-count"></span>
+        </div>
+
+        <div id="no-results-msg" style="display:none; color: #666; padding:12px; font-style: italic;">
+            No results found. Please try a different keyword.
+        </div>
+    </div>
+
+    <!-- SEARCH RESULTS -->
+    <div id="faq-search-results"
+        style="display:none; border-top:1px solid #eee;">
+    </div>
+    <div class="faq-search-wrapper">
+        <ul class="nav nav-tabs" id="navTabs" role="tablist" style="margin-top:1.5rem;">
+            
+            <li class="nav-category col-sm-6 col-md-auto">
+                <a class="nav-faq-link active" href="#delivery-tab">
+                    Delivery
+                </a>
+            </li>
+
+
+            <li class="nav-category col-sm-6 col-md-auto">
+                <a class="nav-faq-link" href="#returns-tab">
+                    Returns & Refunds
+                </a>
+            </li>
+
+
+            <li class="nav-category col-sm-6 col-md-auto">
+                <a class="nav-faq-link" href="#orders-tab">
+                    Orders
+                </a>
+            </li>
+
+
+            <li class="nav-category col-sm-6 col-md-auto">
+                <a class="nav-faq-link" href="#account-tab">
+                    Account & Privileges
+                </a>
+            </li>
+
+
+            <li class="nav-category col-sm-6 col-md-auto">
+                <a class="nav-faq-link" href="#productpricing-tab">
+                    Product & Pricing
+                </a>
+            </li>
+
+
+            <li class="nav-category col-sm-6 col-md-auto">
+                <a class="nav-faq-link" href="#security-tab">
+                    Security
+                </a>
+            </li>
+
+
+            <li class="nav-category col-sm-6 col-md-auto">
+                <a class="nav-faq-link" href="#payment-tab">
+                    Payment
+                </a>
+            </li>
+
+
+            <li class="nav-category col-sm-6 col-md-auto">
+                <a class="nav-faq-link" href="#promotions-tab">
+                    Promotions
+                </a>
+            </li>
+
+        </ul>
+    </div>
+    <hr>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-8">
+                <div class="tab-content">
+                    
+                    <div id="delivery-tab" class="tab-pane show active">
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingdelivery-tab-0">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What are the available delivery options and rates?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsedelivery-tab-0">
+								$include('Page-IncludeShippingAndTracking')$
+								<p>All orders are currently shipped out from Singapore.</p>
+								<p>Orders placed and confirmed by 0900 hours (GMT+8) will be processed on the same day. Orders placed and confirmed after 0900 (GMT+8) on Friday, Saturday, or Sunday will be processed on the next working day.</p>
+								<p>Working days refer to Mondays to Fridays, excluding Saturdays, Sundays, and Public Holidays in Singapore.</p>
+								<p>*Please note that delivery may take longer during sale events.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingdelivery-tab-1">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">List of Public Holidays in Singapore for 2026</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsedelivery-tab-1">
+								<table class='table table-bordered text-center'>
+								<tr><th>Date</th><th>Holiday</th></tr>
+								<tr><td>01 Jan</td><td>New Year’s Day</td></tr>
+								<tr><td>17 – 18 Feb</td><td>Lunar New Year</td></tr>
+								<tr><td>21 Mar</td><td>Hari Raya Puasa</td></tr>
+								<tr><td>03 Apr</td><td>Good Friday</td></tr>
+								<tr><td>01 May</td><td>Labour Day</td></tr>
+								<tr><td>27 May</td><td>Hari Raya Haji</td></tr>
+								<tr><td>31 May</td><td>Vesak Day</td></tr>
+								<tr><td>01 Jun</td><td>Vesak Day (Observed)</td></tr>
+								<tr><td>09 Aug</td><td>National Day</td></tr>
+								<tr><td>10 Aug</td><td>National Day (Observed)</td></tr>
+								<tr><td>08 Nov</td><td>Deepavali</td></tr>
+								<tr><td>09 Nov</td><td>Deepavali (Observed)</td></tr>
+								<tr><td>25 Dec</td><td>Christmas Day</td></tr></table>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingdelivery-tab-2">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">When will I receive my order and what if it is delayed?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsedelivery-tab-2">
+								<p>Deliveries are made from Monday to Friday, excluding weekends and Public Holidays.</p>
+								<p>Delivery dates are estimates and may be affected by customs checks, payment verification, or stock availability.</p>
+								<p>If your order is delayed, you may track it via our <a href="$url('Order-Status')$">order status</a> page.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingdelivery-tab-3">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do I track my order?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsedelivery-tab-3">
+								<p>You may track your order via our <a href="$url('Order-Status')$">order status</a> page.</p>
+								<p>Note: Tracking information may take 24–48 hours to update.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingdelivery-tab-4">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What happens if my delivery address is incorrect or if the delivery fails?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsedelivery-tab-4">
+								<p>Once shipped, we are unable to change the delivery address. If the address is incorrect, the parcel may be returned and you will be responsible for both the original and return shipping charges.</p>
+								<p>Please double-check your address before placing an order, especially the country field (e.g., Austria vs Australia). To update saved addresses, log in and edit them in your Address Book.</p>
+								<p>If no one is available at the time of delivery, the courier will attempt to re-deliver the parcel once more.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingdelivery-tab-5">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Where does Pedro ship and are there any restricted areas?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsedelivery-tab-5">
+								<p>PEDRO ships from Singapore to selected countries in Asia, Europe, the Middle East, North America, and Oceania.</p>
+								<p>For Cambodia and Pakistan, please shop via their respective local online stores. Deliveries must be made to a local address corresponding to the destination country.</p>
+								<p>We do not ship to PO boxes, military, or protected areas. In Singapore, we are unable to deliver to certain restricted areas such as Changi Airport, Jurong Island, MINDEF COMCEN, and PSA Terminal Wharves (Tanjong Pagar, Pasir Panjang, Sembawang).</p>
+								<p>Deliveries to hotels are accepted but only to the reception. PEDRO is not responsible for any loss after delivery is accepted by hotel staff.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingdelivery-tab-6">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Are duties, taxes and tax refunds applicable to my Pedroshoes.com order?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsedelivery-tab-6">
+								<p>All Singapore deliveries include local sales tax, which is automatically applied at checkout in accordance with Singapore regulations. You will not incur additional duties, taxes, or hidden charges upon delivery.</p>
+								<p>Tax refunds are not available for purchases made on PEDROSHOES.COM.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div id="returns-tab" class="tab-pane">
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingreturns-tab-0">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Can I return or exchange my item?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsereturns-tab-0">
+								<p>We want you to love your PEDRO purchase. If you’re not satisfied, you may return your item(s) within 30 days of receiving your order.</p>
+								<p><b>Return Conditions:</b></p>
+								<ol>
+								<li>Item(s) must be in original condition with tags, packaging and labels intact</li>
+								<li>A final inspection will be done before your return is accepted</li>
+								<li>Returns that don’t meet our policy will be sent back at your cost.</li>
+								<li>If your return affects a Gift With Purchase promotion, the GWP must also be returned. Otherwise, its market value will be charged</li>
+								</ol>
+								<p><b>Exchange Policy:</b></p>
+								<p>Exchanges are not available for online purchases. Please submit a return for a refund and place a new order for the desired item<br><br>Exchanges are subject to in-store stock availability. Items purchased in-store are not eligible for exchange via the online store</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingreturns-tab-1">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do I return my purchase?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsereturns-tab-1">
+								<p>Returns are free for online purchases. Submit a return request within 30 days of delivery. Items purchased in physical stores are not eligible for returns.</p>
+								<p>If you received a wrong or defective item or checked out as a guest, please contact us at customers@pedroshoes.com with the Subject: Return Request - ( Your Order Number )</p>
+								<table class="table table-bordered text-center returns-table" style="table-layout: fixed;"><thead class="thead-dark">
+								<tr><th class="" scope="colgroup" colspan="4">Option 1<br>Return In-Store</th></tr>
+								<tr><th class="table-head_description text-color--dark-grey bg-color--lighter-grey" scope="colgroup" colspan="4">Please ensure that the item(s) meet our returns condition before submitting a return request.</th></tr></thead><tbody>
+								<tr><td>
+								<div>
+								<div>&nbsp;</div>
+								<img alt="" src="images/customer-care/01.Create Return Request.webp?$staticlink$" style="width:50px;" title="" /></div>
+								<div>&nbsp;</div>
+								<div style="font-weight: 600;">1. Create Return Request</div>
+								<div>Log in to PEDROSHOES.COM to view your order details under <a href="$url('Order-History')$">My Purchases & Returns</a>. Click on "Submit a Return Request". Select the item(s) you wish to return and state the reason, as well as return method "In Store Return".<br><br>View our Returns Conditions below.</div>
+								<div>&nbsp;</div>
+								</td><td>
+								<div>
+								<div>&nbsp;</div>
+								<img alt="" src="images/customer-care/02.sg-02-locate-store.webp?$staticlink$" style="width:50px;" title="" /></div>
+								<div>&nbsp;</div>
+								<div style="font-weight: 600;">2. Locate your Nearest Store</div>
+								<div>You may return your item(s) at any of our listed <a href="$url('Stores-Find')$" title="Store Locator">stores</a>.</div>
+								<div>&nbsp;</div>
+								</td><td>
+								<div>
+								<div>&nbsp;</div>
+								<img alt="" src="images/customer-care/03.Bring Along.webp?$staticlink$" style="width:50px;" title="" /></div>
+								<div>&nbsp;</div>
+								<div style="font-weight: 600;">3. Bring Along</div>
+								<div>Your item(s) and invoice included in the delivery package.</div>
+								<div>&nbsp;</div>
+								</td><td>
+								<div>
+								<div>&nbsp;</div>
+								<img alt="" src="images/customer-care/04.retail staff assessment-parcel.webp?$staticlink$" style="width:50px;" title="" /></div>
+								<div>&nbsp;</div>
+								<div style="font-weight: 600;">4. Retail Staff Assessment</div>
+								<div>Our retail staff will assess the condition of the item and facilitate the returns process.<br><br>You will be notified via email once your return(s) has been processed.</div>
+								<div>&nbsp;</div>
+								</td></tr></tbody></table>
+								<table class="table table-bordered text-center returns-table" style="table-layout: fixed;"><thead class="thead-dark">
+								<tr><th class="" scope="colgroup" colspan="4">Option 2<br>Parcel Pickup Service</th></tr>
+								<tr><th class="table-head_description text-color--dark-grey bg-color--lighter-grey" scope="colgroup" colspan="4">Please ensure that the item(s) meet our returns condition before submitting a return request.</th></tr></thead><tbody>
+								<tr><td>
+								<div>
+								<div>&nbsp;</div>
+								<img alt="" src="images/customer-care/01.Create Return Request.webp?$staticlink$" style="width:50px;" title="" /></div>
+								<div>&nbsp;</div>
+								<div style="font-weight: 600;">1. Create Return Request</div>
+								<div>Log in to PEDROSHOES.COM to view your order details under <a href="$url('Order-History')$">My Purchases & Returns</a>. Click on "Submit a Return Request". Select the item(s) you wish to return and state the reason, as well as return method "Courier Pick Up".<br><br>View our Returns Conditions below.</div>
+								<div>&nbsp;</div>
+								</td><td>
+								<div>
+								<div>&nbsp;</div>
+								<img alt="" src="images/customer-care/05.arrange for pickup.webp?$staticlink$" style="width:50px;" title="" /></div>
+								<div>&nbsp;</div>
+								<div style="font-weight: 600;">2. Arrange for Pickup</div>
+								<div>Selected your preferred date and time slot for the pickup, and submit your return request.</div>
+								<div>&nbsp;</div>
+								</td><td>
+								<div>
+								<div>&nbsp;</div>
+								<img alt="" src="images/customer-care/03.Bring Along.webp?$staticlink$" style="width:50px;" title="" /></div>
+								<div>&nbsp;</div>
+								<div style="font-weight: 600;">3. Pack Parcel</div>
+								<div>Once the return request is submitted, fill in the return slip and attach it to the returned items. Please pack the item(s) in its original packaging.</div>
+								<div>&nbsp;</div>
+								</td><td>
+								<div>
+								<div>&nbsp;</div>
+								<img alt="" src="images/customer-care/email.webp?$staticlink$" style="width:50px;" title="" /></div>
+								<div>&nbsp;</div>
+								<div>You will be notified via email once your return(s) has been processed.</div>
+								<div>&nbsp;</div>
+								</td></tr></tbody></table>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingreturns-tab-2">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">When will I receive the refund of my return?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsereturns-tab-2">
+								<p>Once your returned item(s) have been received by our Returns Department and have passed the quality inspection, your refund will be processed to your original payment method within 5–10 working days.</p>
+								<p>Please note that the exact refund period varies and depends on your bank’s processing period.</p>
+								<p>If you return your item(s) at one of our retail stores, our staff will assist you with the return process. However, refunds are not issued in-store. The refund will be processed online after your return request has been submitted and approved.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div id="orders-tab" class="tab-pane">
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingorders-tab-0">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do I know if my order has been received?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseorders-tab-0">
+								<p>Once your order is successfully placed, you will receive an Order Confirmation email with your order details. Please note that this may take some time if your payment is undergoing review.</p>
+								<p>If you do not receive the email, kindly check your spam or junk folder, or contact our Customer Care Team for assistance.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingorders-tab-1">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Can I amend or cancel my order?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseorders-tab-1">
+								<p>Orders cannot be amended once placed. However, you may self-cancel your order within:</p>
+								<p>60 minutes for Standard Delivery<br>15 minutes for Express Delivery</p>
+								<p>Please visit our <a href="$url('Order-Status')$">order status</a> page to proceed.</p>
+								<p>After the grace period, the order will be processed. If you change your mind later, eligible items may be returned in accordance with our Return Policy.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingorders-tab-2">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do I check my order status?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseorders-tab-2">
+								<p>You may track your order via our <a href="$url('Order-Status')$">order status</a> page.</p>
+								<p>Order Status Guide:</p>
+								<table class="table table-bordered text-center">
+								<tr><th style="background-color: #333; color: white;">Status</th><th style="background-color: #333; color: white;">Description</th></tr>
+								<tr><td><b>Rejected</b></td><td>Your order was not successfully placed.</td></tr>
+								<tr><td><b>In Progress</b></td><td>Your order is currently being processed.</td></tr>
+								<tr><td><b>Confirmed</b></td><td>Your order has been confirmed.</td></tr>
+								<tr><td><b>Partially Shipped</b></td><td>Part of your order has been shipped.</td></tr>
+								<tr><td><b>Shipped</b></td><td>Your order has been sent to the designated courier company. You will receive a notification email with the tracking number.</td></tr>
+								<tr><td><b>Cancelled</b></td><td>Your order has been cancelled.</td></tr></table>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingorders-tab-3">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">My order was cancelled but payment was made – what should I do?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseorders-tab-3">
+								<p>If your order shows as cancelled but you have been charged, please contact our Customer Care Team with the following details:</p>
+								<ul>
+								<li>Order number</li>
+								<li>Mode of payment</li>
+								<li>Screenshot of your bank statement showing the transaction (please ensure all personal details are appropriately redacted)</li>
+								</ul>
+								<p>If the cancellation was due to an online security review, a refund will be issued to the original payment method within 14 business days.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingorders-tab-4">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What happens if an item in my order is not available?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseorders-tab-4">
+								<p>All orders are fulfilled based on available stock. If a product does not pass our quality checks or is out of stock, your order will be processed with the remaining item(s). Unavailable item(s) will be refunded accordingly.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingorders-tab-5">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What should I do if my order is incorrect or damaged?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseorders-tab-5">
+								<p>Please contact our Customer Care Team with the following:</p>
+								<ul>
+								<li>Order number</li>
+								<li>images showing the item and the affected area (close-up, top view, and outsole)</li>
+								<li>A brief description of the issue</li>
+								</ul>
+								<p>Please do not discard the item, as it may need to be returned.</p>
+								<p>If you received an incorrect item, submit a Return Request online within 30 days of delivery. If the correct item is in stock, we will send a replacement. Otherwise, a refund may be offered at our discretion.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div id="account-tab" class="tab-pane">
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-0">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do I create an account or sign in to my account?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-0">
+								<p>Head on over to the <a href="$url('Login-Show')$">sign in</a> page and fill in your particulars under <a href="$url('Account-CreateAccount')$">Create An Account</a>.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-1">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do I reset/change my password?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-1">
+								<ol>
+								<li>Head to the <a href="$url('Login-Show')$">sign in</a> page and enter your email address under Forgot Password. You will receive an email with a link to reset your password.</li>
+								<li>To change your <a href="$url('Account-PasswordReset')$">password</a>, sign into your account, head to <a href="$url('Account-Show')$">My Account</a> and then to <a href="$url('Account-EditProfile')$">My Profile</a> page.</li>
+								<ol>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-2">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">I didn’t receive the password reset email. What should I do? </span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-2">
+								<p>If you haven’t received the password reset email, please check your spam or junk folder as the email may have been filtered. Ensure that the email address entered is correct and registered with us.</p>
+								<p>If you still haven't received the email after trying the above, please contact our Customer Service Team for further assistance.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-3">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Can I change my email address and account details?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-3">
+								<p>You can update your contact number, address, and name directly through your account.</p>
+								<p>If you need to update your email address, please reach out to our Customer Service team at customers@pedroshoes.com and we’ll be happy to assist you.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-4">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Do I need to have an account to shop at PEDROSHOES.COM?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-4">
+								<p>You are welcome to shop as a guest. Please note that your order history and details will not be stored.</p>
+								<p>We highly recommend creating an account to enjoy benefits such as saving your payment and shipping details for faster checkout, view all past purchases and easily manage returns.</p>
+                            </div>
+                        </div>
+
+
+                        <h2 class="title-header"><b>PEDRO PRIVILEGE MEMBERSHIP</b></h2>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-5">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How can I become a PEDRO Privilege member?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-5">
+								<ol>
+								<li>To join us as a member, all you need to do is to make a purchase at either PEDROSHOES.COM (Singapore site) with a registered account or at one of our PEDRO retail stores in Singapore.</li>
+								<li>You are entitled to a Silver membership if you purchase anything below S$250. If you purchase S$250 and above of PEDRO products in a single receipt, you are entitled to a Platinum membership.</li>
+								<li>For a Silver member to become a Platinum member, you can either make a one-time purchase of S$250 and above, or accumulate purchases up to a total value of S$500 within a year. You can make your purchases either in-store or online to be eligible for this upgrade. Your transition from Silver to Platinum membership will be automatically activated.</li>
+								</ol>
+								<p>Your membership is non-transferable and valid only for registered customers. Without prejudice to any action, misuse and/or abuse of privileges will result in the termination of membership by PEDRO. PEDRO reserves the right to amend the Terms & Conditions of its programme without prior notice. The decision of PEDRO shall be final and binding in the event of a dispute arising out of or in connection with transactions made with membership privileges.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-6">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What privileges am I entitled to?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-6">
+								<div class="col">
+								<table class="table" style="margin:0;">
+								<tr><td style="border:2px solid #fff;padding:0;width:50%;color:#fff;"><span class="text-center" style="display:block;margin-bottom:2px;line-height:33px;background-color:#999;"><b>Silver</b></span></td><td style="border:2px solid #fff;padding:0;width:50%;color:#fff;"><span class="text-center" style="display:block;margin-bottom:2px;line-height:33px;background-color:#d5d0b9;"><b>Platinum</b></span></td></tr></table>
+								<table class="table table-bordered">
+								<tr><th colspan="2" class="text-center">Membership Qualifiers</th></tr>
+								<tr><td style="width:50%;">
+								<ul class="membership-table-list">
+								<li>Simply make your first purchase at either <b>PEDROSHOES.COM (Singapore site)</b> or at <b>one of our PEDRO retail stores in Singapore</b>, to qualify as a Silver Member.</li>
+								</ul>
+								</td><td>
+								<ul class="membership-table-list">
+								<li>Make a one-time purchase of S$250 and above, or accumulate purchases up to a total value of S$500 within a year. You can make your purchases <b>either in-store or online</b> to be eligible for this upgrade.</li>
+								</ul>
+								</td></tr>
+								<tr><th colspan="2" class="text-center">Welcome Privileges</th></tr>
+								<tr><td></td><td>
+								<ul class="membership-table-list">
+								<li>Special promo code for your next online purchase. Promo code will be sent via email.</li>
+								</ul>
+								</td></tr>
+								<tr><th colspan="2" class="text-center">Ongoing Privileges</th></tr>
+								<tr><td>
+								<ul class="membership-table-list">
+								<li>S$10 OFF online purchases upon accumulation of spends worth S$200<br>Promo code will be sent via email.</li>
+								<li>Enjoy a hassle-free checkout experience</li>
+								<li>Receive the latest fashion news, updates on new arrivals, special offers and online exclusive promotions</li>
+								</ul>
+								</td><td>
+								<ul class="membership-table-list">
+								<li>Receive a 10% discount on regular-priced items when you shop at both <b>PEDRO stores in Singapore</b> and <b>online at</b> <b>PEDROSHOES.COM (Singapore deliveries only)</b></li>
+								<li>Enjoy a hassle-free checkout experience</li>
+								<li>Get the latest fashion news, updates on new arrivals, special offers and online exclusive promotions</li>
+								</ul>
+								</td></tr>
+								<tr><th colspan="2" class="text-center">Birthday Privileges</th></tr>
+								<tr><td>
+								<ul class="membership-table-list">
+								<li>15% off at both online & in-stores during your birthday month (capped at 5 items each). Promocode will be sent via email so ensure to subscribe.</li>
+								</ul>
+								</td><td>
+								<ul class="membership-table-list">
+								<li>20% off at both online & in-stores during your birthday month (capped at 5 items each). More perks will be sent via email so ensure to subscribe.</li>
+								</ul>
+								</td></tr>
+								<tr><th colspan="2" class="text-center">Events</th></tr>
+								<tr><td>
+								<ul class="membership-table-list">
+								<li>Be notified of members-exclusive sale and other promotions</li>
+								</ul>
+								</td><td>
+								<ul class="membership-table-list">
+								<li>Be notified of members-exclusive sale and other promotions</li>
+								<li>Exclusive Season Previews</li>
+								<li>Exclusive access to private events and style workshops</li>
+								</ul>
+								</td></tr></table>
+								</div>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-7">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do I activate my member privileges?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-7">
+								<p>Once you become a PEDRO privilege member, you will automatically enjoy the privileges at your next purchase when you shop with your online account at PEDROSHOES.com (Singapore site). A confirmation notification will be sent to your email address to inform you about your privilege membership status before you can start to enjoy your member privileges when you shop at both PEDRO stores in Singapore and online at PEDROSHOES.COM (Singapore deliveries only)</p>
+								<p>If you have not received a confirmation notification email after 7 working days, please contact our customer service department at customers@pedroshoes.com for further assistance.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-8">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Can I enjoy the member privileges immediately on the purchase which qualifies me to be a member?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-8">
+								<p>The member privileges will not be available until a confirmation email has been sent to your registered email address, to inform you about your membership status before you may enjoy your privileges.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-9">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Can I enjoy my membership privileges in overseas stores?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-9">
+								<p>Member privileges are only valid in the location where the privilege membership has been registered. Memberships registered through PEDRO Singapore retail stores and online at PEDROSHOES.com (Singapore site) are valid only for purchases made within Singapore.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-10">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Can I use the promo codes I receive via email at retail stores?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-10">
+								<p>Selected promo codes can be used for both online & in-store purchases. Usage of the promocode will be stated in the email. For online, use your promo code at the checkout page and make sure you’ve signed into your account when making your online purchase. You can flash your email in store for any assistance.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-11">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Will my privilege membership expire?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-11">
+								<p>No, your privilege membership will not expire.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingaccount-tab-12">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Terms & Conditions</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseaccount-tab-12">
+								<ol>
+								<li>PEDRO reserves the right to amend the Terms & Conditions of its loyalty programme without prior notice.</li>
+								<li>Member privileges are only valid in the location where the privilege membership has been registered. Memberships registered through PEDRO Singapore retail stores and online at PEDROSHOES.com (Singapore site) are valid only for purchases made within Singapore.</li>
+								<li>Membership is non-transferable and valid only for the registered customer.</li>
+								<li>Privileges are not applicable for the purchase of gift vouchers, special project items or sale and promotional items, unless otherwise stated.</li>
+								<li>PEDRO reserves the right to suspend membership account and/or perks associated, should account be identified as a duplicated account, or suspected of use for commercial purposes without prior notification.</li>
+								<li>Without prejudice to any action, misuse and/or abuse of privileges will result in termination of membership by PEDRO.</li>
+								<li>The decision of PEDRO shall be final and binding in the event of a dispute arising out of or in connection with transactions made with membership privileges.</li>
+								<li>Refer to <a href="$url('Page-Show', 'cid', 'terms-of-use')$">Terms of Use</a> for more information.</li>
+								<ol>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div id="productpricing-tab" class="tab-pane">
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-0">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Where can I find genuine PEDRO products?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-0">
+								<p>Authentic PEDRO products are available at our PEDRO retail boutiques. To locate a PEDRO boutique near you, click <a href="$url('Stores-Find')$">here</a>.</p>
+								<p>Our products are also available via our official online stores:</p>
+								<table class="table table-bordered"><tbody>
+								<tr><td class="bg-color--darker-grey text-color--white">Region</td><td class="bg-color--darker-grey text-color--white">Location</td></tr>
+								<tr><td>Asia</td><td>Cambodia*, Vietnam, Indonesia, Thailand, Brunei, Malaysia, Philippines, Singapore, South Korea, Taiwan, Hong Kong SAR, Macau SAR</td></tr>
+								<tr><td nowrap>Europe</td><td>Austria, Belgium, Bulgaria, Croatia, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Netherlands, Poland, Portugal, Romania, Slovakia, Slovenia, Spain, Sweden, United Kingdom</td></tr>
+								<tr><td nowrap>Middle East</td><td>Kuwait, Oman, Qatar, United Arab Emirates</td></tr>
+								<tr><td nowrap>North America</td><td>Canada, United States of America</td></tr>
+								<tr><td nowrap>Oceania</td><td>Australia, New Zealand</td></tr></tbody></table>
+								<p>Online Store- <a href="https://pedroshoes.com.kh/">Cambodia</a></p>
+								<p>PEDRO does not offer merchandise for sale through individuals, unauthorised retail locations, Internet auctions, online forums, social media platforms and any other online retailers besides those mentioned above.</p>
+								<p>If you buy a PEDRO product through an unauthorised dealer, you could be purchasing a counterfeit item which may differ from what was advertised and delivered to you. As a result, you will not enjoy the high-quality standards embodied in the PEDRO brand as well as the benefit of our after-sales service. Counterfeit products do not undergo our inspection or testing processes.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-1">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">PEDRO anti-counterfeiting efforts</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-1">
+								<p>We protect and enforce our intellectual property rights rigorously. We actively cooperate with law enforcement agencies, customs authorities, and third-party platforms to immediately stop the manufacture, shipment, and sales of counterfeit PEDRO products. We also work with domain name registrars to take down fraudulent websites.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-2">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How can I report suspected counterfeit products or fake websites? </span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-2">
+								<p>If you suspect counterfeit products or fake websites, please contact us at customers@pedroshoes.com.</p>
+								<p>When reporting, kindly provide as much information as possible, including:</p>
+								<ul>
+								<li>Location of the seller or website</li>
+								<li>Number of products offered</li>
+								<li>Type/style of products offered</li>
+								<li>Attach screenshots and share any relevant links</li>
+								</ul>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-3">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">I have already placed an order via the unofficial site. What should I do?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-3">
+								<p>We strongly advise to purchase item from our official site at PEDROSHOES.COM. By doing so, you can be confident in the authenticity and customer support that we offer.</p>
+								<p>We take such incidents very seriously and recommend taking the following steps to resolve this:</p>
+								<ul>
+								<li>Contact Your Bank/Card Issuer: Immediately inform your bank or card issuer about the unauthorized charge. They can guide you through the process of disputing the transaction and potentially reversing the charge.</li>
+								<li>Contact Your Bank/Card Issuer: Immediately inform your bank or card issuer about the unauthorized charge. They can guide you through the process of disputing the transaction and potentially reversing the charge.</li>
+								<li>Monitor Your Accounts: Keep a close watch on your bank statements and credit card transactions for any further unauthorized activities.</li>
+								</ul>
+								<p>If you need help identifying whether a website is official, feel free to reach out to our Customer Service Team.</p>
+                            </div>
+                        </div>
+
+
+                        <h2 class="title-header"><b>SHOPPING & AVAILABILITY</b></h2>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-4">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Are the same products offered Online available in the Retail boutiques*?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-4">
+								<p>Our Online store offers a wider range of products as compared to our Retail boutiques. Selected items may not be available in the Retail boutiques or may only be available in selected boutiques.</p>
+								<p>*Click <a href="$url('Stores-Find')$">here</a> to find PEDRO retail boutiques near you.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-5">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How often is the website updated with new products?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-5">
+								<p>On PEDROSHOES.COM, new arrivals will be introduced on a weekly basis. Browse our latest collections on the New Arrivals page.</p>
+								<p><a href="$url('Search-Show','cgid','pwnewarrivals')$">WOMEN'S NEW ARRIVALS</a><br><a href="$url('Search-Show','cgid','pmnewarrivals')$">MEN'S NEW ARRIVALS</a></p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-6">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Will an item be restocked?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-6">
+								<p>If the item you’re looking for is out of stock online, we can check for its availability in our physical stores, provided it’s not an Online Exclusive. Please contact us at customers@pedroshoes.com or on live chat for further assistance.</p>
+								<p>Our products are restocked regularly, depending on stock availability and demand.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-7">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Does PEDRO provides customisation service?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-7">
+								<p>PEDRO currently does not provide customisation service.</p>
+                            </div>
+                        </div>
+
+
+                        <h2 class="title-header"><b>PRODUCT INFO & SIZING</b></h2>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-8">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do I find the most suitable sizes and fit?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-8">
+								<p>To help you find your most suitable size, we recommend that you refer to our <a href="$url('Page-Show','cid','size-guide')$">Size Guide</a>. Please note that our sizes do not come in half sizes. You can find the Size Guide available on each product page beside the ‘Select Size’ option to help you choose the best fit.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-9">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Are all product images and colours accurate to the actual item?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-9">
+								<p>We strive to provide accurate product images and descriptions. However, due to screen settings and lighting, colours may slightly vary. Kindly refer to product details for precise information.</p>
+                            </div>
+                        </div>
+
+
+                        <h2 class="title-header"><b>CARE & SERVICES</b></h2>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-10">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Do you provide repair services?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-10">
+								<p>Repair services are only available at PEDRO retail stores in Singapore. We will do our best to repair the faulty item, depending on its condition. However, this service is not guaranteed for all types of damages.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-11">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do I take care of my PEDRO products?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-11">
+								<p>Our products are made of genuine leather; synthetic fabrics and materials; and metallic accessories which can react to humidity, salt and atmospheric agents. This may cause irreversible wear and tear, so we recommend you to keep your item(s) dry.</p>
+								<p>Overexposure to light and heat; direct contact with rain; oil and grease (makeup); alcohol (perfume, solvents); and other abrasive products or excessive friction, should be avoided as colour fading may occur. Care should be taken when wearing lightly-coloured garments and/or when storing products with different colours together as the colours may transfer onto each other.</p>
+								<p>To keep your shoes, bags and accessories clean, wipe them with a soft dry cloth. When they are not in use, store them in a protective bag in a clean, cool and dry place.</p>
+								<p>All our materials are carefully crafted and sourced for their unique qualities. Any incidental marks, tonal changes and/or textural variances are part of the material’s natural characteristic and should not be considered as imperfections.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-12">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Does PEDROSHOES.COM offer price adjustments?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-12">
+								<p>Any form of price adjustment to orders is not applicable.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingproductpricing-tab-13">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How will my order be packaged?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapseproductpricing-tab-13">
+								<p>Your order will be packed in a black PEDRO delivery package. Please note that paper bags are not included with delivery orders.</p>
+								<p>Shoes, belts, wallets, and small leather goods will be placed in an individual box. All other products, including handbags, will be securely sealed within the delivery package.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div id="security-tab" class="tab-pane">
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingsecurity-tab-0">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What is Online Security Fraud Screening?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsesecurity-tab-0">
+								<p>Online Security Fraud Screening is a PEDROSHOES.COM initiative implemented as a preventive measure against credit card and PayPal fraud transactions. It aims to protect customers from unauthorized and fraudulent activity.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingsecurity-tab-1">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Why should I send you my personal information?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsesecurity-tab-1">
+								<p>PEDROSHOES.COM takes cardholder security seriously and has established an online security process developed in line with industry best practices.</p>
+								<p>This process is necessary to protect the interests of credit cardholders whose accounts may have been compromised, as well as PEDROSHOES.COM as the e-commerce merchant.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingsecurity-tab-2">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What should I take note of when sending my personal information?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsesecurity-tab-2">
+								<p>For your safety, PEDROSHOES.COM advises that you never send your full credit card number to anyone. We strongly recommend covering all digits except for the first six and the last four digits.</p>
+								<p>If documents are submitted without masking sensitive information as advised, PEDROSHOES.COM will not be held responsible for any resulting complications.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingsecurity-tab-3">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Is my personal information kept secure?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsesecurity-tab-3">
+								<p>All information submitted by customers is kept secure and confidential. Only limited and authorized personnel have access to such information.</p>
+								<p>We do not share, rent, or sell your personal information without your consent. For more details, please refer to PEDRO’s Privacy Policy.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingsecurity-tab-4">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Will I receive an Online Security email every time I place an order?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsesecurity-tab-4">
+								<p>Online Security verification is generally conducted as a one-time verification process.</p>
+								<p>To minimize potential delays due to additional checks, we recommend using the same credit card for future purchases.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingsecurity-tab-5">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">I received an Online Security email. Will I still receive my order within the delivery timeframe?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsesecurity-tab-5">
+								<p>Delivery timelines may be affected depending on when you respond to the Online Security email and the validity of the submitted documents.</p>
+								<p>Once your documents have been verified as valid, we will process your order as soon as possible.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingsecurity-tab-6">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What if I fail to respond within the given timeframe?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsesecurity-tab-6">
+								<p>If you do not respond to the Online Security verification email within the specified timeframe, your order will be automatically cancelled and the amount will be refunded to your original mode of payment.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingsecurity-tab-7">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What should I take note of as an internet user and online shopper?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsesecurity-tab-7">
+								<p>PEDROSHOES.COM takes multiple measures to ensure that our website is secure and protected from malicious activity.</p>
+								<p>All information you enter and transmit is protected by Secure Sockets Layer (SSL) encryption. SSL encrypts your order information before transmission, preventing unauthorized parties from decoding your data.</p>
+								<p>We strongly advise users to follow these additional safety practices:</p>
+								<ul>
+								<li>Avoid using public computers or terminals to sign in to your account.</li>
+								<li>Create a strong password that is not easily guessed.</li>
+								<li>Keep your passwords confidential.</li>
+								<li>Change your password regularly.</li>
+								<li>Avoid using the same password across multiple services.</li>
+								<li>Do not save passwords in your browser.</li>
+								<li>Clear your browser history, cookies, cache, and saved passwords after use.</li>
+								<li>Be cautious of unsolicited emails or phone calls claiming to be from PEDROSHOES.COM requesting account updates.</li>
+								</ul>
+								<p>If you receive a suspicious email or call, please contact customers@pedroshoes.com to verify its authenticity.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div id="payment-tab" class="tab-pane">
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpayment-tab-0">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What forms of payment can I use?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepayment-tab-0">
+								<p>We accept payment via MasterCard, Visa, American Express, Paypal, Shopback, PayNow, Shopee Pay, GrabPay, Apple Pay, Google Pay and Atome</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpayment-tab-1">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What currencies do you accept?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepayment-tab-1">
+								<p>We accept Australian dollar, Canadian dollar, Euro dollar, Hong Kong SAR dollar, Malaysian Ringgit, New Taiwan dollar, New Zealand Dollar, Omani Rial, Pakistani Rupee, Philippine Pesos, Sterling Pound, United Arab Emirates Dirham, United States dollar, South Korean Won, Singapore dollar and Thai Baht.</p>
+								<p>You will be charged in the default currency of the delivery destination which you have selected to ship your order.</p>
+                            </div>
+                        </div>
+
+
+                        <h2 class="title-header"><b>PAYMENT PROCESSING</b></h2>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpayment-tab-2">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Will PEDROSHOES.COM store my payment information?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepayment-tab-2">
+								<p>PEDROSHOES.COM does not store any customer's credit/debit card information. When you pay by credit/debit card, all credit/debit card information is directly transacted in a secure fashion to CyberSource or PayPal, our payment gateway providers.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpayment-tab-3">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Is my credit card information kept secured?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepayment-tab-3">
+								<p>We have security measures in place to safeguard your payment details. All credit card information are securely encrypted and stored with our payment gateway Cybersource, a subsidiary company of VISA Inc. This gives a second layer of protection for customers’ credit card information.</p>
+								<p>PEDROSHOES.COM is fully PCI (Payment Card Industry Data Security Standard) compliant with sophisticated fraud prevention tools, as well as experienced fraud prevention specialists screening our daily transactions. You also have the option to remove any stored credit cards in ‘My Saved Cards’ under ‘My Account Overview’.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpayment-tab-4">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What is Payment Authorisation?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepayment-tab-4">
+								<p>Payment authorisation is confirmation of a cashless payment given during a payment transaction. It may involve the customer entering a PIN in a card transaction. All payments are authorised and captured once your order has been placed.</p>
+                            </div>
+                        </div>
+
+
+                        <h2 class="title-header"><b>PAYMENT ISSUE & TROUBLESHOOTING</b></h2>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpayment-tab-5">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">My payment was declined, what should I do?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepayment-tab-5">
+								<p>If your payment is declined, kindly place a new order as we cannot reinstate declined transaction. Verify that your card details, CVV and OTP are correct. If the issue continues, contact your bank or use an alternative payment method. </p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpayment-tab-6">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What should I do if I did not receive an order confirmation, but payment was deducted?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepayment-tab-6">
+								<p>If your payment has been deducted but you have not received an order confirmation email within the expected time, kindly contact our Customer Care Team with the following details for assistance:</p>
+								<ul>
+								<li>Order Number (if available)</li>
+								<li>Full Name</li>
+								<li>Email address used for the order</li>
+								<li>A screenshot of the payment transaction from your account (Please ensure all personal details are appropriately redacted)</li>
+								</ul>
+								<p>Providing this information will help us find your order and resolve the matter swiftly.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpayment-tab-7">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Why do I see double records on my online bank statement for my purchase?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepayment-tab-7">
+								<p>All payments made using a debit card will result in two records: authorisation and settlement. You will see both records reflected on your online bank statement. Authorisation refers to funds held by the bank while the payment is in the process of being approved or declined. Settlement refers to the actual payment (i.e the merchant has captured the fund that was on hold previously).</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpayment-tab-8">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Why are there extra charges reflected on my credit card bill?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepayment-tab-8">
+								<p>Your issuing bank may impose small administrative charges for overseas usage. Please contact your bank for further information.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div id="promotions-tab" class="tab-pane">
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpromotions-tab-0">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What types of promotions does PEDROSHOES.COM offer?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepromotions-tab-0">
+								<p>We periodically offer special promotions, limited-time offers, and exclusive online deals. Promotional codes or vouchers may also be issued for future purchases.</p>
+								<p>Please note that price adjustments are not available for prior purchases or previous promotions.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpromotions-tab-1">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">How do promo codes work and what should I do if mine is not working?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepromotions-tab-1">
+								<p>Only one promo code may be applied per order.</p>
+								<p>If your promo code is not working, please ensure that it is valid, has not been previously used, and has not expired.</p>
+								<p>You may also refer to the Terms & Conditions on our Promotions page for further details. If you require additional assistance, please contact our Customer Care Team.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpromotions-tab-2">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">What are the Terms and Conditions for promotions?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepromotions-tab-2">
+								<p>Promotions cannot be exchanged for cash or vouchers and are valid only on PEDROSHOES.COM unless otherwise stated. No price adjustments will be made for past purchases.</p>
+								<p>Orders cannot be changed or cancelled after:</p>
+								<p>1 hour for Standard Delivery orders<br>15 minutes for Express Delivery orders</p>
+								<p>PEDROSHOES.COM reserves the right to modify or terminate promotions at any time without prior notice. In the event of a dispute, PEDROSHOES.COM’s decision shall be final.</p>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <div class="accordion-heading collapsed" id="headingpromotions-tab-3">
+                                <svg class="icon-arrow" width="16" height="16" viewBox="0 0 16 16">
+                                    <path d="M5.5 11L8 8.5l2.5 2.5L12 9 8 5l-4 4z"/>
+                                </svg>
+                                <span class="accordion-title">Can promotions be extended and are they the same as in-store promotions?</span>
+                            </div>
+
+                            <div class="accordion-body collapse" id="collapsepromotions-tab-3">
+								<p>Expired promotions cannot be extended due to system limitations.</p>
+								<p>Promotions on PEDROSHOES.COM and in PEDRO retail boutiques may differ. Certain online offers may be exclusive to the website.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-4" style="margin-top:50px">
+                <h2><b>Need Help?</b></h2>
+                <p>Contact our customer service team for assistance.</p>
+                <p>
+                    <img src="images/customer-care/chat.svg?$staticlink$" style="width: 5%;" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="js-liveChat btn-link" href="$url('ContentForms-ContactUsForm')$"><b>Chat With Us</b></a>
+                </p>
+                <p>
+                    <img src="images/customer-care/email.svg?$staticlink$" style="width: 5%;" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <b>Email</b><br><br><a href="mailto:customers@pedroshoes.com">customers@pedroshoes.com</a>
+                </p>
+                <p>Customer Service operating hours :<br>Monday - Friday 0900 to 1800 (GMT +8).<br>Closed on Saturday Sunday and Public Holidays.</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 50px;">&nbsp;</div>
+    <div style="text-align: center;">
+        <a style="text-decoration: underline;" href="#top">Back to Top</a>
+    </div>
+    <div style="height: 50px;">&nbsp;</div>
+</div>
+
+<script>
+setTimeout(function() {
+ 
+  function getRoot() {
+    // Try modal first
+    var els = document.querySelectorAll('.modal-body .cms');
+    if (els.length > 0) return els[els.length - 1];
+    // Fallback for standalone page
+    var all = document.querySelectorAll('.cms');
+    return all[all.length - 1] || null;
+ }
+ 
+  var root = getRoot();
+  if (!root) return;
+ 
+  // Remove old handler
+  if (window._faqClickHandler) {
+    document.removeEventListener("click", window._faqClickHandler, true);
+  }
+ 
+  // Reset all tabs
+  root.querySelectorAll(".tab-pane").forEach(function(tab) {
+    tab.style.display = "none";
+    tab.classList.remove("show", "active");
+  });
+ 
+  // Show delivery by default
+  var defaultTab = root.querySelector("#delivery-tab");
+  if (defaultTab) {
+    defaultTab.style.display = "block";
+    defaultTab.classList.add("show", "active");
+  }
+ 
+  window._faqClickHandler = function(e) {
+    var currentRoot = getRoot();
+    if (!currentRoot || !currentRoot.contains(e.target)) return;
+ 
+    var navLink = e.target.closest(".nav-faq-link");
+    if (navLink) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      currentRoot.querySelectorAll(".tab-pane").forEach(function(tab) {
+        tab.style.display = "none";
+        tab.classList.remove("show", "active");
+      });
+      var targetTab = currentRoot.querySelector("#" + navLink.getAttribute("href").substring(1));
+      if (targetTab) {
+        targetTab.style.display = "block";
+        targetTab.classList.add("show", "active");
+      }
+      currentRoot.querySelectorAll(".nav-faq-link").forEach(function(link) {
+        link.classList.remove("active");
+      });
+      navLink.classList.add("active");
+      var r = currentRoot.querySelector("#faq-search-results");
+      var c = currentRoot.querySelector("#results-counter");
+      var n = currentRoot.querySelector("#no-results-msg");
+      if (r) r.style.display = "none";
+      if (c) c.style.display = "none";
+      if (n) n.style.display = "none";
+      return;
+    }
+ 
+    var heading = e.target.closest(".accordion-heading");
+    if (heading) {
+      e.stopImmediatePropagation();
+      var body = heading.nextElementSibling;
+      if (body) {
+        heading.classList.toggle("collapsed");
+        body.classList.toggle("collapse");
+        body.classList.toggle("show");
+      }
+      return;
+    }
+  };
+ 
+  document.addEventListener("click", window._faqClickHandler, true);
+ 
+  window.filterExistingFAQs = function() {
+    var currentRoot = getRoot();
+    if (!currentRoot) return;
+    var query = currentRoot.querySelector("#faqSearchInput").value.trim().toLowerCase();
+    var results = currentRoot.querySelector("#faq-search-results");
+    var counter = currentRoot.querySelector("#results-counter");
+    var countText = currentRoot.querySelector("#results-count");
+    var noMsg = currentRoot.querySelector("#no-results-msg");
+    results.innerHTML = "";
+    if (!query) {
+      results.style.display = "none";
+      counter.style.display = "none";
+      noMsg.style.display = "none";
+      return;
+    }
+    var matches = [];
+    currentRoot.querySelectorAll(".tab-pane").forEach(function(tab) {
+      var tabId = tab.id;
+      tab.querySelectorAll(".accordion-item").forEach(function(item, index) {
+        var title = (item.querySelector(".accordion-title") || {}).innerText || "";
+        var content = (item.querySelector(".accordion-body") || {}).innerText || "";
+        if ((title + content).toLowerCase().includes(query)) {
+          matches.push({ tabId: tabId, title: title, index: index });
+        }
+      });
+    });
+    if (matches.length === 0) {
+      noMsg.style.display = "block";
+      counter.style.display = "none";
+      results.style.display = "none";
+      return;
+    }
+    noMsg.style.display = "none";
+    counter.style.display = "block";
+    countText.textContent = matches.length + " result" + (matches.length > 1 ? "s" : "") + " found";
+    matches.forEach(function(item) {
+      var div = document.createElement("div");
+      div.className = "faq-search-item";
+      div.innerHTML = '<div class="faq-search-title">' + item.title + '</div><div class="faq-search-tab">' + getTabTitle(item.tabId) + '</div>';
+      div.onclick = function() {
+        var cr = getRoot();
+        if (!cr) return;
+        var nl = cr.querySelector('.nav-faq-link[href="#' + item.tabId + '"]');
+        if (nl) nl.click();
+        setTimeout(function() {
+          var cr2 = getRoot();
+          if (!cr2) return;
+          var h = cr2.querySelector("#heading" + item.tabId + "-" + item.index);
+          var b = cr2.querySelector("#collapse" + item.tabId + "-" + item.index);
+          if (h && b) {
+            h.classList.remove("collapsed");
+            b.classList.add("show");
+            h.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 200);
+        results.style.display = "none";
+      };
+      results.appendChild(div);
+    });
+    results.style.display = "block";
+  };
+ 
+  function getTabTitle(tabId) {
+    var currentRoot = getRoot();
+    var tab = currentRoot ? currentRoot.querySelector('.nav-faq-link[href="#' + tabId + '"]') : null;
+    return tab ? tab.innerText : "";
+  }
+ 
+}, 300);
+</script>
+
+</body>
+
+</html>

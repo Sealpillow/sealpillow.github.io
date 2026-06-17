@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+html, body {
+    overflow-x: hidden;
+    color: black;
+    text-wrap: pretty;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+.page.parallax {
+    padding-top: 0px !important;
+}
+
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+
+}
+    video {
+  width: 100%;
+  display: block;
+}
+video:focus, 
+.controls button:focus {
+    outline: none;
+}
+  img,
+  video {
+    clip-path: fill-box; 
+  }
+.controls {
+  position: absolute;
+  bottom: 1rem;
+  width: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.controls button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.controls button img {
+    display: block;
+  }
+  .icon-play, .icon-pause {
+    width: 12px;
+    height: 24px;
+  }
+  .icon-mute, .icon-unmute {
+    width: 12px;
+    height: 12px;
+  }
+  .controls .mute {
+    transform: translateY(-1.5px); /* tweak: -1px to -4px */
+  }
+  /* play / pause icons */
+  .icon-pause { display: none; }
+  .play.is-playing .icon-play { display: none; }
+  .play.is-playing .icon-pause { display: inline; }
+  .play.is-paused .icon-play {display: inline;}
+  .play.is-paused .icon-pause {display: none;}
+
+  .timeline {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+/* SMOOTH PROGRESS BAR */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  background: white;
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+
+/* invisible seek input */
+.seek {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dropdown1 {
+    cursor: pointer;
+    padding: 14px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.dropdown1-content {
+    display: none;
+    padding: 15px;
+}
+
+.dropdown1-content a {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}
+
+.arrow.rotate {
+    transform: rotate(180deg);
+}
+
+.arrow {
+    width: 1em;
+    height: 1em;
+    transition: transform 0.3s ease;
+}
+
+
+/* Ensure mobile version of the dropdown is shown in center */
+@media (max-width: 767px) {
+    .dropdown1,
+    .dropdown1-content {
+        text-align: center;
+    }
+}
+/* Default for Desktop (min-width: 992px) */
+#icon,
+#demi,
+#jatte {
+    scroll-margin-top: 550px; /* Desktop scroll margin */
+}
+
+/* For Tablets (min-width: 768px and max-width: 991px) */
+@media (max-width: 991px) and (min-width: 768px) {
+    #icon,
+    #demi,
+    #jatte {
+        scroll-margin-top: 525px; /* Tablet scroll margin */
+    }
+}
+
+/* For Mobile (max-width: 767px) */
+@media (max-width: 767px) {
+    #icon,
+    #demi,
+    #jatte {
+        scroll-margin-top: 360px; /* Mobile scroll margin */
+    }
+}
+
+/* For Large Screens (min-width: 1200px) */
+@media (min-width: 1600px) {
+    #icon,
+    #demi,
+    #jatte {
+        scroll-margin-top: 950px; /* Large screen scroll margin */
+    }
+}
+
+.slider-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content img,
+  .slide-content video {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Text below each slide image, outside the image */
+  .slide-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10;
+  }
+  .slide-text h3 {
+    font-size: 14px;
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+  .slide-text p {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  /* Hide arrows & pagination */
+  .splide__arrows,
+  .splide__pagination { display: none; }
+
+  .splide__track { cursor: grab; }
+  .splide__track:active { cursor: grabbing; }
+
+</style>
+</head>
+
+<body>
+
+
+<div class="video-wrapper js-vertical-slider">
+  <div class="video-media-container">
+    <!-- Video Background (Desktop) -->
+    <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/dp-main-video.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Mobile Video -->
+    <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+        style="width: 100%; object-fit: cover;">
+        <source src="images/design-philosophy/dp-main-video-mobile.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="controls">
+      <button class="play is-playing">
+        <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+        <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+      </button>
+
+      <div class="timeline">
+        <div class="progressBar">
+          <div class="progressFill"></div>
+        </div>
+        <input class="seek" type="range" value="0" min="0" step="0.01">
+      </div>
+
+      <button class="mute">
+        <img class="icon-mute" src="images/media-assets/mute.webp?$staticlink$">
+        <img class="icon-unmute" src="images/media-assets/unmute.webp?$staticlink$" style="display:none;">
+      </button>
+    </div>
+  </div>
+</div>
+
+<section class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        
+        <!-- Common Title -->
+        <p class="mb-0 p-0 col-md-12" style="font-family:proxima-nova; font-size:14px; width:100%; margin: 0 auto; text-align: center; line-height:33px;">
+            Design Philosophy
+        </p>
+        <br>
+
+        <!-- Desktop Description -->
+        <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+            Our language is defined by precision and subtlety, shaped by an understanding of how objects are experienced
+            in everyday life. Refined through inspiration and intuition, design unfolds as a living system, expressed across
+            distinct elements that offer unique interpretations of contemporary utility. Unified by clarity, open to individuality.
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:20px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+            Our language is defined by precision<br>
+            and subtlety, shaped by an<br>
+            understanding of how objects are<br>
+            experienced in everyday life. Refined<br>
+            through inspiration and intuition, design<br>
+            unfolds as a living system, expressed<br>
+            across distinct elements that offer<br>
+            unique interpretations of contemporary<br>
+            utility. Unified by clarity, open to<br>
+            individuality.
+        </p>
+    </div>
+</section>
+
+<!-- Dropdown (Desktop and Mobile) -->
+<div class="dropdown1 d-block" onclick="toggleDropdown()">
+    <span style="font-size:14px;font-weight:500;">NOVO</span>
+    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+</div>
+
+<!-- Dropdown Content (Shared for Desktop & Mobile) -->
+<div class="dropdown1-content" id="dropdown1-content">
+    <a href="#horseprint" style="font-size:14px;font-weight:500;line-height:2">HORSE PRINT</a>
+    <br>
+    <a href="#emblem" style="font-size:14px;font-weight:500;line-height:2">THE EMBLEM</a>
+    <br>
+    <a href="#demi" style="font-size:14px;font-weight:500;line-height:2">DEMI</a>
+    <br>
+    <a href="#jatte" style="font-size:14px;font-weight:500;line-height:2">JATTE</a>
+</div>
+
+<!-----------------------------------------------------
+  NOVO
+------------------------------------------------------->
+
+<div class="slider-container">
+  <div class="splide" id="carouselExploreSlider1">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<section id="novo" class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        
+        <!-- Common Title -->
+        <p class="mb-0 p-0 col-md-12" style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto; text-align: center; line-height:33px;">
+            Novo
+        </p>
+        <br>
+
+        <!-- Desktop Description -->
+        <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width: 60%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+          Our language is defined by precision and subtlety, shaped by an understanding of 
+          how objects are experienced in everyday life. Refined through inspiration and 
+          intuition, design unfolds as a living system, expressed across distinct elements 
+          that offer unique interpretations of contemporary utility. 
+          Unified by clarity, open to individuality.
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width: 85%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+          Our language is defined by precision and subtlety, shaped by an understanding of 
+          how objects are experienced in everyday life. Refined through inspiration and 
+          intuition, design unfolds as a living system, expressed across distinct elements 
+          that offer unique interpretations of contemporary utility. 
+          Unified by clarity, open to individuality.
+        </p>
+
+        <br><br>
+
+        <!-- Anchor link (same for both) -->
+        <a href="$url('Page-Show', 'cid', 'design-philosophy-novo')$" style="text-decoration: underline;" target="_blank">
+            Discover Story
+        </a>
+    </div>
+</section>
+
+<!-----------------------------------------------------
+    HORSE PRINT
+------------------------------------------------------->
+
+
+<div class="slider-container">
+  <div class="splide" id="carouselExploreSlider2">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+
+
+<section id="horseprint" class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        
+        <!-- Common Title -->
+        <p class="mb-0 p-0 col-md-12" style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto; text-align: center; line-height:33px;">
+            Horse Print
+        </p>
+        <br>
+
+        <!-- Desktop Description -->
+        <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width: 60%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+            Created for the Year of the Horse, the motif reimagines a symbol long associated with
+            momentum and progress. Rooted in heritage but designed for the present, it embodies
+            continuity and evolution, reinterpreted for contemporary life.
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width: 85%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+            Created for the Year of the Horse, the motif reimagines a
+            symbol long associated with momentum and progress.
+            Rooted in heritage but designed for the present, it
+            embodies continuity and evolution, reinterpreted for
+            contemporary life.
+        </p>
+
+        <br><br>
+
+        <!-- Anchor link (same for both) -->
+        <a href="$url('Page-Show', 'cid', 'design-philosophy-horseprint')$" style="text-decoration: underline;" target="_blank">
+            Discover Story
+        </a>
+    </div>
+</section>
+<!-----------------------------------------------------
+    ICON
+------------------------------------------------------->
+<div class="slider-container">
+  <div class="splide" id="carouselExploreSlider3">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<section id="icon" class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        
+        <!-- Common Title -->
+        <p class="mb-0 p-0 col-md-12" style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto; text-align: center; line-height:33px;">
+            The Emblem
+        </p>
+        <br>
+
+        <!-- Desktop Description -->
+        <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width: 60%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+          The emblem is more than a symbol; it is the distilled expression of our ethos
+          of connecting the wearer to the brand’s commitment to self-expression and infinite
+          possibility. It is the intersection where modern design meets lasting craft.
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width: 85%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+          The emblem is more than a symbol;
+          it is the distilled expression of our
+          ethos of connecting the wearer to
+          the brand’s commitment to self-
+          expression and infinite possibility. It
+          is the intersection where modern
+          design meets lasting craft.
+        </p>
+
+        <br><br>
+
+        <!-- Anchor link (same for both) -->
+        <a href="$url('Page-Show', 'cid', 'design-philosophy-the-emblem')$" style="text-decoration: underline;" target="_blank">
+            Discover Story
+        </a>
+    </div>
+</section>
+
+
+
+<!-----------------------------------------------------
+    DEMI
+------------------------------------------------------->
+<!-- Slider 5 -->
+<div class="slider-container">
+  <div class="splide" id="carouselExploreSlider4">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<section id="demi" class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        
+        <!-- Common Title -->
+        <p class="mb-0 p-0 col-md-12" style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto; text-align: center; line-height:33px;">
+            Demi
+        </p>
+        <br>
+
+        <!-- Desktop Description -->
+        <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width: 60%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+            Designed with a modern sensibility, the Demi collection offers a clean, elevated take on
+            everyday dressing. Minimal, considered and intentionally versatile, it is the kind of piece you
+            reach for without thinking. Made well for a life well lived.
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width: 85%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+            Designed with a modern sensibility, the Demi collection
+            offers a clean, elevated take on everyday dressing.
+            Minimal, considered and intentionally versatile, it is the
+            kind of piece you reach for without thinking.
+            Made well for a life well lived.
+        </p>
+
+        <br><br>
+
+        <!-- Anchor link (same for both) -->
+        <a href="$url('Page-Show', 'cid', 'design-philosophy-demi')$" style="text-decoration: underline;" target="_blank">
+            Discover Story
+        </a>
+    </div>
+</section>
+
+<!-----------------------------------------------------
+    JATTE
+------------------------------------------------------->
+<!-- Slider 7 -->
+<!-- Desktop slider -->
+<div class="slider-container">
+  <div class="splide" id="carouselExploreSlider5">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<section id="jatte" class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        
+        <!-- Common Title -->
+        <p class="mb-0 p-0 col-md-12" style="font-family:proxima-nova; font-size:35px; width:100%; margin: 0 auto; text-align: center; line-height:33px;">
+            Jatte
+        </p>
+        <br>
+
+        <!-- Desktop Description -->
+        <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width: 60%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+            Elevated yet everyday, each silhouette is designed to move with you — through moods,
+            through seasons, through scenes. With form, texture, and detail finely tuned, Jatte is the new
+            core essential: designed for presence, wardrobe anchor with edge.
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width: 85%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+            Elevated yet everyday, each silhouette is designed to
+            move with you — through moods, through seasons,
+            through scenes. With form, texture, and detail finely
+            tuned, Jatte is the new core essential: designed for
+            presence, wardrobe anchor with edge.
+        </p>
+
+        <br><br>
+
+        <!-- Anchor link (same for both) -->
+        <a href="$url('Page-Show', 'cid', 'design-philosophy-jatte')$" style="text-decoration: underline;" target="_blank">
+            Discover Story
+        </a>
+    </div>
+</section>
+
+<script>
+function initVideoControls(scope = document) {
+
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+
+    const videos = container.querySelectorAll('.video');
+    if (!videos.length) return;
+
+    // Use the visible video (desktop/mobile)
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    // Set default volume
+    video.volume = 0.2;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+    const iconMute = container.querySelector('.icon-mute');
+    const iconUnmute = container.querySelector('.icon-unmute');
+
+    if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
+
+    // Remove any existing event listeners by cloning the buttons
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newMuteBtn = muteBtn.cloneNode(true);
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+    // Update references to the new buttons
+    const freshPlayBtn = container.querySelector('.play');
+    const freshMuteBtn = container.querySelector('.mute');
+    const freshIconMute = container.querySelector('.icon-mute');
+    const freshIconUnmute = container.querySelector('.icon-unmute');
+
+    // PLAY / PAUSE
+    freshPlayBtn.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        freshPlayBtn.classList.add('is-playing');
+        freshPlayBtn.classList.remove('is-paused');
+      } else {
+        video.pause();
+        freshPlayBtn.classList.add('is-paused');
+        freshPlayBtn.classList.remove('is-playing');
+      }
+    });
+
+    // MUTE
+    freshMuteBtn.addEventListener('click', () => {
+      video.muted = !video.muted;
+      freshIconMute.style.display = video.muted ? 'block' : 'none';
+      freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+    });
+
+    // PROGRESS UPDATE
+    video.addEventListener('timeupdate', () => {
+      const progress = video.currentTime / video.duration;
+      progressFill.style.transform = `scaleX(${progress})`;
+      seek.value = progress * 100;
+    });
+
+    // SEEK
+    seek.addEventListener('input', () => {
+      const percent = seek.value / 100;
+      video.currentTime = percent * video.duration;
+    });
+
+  });
+}
+
+// INIT ON PAGE LOAD
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
+
+
+
+<script>
+    function toggleDropdown() {
+        const content = document.getElementById("dropdown1-content");
+        const arrow = content.previousElementSibling.querySelector('.arrow');
+
+        const isOpen = content.style.display === "block";
+        content.style.display = isOpen ? "none" : "block";
+        arrow.classList.toggle("rotate", !isOpen);
+    }
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      // Media
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline loading="lazy">
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}" loading="lazy">`;
+      }
+
+      // Wrap in anchor
+      let content = '';
+      if (slide.url) {
+        if (slide.analytics) {
+          content = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        } else {
+          content = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        content = mediaHtml;
+      }
+
+      // Text below image (outside anchor)
+      if (slide.title || slide.description) {
+        content += `
+          <div class="slide-text">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      wrapper.innerHTML = content;
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      arrows: false,
+      pagination: false,
+      padding: { left: '0rem', right: '6rem' },
+      breakpoints: {
+        1024: { perPage: 1 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount();
+  }
+
+  createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider1',
+    slides: [
+        { type: 'video', src: "images/design-philosophy/dp-main-novo-1.mp4?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-novo')$", alt: 'Slide 1'},
+        { type: 'image', src: "images/design-philosophy/dp-main-novo-2.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-novo')$", alt: 'Slide 1'},
+        { type: 'video', src: "images/design-philosophy/dp-main-novo-3.mp4?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-novo')$", alt: 'Slide 1'},
+        { type: 'image', src: "images/design-philosophy/dp-main-novo-4.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-novo')$", alt: 'Slide 1'}
+    ],
+    options: {
+      perPage: 3,
+    }
+  });
+
+
+  createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider2',
+    slides: [
+        { type: 'image', src: "images/design-philosophy/dp-main-horseprint-1.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-horseprint')$", alt: 'Slide 1'},
+        { type: 'video', src: "images/design-philosophy/dp-main-horseprint-2.mp4?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-horseprint')$", alt: 'Slide 1'},
+        { type: 'image', src: "images/design-philosophy/dp-main-horseprint-3.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-horseprint')$", alt: 'Slide 1'},
+        { type: 'video', src: "images/design-philosophy/dp-main-horseprint-4.mp4?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-horseprint')$", alt: 'Slide 1'}],
+    options: {
+      perPage: 3,
+    }
+  });
+
+
+  createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider3',
+    slides: [
+        { type: 'image', src: "images/design-philosophy/dp-main-icon-1.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-the-emblem')$", alt: 'Slide 3'},
+        { type: 'video', src: "images/design-philosophy/dp-main-icon-2.mp4?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-the-emblem')$", alt: 'Slide 3'},
+        { type: 'image', src: "images/design-philosophy/dp-main-icon-4.gif?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-the-emblem')$", alt: 'Slide 3'},
+        { type: 'image', src: "images/design-philosophy/dp-main-icon-5.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-the-emblem')$", alt: 'Slide 3'}
+    ],
+    options: {
+      perPage: 3,
+    }
+  });
+
+  createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider4',
+    slides: [
+        { type: 'image', src: "images/design-philosophy/dp-main-demi-1.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-demi')$", alt: 'Slide 5'},
+        { type: 'video', src: "images/design-philosophy/dp-main-demi-2.mp4?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-demi')$", alt: 'Slide 5'},
+        { type: 'image', src: "images/design-philosophy/dp-main-demi-3.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-demi')$", alt: 'Slide 5'},
+        { type: 'image', src: "images/design-philosophy/dp-main-demi-4.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-demi')$", alt: 'Slide 5'}
+    ],
+    options: {
+      perPage: 3,
+    }
+  });
+
+  createSplideSliderCarousel({
+    sliderId: 'carouselExploreSlider5',
+    slides: [
+        { type: 'video', src: "images/design-philosophy/dp-main-jatte-1.mp4?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-jatte')$", alt: 'Slide 7'},
+        { type: 'image', src: "images/design-philosophy/dp-main-jatte-2.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-jatte')$", alt: 'Slide 7'},
+        { type: 'image', src: "images/design-philosophy/dp-main-jatte-3.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-jatte')$", alt: 'Slide 7'},
+        { type: 'image', src: "images/design-philosophy/dp-main-jatte-4.webp?$staticlink$", url:"$url('Page-Show','cid','design-philosophy-jatte')$", alt: 'Slide 7'}
+    ],
+    options: {
+      perPage: 3,
+    }
+  });
+
+
+});
+</script>
+
+</body>
+
+</html>

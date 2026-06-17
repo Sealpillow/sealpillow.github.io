@@ -1,0 +1,112 @@
+
+<style>
+/* Scroll Sticky Text */
+.scroll-sticky-text {
+  left: 50%;
+  pointer-events: none;
+  position: fixed;
+  text-align:center;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 50;
+}
+
+/* Sticky Desktop */
+.sticky-desktop {
+  font-family: aktiv-grotesk-extended;
+  font-size:20px;
+  opacity:1;
+  transition: opacity 0.4s ease;
+}
+
+/* Sticky Mobile */
+.sticky-mobile {
+  font-family: aktiv-grotesk-extended;
+  font-size:15px;
+  opacity:1;
+  transition: opacity 0.4s ease;
+  width:80%;
+}
+
+/* Fade Out */
+.fade-out {
+  opacity:0;
+}
+</style>
+
+<div class="scroll-sticky-text">
+
+    <!-- Desktop -->
+    <div class="sticky-desktop d-none d-lg-block" id="scrollStickyTextDesktop">
+        THE DEMI Pastel Edition
+    </div>
+
+    <!-- Mobile -->
+    <div class="sticky-mobile d-block d-lg-none" id="scrollStickyTextMobile">
+        THE DEMI Pastel Edition
+    </div>
+
+</div>
+
+
+
+<div class="scroll-trigger" data-text="Form" data-color="#555">
+
+</div>
+
+    
+<section class="scroll-trigger" data-text="Expression" data-color="#000">
+    
+</section>
+
+</section>
+
+<script>
+const stickyDesktop = document.getElementById("scrollStickyTextDesktop");
+const stickyMobile = document.getElementById("scrollStickyTextMobile");
+
+const triggers = document.querySelectorAll(".scroll-trigger");
+
+function updateText(newText, newColor){
+
+    const elements = [stickyDesktop, stickyMobile];
+
+    elements.forEach(el => {
+
+        if(!el) return;
+
+        el.classList.add("fade-out");
+
+        setTimeout(()=>{
+
+            if(newText) el.textContent = newText;
+            if(newColor) el.style.color = newColor;
+
+            el.classList.remove("fade-out");
+
+        }, 400);
+
+    });
+
+}
+
+const observer = new IntersectionObserver((entries)=>{
+
+    entries.forEach(entry=>{
+
+        if(entry.isIntersecting){
+
+            const text = entry.target.dataset.text;
+            const color = entry.target.dataset.color;
+
+            updateText(text, color);
+
+        }
+
+    });
+
+},{ threshold:0.6 });
+
+triggers.forEach(trigger => observer.observe(trigger));
+
+</script>

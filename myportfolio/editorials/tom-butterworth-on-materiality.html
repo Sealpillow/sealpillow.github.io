@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+html, body {
+    overflow-x: hidden;
+    color: black;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+.page.parallax {
+    padding-top: 0px !important;
+}
+
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+
+
+/* General image styling */
+.pair-image img,
+.pair-image2 img {
+    width: 100%;           /* Image fills 50% of container */
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+/* Make anchors behave nicely 
+.pair-image a {
+    display: block;
+    width: 100%;
+}*/
+/* Desktop layout */
+.pair-image{
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+}
+.pair-image2 {
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+    gap: 5px;
+    padding-top: 84px;
+}
+
+/* Mobile layout - Stack images vertically */
+@media (max-width: 768px) {  /* Mobile screen size */
+    .pair-image {
+        display: flex;          /* Keep flex */
+        flex-direction: column; /* Stack vertically */
+        width: 100%;          /* Full width of the container */
+        margin: 0 auto;            /* Reset any margins */
+    }
+    .pair-image2 {
+        display: flex;          /* Keep flex */
+        flex-direction: column; /* Stack vertically */
+        width: 100%;          /* Full width of the container */
+        margin: 0 auto;            /* Reset any margins */
+        gap: 0px;
+    }
+}
+.main-title-text {
+    margin: 100px 0px 65px 0px;
+}
+@media (max-width: 768px) {
+        .main-title-text {
+        margin: 65px 0px 65px 0px;
+    }
+}
+
+.section-links {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: center;
+    width: 100%;
+    font-size: 12px;
+    font-family: baskerville;
+}
+
+/* Column placement */
+.section-links .left-link {
+    grid-column: 1;
+    font-family: baskerville;
+}
+
+.section-links .spacing-text1 {
+    grid-column: 3;
+    justify-self: center;
+    font-family: baskerville;
+}
+
+.section-links .spacing-text2 {
+    grid-column: 4;
+    justify-self: center;   
+    font-family: baskerville;
+}
+
+.section-links .spacing-text3 {
+    grid-column: 5;
+    font-family: baskerville;
+}
+@media (max-width: 768px) {
+    .section-links {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        row-gap: 5px;
+        text-align: center;
+    }
+
+    /* Left link on top */
+    .section-links .left-link {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: start;
+        padding-left: 20%
+    }
+
+    /* Bottom row container behavior */
+    .section-links .spacing-text1,
+    .section-links .spacing-text2,
+    .section-links .spacing-text3 {
+        grid-row: 2;
+    }
+    .section-links .spacing-text1{
+        justify-self: start;
+        padding-left: 20%
+    }
+    .section-links .spacing-text3{
+        justify-self: end;
+        padding-right: 20%
+    }
+
+    /* Make second row 3 equal columns */
+    .section-links {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .section-links .spacing-text1 {
+        grid-column: 1;
+    }
+
+    .section-links .spacing-text2 {
+        grid-column: 2;
+    }
+
+    .section-links .spacing-text3 {
+        grid-column: 3;
+    }
+}
+
+.responsive-width {
+    width: 33%;
+    margin: 100px auto;
+    display: block;
+}
+.responsive-width img{
+    width: 100%;
+    height: auto;
+    display: block;
+}
+@media (max-width: 768px) {
+    .responsive-width {
+        width: 90%;
+    }
+}
+
+
+.question-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* Q | Question | Empty */
+    gap: 16px;
+    align-items: start;
+    margin: 0 auto 25px;
+}
+.q-label {
+    justify-self: end;   /* pushes Q to the right side of its grid column */
+    padding-right: 20%;
+}
+
+.question-text {
+    width: 49%;
+    justify-self: end;
+    font-weight: 500;
+}
+.answer-row {
+    width: 33%;
+    margin: 0 auto 50px;
+    font-weight: 400;
+}
+@media (max-width: 768px) {
+    .question-row {
+        grid-template-columns: auto 1fr;
+        width: 90%;
+        margin: 0 auto 50px;
+    }
+    .q-label {
+        padding: 0;
+    }
+    .empty-column {
+        display: none; /* Remove 3rd column */
+    }
+    .answer-row {
+        width: 90%;
+    }
+}
+
+
+.flexi-col-image {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 84px;
+}
+.flexi-col-image2 {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+.flexi-col-image-right a,
+.flexi-col-image-left a,
+.flexi-col-image-right2 a,
+.flexi-col-image-left2 a {
+    display: block;
+    width: 100%;
+}
+.flexi-col-image-right {
+    width: 70%;
+    margin-left: auto;
+}
+.flexi-col-image-right2 {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .flexi-col-image,
+    .flexi-col-image2  {
+        display: grid;
+        grid-template-rows: 0.5fr 0.5fr;
+        grid-template-columns: none;
+    }
+    
+    .flexi-col-image-left {
+        order: 1;
+    }
+    .flexi-col-image-right {
+        width: 100%;
+        order: 2;
+        padding: 10% 10% 0% 10%;
+    }
+
+
+    .flexi-col-image-left2 {
+        order: 1;
+        width: 60%;
+        justify-self: end;
+    }
+    .flexi-col-image-right2 {
+        width: 100%;
+        order: 2;
+    }
+
+
+}
+
+</style>
+</head>
+
+<body>
+
+
+<div class="pair-image d-md-flex js-vertical-slider">
+    <a class="js-shop-the-collection" data-pid="PM1-66210004_DK.TAU" href="$url('Product-Show','pid','PM1-66210004_DK.TAU')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/tom-butterworth-on-materiality/tom-butterworth-a1_mobile.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/tom-butterworth-on-materiality/tom-butterworth-a1.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+    <a class="js-shop-the-collection" data-pid="PM2-26390004_BLACK" href="$url('Product-Show','pid','PM2-26390004_BLACK')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/tom-butterworth-on-materiality/tom-butterworth-a2_mobile.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/tom-butterworth-on-materiality/tom-butterworth-a2.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+    
+<section class="main-title-text text-center">
+
+    <p class="mb-0 p-0" style="font-family: baskerville; font-size:24px; width:100%; margin: 0 auto; text-align: center; line-height:33px; font-weight: 100;">
+        Carving A New Silhouette
+    </p>
+
+    <p class="mb-0 d-none d-lg-block" style="font-family: aktiv-grotesk-extended; font-size:50px; width: 100%; margin: 0 auto; text-align: center; line-height: 50px;">
+        Tom Butterworth On<br>
+        Materiality & Identity
+    </p>
+
+    <p class="mb-0 d-block d-lg-none" style="font-family: aktiv-grotesk-extended; font-size:30px; width: 100%; margin: 0 auto; text-align: center; line-height: 30px;">
+        Tom Butterworth On<br>
+        Materiality & Identity
+    </p>
+    
+    <br><br><br>
+    <div class="section-links">
+        <a href="https://www.instagram.com/tombutterworthxo/" class="left-link">
+            @tombutterworthxo
+        </a>
+
+        <div class="spacing-text1">Designer</div>
+
+        <div class="spacing-text2">And</div>
+
+        <div class="spacing-text3">Sculptor</div>
+    </div>
+
+</section>
+
+
+<section class="text-center" style="margin-bottom: 50px;">
+    <!-- Desktop Version -->
+    <p class="d-none d-lg-block" style="font-family: proxima-nova; font-size:25px; width: 33%; margin: 0 auto; text-align: left; line-height:normal; margin-bottom: 50px;">
+        There is a specific kind of magic in the unexpected. For Sydney-based designer & sculptor Tom Butterworth, that magic arrived in the form of a sandstone boulder blocking a job site for the former carpenter. 
+    </p>
+    <!-- Mobile Version -->
+    <p class="d-block d-lg-none" style="font-family: proxima-nova; font-size:25px; width: 80%; margin: 0 auto; text-align: left; line-height:normal; margin-bottom: 50px">
+        There is a specific kind of magic in the unexpected. For Sydney-based designer & sculptor Tom Butterworth, that magic arrived in the form of a sandstone boulder blocking a job site for the former carpenter. 
+    </p>
+
+    <p class="d-none d-lg-block" style="font-family: proxima-nova; font-size:14px; width: 33%; margin: 0 auto; text-align: left; line-height:normal;">
+        Beyond the studio, Tom’s philosophy extends to his personal expression, treating fashion not as a uniform, but as a daily celebration of self. We speak to Tom about the discipline of patience, the evolution of his practice, and what it means to let the universe set the brief. 
+    </p>
+    <!-- Mobile Version -->
+    <p class="d-block d-lg-none" style="font-family: proxima-nova; font-size:14px; width: 80%; margin: 0 auto; text-align: left; line-height:normal;">
+        Beyond the studio, Tom’s philosophy extends to his personal expression, treating fashion not as a uniform, but as a daily celebration of self. We speak to Tom about the discipline of patience, the evolution of his practice, and what it means to let the universe set the brief. 
+    </p>
+</section>
+
+<div class="responsive-width" style="margin:50px auto 100px auto">
+    <a class="js-shop-the-collection" data-pid="PM1-66210004_DK.TAU" href="$url('Product-Show','pid','PM1-66210004_DK.TAU')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/tom-butterworth-on-materiality/tom-butterworth-a1_mobile.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/tom-butterworth-on-materiality/tom-butterworth-a1.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            Your transition from carpentry to sculpting seems less like a career change and more like a spiritual homecoming. When you look back at that first encounter with the boulder, what do you think it truly represented for you?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>I like to feel it was the universe guiding me to tap into my true passion, a new world of exploration, creativity and craftsmanship. I was super unhappy at the time and mentally not in my greatest state. My back from being on the job site was sore and my overall excitement with life was lacking, probably because deep down I knew I wanted to be creating in another form, but I just didn't know what.</p>
+        <p>If I can inspire one reader: continue to follow your ideas. If something comes to mind, try it once. It may not stick, but that's cool, maybe the next idea will. All ideas are inspiration sent from somewhere, and if you don't try it, it's a waste of energy.</p>
+    </div>
+</section>
+
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            Your background spans carpentry, photography, and graphic design. How did your journey come about, and how do those disciplines surface in your sculptures? 
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row" style="margin-bottom: 0;">
+        <p>I started carpentry in my late teens, unsure of what to do. It’s basically what you do here in Sydney when you’re a young fella — you jump on a job site. After a few injuries, though, I found myself heading to design school, which led me into the graphic design and branding world. Around the same time, I picked up a camera and started doing bits of photography. Then COVID hit, work slowed down, I jumped back on the job site — and then everything you’ve seen followed. </p>
+        <p>If I didn’t have my carpentry background, there’s no way I’d be able to do what I do now. Those skills are the foundation. At the same time, my experience in design and branding gives me the business understanding and ability to bring my whole practice together. It doesn’t stop when I leave the studio. Having all those abilities means I can genuinely do it all myself.</p>
+    </div>
+</section>
+
+
+<div class="pair-image2 d-md-flex">
+    <a class="js-shop-the-collection" data-pid="PM2-26390004_DK.TAU" href="$url('Product-Show','pid','PM2-26390004_DK.TAU')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/tom-butterworth-on-materiality/tom-butterworth-c1_mobile.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/tom-butterworth-on-materiality/tom-butterworth-c1.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+    <a class="js-shop-the-collection" data-pid="PM2-26390004_BLACK" href="$url('Product-Show','pid','PM2-26390004_BLACK')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/tom-butterworth-on-materiality/tom-butterworth-c2_mobile.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/tom-butterworth-on-materiality/tom-butterworth-c2.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+<section class="d-block">
+  <div class="position-relative text-center" style="margin: 100px 0px">
+    <!-- Desktop Description -->
+      <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:baskerville; font-size:20px; width:80%; margin: 0 auto; text-align: center;">
+        "It is about shedding all those conditioned layers one day at a time...<br>
+        this journey has allowed me to be the truest version of myself." 
+      </p>
+
+      <!-- Mobile Description -->
+      <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:baskerville; font-size:20px; width:80%; margin: 0 auto; text-align: center;">
+        "It is about shedding all those conditioned layers one day at a time...
+        this journey has allowed me to be the truest version of myself." 
+      </p>  
+  </div>
+</section>
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            Much of your work seems to be in response to place. Growing up along Sydney’s coastline, how did the landscape imprint itself on you?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>Surfing my whole life with sandstone headlands in view 100% of the time is something super special. It’s hard not to be in awe of this coastline, and it has definitely played a pivotal part in my art and design practice.</p>
+    </div>
+</section>
+
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            After years of feeling lost and physically drained on job sites, what does it feel like to step fully into your creative practice now?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row" style="margin-bottom: 0;">
+        <p>I’m a very grateful human. To all my collectors: you’ve given me another chance at life that, at one point, I didn’t think was possible.</p>
+    </div>
+</section>
+
+
+
+<div class="flexi-col-image" style="width: 100%;">
+    <!-- Left side: Two smaller images stacked -->
+    <div class="flexi-col-image-left">
+        <a class="js-shop-the-collection" data-pid="PM1-46600218_DK.BRW" href="$url('Product-Show','pid','PM1-46600218_DK.BRW')$">
+            <picture>
+                <source srcset="images/tom-butterworth-on-materiality/tom-butterworth-d1_mobile.webp?$staticlink$" media="(min-width: 768px)">
+                <img src="images/tom-butterworth-on-materiality/tom-butterworth-d1.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; height: 100%; object-fit: cover;">
+            </picture>      
+        </a>
+    </div>
+
+    <!-- Right side: One large image -->
+    <div class="flexi-col-image-right" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PM2-26320217-4_DK.TAU" href="$url('Product-Show','pid','PM2-26320217-4_DK.TAU')$">
+            <picture>
+                <source srcset="images/tom-butterworth-on-materiality/tom-butterworth-d2_mobile.webp?$staticlink$" media="(min-width: 768px)">
+                <img src="images/tom-butterworth-on-materiality/tom-butterworth-d2.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>    
+    </div>
+</div>
+
+<section class="d-block">
+  <div class="position-relative text-center" style="margin: 100px 0px">
+    <!-- Desktop Description -->
+      <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:baskerville; font-size:20px; width:80%; margin: 0 auto; text-align: center;">
+        "Flow is a big one for me. Without flow you’re pushing against what is.<br>Dress for you, nobody else.” 
+      </p>
+
+      <!-- Mobile Description -->
+      <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:baskerville; font-size:20px; width:80%; margin: 0 auto; text-align: center;">
+        "Flow is a big one for me. Without flow you’re pushing against what is. Dress for you, nobody else.” 
+      </p>  
+  </div>
+</section>
+
+
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            There’s a sensitivity in your work that contrasts with the inherent weight of the materials you use. How do you approach creating that sense of lightness?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>I’m really drawn to creating pieces that carry a strong sense of the feminine. It’s not always obvious at first glance, but it’s there, embedded in the lines, in the posture, and in the flow. If you look closely, a lot of the curves echo the silhouette of a woman’s body.</p>
+    </div>
+</section>
+
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            As a self-taught sculptor, how has learning outside a formal structure shaped approach to creativity?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row" style="margin-bottom: 0;">
+        <p>I’ve come into this world so raw, and I think that’s what collectors have been drawn towards. There have been no boundaries from the start. No one else does exactly what I do, so I think it’s caught everyone's eye.</p>
+    </div>
+</section>
+
+
+<div class="responsive-width">
+    <a class="js-shop-the-collection" data-pid="PM2-26390004_DK.TAU" href="$url('Product-Show','pid','PM2-26390004_DK.TAU')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/tom-butterworth-on-materiality/tom-butterworth-e1_mobile.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/tom-butterworth-on-materiality/tom-butterworth-e1.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+
+
+
+<div class="flexi-col-image2" style="width: 100%; margin-bottom: 100px;" >
+    <!-- Left side: Two smaller images stacked -->
+    <div class="flexi-col-image-left2">
+        <picture>
+            <source srcset="images/tom-butterworth-on-materiality/tom-butterworth-f1_mobile.webp?$staticlink$" media="(min-width: 768px)">
+            <img src="images/tom-butterworth-on-materiality/tom-butterworth-f1.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+        </picture>      
+    </div>
+
+    <!-- Right side: One large image -->
+    <div class="flexi-col-image-right2" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PM2-26390004_BLACK" href="$url('Product-Show','pid','PM2-26390004_BLACK')$">
+            <picture>
+                <source srcset="images/tom-butterworth-on-materiality/tom-butterworth-f2_mobile.webp?$staticlink$" media="(min-width: 768px)">
+                <img src="images/tom-butterworth-on-materiality/tom-butterworth-f2.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>    
+    </div>
+</div>
+
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            Sandstone is often estimated to be millions of years old. Does working with a material that has such an immense history change your perception of time and trends?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>Not exactly. I just create from whatever has been sent to me, wherever these ideas come from. I follow them, and if people connect with the work, that brings me a lot of love. </p>
+        <p>It’s definitely incredible how old sandstone is. There’s something about it — the age, the history, that creates an immense grounding effect in a space. I’ve had clients tell me it’s completely transformed their space, which is such a beautiful thing to hear.</p>
+    </div>
+</section>
+
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            By virtue of the materials you work with, your pieces are inherently enduring. What presence or energy do you hope your sculptures bring into a space?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row" style="margin-bottom: 0;">
+        <p>It’s about creating a real sense of groundedness. There’s something powerful about immersing exterior into the interior — by including the outside elements within, it creates a deeper calm, a presence that makes the space feel more honest.</p>
+    </div>
+</section>
+
+
+<div class="responsive-width">
+    <a class="js-shop-the-collection" data-pid="PM2-26390004_DK.TAU" href="$url('Product-Show','pid','PM2-26390004_DK.TAU')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/tom-butterworth-on-materiality/tom-butterworth-g1_mobile.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/tom-butterworth-on-materiality/tom-butterworth-g1.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            Your journey feels like an ever-evolving quest toward developing your identity. What continues to inspire you to explore and grow as a creative?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>Oh wow, I would say just shedding all those conditioned layers one day at a time. I was definitely afraid to fully express my creativity as a younger male through my early 20s, but this journey has allowed me to be the truest version of myself.</p>
+    </div>
+</section>
+
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            Your work balances patience, flow, and form. Do these same principles guide the way you dress or express yourself through fashion?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row" style="margin-bottom: 0;">
+        <p>Flow is a big one for me. Without flow you’re pushing against what is, and that can definitely translate into how I express myself through fashion. Dress for you, nobody else.</p>
+    </div>
+</section>
+
+
+<div class="pair-image2 d-md-flex">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/tom-butterworth-on-materiality/tom-butterworth-h1_mobile.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/tom-butterworth-on-materiality/tom-butterworth-h1.webp?$staticlink$" alt="Bag">
+      </picture>
+    <a class="js-shop-the-collection" data-pid="PM2-26320217-4_BLACK" href="$url('Product-Show','pid','PM2-26320217-4_BLACK')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/tom-butterworth-on-materiality/tom-butterworth-h2_mobile.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/tom-butterworth-on-materiality/tom-butterworth-h2.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+<section class="d-block">
+  <div class="position-relative text-center" style="margin: 100px 0px">
+    <!-- Desktop Description -->
+      <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:baskerville; font-size:20px; width:80%; margin: 0 auto; text-align: center;">
+        "All ideas are inspiration sent from somewhere, and if you don’t try them, it’s a waste of energy."
+      </p>
+
+      <!-- Mobile Description -->
+      <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:baskerville; font-size:20px; width:80%; margin: 0 auto; text-align: center;">
+        "All ideas are inspiration sent from somewhere, and if you don’t try them, it’s a waste of energy."
+      </p>  
+  </div>
+</section>
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            How does your background in craftsmanship shape the way you look at materiality and construction in your wardrobe?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>I look for quality, because then I know it will be a piece of longevity and this is something that really lights me up!</p>
+    </div>
+</section>
+
+
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            If the universe were to place another “boulder” in your path today, how would you approach it?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>I’d make a dining table and then have a dinner party.</p>
+    </div>
+</section>
+
+<!-- Web -->
+<section >
+    <div class="position-relative text-center" style ="margin: 100px 0px;">
+        <a href="#" class="js-tab-link" data-page="material-story" data-tab="grano">
+            Discover Our Material Story: Grano
+        </a>
+    </div>
+</section>
+
+<!-- Publish Content -->
+<div class="publish-content" style = "padding-top:3rem; padding-left: 40px;">
+    <span style="font-size: 18px;">
+        Published on 2 March 2026
+        <br><br>
+        <a href="$url('Search-Show','cgid','pmnewarrivals')$">
+            SHOP MEN'S NEW ARRIVALS
+        </a> &gt;
+    </span>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  document.querySelectorAll('.js-tab-link').forEach(link => {
+    const tab    = link.dataset.tab;
+    const subtab = link.dataset.subtab;
+    const page   = link.dataset.page;
+
+    if (!tab || !page) return;
+
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const countryCode = pathParts[0];
+
+    let hash = `#tab=${tab}`;
+    if (subtab) hash += `&subtab=${subtab}`;
+
+    link.href = `/${countryCode}/${page}.html${hash}`;
+  });
+
+});
+</script>
+
+</body>
+
+</html>
+

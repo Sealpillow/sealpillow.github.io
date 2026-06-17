@@ -1,0 +1,113 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Split Section V2 */
+.split-section-v2 {
+  display: grid;
+  grid-template-columns: 0.5fr 0.5fr;
+}
+
+/* Split Section V2 > A */
+.split-section-v2 a {
+  display: block;
+}
+
+/* Split Section V2 > Split Right > Img */
+.split-section-v2 .split-right img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Split Section V2 > Split Left */
+.split-section-v2 .split-left {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}
+
+/* Split Section V2 > Left Top > Img */
+.split-section-v2 .left-top img {
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Split Section V2 > Left Top */
+.split-section-v2 .left-top {
+  display: block;
+  margin-right: auto;
+  width: 40%;
+}
+
+/* Split Section V2 > Left Bottom */
+.split-section-v2  .left-bottom {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  margin-bottom: 5%;
+  padding: 0 20% 0 10%;
+}
+
+/* Split Section V2 > Left Bottom > A */
+.split-section-v2  .left-bottom a {
+  text-decoration: underline;
+}
+
+/* Split Section V2 > Left Bottom > H2 */
+.split-section-v2 .left-bottom h2 {
+  margin-bottom: 15px;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Split Section V2 */
+  .split-section-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Split Section V2 > Split Left */
+  .split-section-v2 .split-left {
+    grid-template-rows: auto auto;
+  }
+
+  /* Split Section V2 > Left Bottom */
+  .split-section-v2 .left-bottom {
+    padding: 30px;
+  }
+}
+</style>
+
+<div class="split-section-v2">
+
+    <!-- left COLUMN -->
+    <div class="split-left">
+
+        <!-- TOP SMALL IMAGE -->
+        <div class="left-top">
+            <a href="your-link-here.html">
+                <picture>
+                    <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                    <img src="../../media/portrait.jpg" alt="">
+                </picture>
+            </a>
+        </div>
+
+        <!-- BOTTOM TEXT -->
+        <div class="left-bottom">
+            <p>
+                This is the description text area. You can place any content here
+                such as paragraphs, links, or buttons.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- right LARGE IMAGE -->
+    <div class="split-right">
+        <a href="your-link-here.html">
+            <picture>
+                <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                <img src="../../media/portrait.jpg" alt="">
+            </picture>
+        </a>
+    </div>
+
+</div>

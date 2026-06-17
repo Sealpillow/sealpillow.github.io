@@ -1,0 +1,154 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Arrow */
+.arrow {
+  display: block;
+  transition: transform 0.3s ease;
+  width: 14px;
+}
+
+/* Arrow > Rotate */
+.arrow.rotate {
+  transform: rotate(180deg);
+}
+
+/* Inline Tab */
+.inline-tab {
+  color: #999;
+  cursor: pointer;
+  font-family: proxima-nova;
+  font-size: 12px;
+}
+
+/* Inline Tab */
+.inline-tab.active {
+  color: #000;
+}
+
+/* Inline Tab Wrapper */
+.inline-tab-wrapper {
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  display: flex;
+  gap: 40px;
+  justify-content: flex-start;
+  padding: 14px;
+}
+
+/* Mobile Tab Dropdown Content > Inline Tab */
+.mobile-tab-dropdown-content .inline-tab.active {
+  display: none;
+}
+
+/* Mobile Tab Dropdown */
+.mobile-tab-dropdown {
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  display: none;
+}
+
+/* Mobile Tab Dropdown Header */
+.mobile-tab-dropdown-header {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-family: proxima-nova;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 8px;
+  justify-content: center;
+  padding: 14px;
+}
+
+/* Mobile Tab Dropdown Content */
+.mobile-tab-dropdown-content {
+  display: none;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+/* Mobile Tab Dropdown Content > Inline Tab */
+.mobile-tab-dropdown-content .inline-tab {
+  display: block;
+  padding: 10px 14px;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Inline Tab Wrapper */
+  .inline-tab-wrapper {
+    display: none;
+  }
+
+  /* Mobile Tab Dropdown */
+  .mobile-tab-dropdown {
+    display: block;
+  }
+}
+</style>
+<!-- Desktop: inline tabs -->
+<div class="inline-tab-wrapper">
+    <div class="inline-tab active" onclick="switchInlineTab('cassier-shoulder-bag', this)">CASSIER SHOULDER BAG</div>
+    <div class="inline-tab" onclick="switchInlineTab('cassier-tote-bag', this)">CASSIER TOTE BAG</div>
+    <div class="inline-tab" onclick="switchInlineTab('utility-tote-bag', this)">UTILITY TOTE BAG</div>
+</div>
+
+<!-- Mobile: dropdown -->
+<div class="mobile-tab-dropdown">
+    <div class="mobile-tab-dropdown-header" onclick="toggleMobileTabDropdown(this)">
+        <span class="mobile-tab-title">CASSIER SHOULDER BAG</span>
+        <svg class="arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </div>
+    <div class="mobile-tab-dropdown-content">
+        <div class="inline-tab active" onclick="switchInlineTab('cassier-shoulder-bag', this); updateMobileTitle(this)">CASSIER SHOULDER BAG</div>
+        <div class="inline-tab" onclick="switchInlineTab('cassier-tote-bag', this); updateMobileTitle(this)">CASSIER TOTE BAG</div>
+        <div class="inline-tab" onclick="switchInlineTab('utility-tote-bag', this); updateMobileTitle(this)">UTILITY TOTE BAG</div>
+    </div>
+</div>
+
+<div id="cassier-shoulder-bag" class="tab-panel" style="display:block;"> 
+
+</div>
+
+<div id="cassier-tote-bag" class="tab-panel" style="display:none;"> 
+
+</div>
+
+<div id="utility-tote-bag" class="tab-panel" style="display:none;"> 
+</div>
+
+<script>
+
+    function switchInlineTab(type, element) {
+      document.querySelectorAll('.tab-panel').forEach(el => {
+        el.style.display = 'none';
+      });
+
+      const selected = document.getElementById(type);
+      if (selected) selected.style.display = 'block';
+
+      document.querySelectorAll('.inline-tab').forEach(item => item.classList.remove('active'));
+      
+      // Activate all tabs with same type
+      document.querySelectorAll(`.inline-tab[onclick*="${type}"]`).forEach(item => item.classList.add('active'));
+    }
+    function toggleMobileTabDropdown(el) {
+      const content = el.nextElementSibling;
+      const arrow = el.querySelector('.arrow');
+      const isOpen = content.style.display === 'block';
+      content.style.display = isOpen ? 'none' : 'block';
+      arrow.classList.toggle('rotate', !isOpen);
+    }
+
+    function updateMobileTitle(element) {
+      const title = element.closest('.mobile-tab-dropdown').querySelector('.mobile-tab-title');
+      if (title) title.textContent = element.textContent;
+      // Close dropdown
+      const content = element.closest('.mobile-tab-dropdown-content');
+      const arrow = element.closest('.mobile-tab-dropdown').querySelector('.arrow');
+      content.style.display = 'none';
+      arrow.classList.remove('rotate');
+    }
+</script>

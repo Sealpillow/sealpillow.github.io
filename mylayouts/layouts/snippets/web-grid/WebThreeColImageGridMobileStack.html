@@ -1,0 +1,81 @@
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<style>
+/* Img Fluid */
+.img-fluid {
+  height: auto;
+  max-width: 100%;
+}
+
+/* Multigrid > Row */
+.multigrid .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* Multigrid > Col Md 4 */
+.multigrid .col-md-4 {
+  width: 33.33%;
+}
+
+/* Desktop — min-width: 768px */
+@media (min-width: 768px) {
+  /* Multigrid > Col Md 4 */
+  .multigrid .col-md-4 {
+    width: 33.33%;
+  }
+}
+
+/* Multigrid */
+.multigrid {
+  margin: 100px auto;
+}
+</style>
+
+
+<div class="multigrid d-md-block d-none" style="width: 80%;">
+  <div class="row g-2 justify-content-center" id="productsContainerDesktop"></div>
+</div>
+
+<div class="multigrid d-block d-md-none" style="width: 100%;">
+  <div class="row g-2 justify-content-center" id="productsContainerMobile"></div>
+</div>
+
+<script>
+
+  const products = [
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' },
+    { link: "$url('Product-Show','pid','PW1-26480097_BLACK')$", imageDesktop: '../../media/landscape.jpg', imageMobile: '../../media/portrait.jpg' }
+
+  ];
+
+function productCardTemplate(product, isMobile) {
+  const imageSrc = isMobile ? product.imageMobile : product.imageDesktop;
+  return `
+    <div class="col-md-4 col-4 px-0">
+      <div class="d-flex justify-content-center">
+        
+        <a href="${product.link}">
+          <img alt="${product.name}" class="w-100 img-fluid" src="${imageSrc}" />
+        </a>
+      </div>
+    </div>
+  `;
+}
+  function renderProducts(containerId, isMobile = false) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = products.map(product => productCardTemplate(product, isMobile)).join('');
+  }
+
+  renderProducts('productsContainerDesktop', false);
+  renderProducts('productsContainerMobile', true);
+</script>

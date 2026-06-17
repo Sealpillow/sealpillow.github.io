@@ -1,0 +1,643 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+  <link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+
+
+
+  <style>
+  html, body {
+      overflow-x: hidden;
+      color: black;
+      height: auto;
+      margin: 0;
+      padding: 0;
+  }
+  .page.parallax {
+      padding-top: 0px !important;
+  }
+
+  /* Hide folder headers (SiteGenesis leftover) */
+  .folder-header,
+  .folder_post .folder-container .container {
+      display: none !important;
+  }
+
+  video{
+      filter: grayscale(0);
+  }
+
+  .img-wrap {
+      position: relative;
+      display: block;
+      max-width: 100%;
+    }
+
+    .img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+
+  .main-title-text {
+      margin: 100px 0px 65px 0px;
+  }
+  @media (max-width: 768px) {
+          .main-title-text {
+          margin: 65px 0px 65px 0px;
+      }
+  }
+  .section-links {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;        /* ← add this */
+      width: 100%;
+      font-size: 12px;
+      
+  }
+  .section-links .left-link, 
+  .section-links .spacing-text1 {
+    font-family: baskerville; 
+  }
+
+  .left-group {
+      display: flex;
+      gap: 100px;
+      padding-left: 10%;
+  }
+      
+  .section-links .spacing-text3 {
+      padding-right: 10%;
+      font-family: baskerville;
+  }
+
+  @media (max-width: 768px) {
+      .left-group {
+          display: contents;
+      }
+
+      .section-links .left-link {
+          width: 100%;
+          padding-left: 10%;
+          display: block;
+          text-align: left;   /* ← this fixes the centering */
+      }
+
+      .section-links .spacing-text1 {
+          padding-left: 10%;
+          flex: 1;
+          text-align: left;
+      }
+
+      .section-links .spacing-text3 {
+          padding-right: 10%;
+      }
+  }
+
+  .responsive-width {
+      width: 25%;
+      margin: 100px auto;
+      display: block;
+  }
+  .responsive-width img{
+      width: 100%;
+      height: auto;
+      display: block;
+  }
+  .responsive-width video {
+      width: 100%;
+      height: auto;
+      display: block;
+  }
+  @media (max-width: 768px) {
+      .responsive-width {
+          width: 90%;
+      }
+  }
+
+
+
+  .question-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr; /* Q | Question | Empty */
+      gap: 16px;
+      align-items: start;
+      margin: 0 auto 25px;
+  }
+  .q-label {
+      justify-self: end;   /* pushes Q to the right side of its grid column */
+      padding-right: 20%;
+  }
+
+  .question-text {
+      width: 49%;
+      justify-self: end;
+      font-weight: 500;
+  }
+  .answer-row {
+      width: 33%;
+      margin: 0 auto 50px;
+      font-weight: 400;
+  }
+  @media (max-width: 768px) {
+      .question-row {
+          grid-template-columns: auto 1fr;
+          width: 90%;
+          margin: 0 auto 50px;
+      }
+      .q-label {
+          padding: 0;
+      }
+      .empty-column {
+          display: none; /* Remove 3rd column */
+      }
+      .answer-row {
+          width: 90%;
+      }
+  }
+
+  .wrap {
+      display: grid;
+      grid-template-areas:
+          "img nav"
+          "img media"
+          "img caption";
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+  }
+  .area-img {
+      grid-area: img;
+      display: flex;
+      flex-direction: column;
+  }
+  .area-img img {
+      width: 100%;
+      height: auto;
+      display: block;
+  }
+
+  .imgtext-box {
+      margin-top: 10px;
+      text-align: right; /* or center/left */
+  }
+  .area-imgtext { grid-area: imgtext; width: auto; margin-left:auto; }
+  .area-nav { grid-area: nav; }
+  .area-media { grid-area: media; margin: 0 auto; width: 60%; }
+  .area-caption { grid-area: caption; margin: 0 auto; width: 60%; }
+
+  .nav { display: flex; flex-direction: column; gap: 0.5rem; }
+  .nav-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .nav-item .bracket { font-size: 11px; color: #999; transition: color 0.2s; }
+  .nav-item .label { font-size: 13px; color: #999; font-family: baskerville; transition: color 0.2s; }
+  .nav-item.active .label,
+  .nav-item.active .bracket { color: #1a1a1a; font-weight: 500; }
+  .nav-item:hover .label,
+  .nav-item:hover .bracket {
+      color: #1a1a1a;
+  }
+  .media-box { min-height: 320px; overflow: hidden; }
+  .media-box video,
+  .media-box img { width: 100%; height: auto; object-fit: cover; display: block; }
+
+
+  .caption-box p { font-size: 10px; line-height: 1.75; color: #555; font-family: "Nothing You Could Do", cursive; }
+  .imgtext-box p { font-size: 8px; line-height: 1.75; color: #555; font-family: 'proxima-nova', sans-serif; font-style: italic; }
+
+  @media (max-width: 640px) {
+  .wrap {
+    display: block;
+    grid-template-areas: "img" "nav" "media" "caption" "imgtext";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .area-nav{
+    padding: 2.5rem 0 25px 10%;
+  }
+  .area-media{ margin: 50px auto; }
+  .area-caption { margin: 0px auto;}
+  .area-imgtext{ margin: 0px auto 100px auto; text-align: center; }
+  }
+
+  </style>
+
+
+  <div class="img-wrap js-vertical-slider">
+      <a class="js-shop-the-collection" data-pid="PM1-66210004_DK.TAU" href="$url('Product-Show','pid','PM2-26320159-6_NVY.DE')$">
+        <picture>
+          <!-- Mobile version (smaller image) -->
+          <source srcset="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg-mobile_01.jpg" alt="Bag" media="(max-width: 768px)">
+          <!-- Web version (larger image) -->
+          <img src="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg_01.jpg" alt="Bag">
+        </picture>
+      </a>
+  </div>
+
+
+  <section class="main-title-text text-center">
+
+      <p class="mb-0 d-none d-lg-block" style="font-family: aktiv-grotesk-extended; font-size:30px; width: 100%; margin: 0 auto; text-align: center; line-height: 30px;">
+        On the Move with<br>
+        the Jones Backpack
+
+      </p>
+
+      <p class="mb-0 d-block d-lg-none" style="font-family: aktiv-grotesk-extended; font-size:30px; width: 100%; margin: 0 auto; text-align: center; line-height: 30px;">
+        On the Move with<br>
+        the Jones Backpack
+      </p>
+      
+      <br><br><br>
+      <div class="section-links">
+          <div class="left-group">
+              <span class="left-link">
+                  @kennethsbw
+              </span>
+              <div class="spacing-text1">Illustrator</div>
+          </div>
+          <div class="spacing-text3">PEDRO x Kenneth</div>
+      </div>
+
+  </section>
+
+
+  <section class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px">
+      <!-- Desktop Description -->
+        <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width:80%; margin: 0 auto; text-align: left;">
+          The things we collect while travelling often become lasting reminders of where 
+          we have been and who we have met along the way. The Jones Backpack continues 
+          through a series of collaborations with creatives from across the region, 
+          each interpreting the places, people, and experiences that have shaped their 
+          perspective into collectible patches designed to be carried forward. 
+          In collaboration with visual artist Kenneth Seow, this chapter highlights a 
+          creative process shaped by details that often go unseen.
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width:90%; margin: 0 auto; text-align: left;">
+          The things we collect while travelling often become lasting reminders of where 
+          we have been and who we have met along the way. The Jones Backpack continues 
+          through a series of collaborations with creatives from across the region, 
+          each interpreting the places, people, and experiences that have shaped their 
+          perspective into collectible patches designed to be carried forward. 
+          In collaboration with visual artist Kenneth Seow, this chapter highlights a 
+          creative process shaped by details that often go unseen.
+        </p>  
+    </div>
+  </section>
+
+
+  <div class="responsive-width" style="margin-bottom: 50px;">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg_02.jpg" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg_02.jpg" alt="Bag">
+      </picture>
+  </div>
+
+  <section class="d-block">
+    <div class="position-relative text-center" style="margin-bottom: 100px">
+      <!-- Desktop Description -->
+        <p class="mb-0 d-md-block d-none" style="font-family:baskerville; font-size:12px; width:12%; margin-right: 37.5%; text-align: left; justify-self: end;">
+          “I draw a lot of inspiration from nature, from light, movement, 
+          and the simple act of watching the world go by. Even in a fast paced
+          city like Singapore, these quiet moments remind me to appreciate the small things.” 
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 d-block d-md-none" style="font-family:baskerville; font-size:20px; width:40%; margin: 0px 10% 0px auto; text-align: left;">
+          “I draw a lot of inspiration from nature, from light, movement, 
+          and the simple act of watching the world go by. Even in a fast paced
+          city like Singapore, these quiet moments remind me to appreciate the small things.” 
+        </p>  
+    </div>
+  </section>
+
+
+  <section class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px">
+      <!-- Desktop Description -->
+        <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:25px; width:45%; margin: 0 auto; text-align: left;">
+          Drawing from his regular runs through the historic neighbourhood of Joo Chiat, 
+          Kenneth transforms fragments of his daily route into a series of collectible 
+          patches. Familiar sights, textures, and passing moments are distilled into 
+          graphic form, capturing the places he moves through every day and inviting 
+          new stories to accumulate over time. 
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:25px; width:80%; margin: 0 auto; text-align: left;">
+          Drawing from his regular runs through the historic neighbourhood of Joo Chiat, 
+          Kenneth transforms fragments of his daily route into a series of collectible 
+          patches. Familiar sights, textures, and passing moments are distilled into 
+          graphic form, capturing the places he moves through every day and inviting 
+          new stories to accumulate over time. 
+        </p>  
+    </div>
+  </section>
+
+  <section class="qna">
+      <div class="question-row">
+          <div class="q-label">Q:</div>
+          <div class="question-text">
+            What is the inspiration behind your designs? 
+            What story would you like to tell others through your designs?
+          </div>
+          <div class="empty-column"></div>
+      </div>
+      <div class="answer-row">
+          <p>
+            My inspiration comes from the things I genuinely love doing. 
+            I enjoy being out at sea and surfing because it gives me a sense 
+            of peace and joy. I also find inspiration in working out, in slowing down, 
+            and in taking time to simply be present with my thoughts. 
+            Even spending time with my dogs or embracing quiet moments in everyday life 
+            influences my work.
+          </p>
+          <p>
+            Through my illustrations, I hope to share a simple message.
+            Growth is never linear. We are all evolving at our own pace, 
+            even when it does not feel obvious. My journey into illustration
+            has been driven by passion and I want my work to bring a sense 
+            of joy and reassurance to others who may be navigating their own paths.
+          </p>
+        </div>
+  </section>
+
+  <section class="qna">
+      <div class="question-row">
+          <div class="q-label">Q:</div>
+          <div class="question-text">
+            How does your passion for fitness influence your aesthetic as an illustrator, 
+            if at all? Or do you see them as two entirely different creative spaces?
+          </div>
+          <div class="empty-column"></div>
+      </div>
+      <div class="answer-row" style="margin: 0 auto 100px;">
+          <p>
+            For me, fitness and illustration are deeply connected. 
+            Both are forms of self expression. I mainly practise calisthenics, 
+            which involves movements like handstands and different variations on 
+            the pull up bar. There is a sense of play and experimentation in training
+            that mirrors how I approach my art.
+          </p>
+          <p>
+            Working out also helps me clear my mind. When I get into the zone, 
+            it allows my thoughts to reset and that is often when creative ideas surface.
+            Many of my illustration concepts have come from these moments of movement 
+            and flow. In that way, fitness does not just influence my aesthetic. 
+            It shapes how I think and create.
+          </p>
+        </div>
+  </section>
+
+  <div class="wrap" style="margin-bottom: 100px;">
+
+    <!-- LEFT IMAGE -->
+    <div class="area-img">
+      <a class="js-shop-the-collection"
+        data-pid="PM2-26320159-6_NVY.DE"
+        href="$url('Product-Show','pid','PM2-26320159-6_NVY.DE')$">
+        <img src="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg_03.jpg" alt="">
+      </a>
+
+      <div class="imgtext-box">
+        <p>Inspiration images courtesy of @kennethsbw</p>
+      </div>
+    </div>
+
+    <!-- RIGHT NAV -->
+    <div class="area-nav">
+      <div class="nav">
+        <div class="nav-item active"
+          data-video="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg_04-1.mp4"
+          data-caption="One of my favourite reminders in life to keep learning, keep growing, but stay flexible enough to let things unfold naturally. Just like water, we move with the currents, adapting, shifting, and finding our own rhythm. And just like a wave, every swell is shaped by flow. Trust it, ride it, grow with it.">
+          <span class="bracket">[01]</span>
+          <span class="label">Grow With The Flow</span>
+        </div>
+
+        <div class="nav-item"
+          data-video="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg_04-2.mp4"
+          data-caption="I’m a big believer in doing what you love. Life’s short, and it doesn’t always have to be about chasing the next thing. Sometimes it’s just sitting on a park bench, watching the world go by, doodling, or penning down random thoughts instead of getting caught up in the rat race. <br><br>And of course, my dogs, Riot & Rebel are a huge part of my world, bringing me endless joy, laughs, and the best company I could ever ask for.">
+          <span class="bracket">[02]</span>
+          <span class="label">Do What You Love</span>
+        </div>
+
+        <div class="nav-item"
+          data-video="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg_04-3.mp4"
+          data-caption="I chose to illustrate a runner because fitness has always been a big part of my life. He’s holding a packet of teh-C, my go-to hawker drink.<br><br>Running past the shophouses, a nod not just to Singapore’s heritage but also to mine. Joo Chiat was my first home after moving out, and its colourful shophouses have always felt familiar, distinct, and beautifully rooted in our culture.">
+          <span class="bracket">[03]</span>
+          <span class="label">Move At Your Own Pace</span>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- RIGHT MEDIA -->
+    <div class="area-media">
+      <div class="media-box">
+        <video id="main-video" autoplay muted loop playsinline>
+          <source src="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg_04-1.mp4" type="video/mp4">
+        </video>
+        <img id="main-img" src="" alt="" style="display:none;">
+      </div>
+    </div>
+
+    <!-- RIGHT CAPTION -->
+    <div class="area-caption">
+      <div class="caption-box">
+        <p id="main-caption">
+          One of my favourite reminders in life to keep learning, keep growing, but stay flexible enough to let things unfold naturally. Just like water, we move with the currents, adapting, shifting, and finding our own rhythm. And just like a wave, every swell is shaped by flow. Trust it, ride it, grow with it.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="qna">
+      <div class="question-row">
+          <div class="q-label">Q:</div>
+          <div class="question-text">
+            Is there a place in Singapore that always resets your perspective? 
+            What do you typically turn to for inspiration?
+          </div>
+          <div class="empty-column"></div>
+      </div>
+      <div class="answer-row">
+          <p>
+            East Coast Park is a place I often return to when I need a reset. 
+            There are pockets of calm where you can sit, observe, and simply let your 
+            mind slow down. Being close to nature helps me reconnect with my thoughts 
+            and emotions, which is essential for my creative process.
+          </p>
+          <p>
+            I draw a lot of inspiration from nature, from light, movement, 
+            and the simple act of watching the world go by. Even in a fast paced city 
+            like Singapore, these quiet moments remind me to appreciate the small things.
+          </p>
+        </div>
+  </section>
+
+  <section class="qna">
+      <div class="question-row">
+          <div class="q-label">Q:</div>
+          <div class="question-text">
+            Most of your illustrations feature strong storytelling elements. 
+            Is there a particular quote or philosophy that resonates with you?
+          </div>
+          <div class="empty-column"></div>
+      </div>
+      <div class="answer-row">
+          <p>
+            A philosophy I resonate with is grow with the flow. 
+            Everyone’s journey is different and there is no single path that 
+            defines success or growth. I have taken this mindset into my illustration 
+            practice by learning as I go, staying open to advice, and trusting the process.
+            It reminds me to be patient with myself and to embrace change as part of the 
+            creative journey.
+          </p>
+        </div>
+  </section>
+
+  <div class="responsive-width">
+    <a class="js-shop-the-collection" data-pid="PM2-26320159-6_NVY.DE" href="$url('Product-Show','pid','PM2-26320159-6_NVY.DE')$">
+      <video autoplay muted loop playsinline>
+        <source src="images/on-the-move-with-jones-backpack/jones-backpack-editorial-sg_05.mp4" type="video/mp4">
+      </video>
+    </a>
+  </div>
+
+  <section class="qna">
+      <div class="question-row">
+          <div class="q-label">Q:</div>
+          <div class="question-text">
+              When packing your bag for a day that involves both work and training, 
+              what is the one non negotiable item you carry?
+          </div>
+          <div class="empty-column"></div>
+      </div>
+      <div class="answer-row">
+          <p>
+            My non negotiables are my iPad mini and my sunglasses. 
+            The iPad mini is compact enough to carry everywhere, 
+            which allows me to sketch ideas the moment inspiration strikes. 
+            My prescription sunglasses are equally important because I spend 
+            a lot of time outdoors. They help me stay comfortable, focused, 
+            and ready to create wherever I am.
+          </p>
+      </div>
+  </section>
+
+  <section class="qna">
+      <div class="question-row">
+          <div class="q-label">Q:</div>
+          <div class="question-text">
+            If someone sees your patch on a bag in the wild, 
+            what is the one thing you want them to know about the Singapore creative scene?
+          </div>
+          <div class="empty-column"></div>
+      </div>
+      <div class="answer-row">
+          <p>
+            I would want them to know that the creative scene in Singapore is far 
+            more vibrant than people often realise. Choosing a creative path here 
+            can feel unconventional, but there are many talented individuals expressing 
+            themselves in meaningful and inspiring ways.
+          </p>
+          <p>
+            More than anything, I hope it encourages people to pursue what they love. 
+            We only have one life and it is never too late to start creating or exploring something new.
+          </p>
+      </div>
+  </section>
+
+
+  <section class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px">
+      <!-- Desktop Description -->
+        <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width:80%; margin: 0 auto; text-align: center;">
+          From their world to yours.<br>
+          Markers of a journey waiting to unfold.
+        </p>
+
+        <!-- Mobile Description -->
+        <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width:80%; margin: 0 auto; text-align: center;">
+          From their world to yours.<br>
+          Markers of a journey waiting to unfold.
+        </p>  
+    </div>
+  </section>
+
+  <!-- Publish Content -->
+  <div class="publish-content" style = "padding-top: 50px; padding-left: 40px;">
+    <span style="font-size: 18px;">
+        Published on 15 June 2026
+        <br><br>
+        <a href="$url('Search-Show','cgid','pmnewarrivals')$">
+          SHOP MEN'S NEW ARRIVALS
+        </a> &gt;
+        <br>
+        <a href="$url('Search-Show','cgid','pmjonescollection')$">
+          SHOP JONES COLLECTION
+        </a> &gt;
+    </span>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('.js-tab-link').forEach(link => {
+      const tab    = link.dataset.tab;
+      const subtab = link.dataset.subtab;
+      const page   = link.dataset.page;
+
+      if (!tab || !page) return;
+
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      const countryCode = pathParts[0];
+
+      let hash = `#tab=${tab}`;
+      if (subtab) hash += `&subtab=${subtab}`;
+
+      link.href = `/${countryCode}/${page}.html${hash}`;
+    });
+
+  });
+  </script>
+
+
+<script>
+  const navItems = document.querySelectorAll('.nav-item');
+  const video = document.getElementById('main-video');
+  const mainImg = document.getElementById('main-img');
+  const caption = document.getElementById('main-caption');
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      navItems.forEach(n => n.classList.remove('active'));
+      item.classList.add('active');
+
+      if (item.dataset.img) {
+        video.style.display = 'none';
+        mainImg.style.display = 'block';
+        mainImg.src = item.dataset.img;
+      } else {
+        mainImg.style.display = 'none';
+        video.style.display = 'block';
+        video.src = item.dataset.video;
+        video.load();
+      }
+
+      caption.innerHTML = item.dataset.caption;
+    });
+  });
+</script>

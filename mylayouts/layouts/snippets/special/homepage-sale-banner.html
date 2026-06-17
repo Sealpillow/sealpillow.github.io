@@ -1,0 +1,246 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  ============================================================
+  DYNAMIC PROMO BANNER
+  ============================================================
+  CONFIG: Edit the variables below to control banner behaviour.
+ 
+  LAYOUT_MODE:
+    "split"    → Two banners displayed side by side (50/50)
+    "carousel" → Single banner that auto-slides through all slides
+ 
+  SLIDES:
+    Add or remove slide objects from the array.
+    Each slide needs:
+      - href         : Link URL when banner is clicked
+      - imgDesktop   : Desktop image path
+      - imgMobile    : Mobile image path  (<768px)
+      - analyticsId  : Content analytics ID string
+ 
+  CAROUSEL_INTERVAL:
+    Auto-advance interval in milliseconds (default: 5000)
+  ============================================================
+-->
+<style>
+/* Promo Banner */
+.promo-banner * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Promo Banner > A */
+.promo-banner a {
+  display: block;
+  line-height: 0;
+}
+
+/* Promo Banner > Img */
+.promo-banner img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+/* Promo Banner > Desktop */
+.promo-banner .desktop {
+  display: block;
+}
+
+/* Promo Banner > Mobile */
+.promo-banner .mobile {
+  display: none;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Promo Banner > Desktop */
+  .promo-banner .desktop {
+    display: none;
+  }
+
+  /* Promo Banner > Mobile */
+  .promo-banner .mobile {
+    display: block;
+  }
+}
+
+/* Promo Banner > Carousel Layout */
+.promo-banner .carousel-layout {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Promo Banner > Carousel Track */
+.promo-banner .carousel-track {
+  display: flex;
+  transition: transform 0.45s ease;
+  will-change: transform;
+}
+
+/* Promo Banner > Carousel Track > Div */
+.promo-banner .carousel-track > div {
+  flex: 0 0 100%;
+}
+
+/* Promo Banner > Split Slide */
+.promo-banner .split-slide {
+  display: flex;
+  width: 100%;
+}
+
+/* Promo Banner > Split Slide > Div */
+.promo-banner .split-slide > div {
+  flex: 1;
+  min-width: 0;
+}
+</style>
+
+<div class="promo-banner" id="promoBannerRoot"></div>
+
+<script>
+(function () {
+  var CAROUSEL_INTERVAL = 5000; // 5 seconds
+
+  var SLIDES = [
+    {
+      type: "split",
+      left: {
+        href: "$url('Search-Show', 'cgid', 'pm')$",
+        imgDesktop: "../../media/landscape.jpg",
+        imgMobile: "../../media/portrait.jpg",
+        analyticsId: "b_toppromobanner_pm_salestext_1"
+      },
+      right: {
+        href: "$url('Search-Show', 'cgid', 'pw')$",
+        imgDesktop: "../../media/landscape.jpg",
+        imgMobile: "../../media/portrait.jpg",
+        analyticsId: "b_toppromobanner_pw_salestext_1"
+      }
+    },
+    {
+      type: "single",
+      href: "$url('Search-Show', 'cgid', 'pw')$",
+      imgDesktop: "../../media/landscape.jpg",
+      imgMobile: "../../media/portrait.jpg",
+      analyticsId: "b_toppromobanner_generic_gwptext_1"
+    },
+
+  ];
+
+  var root = document.getElementById("promoBannerRoot");
+  if (!root || !SLIDES.length) return;
+  root.innerHTML = "";
+  function analytics(id) {
+    return '{"contentId":"' + id + '","contentType":"asset"}';
+  }
+
+  function makeImg(src, alt) {
+    var img = document.createElement("img");
+    img.src = src;
+    img.alt = alt || "";
+    img.className = "product_list-hero_image";
+    return img;
+  }
+
+  function makeLink(slide, mobile) {
+    var a = document.createElement("a");
+    a.href = slide.href;
+    a.setAttribute("data-content-analytic", analytics(slide.analyticsId));
+    a.appendChild(makeImg(mobile ? slide.imgMobile : slide.imgDesktop));
+    return a;
+  }
+
+  function makeResponsiveImage(item) {
+    var wrap = document.createElement("div");
+
+    var desktop = document.createElement("div");
+    desktop.className = "desktop";
+    desktop.appendChild(makeLink(item, false));
+
+    var mobile = document.createElement("div");
+    mobile.className = "mobile";
+    mobile.appendChild(makeLink(item, true));
+
+    wrap.appendChild(desktop);
+    wrap.appendChild(mobile);
+
+    return wrap;
+  }
+
+  function makeHybridSlide(slide) {
+    var wrap = document.createElement("div");
+
+    if (slide.type === "split") {
+      var split = document.createElement("div");
+      split.className = "split-slide";
+
+      split.appendChild(makeResponsiveImage(slide.left));
+      split.appendChild(makeResponsiveImage(slide.right));
+
+      wrap.appendChild(split);
+    } else {
+      wrap.appendChild(makeResponsiveImage(slide));
+    }
+
+    return wrap;
+  }
+
+  function buildCarousel() {
+    var current = 0;
+    var timer = null;
+
+    var wrap = document.createElement("div");
+    wrap.className = "carousel-layout";
+
+    var track = document.createElement("div");
+    track.className = "carousel-track";
+
+    SLIDES.forEach(function (slide) {
+      track.appendChild(makeHybridSlide(slide));
+    });
+
+    track.appendChild(makeHybridSlide(SLIDES[0]));
+
+    wrap.appendChild(track);
+    root.appendChild(wrap);
+
+    var total = SLIDES.length;
+
+    function go(index) {
+      current = index;
+      track.style.transition = "transform 0.45s ease";
+      track.style.transform = "translateX(-" + (current * 100) + "%)";
+    }
+
+    function next() {
+      current++;
+      go(current);
+
+      if (current === total) {
+        setTimeout(function () {
+          track.style.transition = "none";
+          current = 0;
+          track.style.transform = "translateX(0)";
+        }, 450);
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(next, CAROUSEL_INTERVAL);
+    }
+
+    wrap.addEventListener("mouseenter", function () {
+      clearInterval(timer);
+    });
+
+    wrap.addEventListener("mouseleave", startTimer);
+
+    startTimer();
+  }
+  
+  buildCarousel();
+})();
+</script>

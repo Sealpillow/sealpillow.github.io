@@ -1,0 +1,109 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Flex Collage */
+.flex-collage {
+  display: grid;
+  grid-auto-rows: auto;
+  grid-template-columns: repeat(25, 1fr);
+  margin: 0 auto;
+  row-gap: 4rem;
+}
+
+/* Flex Collage > Img */
+.flex-collage img {
+  display: block;
+  width: 100%;
+}
+
+/* Flex Hero */
+.flex-hero {
+  grid-column: 1 / -1;
+}
+
+/* Flex Left Large */
+.flex-left-large {
+  grid-column: 4 / 13;
+  margin-top: -70%;
+}
+
+/* Flex Right Large */
+.flex-right-large {
+  grid-column: 17 / 23;
+}
+
+/* Flex Bottom */
+.flex-bottom {
+  grid-column: 10 / 17;
+  margin-bottom: 4rem;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Flex Collage */
+  .flex-collage {
+    grid-template-columns: 1fr;
+    row-gap: 3rem;
+  }
+
+  /* Flex Collage > Div */
+  .flex-collage > div {
+    grid-column: 1 / -1;
+  }
+
+  /* Flex Right Large */
+  .flex-right-large {
+    display: none;
+  }
+
+  /* Flex Left Large */
+  .flex-left-large {
+    margin: 0;
+    order: 4;
+  }
+
+  /* Flex Bottom */
+  .flex-bottom {
+    display: none;
+  }
+}
+</style>
+
+
+<div class="flex-collage scroll-trigger" data-text1="THE DEMI" data-text2="Pastel Edition" data-color1="black" data-color2="black">
+
+  <!-- RIGHT LARGE -->
+  <div class="item flex-right-large">
+    <a class="js-shop-the-collection" data-pid="PW4-95210012_CHALK,PW2-75210163-16_BEIGE,PW2-75210180-2_BEIGE" href="$url('Product-Show','pid','PW4-95210012_CHALK')$">
+        <picture>
+            <!-- Mobile version (smaller image) -->
+            <source srcset="../../media/portrait.jpg" alt="Bag" media="(max-width: 768px)">
+            <!-- Web version (larger image) -->
+            <img src="../../media/portrait.jpg" alt="Bag">
+        </picture>
+    </a>
+  </div>
+
+  <!-- LEFT LARGE -->
+  <div class="item flex-left-large">
+    <a class="js-shop-the-collection" data-pid="PW2-75210163-16_BEIGE" href="$url('Product-Show','pid','PW2-75210163-16_BEIGE')$">
+        <picture>
+            <!-- Mobile version (smaller image) -->
+            <source srcset="../../media/portrait.jpg" alt="Bag" media="(max-width: 768px)">
+            <!-- Web version (larger image) -->
+            <img src="../../media/portrait.jpg" alt="Bag">
+        </picture>
+    </a>
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="item flex-bottom">
+    <a class="js-shop-the-collection" data-pid="PW2-75210163-16_L.YELL" href="$url('Product-Show','pid','PW2-75210163-16_L.YELL')$">
+        <picture>
+            <!-- Mobile version (smaller image) -->
+            <source srcset="../../media/portrait.jpg" alt="Bag" media="(max-width: 768px)">
+            <!-- Web version (larger image) -->
+            <img src="../../media/portrait.jpg" alt="Bag">
+        </picture>
+    </a>
+  </div>
+</div>

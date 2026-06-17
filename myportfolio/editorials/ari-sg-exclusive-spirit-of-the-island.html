@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+
+<style>
+html, body {
+    overflow-x: hidden;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+.page.parallax {
+    padding-top: 0px !important;
+}
+
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+
+.img-wrap {
+  position: relative;
+  display: block;
+  max-width: 100%;
+}
+
+.img-wrap img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* General image styling */
+.pair-container img {
+  width: 100%;           /* Image fills 50% of container */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+/* Make anchors behave nicely */
+.pair-container a {
+  display: block;
+  width: 100%;
+}
+/* Desktop layout */
+.pair-container {
+  display: flex;
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 50px; /* adjust as needed */
+}
+
+/* Mobile layout - Stack images vertically */
+@media (max-width: 768px) {  /* Mobile screen size */
+  .pair-container {
+    display: flex;          /* Keep flex */
+    flex-direction: column; /* Stack vertically */
+    width: 100%;          /* Full width of the container */
+    margin: 0 auto;            /* Reset any margins */
+  }
+  
+  .pair-container img,
+  .pair-container a {
+    width: 100%;           /* Images take full width of container on mobile */
+  }
+  .pair-container a {
+    width: 100%;           /* Images take full width of container on mobile */
+  }
+
+  /* Remove the margin from the last image */
+  .pair-container a:last-child {
+    margin-bottom: 0;
+  }
+    .pair-container img:first-child {
+    order: 2;
+  }
+
+  .pair-container img:last-child {
+    order: 1;
+  }
+}
+
+
+
+/* MAIN */
+.spirit {
+  padding: 50px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* ================= DESKTOP ================= */
+.spirit-inner {
+  display: flex;
+}
+
+.spirit-left,
+.spirit-right {
+  width: 50%;
+}
+
+.spirit-right {
+  text-align: right;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  font-family: Andale Mono,monospace;
+}
+
+.top-row-left {
+  display: flex;
+  justify-content: space-between;
+  letter-spacing: 0.04em;
+  margin-bottom: 28px;
+  
+}
+.top-row-left span{
+  font-size: 20px;
+  font-family: Andale Mono,monospace;
+}
+
+.body-text {
+
+  font-size: 14px;
+  line-height: 1.65;
+  max-width: 100%;
+  margin-bottom: 0px;
+}
+
+.mobile-title,
+.mobile-subtitle,
+.mobile-header {
+  display: none;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 767px) {
+
+  .spirit {
+    padding: 24px 22px 28px;
+  }
+
+  .spirit-inner {
+    flex-direction: column;
+  }
+
+  .spirit-left {
+    width: 100%;
+  }
+
+  .spirit-right {
+    display: none;
+  }
+
+  .mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 20px;
+    margin-bottom: 22px;
+  }
+  .mobile-header span,
+  .mobile-header .mobile-title{
+    font-family: Andale Mono,monospace;
+  }
+  .top-row-left {
+    display: none;
+  }
+
+  .mobile-title {
+    display: block;
+    line-height: 1.4;
+    font-family: Andale Mono,monospace;
+  }
+
+  .mobile-subtitle {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 14px;
+    font-family: Andale Mono,monospace;
+  }
+
+}
+
+
+  /* ----------------------------------------------------
+  VIDEO BLOCK
+  ---------------------------------------------------- */
+.video-wrapper {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin-bottom: 50px; /* space below video */
+}
+.video-media-container video {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.video-media-container video:focus, 
+.controls button:focus {
+    outline: none;
+}
+.video-media-container  video, image {
+    clip-path: fill-box; 
+  }
+.controls {
+  position: absolute;
+  bottom: 1rem;
+  width: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.controls button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.controls button img {
+  display: block;
+}
+.icon-play, .icon-pause {
+  width: 12px;
+  height: 24px;
+}
+.icon-mute, .icon-unmute {
+  width: 12px;
+  height: 12px;
+}
+.controls .mute {
+  transform: translateY(-1.5px); /* tweak: -1px to -4px */
+}
+/* play / pause icons */
+.icon-pause { display: none; }
+.play.is-playing .icon-play { display: none; }
+.play.is-playing .icon-pause { display: inline; }
+.play.is-paused .icon-play {display: inline;}
+.play.is-paused .icon-pause {display: none;}
+
+.timeline {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+/* SMOOTH PROGRESS BAR */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  background: white;
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+
+/* invisible seek input */
+.seek {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Container section for smoother scroll */
+.video-container {
+    height: 300vh;
+    position: relative;
+    overflow: hidden; /* ADD THIS — clips the video inside the container */
+}
+
+/* Base video wrapper */
+.video-scroll-wrapper {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    will-change: transform; /* Hint to browser to optimize transformations */
+}
+
+/* Fixed while scrubbing */
+.video-scroll-wrapper.is-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    transform: translate3d(0, 0, 0); /* Use transform for smoother movement */
+}
+
+
+/* Released after end - stays in flow and scrolls out */
+.video-scroll-wrapper.is-released {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+/* Video styling */
+.video-scroll-wrapper video {
+    width: 100%;
+    height: 100vh;        /* fill the full viewport height */
+    object-fit: cover;    /* crop to fill without white space */
+}
+
+.video-bottom-text {
+  position: relative;
+  z-index: 20;
+  background: #fff;
+  padding: 50px; /* adjust as needed */
+}
+.video-bottom-desc {
+  font-size: 14px;
+  width: 50%;
+}
+@media (max-width: 767px) {
+  .video-bottom-desc {
+    width: 80%;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="img-wrap js-vertical-slider">
+  <a href="$url('Product-Show','pid','PW2-75940008-9_YELLOW')$"  data-pid="PW2-75940008-9_YELLOW" >
+    <picture>
+      <img src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_01.jpg?$staticlink$"/>
+    </picture>
+  </a>
+</div>
+
+<div class="spirit">
+  <div class="spirit-inner">
+
+    <div class="spirit-left">
+      <div class="top-row-left">
+        <span>Spirit of the Island</span>
+        <span>Singapore-Exclusive Ari</span>
+      </div>
+
+      <div class="mobile-header">
+        <div class="mobile-title">
+          Spirit of<br>the Island
+        </div>
+        <span>Summer'26</span>
+      </div>
+
+      <div class="mobile-subtitle">
+        Singapore Exclusive Ari
+      </div>
+
+      <p class="body-text">
+        Inspired by sun-drenched moments and as an ode to a tropical home, the Singapore-exclusive Ari bag reflects this shift through organic textures. A link between nature and the city's thoughtful way of life, this limited-edition capsule serves as an appreciation for the island's botanical soul.
+      </p>
+    </div>
+
+    <div class="spirit-right">
+      Summer'26
+    </div>
+
+  </div>
+</div>
+
+
+<div class="video-wrapper js-vertical-slider">
+    <div class="video-media-container">
+        <!-- Video Background (Desktop) -->
+        <video class="video d-md-block d-none" playsinline autoplay loop muted
+            style="width: 100%; object-fit: cover;">
+            <source src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_02.mp4?$staticlink$" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Mobile Video -->
+        <video class="video d-md-none d-block" playsinline autoplay loop muted
+            style="width: 100%; object-fit: cover;">
+            <source src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial-mobile_02.mp4?$staticlink$" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="controls">
+          <button class="play is-playing">
+              <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+              <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+          </button>
+
+          <div class="timeline">
+              <div class="progressBar">
+              <div class="progressFill"></div>
+              </div>
+              <input class="seek" type="range" value="0" min="0" step="0.01">
+          </div>
+
+          <button class="mute">
+              <img class="icon-mute" src="images/media-assets/mute.png?$staticlink$">
+              <img class="icon-unmute" src="images/media-assets/unmute.png?$staticlink$" style="display:none;">
+          </button>
+        </div>
+    </div>
+</div>
+
+<div class="pair-container d-md-flex">
+    <a class="js-shop-the-collection" href="$url('Product-Show','pid','PW2-75940008-9_YELLOW')$"  data-pid="PW2-75940008-9_YELLOW" >
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_03.jpg?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_03.jpg?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+    <a class="js-shop-the-collection" href="$url('Product-Show','pid','PW2-75940008-9_YELLOW')$"  data-pid="PW2-75940008-9_YELLOW" >
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_04.jpg?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_04.jpg?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+
+
+
+<div class="video-container" id="videoContainer">
+    <div class="video-scroll-wrapper" id="videoScrollWrapper">
+        <!-- No <source> tags — JS will set src directly -->
+        <video id="scrollVideo" muted playsinline preload="auto"></video>
+    </div>
+</div>
+<!-- BOTTOM TEXT SECTION -->
+<div class="video-bottom-text d-md-block d-none" >
+    <div class="video-bottom-inner">
+        <p class="video-bottom-desc" style="width: 100%;font-family: Andale Mono,monospace;; margin-bottom: 0px; letter-spacing: 0.04em;">
+            Colour and texture layered in the best possible sense, the perfect supplement to modern life.
+        </p>
+    </div>
+</div>
+
+<!-- BOTTOM TEXT SECTION -->
+<div class="video-bottom-text d-block d-md-none">
+    <div class="video-bottom-inner">
+        <p class="video-bottom-desc" style="width: 60%; font-family: Andale Mono,monospace; letter-spacing: 0.04em; padding-top: 0px">
+            Colour and texture<br>layered in the best<br>possible sense
+        </p>
+        <p class="video-bottom-desc" style="width: 50%; font-family: Andale Mono,monospace; margin: 0 auto; text-align: center;  letter-spacing: 0.04em;">
+            the perfect<br>supplement to<br>modern life.
+        </p>
+    </div>
+</div>
+
+<div class="img-wrap js-vertical-slider">
+  <a class="js-shop-the-collection" href="$url('Product-Show','pid','PW2-75940008-9_YELLOW')$"  data-pid="PW2-75940008-9_YELLOW" >
+    <picture>
+      <img src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_06.jpg?$staticlink$"/>
+    </picture>
+  </a>
+</div>
+
+<!-- BOTTOM TEXT SECTION -->
+<div class="video-bottom-text">
+    <div class="video-bottom-inner">
+        <p class="video-bottom-title" style="font-family: Andale Mono,monospace; font-size: 20px;">The Signature Ari</p>
+        <p class="video-bottom-desc">
+            Beyond woven textures, the range expands into smooth leathers and polished hardware,
+            spanning functional volumes and structured forms. Each iteration offers an architectural 
+            ease that anchors the modern wardrobe, a companion for the imaginative everyday.
+        </p>
+        <a href ="$url('Search-Show', 'cgid','pwaribags-anchor')$" style="text-decoration: underline;">Shop Ari</a>
+    </div>
+</div>
+
+<div class="pair-container d-md-flex">
+    <a class="js-shop-the-collection" href="$url('Product-Show','pid','PW4-95940017-2_YELLOW')$" data-pid="PW4-95940017-2_YELLOW">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_07.jpg?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_07.jpg?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+    <a class="js-shop-the-collection" href="$url('Product-Show','pid','PW4-95940017-2_YELLOW')$" data-pid="PW4-95940017-2_YELLOW">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_08.jpg?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_08.jpg?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+<!-- Publish Content -->
+<div class="publish-content" style = "padding-left: 40px;">
+    <span style="font-size: 18px;">
+        Published on 15 May 2026
+        <br><br>
+        <a href="$url('Search-Show','cgid','pwaribags-anchor')$">
+            SHOP ARI
+        </a> &gt;
+    </span>
+</div>
+
+<script>
+const video = document.getElementById('scrollVideo');
+const container = document.getElementById('videoContainer');
+const wrapper = document.getElementById('videoScrollWrapper');
+
+let isScrolling = false;
+let lastScrollY = 0;
+let videoProgress = 0;
+
+// --- Source switching ---
+const mq = window.matchMedia('(max-width: 767px)');
+
+function setVideoSource(e) {
+    video.src = e.matches
+        ? 'images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial-mobile_05.mp4?$staticlink$'
+        : 'images/ari-sg-exclusive-spirit-of-the-island/ari-exclusive-editorial_05.mp4?$staticlink$';
+    video.load();
+}
+
+setVideoSource(mq);
+mq.addEventListener('change', setVideoSource);
+
+// --- Scroll scrubbing ---
+video.addEventListener('loadedmetadata', () => {
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+});
+
+function onScroll() {
+    const scrollY = window.scrollY;
+
+    if (Math.abs(scrollY - lastScrollY) < 1) return;
+
+    if (!isScrolling) {
+        window.requestAnimationFrame(() => {
+            updateVideoProgress();
+            isScrolling = false;
+        });
+        isScrolling = true;
+    }
+
+    lastScrollY = scrollY;
+}
+
+function updateVideoProgress() {
+    const start = container.offsetTop;
+    const end = start + container.offsetHeight - window.innerHeight;
+    const scrollY = window.scrollY;
+
+    let progress = (scrollY - start) / (end - start);
+    progress = Math.max(0, Math.min(1, progress));
+
+    if (scrollY >= start && scrollY <= end) {
+        wrapper.classList.add('is-fixed');
+        wrapper.classList.remove('is-released');
+    } else if (scrollY > end) {
+        wrapper.classList.remove('is-fixed');
+        wrapper.classList.add('is-released');
+    } else {
+        wrapper.classList.remove('is-fixed', 'is-released');
+    }
+
+    if (video.duration) {
+        video.currentTime = progress * video.duration;
+    }
+}
+</script>
+
+
+
+
+<script>
+function initVideoControls(scope = document) {
+
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+
+    const videos = container.querySelectorAll('.video');
+    if (!videos.length) return;
+
+    // Use the visible video (desktop/mobile)
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    // Set default volume
+    video.volume = 0.2;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+    const iconMute = container.querySelector('.icon-mute');
+    const iconUnmute = container.querySelector('.icon-unmute');
+
+    if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
+
+    // Remove any existing event listeners by cloning the buttons
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newMuteBtn = muteBtn.cloneNode(true);
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+    // Update references to the new buttons
+    const freshPlayBtn = container.querySelector('.play');
+    const freshMuteBtn = container.querySelector('.mute');
+    const freshIconMute = container.querySelector('.icon-mute');
+    const freshIconUnmute = container.querySelector('.icon-unmute');
+
+    // PLAY / PAUSE
+    freshPlayBtn.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        freshPlayBtn.classList.add('is-playing');
+        freshPlayBtn.classList.remove('is-paused');
+      } else {
+        video.pause();
+        freshPlayBtn.classList.add('is-paused');
+        freshPlayBtn.classList.remove('is-playing');
+      }
+    });
+
+    // MUTE
+    freshMuteBtn.addEventListener('click', () => {
+      video.muted = !video.muted;
+      freshIconMute.style.display = video.muted ? 'block' : 'none';
+      freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+    });
+
+    // PROGRESS UPDATE
+    video.addEventListener('timeupdate', () => {
+      const progress = video.currentTime / video.duration;
+      progressFill.style.transform = `scaleX(${progress})`;
+      seek.value = progress * 100;
+    });
+
+    // SEEK
+    seek.addEventListener('input', () => {
+      const percent = seek.value / 100;
+      video.currentTime = percent * video.duration;
+    });
+
+  });
+}
+
+// INIT ON PAGE LOAD
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
+
+</body>
+
+</html>
+

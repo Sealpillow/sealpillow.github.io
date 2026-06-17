@@ -1,0 +1,251 @@
+
+<style>
+/* Video Wrapper */
+.video-wrapper {
+  display: block;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Video Media Container > Video */
+.video-media-container video {
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Video Media Container > Video > Image */
+.video-media-container  video, image {
+  filter: grayscale(0);
+}
+
+/* Controls */
+.controls {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Video Wrapper > Controls */
+.video-wrapper:hover .controls {
+  opacity: 1;
+}
+
+/* Controls */
+.controls {
+  align-items: center;
+  bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  left: 50%;
+  padding: 1rem;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 85%;
+}
+
+/* Controls > Button */
+.controls button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Controls > Button > Img */
+.controls button img {
+  display: block;
+}
+
+/* Icon Play > Icon Pause */
+.icon-play, .icon-pause {
+  height: 24px;
+  width: 12px;
+}
+
+/* Icon Mute > Icon Unmute */
+.icon-mute, .icon-unmute {
+  height: 12px;
+  width: 12px;
+}
+
+/* Controls > Mute */
+.controls .mute {
+  transform: translateY(-1.5px);
+}
+
+/* Icon Pause */
+.icon-pause {
+  display: none;
+}
+
+/* Play > Is Playing > Icon Play */
+.play.is-playing .icon-play {
+  display: none;
+}
+
+/* Play > Is Playing > Icon Pause */
+.play.is-playing .icon-pause {
+  display: inline;
+}
+
+/* Play > Is Paused > Icon Play */
+.play.is-paused .icon-play {
+  display: inline;
+}
+
+/* Play > Is Paused > Icon Pause */
+.play.is-paused .icon-pause {
+  display: none;
+}
+
+/* Timeline */
+.timeline {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+
+/* Progressbar */
+.progressBar {
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  height: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Progressfill */
+.progressFill {
+  background: white;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  width: 100%;
+  will-change: transform;
+}
+
+/* Seek */
+.seek {
+  cursor: pointer;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+}
+</style>
+
+
+<div class="video-wrapper js-vertical-slider">
+    <div class="video-media-container">
+        <!-- Video Background (Desktop) -->
+        <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+            style="width: 100%; object-fit: cover;">
+            <source src="../../media/landscape_video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Mobile Video -->
+        <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+            style="width: 100%; object-fit: cover;">
+            <source src="../../media/portrait_video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="controls">
+          <button class="play is-playing">
+              <img class="icon-play" src="../../media/play-white.svg" >
+              <img class="icon-pause" src="../../media/pause-white.svg" >
+          </button>
+
+          <div class="timeline">
+              <div class="progressBar">
+              <div class="progressFill"></div>
+              </div>
+              <input class="seek" type="range" value="0" min="0" step="0.01">
+          </div>
+
+          <button class="mute">
+              <img class="icon-mute" src="../../media/mute.png" >
+              <img class="icon-unmute" src="../../media/unmute.png" style="display:none;">
+          </button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+function initVideoControls(scope = document) {
+
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+
+    const videos = container.querySelectorAll('.video');
+    if (!videos.length) return;
+
+    // Use the visible video (desktop/mobile)
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    // Set default volume
+    video.volume = 0.2;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+    const iconMute = container.querySelector('.icon-mute');
+    const iconUnmute = container.querySelector('.icon-unmute');
+
+    if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
+
+    // Remove any existing event listeners by cloning the buttons
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newMuteBtn = muteBtn.cloneNode(true);
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+    // Update references to the new buttons
+    const freshPlayBtn = container.querySelector('.play');
+    const freshMuteBtn = container.querySelector('.mute');
+    const freshIconMute = container.querySelector('.icon-mute');
+    const freshIconUnmute = container.querySelector('.icon-unmute');
+
+    // PLAY / PAUSE
+    freshPlayBtn.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        freshPlayBtn.classList.add('is-playing');
+        freshPlayBtn.classList.remove('is-paused');
+      } else {
+        video.pause();
+        freshPlayBtn.classList.add('is-paused');
+        freshPlayBtn.classList.remove('is-playing');
+      }
+    });
+
+    // MUTE
+    freshMuteBtn.addEventListener('click', () => {
+      video.muted = !video.muted;
+      freshIconMute.style.display = video.muted ? 'block' : 'none';
+      freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+    });
+
+    // PROGRESS UPDATE
+    video.addEventListener('timeupdate', () => {
+      const progress = video.currentTime / video.duration;
+      progressFill.style.transform = `scaleX(${progress})`;
+      seek.value = progress * 100;
+    });
+
+    // SEEK
+    seek.addEventListener('input', () => {
+      const percent = seek.value / 100;
+      video.currentTime = percent * video.duration;
+    });
+
+  });
+}
+
+// INIT ON PAGE LOAD
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
+

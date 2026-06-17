@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+
+<!-- ================= SPLIDE CSS ================= -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+
+<!-- ================= SPLIDE JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js"></script>
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+  body,
+    html {
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+        /*background-color: #e8e8e8;*/
+        color: black;
+        text-wrap: pretty;
+        height:auto; /* make the pedro banner visible at the top when scrolling*/
+        margin: 0;
+        padding: 0;
+    }
+    .folder-header {
+        visibility: hidden;
+        display: none;
+    }
+    .folder_post .folder-container .container {
+        display: none;
+    }
+    a {
+      color: black;
+    }
+    .page.parallax {
+        padding-top: 0px !important;
+    }
+    .img-wrap {
+        position: relative;
+        display: block;
+        max-width: 100%;
+        background: #000;
+    }
+
+  .img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+.main-title{
+  font-size: 50px;
+    line-height: 50px;
+}
+@media (max-width: 768px) {
+  .main-title{
+  font-size: 34px;
+    line-height: 34px;
+}
+}
+.left-right-big-small-wrapper {
+  width:70%;
+  margin: 0 auto;
+}
+
+.left-right-big-small-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* left bigger, right smaller */
+  gap: 10px;
+  align-items: start;
+}
+
+/* Left image */
+.left-right-big-small-left img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Right column */
+.left-right-big-small-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.left-right-big-small-right img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* Caption style */
+.small-caption {
+  font-size: 10px;
+  color: #888;
+  font-family: proxima-nova;
+}
+
+/* Mobile: stack */
+@media (max-width: 768px) {
+  .left-right-big-small-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .left-right-big-small-wrapper{
+    width: 100%;
+  }
+
+  .small-caption {
+    text-align: left;
+  }
+  .left-right-big-small-right{
+    padding: 0px 40px;
+  }
+}
+
+.middle-image{
+    width: 40%;
+    margin: 0 auto;
+    display: block;
+}
+.middle-caption {
+    width: 45%;
+    margin: 100px auto;
+    font-size: 14px;
+    text-align: center;
+}
+.qna {
+  width: 45%;
+}
+@media (max-width: 768px) {
+    .middle-image,
+    .middle-caption,
+    .qna{
+        width: 80%;
+    }
+}
+
+.slider-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.splide__list {
+  display: flex;
+  align-items: center; /* Vertically center the content in the list */
+}
+.slide-content {
+  width: 100%;
+  overflow: hidden; /* Add this to swiper itself */
+}
+
+.slide-content img,
+.slide-content video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    clip-path: fill-box;
+}
+
+/* Hide arrows & pagination */
+.splide__arrows,
+.splide__pagination {
+  display: none;
+}
+
+/* Drag cursor */
+.splide__track {
+  cursor: grab;
+}
+
+.splide__track:active {
+  cursor: grabbing;
+}
+
+/* General image styling */
+.pair-container img {
+  width: 100%;           /* Image fills 50% of container */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+/* Make anchors behave nicely */
+.pair-container a {
+  display: block;
+  width: 50%;
+}
+/* Desktop layout */
+.pair-container {
+  display: flex;
+  width: 80%;
+  margin: 0 auto;
+  gap: 15px;
+}
+
+/* Mobile layout - Stack images vertically */
+@media (max-width: 768px) {  /* Mobile screen size */
+  .pair-container {
+    display: block;       /* Stack images vertically */
+    width: 80%;          /* Full width of the container */
+    margin: 0 auto;            /* Reset any margins */
+  }
+  
+  .pair-container img,
+  .pair-container a {
+    width: 100%;           /* Images take full width of container on mobile */
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="img-wrap js-vertical-slider">
+
+    <picture>
+      <a class="js-shop-the-collection" data-pid="PW2-15060012-4_BLK.CA" href="$url('Product-Show','pid','PW2-15060012-4_BLK.CA')$">
+        <img class="d-md-block d-none" src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_01.webp?$staticlink$"/>
+      </a>
+      <a class="js-shop-the-collection" data-pid="PW2-15060012-4_BLK.CA" href="$url('Product-Show','pid','PW2-15060012-4_BLK.CA')$">
+        <img class="d-block d-md-none" src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial-mobile_01.webp?$staticlink$"/>
+      </a>
+    </picture>
+
+</div>
+
+<section class="d-block">
+  <div class="position-relative text-center" style="margin: 100px 0px">
+      
+    <!-- Common Title -->
+      <p class="mb-0 p-0 col-md-12" style="font-family:aktiv-grotesk-extended;  font-size:20px; width:100%; margin: 0 auto; text-align: center;">
+          The Shape of Becoming:
+      </p>
+
+      <!-- Common Title -->
+      <p class="main-title mb-0 p-0 col-md-12" style="font-family:aktiv-grotesk-extended; width:100%; margin: 0 auto; text-align: center;">
+          In Conversation with<br>
+          Carlotta Scholz
+      </p>
+      <br>
+      <br>
+
+      <!-- Desktop Description -->
+      <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+        For Carlotta Scholz, design is not just a profession, but a lifelong language. A graduate of Berlin’s<br>
+        prestigious Kunsthochschule Weißensee with an exchange at Central Saint Martins, Carlotta has cultivated a<br>
+        practice where conceptual rigor meets a playful, hands-on curiosity. Since establishing her creative studio in<br>
+        2023, she has become a rising figure in the international design scene, often splitting her creative energy<br>
+        between the structural heritage of Berlin and the vibrant, evolving atmosphere of Paris.
+        <br><br>
+        In this exclusive feature for PEDRO, we sit down with Carlotta to discuss her journey from art school to her<br>
+        current practice, the influence of European cultural shifts on her aesthetic, and how she navigates the<br>
+        constant process of self-discovery through her work and personal style.
+      </p>
+
+      <!-- Mobile Description -->
+      <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+        For Carlotta Scholz, design is not just a profession,<br>
+        but a lifelong language. A graduate of Berlin’s<br>
+        prestigious Kunsthochschule Weißensee with an<br>
+        exchange at Central Saint Martins, Carlotta has<br>
+        cultivated a practice where conceptual rigor meets<br>
+        a playful, hands-on curiosity. Since establishing her<br>
+        creative studio in 2023, she has become a rising<br>
+        figure in the international design scene, often<br>
+        splitting her creative energy between the structural<br>
+        heritage of Berlin and the vibrant, evolving<br>
+        atmosphere of Paris.
+        <br><br>
+        In this exclusive feature for PEDRO, we sit down<br>
+        with Carlotta to discuss her journey from art school<br>
+        to her current practice, the influence of European<br>
+        cultural shifts on her aesthetic, and how she<br>
+        navigates the constant process of self-discovery<br>
+        through her work and personal style.
+      </p>
+  </div>
+</section>
+
+
+
+<div class="left-right-big-small-wrapper">
+  <div class="left-right-big-small-layout">
+    <!-- Left large image -->
+    <div class="left-right-big-small-left">
+      <a class="js-shop-the-collection" data-pid="PW2-75060135-1_BLK.CA,PW2-75060135_L.TAUP" href="$url('Product-Show','pid','PW2-75060135-1_BLK.CA')$">
+        <img src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_02.webp?$staticlink$" alt="Left left-right-big-small image">
+      </a>
+    </div>
+
+    <!-- Right column -->
+    <div class="left-right-big-small-right">
+      <a class="js-shop-the-collection" data-pid="PW1-66210006_CHALK,PW1-66210006_L.TAUP" href="$url('Product-Show','pid','PW2-75060135_L.TAUP')$">
+        <img src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_03.webp?$staticlink$" alt="Right left-right-big-small image">
+      </a>  
+      <p class="small-caption" style="width: 100%;">
+        CARLOTTA <span style="font-style: italic;">(@carlotta_cosi),</span>
+        <br>DESIGNER & MODEL
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<section class="d-block">
+  <div class="position-relative text-center" style="margin: 120px 0px">
+    <!-- Desktop Description -->
+      <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:Kepler-Std; font-style: italic; font-size:40px; width:80%; margin: 0 auto; text-align: center;">
+        “Material is often my starting point,<br>
+        frequently developing in tandem with construction.”
+      </p>
+
+      <!-- Mobile Description -->
+      <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:Kepler-Std; font-style: italic; font-size:30px; width:80%; margin: 0 auto; text-align: center;">
+        “Material is often my starting point,
+        frequently developing in tandem with construction.”
+      </p>  
+  </div>
+</section>
+
+
+<div style="margin-bottom: 100px">
+  <a class="js-shop-the-collection" data-pid="PW2-15060012-4_BLK.CA" href="$url('Product-Show','pid','PW2-15060012-4_BLK.CA')$">
+    <img 
+      src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_04.webp?$staticlink$" 
+      class="middle-image">
+  </a>
+    <div class="middle-caption">
+        An adherent of the “less is more” philosophy, what began as a childhood instinct for knitting and drawing has matured into a sophisticated design identity centred on restraint and materiality. Whether she is experimenting with the tactile potential of a new textile or exploring the structural limits of construction, her process remains rooted in a sense of discovery.
+    </div>
+</div>
+
+<div style="margin-bottom: 100px">
+    <img 
+    src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_05.webp?$staticlink$" 
+    class="middle-image d-md-block d-none">
+</div>
+
+<div class="d-md-none d-block slider-container">
+  <div class="splide" id="slider-1">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+<div class="middle-caption small-caption" style="font-style:italic; font-size: 10px;">
+    Images provided by Carlotta
+</div>
+
+<section class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px">
+      
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px;  margin: 0 auto; text-align: center;">
+            <b>Q: Where did your relationship with design begin?</b>
+            <br><br>
+            My relationship with design began very early. As a child, I used drawing as a form of journaling and was constantly sewing, knitting, and making things by hand. That instinct became more conscious when I began studying textile design and entered the world of art school. It was there that design shifted from pure intuition into a professional language. 
+        </p>
+        <br>
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px;  margin: 0 auto; text-align: center;">
+            <b>Q: How did your time at Central Saint Martins shape your thinking?</b>
+            <br><br>
+            I spent an exchange semester at Central Saint Martins, which proved to be incredibly enriching. It exposed me to different ways of thinking and diverse approaches to design. I was able to synthesize those experiences with the conceptual education I received at Kunsthochschule Weißensee in Berlin. That contrast helped me define my own unique methodology. 
+        </p>
+        <br>
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px;	margin: 0 auto; text-align: center;">
+            <b>Q: What motivated you to start your creative practice in 2023?</b> 
+            <br><br>
+            I have always been a prolific creator, but after graduating, I felt a stronger need to seek a definitive direction. Some projects were more structured and serious, while others remained playful, experimental, or research-driven. That period was dedicated to testing, observing, and allowing my work to develop naturally. 
+        </p>
+        <br>
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px;  margin: 0 auto; text-align: center;">
+            <b>Q: How does Paris influence your work and aesthetic?</b>
+            <br><br>
+            Paris has a profound influence on my work due to its international energy, which has become even more vibrant in recent years. This cultural exchange is deeply motivating. At the same time, the constant production of images within the fashion industry can be overwhelming. I find it essential to maintain a sense of distance and balance, allowing myself to be inspired without losing my own clarity. 
+        </p>
+    </div>
+</section>
+
+<div style="margin-bottom: 100px">
+  <a class="js-shop-the-collection" data-pid="PW1-66600017-2_BRW.CA,PW2-15060012-4_BLK.CA" href="$url('Product-Show','pid','PW1-66600017-2_BRW.CA')$">
+    <img 
+    src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_06.webp?$staticlink$" 
+    class="middle-image">
+  </a>
+</div>
+
+<section class="d-block">
+    <div class="position-relative text-center" style="margin: 100px 0px">
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px; 	 margin: 0 auto; text-align: center;">
+            <b>Q: How would you describe your design identity today?</b>
+            <br><br>
+            Over time, my work has become more minimalist, guided by the principle that less is more. I used to be eager to combine a multitude of techniques, colors, and materials into a single piece. Now, I focus on restraint and intention while still preserving a sense of playfulness. 
+        </p>
+        <br>
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px; 	 margin: 0 auto; text-align: center;">
+            <b>Q: What draws you to a material, and how does it shape your process?</b>
+            <br><br>
+            Material is often my starting point, frequently developing in tandem with construction. There is a constant interplay between the two. I enjoy uncovering their potential through experimentation to see what they are capable of before I ever consider their final application. 
+        </p>
+        <br>
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px; 	 margin: 0 auto; text-align: center;">
+            <b>Q: How would you describe your personal style?</b> 
+            <br><br>
+            There is no true separation between my work and how I dress. Over the past eight years, I have moved through many creative phases, and my personal style has always reflected that internal state. With time comes more ease, yet the journey of becoming is still ongoing. 
+        </p>
+        <br>
+    </div>
+</section>
+
+
+<div class="pair-container d-md-flex">
+    <a class="js-shop-the-collection" data-pid="PW1-66210006_CHALK" href="$url('Product-Show','pid','PW1-66210006_CHALK')$">
+      <img src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_07.webp?$staticlink$" alt="Bag">
+    </a>
+    <a class="js-shop-the-collection" data-pid="PW1-66210006_CHALK,PW1-66210006_L.TAUP" href="$url('Product-Show','pid','PW1-66210006_L.TAUP')$">
+      <img src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_08.webp?$staticlink$" alt="Bag">
+    </a>
+</div>
+
+
+<section class="d-block">
+  <div class="position-relative text-center" style="margin: 120px 0px">
+    <!-- Desktop Description -->
+      <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:Kepler-Std; font-style: italic; font-size:40px; width: 100%; margin: 0 auto; text-align: center;">
+        “I find it essential to maintain a sense of<br>
+        distance and balance, allowing myself to be<br>
+        inspired without losing my own clarity.”
+      </p>
+
+      <!-- Mobile Description -->
+      <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:Kepler-Std; font-style: italic; font-size:30px; width:90%; margin: 0 auto; text-align: center;">
+        “I find it essential to maintain a sense of
+        distance and balance, allowing myself to be
+        inspired without losing my own clarity.”
+      </p>  
+  </div>
+</section>
+
+<div style="margin-bottom: 100px">
+  <a class="js-shop-the-collection" data-pid="PW1-65110100_COGNAC" href="$url('Product-Show','pid','PW1-65110100_COGNAC')$">
+    <img 
+    src="images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_09.webp?$staticlink$" 
+    class="middle-image">
+  </a>
+</div>
+
+
+
+<section class="d-block">
+
+    <div class="position-relative text-center" style="margin: 100px 0px">
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px; 	 margin: 0 auto; text-align: center;">
+            <b>Q: How has collaboration shaped your practice?</b>
+            <br><br>
+            I value collaboration deeply. Working with others is enriching and allows projects to reach a potential that would not be possible alone. At the same time, it is vital to understand exactly what you bring to the table: your specific skills, your aesthetic, and your own visual language.  
+        </p>
+        <br>
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px; 	 margin: 0 auto; text-align: center;">
+            <b>Q: PEDRO's Fall collection explores style as self-discovery.<br>
+                How does that resonate with where you are right now? 
+            </b>
+            <br><br>
+            My personal style is always evolving, shaped by my mindset and my environment.<br>
+            It is a continuous process of self-discovery, which aligns perfectly with the spirit of this collection. 
+        </p>
+        <br>
+        <!-- Question -->
+        <p class="qna mb-0 p-0 col-md-12" style="font-size:14px; 	 margin: 0 auto; text-align: center;">
+            <b>Q: What energy are you carrying into this next chapter?</b> 
+            <br><br>
+            Positivity, trust in the process, and care for the people I love
+        </p>
+        <br>
+    </div>
+</section>
+
+<div class="new-arrivals" style ="padding-left: 40px;">
+  <p>Published on 9 February 2026</p>
+  <a href="$url('Search-Show','cgid','pwnewarrivals')$">SHOP WOMEN'S NEW ARRIVALS ></a>
+  <br>
+  <a href="$url('Search-Show','cgid','pmnewarrivals')$">SHOP MEN'S NEW ARRIVALS ></a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSlider({
+    sliderId,
+    slides,
+    options = {}
+  }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      if (slide.type === 'video') {
+        wrapper.innerHTML = `
+          <video autoplay muted loop playsinline>
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        wrapper.innerHTML = `
+          <img src="${slide.src}" alt="${slide.alt || ''}">
+        `;
+      }
+
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      gap: 20,
+      autoScroll: {
+        speed: 1,
+        pauseOnHover: true,
+        pauseOnFocus: false,
+      },
+      arrows: false,
+      pagination: false,
+      breakpoints: {
+        1024: { perPage: 2 },
+        640: { perPage: 1 },
+      },
+      ...options,
+    });
+
+    splide.mount(window.splide.Extensions);
+  }
+
+  /* ================= SLIDER DATA ================= */
+
+  createSplideSlider({
+    sliderId: 'slider-1',
+    slides: [
+      { type: 'image', src: 'images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial-mobile_05-1.webp?$staticlink$' },
+      { type: 'image', src: 'images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial-mobile_05-2.webp?$staticlink$' },
+      { type: 'image', src: 'images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial-mobile_05-3.webp?$staticlink$' },
+      { type: 'image', src: 'images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial-mobile_05-4.webp?$staticlink$' },
+    ],
+  });
+
+});
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<style>
+/* Horsebit Container1 > Img */
+.horsebit-container1 img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Horsebit Container1 */
+.horsebit-container1 {
+  display: flex;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Horsebit Container1 > A */
+.horsebit-container1 a {
+  display: block;
+  flex: 1;
+  position: relative;
+}
+</style>
+
+
+<div class="horsebit-container1 d-md-flex d-none">
+  <!-- Left Image -->
+  <a href="#" class="js-tab-link" data-page="versatility-in-one" data-tab="multiwaystyling" data-subtab="horsebit-shoulder-bag-black">
+      <img alt="Left Image"  class="img-fluid w-100" loading="lazy"
+          src="../../media/portrait.jpg"/>
+  </a>
+  <!-- Right Image -->
+  <a href="#" class="js-tab-link" data-page="versatility-in-one" data-tab="travel" data-subtab="travel2">
+      <img alt="Right Image"  class="img-fluid w-100" loading="lazy"
+          src="../../media/portrait.jpg"/>
+  </a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  document.querySelectorAll('.js-tab-link').forEach(link => {
+    const tab    = link.dataset.tab;
+    const subtab = link.dataset.subtab;
+    const page   = link.dataset.page;
+
+    if (!tab || !page) return;
+
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const countryCode = pathParts[0];
+
+    let hash = `#tab=${tab}`;
+    if (subtab) hash += `&subtab=${subtab}`;
+
+    link.href = `/${countryCode}/${page}.html${hash}`;
+  });
+
+});
+</script>
+

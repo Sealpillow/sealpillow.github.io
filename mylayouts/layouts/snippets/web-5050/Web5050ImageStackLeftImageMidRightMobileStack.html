@@ -1,0 +1,103 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Flexi Left Stack Right Mid */
+.flexi-left-stack-right-mid {
+  display: flex;
+}
+
+/* Flexi Left Stack Right Mid > Img */
+.flexi-left-stack-right-mid img {
+  height: auto;
+  width: 100%;
+}
+
+/* Flexi Left Stack Right Mid > A */
+.flexi-left-stack-right-mid a {
+  display: block;
+}
+
+/* Flexi Left Stack Right Mid > Left */
+.flexi-left-stack-right-mid .left {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+/* Flexi Left Stack Right Mid > Left Top */
+.flexi-left-stack-right-mid .left-top {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+/* Flexi Left Stack Right Mid > Left Bottom */
+.flexi-left-stack-right-mid .left-bottom {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+/* Flexi Left Stack Right Mid > Right */
+.flexi-left-stack-right-mid .right {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-left: 20%;
+  width: 20%;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Flexi Left Stack Right Mid */
+  .flexi-left-stack-right-mid {
+    flex-direction: column;
+  }
+
+  /* Flexi Left Stack Right Mid > Left > Right */
+  .flexi-left-stack-right-mid .left,
+    .flexi-left-stack-right-mid .right {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  /* Flexi Left Stack Right Mid > Left Bottom > Right */
+  .flexi-left-stack-right-mid .left-bottom,
+    .flexi-left-stack-right-mid .right {
+    margin-top: 10px;
+  }
+}
+</style>
+
+<div class="flexi-left-stack-right-mid">
+    <!-- Left side (split into top and bottom) -->
+    <div class="left">
+        <div class="left-top">
+            <a href="your-link-here.html">
+                <picture>
+                    <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                    <img src="../../media/portrait.jpg" alt="">
+                </picture>
+            </a>
+        </div>
+        <div class="left-bottom">
+            <a href="your-link-here.html">
+                <picture>
+                    <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                    <img src="../../media/portrait.jpg" alt="">
+                </picture>
+            </a>
+        </div>
+    </div>
+
+    <!-- Right side (centralized image) -->
+    <div class="right">
+        <a href="your-link-here.html">
+            <picture>
+                <source srcset="../../media/portrait.jpg" media="(min-width: 768px)">
+                <img src="../../media/portrait.jpg" alt="">
+            </picture>
+        </a>
+    </div>
+</div>

@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About - Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --cream: #f5f0e8;
+    --bone: #ede8dc;
+    --ink: #1a1714;
+    --charcoal: #2e2a26;
+    --gold: #b89a6a;
+    --gold-light: #d4b896;
+    --muted: #7a7268;
+    --text-strong: #2b2520;
+    --text-body: #52483d;
+    --text-soft: #6d6255;
+    --rule: rgba(26,23,20,0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bone); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 0; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--charcoal); }
+
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(245, 240, 232, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 56px;
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .nav-link {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .nav-link:hover { color: var(--ink); }
+  .nav-link.active { color: var(--gold); }
+
+  .hero {
+    position: relative;
+    padding: 100px 60px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: end;
+    border-bottom: 1px solid var(--rule);
+    animation: fadeDown 1.2s ease both;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: 'ABOUT';
+    position: absolute;
+    right: -20px;
+    bottom: -10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(80px, 14vw, 160px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: rgba(184,154,106,0.07);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .hero-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    line-height: 0.95;
+    color: var(--ink);
+  }
+
+  .hero-name em { font-style: italic; color: var(--charcoal); }
+
+  .hero-rule {
+    width: 50px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--text-body);
+    max-width: 420px;
+  }
+
+  .hero-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 8px;
+  }
+
+  .hero-visual {
+    position: absolute;
+    left: 34%;
+    top: 44%;
+    transform: translate(0, 0);
+    z-index: 2;
+  }
+
+  .hero-gif-wrap {
+    width: 218px;
+  }
+
+  .hero-gif {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 22px rgba(26, 23, 20, 0.08));
+  }
+
+  .hero-intro {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    line-height: 2;
+    color: var(--text-body);
+  }
+
+  .profile-section {
+    position: relative;
+    padding: 80px 60px;
+    border-bottom: 1px solid var(--rule);
+    animation: fadeUp 1s ease 0.2s both;
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    max-width: 920px;
+  }
+
+  .profile-visual {
+    position: absolute;
+    right: 72px;
+    bottom: 28px;
+    width: 240px;
+    pointer-events: none;
+  }
+
+  .profile-gif {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 28px rgba(26, 23, 20, 0.08));
+  }
+
+  .content-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .block-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .block-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+    max-width: 60px;
+  }
+
+  .block-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    color: var(--text-strong);
+  }
+
+  .block-heading em { font-style: italic; }
+
+  .block-body {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 2;
+    color: var(--text-body);
+  }
+
+  .tags-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .tag {
+    padding: 6px 14px;
+    border: 1px solid var(--rule);
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    transition: all 0.2s ease;
+    background: rgba(255,255,255,0.35);
+  }
+
+  .tag:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(184,154,106,0.05);
+  }
+
+  .resume-section {
+    padding: 80px 60px;
+    border-bottom: 1px solid var(--rule);
+    animation: fadeUp 1s ease 0.3s both;
+  }
+
+  .resume-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+    gap: 40px;
+  }
+
+  .resume-sidebar,
+  .resume-main {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .resume-card {
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(26,23,20,0.14);
+    padding: 28px 28px 30px;
+  }
+
+  .resume-card + .resume-card {
+    margin-top: 0;
+  }
+
+  .resume-card-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+    display: inline-block;
+  }
+
+  .resume-item + .resume-item {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .resume-kicker {
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+  }
+
+  .resume-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+    color: var(--text-strong);
+    margin-bottom: 6px;
+  }
+
+  .resume-subtitle {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .resume-text {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.95;
+    color: var(--text-body);
+  }
+
+  .resume-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .resume-list li {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    line-height: 1.85;
+    color: var(--text-body);
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .resume-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  .mini-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .mini-tag {
+    padding: 7px 12px;
+    border: 1px solid var(--rule);
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    background: rgba(255,255,255,0.62);
+  }
+
+
+  .cta-section {
+    position: relative;
+    padding: 80px 60px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 60px;
+    align-items: center;
+    border-bottom: 1px solid var(--rule);
+    animation: fadeUp 1s ease 0.5s both;
+  }
+
+  .cta-visual {
+    position: absolute;
+    left: 69%;
+    top: 61%;
+    transform: translate(-50%, -42%);
+    width: 150px;
+    pointer-events: none;
+  }
+
+  .cta-gif {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 24px rgba(26, 23, 20, 0.08));
+  }
+
+  .cta-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cta-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  .cta-heading em { font-style: italic; }
+
+  .cta-sub {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--text-body);
+    line-height: 1.8;
+  }
+
+  .cta-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .btn-primary {
+    padding: 14px 36px;
+    background: var(--ink);
+    color: var(--cream);
+    border: 1px solid var(--ink);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover { background: transparent; color: var(--ink); }
+
+  .btn-secondary {
+    padding: 14px 36px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+  .site-footer {
+    border-top: 1px solid var(--rule);
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--text-soft);
+  }
+
+  .footer-back {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-back:hover { color: var(--ink); }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 900px) {
+    .site-header { padding: 50px 24px 40px; }
+    .nav-bar { padding: 0 24px; }
+    .hero {
+      padding: 60px 24px 50px;
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .hero::after { display: none; }
+    .hero-tagline { max-width: 100%; }
+    .hero-visual {
+      position: static;
+      transform: none;
+      margin-top: 6px;
+      align-self: flex-start;
+    }
+    .hero-gif-wrap { width: min(150px, 48%); }
+    .profile-section { padding: 50px 24px; }
+    .profile-visual {
+      position: static;
+      width: min(220px, 55%);
+      margin: 8px 0 0 auto;
+    }
+    .resume-section { padding: 50px 24px; }
+    .cta-visual {
+      position: static;
+      transform: none;
+      width: min(180px, 48%);
+      margin: 16px 0 0 auto;
+    }
+    .resume-grid { grid-template-columns: 1fr; gap: 24px; }
+    .cta-section {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding: 50px 24px;
+    }
+    .cta-actions {
+      align-items: flex-start;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    .site-footer {
+      padding: 30px 24px;
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav-bar">
+  <div class="nav-left">
+    <span class="nav-logo">Portfolio</span>
+    <div class="nav-links">
+      <a href="about.html" class="nav-link active">About</a>
+      <a href="myportfolio/" class="nav-link">Work</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-left">
+    <span class="eyebrow">About Me</span>
+    <h1 class="hero-name">Brian <em>Lua</em><br>Zhi Heng</h1>
+    <div class="hero-rule"></div>
+    <p class="hero-tagline">Software development, business analysis, and data automation across e-commerce, government, and research domains.</p>
+  </div>
+  <div class="hero-right">
+    <p class="hero-intro">I am currently working as an IT Business Analyst at Charles &amp; Keith, with experience across software development, business analysis, and data-focused work. My background spans e-commerce, enterprise systems, and research-driven projects, with practice in both technical execution and translating business requirements into implementation.</p>
+    <p class="hero-intro">I graduated from Nanyang Technological University in 2025 with a degree in Computer Science, and I am comfortable moving between coding, platform administration, and analytical work. This portfolio serves as supporting evidence of my front-end experience, particularly in responsive implementation and user-facing digital presentation.</p>
+    <p class="hero-intro">I am open to opportunities where I can contribute to software, digital product, business analysis, or data-related work, especially in roles that value both technical understanding and practical execution.</p>
+    <div class="hero-visual">
+      <div class="hero-gif-wrap">
+        <img class="hero-gif" src="cute-kitty-animated-gif.gif" alt="Animated cat sticker">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="profile-section">
+  <div class="profile-visual" aria-hidden="true">
+    <img class="profile-gif" src="cute-seal-doodle.gif" alt="">
+  </div>
+  <div class="about-content">
+    <div class="content-block">
+      <span class="block-label">Profile</span>
+      <h2 class="block-heading">Current <em>focus</em></h2>
+      <p class="block-body">My current role at Charles &amp; Keith combines business analysis with hands-on digital execution. I work on Salesforce Commerce Cloud storefront experiences, platform administration, and requirement gathering, while supporting homepage, editorial, and campaign page delivery through HTML, CSS, and JavaScript.</p>
+      <p class="block-body">This work has strengthened my interest in front-end implementation, especially where business needs, structured thinking, and user-facing presentation intersect in a live e-commerce environment.</p>
+    </div>
+
+    <div class="content-block">
+      <span class="block-label">Approach</span>
+      <h2 class="block-heading">How I <em>work</em></h2>
+      <p class="block-body">I value work that is clear, structured, and practical. My approach is shaped by analytical thinking, careful implementation, and an interest in how digital experiences are delivered in a way that is both functional and polished.</p>
+    </div>
+
+    <div class="content-block">
+      <span class="block-label">Core Areas</span>
+      <h2 class="block-heading">What I <em>do</em></h2>
+      <p class="block-body">This portfolio highlights selected front-end and user-facing work, while the resume sections below provide a broader view of experience across software, business analysis, enterprise systems, and project delivery.</p>
+      <div class="tags-wrap">
+        <span class="tag">Business Analysis</span>
+        <span class="tag">Front-End Development</span>
+        <span class="tag">SFCC</span>
+        <span class="tag">HTML CSS JavaScript</span>
+        <span class="tag">Python</span>
+        <span class="tag">Requirements Gathering</span>
+        <span class="tag">Platform Administration</span>
+        <span class="tag">User-Facing Digital Work</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="resume-section">
+  <div class="resume-grid">
+    <div class="resume-sidebar">
+      <div class="resume-card">
+        <span class="resume-card-label">Skills</span>
+        <div class="mini-tags">
+          <span class="mini-tag">Python</span>
+          <span class="mini-tag">JavaScript</span>
+          <span class="mini-tag">HTML5</span>
+          <span class="mini-tag">CSS3</span>
+          <span class="mini-tag">Flask</span>
+          <span class="mini-tag">SFCC</span>
+          <span class="mini-tag">ABAP</span>
+          <span class="mini-tag">GitHub</span>
+        </div>
+      </div>
+
+      <div class="resume-card">
+        <span class="resume-card-label">Education</span>
+        <div class="resume-item">
+          <div class="resume-kicker">Aug 2021 - May 2025</div>
+          <h3 class="resume-title">B.Comp. Computer Science</h3>
+          <div class="resume-subtitle">Nanyang Technological University - Singapore</div>
+          <p class="resume-text">Computer Science graduate with project experience spanning software development, data analysis, AI-assisted tools, and digital product implementation.</p>
+        </div>
+        <div class="resume-item">
+          <div class="resume-kicker">Apr 2016 - May 2019</div>
+          <h3 class="resume-title">Diploma in Aerospace Electronics</h3>
+          <div class="resume-subtitle">Ngee Ann Polytechnic - Singapore</div>
+          <p class="resume-text">Recognitions include Director's List (2017), Edusave Merit Bursary (2017-2019), and finalist placement in the Lee Hsien Loong Interactive Digital Smart Nation Award 2019.</p>
+        </div>
+      </div>
+
+      <div class="resume-card">
+        <span class="resume-card-label">Projects</span>
+        <div class="resume-item">
+          <div class="resume-kicker">Portfolio Highlights</div>
+          <p class="resume-text">Selected work in this portfolio reflects experience across responsive layout, multimedia presentation, interaction patterns, and user-facing implementation. Additional technical projects from my resume include AI, analytics, automation, and hardware-linked prototypes.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="resume-main">
+      <div class="resume-card">
+        <span class="resume-card-label">Experience</span>
+
+        <div class="resume-item">
+          <div class="resume-kicker">Jul 2025 - Present</div>
+          <h3 class="resume-title">IT Business Analyst</h3>
+          <div class="resume-subtitle">Charles &amp; Keith - Singapore</div>
+          <p class="resume-text">Work across e-commerce delivery, platform administration, and stakeholder requirement gathering, with direct involvement in storefront content and campaign implementation on Salesforce Commerce Cloud.</p>
+          <ul class="resume-list">
+            <li>Developed and maintained homepage, editorial, and campaign storefront experiences through HTML, CSS, and JavaScript on Salesforce Commerce Cloud.</li>
+            <li>Owned SFCC Business Manager administration across content assets, site preferences, and catalog-related configuration while supporting zero-downtime launches.</li>
+            <li>Gathered and translated business requirements from marketing and operations stakeholders into clearer functional specifications and delivery priorities.</li>
+            <li>Partnered with backend engineering teams on feature scoping, implementation planning, and platform improvements.</li>
+          </ul>
+        </div>
+
+        <div class="resume-item">
+          <div class="resume-kicker">Aug - Dec 2023</div>
+          <h3 class="resume-title">Data Analyst Intern (SAP Developer Team)</h3>
+          <div class="resume-subtitle">NCS - Singapore</div>
+          <p class="resume-text">Worked within a large-scale SAP environment supporting government digital services, combining ABAP development work with structured data and release-related tasks.</p>
+          <ul class="resume-list">
+            <li>Delivered 11 Change Requests in 17 weeks across services including Career@Gov and the Payroll Admin Portal, with zero rollbacks.</li>
+            <li>Performed ABAP backend development and structured data management tasks in an enterprise SAP environment.</li>
+            <li>Managed workload independently in a fast-paced team setting with minimal supervision.</li>
+          </ul>
+        </div>
+
+        <div class="resume-item">
+          <div class="resume-kicker">Apr - Jul 2019</div>
+          <h3 class="resume-title">Project Engineer</h3>
+          <div class="resume-subtitle">Ngee Ann Polytechnic - Singapore</div>
+          <p class="resume-text">Served as sole developer for a live multi-drone synchronisation system built for public demonstration.</p>
+          <ul class="resume-list">
+            <li>Built a real-time multi-drone synchronisation system using Python, Packet Sender, and the Tello Edu SDK.</li>
+            <li>Demonstrated the system live to more than 30 attendees at Innopoly Forum 2019.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="resume-card">
+        <span class="resume-card-label">Selected Front-End Work</span>
+
+        <div class="resume-item">
+          <div class="resume-kicker">Portfolio-Based Experience</div>
+          <h3 class="resume-title">User-Facing Digital Projects</h3>
+          <p class="resume-text">This portfolio serves as supporting work for front-end experience, showing practice in responsive page construction, interaction-led layouts, and polished digital presentation developed alongside my broader technical and business analysis background.</p>
+          <ul class="resume-list">
+            <li>Built and refined HTML pages with attention to structure, layout, responsiveness, and on-brand execution.</li>
+            <li>Worked with campaign and editorial page formats that required careful positioning, responsive behaviour, and visual consistency across screen sizes.</li>
+            <li>Applied richer user-facing patterns including sliders, multimedia sections, campaign storytelling, and more interactive page behaviours.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-left">
+    <h2 class="cta-heading">Open to <br><em>opportunities</em></h2>
+    <p class="cta-sub">Interested in roles across software, digital product, business analysis, and user-facing implementation.<br>View selected projects or get in touch.</p>
+  </div>
+  <div class="cta-visual" aria-hidden="true">
+    <img class="cta-gif" src="cute-pikachu.gif" alt="">
+  </div>
+  <div class="cta-actions">
+    <a href="mailto:luatan68@hotmail.com" class="btn-primary">Get in Touch -></a>
+    <a href="myportfolio/" class="btn-secondary">View Work</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <span class="footer-mark">Portfolio - About</span>
+  <a href="myportfolio/" class="footer-back">Back to Work</a>
+</footer>
+
+</body>
+</html>

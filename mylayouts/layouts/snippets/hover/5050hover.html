@@ -1,0 +1,98 @@
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css">
+  <link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css">
+  
+  <style>
+/* Hover Half Section */
+.hover-half-section {
+  width: 100%;
+}
+
+/* Hover Half Grid */
+.hover-half-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+/* Hover Half Block */
+.hover-half-block {
+  aspect-ratio: 4 / 3;
+  flex: 1 1 48%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hover Half Block > Img */
+.hover-half-block img {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  transition: opacity 0.4s ease;
+  width: 100%;
+}
+
+/* Hover Half Block > Hover Img */
+.hover-half-block .hover-img {
+  opacity: 0;
+  z-index: 2;
+}
+
+/* Hover Half Block > Hover Img */
+.hover-half-block:hover .hover-img {
+  opacity: 1;
+}
+
+/* Hover Half Block > Default Img */
+.hover-half-block:hover .default-img {
+  opacity: 0;
+}
+
+/* Hover Half Caption */
+.hover-half-caption {
+  bottom: 10px;
+  font-size: 0.9rem;
+  left: 10px;
+  padding: 4px 8px;
+  position: absolute;
+  z-index: 3;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Hover Half Block */
+  .hover-half-block {
+    flex: 1 1 100%;
+    gap: 0px;
+  }
+}
+</style>
+
+<p id="discoverstories" class="mt-md-5 text-center text-md-left w-full pl-md-5" style="font-size: 35px; font-family: 'proxima-nova';">
+    Discover Stories
+</p>
+
+<section class="hover-half-section">
+    <div class="hover-half-grid">
+        <!-- Story 1 -->
+        <div class="hover-half-block">
+        <img src="https://picsum.photos/800/600?random=1" alt="Coming Soon">
+        <div class="hover-half-caption">Coming Soon</div>
+        </div>
+
+        <!-- Story 2 -->
+        <div class="hover-half-block">
+        <a href="$url('Page-Show','cid','the-jatte-living')$">
+            <img src="../../media/landscape.jpg" class="default-img d-none d-md-block" alt="The Jatte Living">
+            <img src="../../media/landscape.jpg" class="hover-img d-none d-md-block" alt="The Jatte Living Hover">
+            <img src="../../media/landscape.jpg" class="d-block d-md-none" alt="The Jatte Living Mobile">
+            <div class="hover-half-caption">The Jatte Living</div>
+        </a>
+        </div>
+    </div>
+</section>

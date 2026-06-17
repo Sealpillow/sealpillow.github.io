@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+body,
+html {
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+    /*background-color: #e8e8e8;*/
+    color: black;
+    text-wrap: pretty;
+}
+ a{
+  font-family: "Proxima Nova";
+  font-size: 14px !important;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  display: inline-block;
+  vertical-align: middle; /* Align the hover text properly */
+  color: black !important;
+}
+
+.folder-page_title {
+  margin: 18px auto 18px
+}
+.code-spacing{
+  padding-top: 50px;
+}
+.folder-header {
+    visibility: hidden;
+    display: none;
+}
+.folder_post .folder-container .container {
+    display: none;
+}
+
+.folder_post-content{
+  font-size: 14px;
+}
+/* Overview Section Styles */
+
+.overview-section {
+    text-align: center;
+    padding-top: 40px;
+    padding-bottom: 20px;
+}
+/* Header Style */
+.overview-header {
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Redirect links container in a single row */
+.section-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Space between the links */
+    font-size: 14px;
+}
+
+  /* Normal text links */
+.section-links a {
+    text-decoration: none;
+    transition: color 0.3s, text-decoration 0.3s;
+}
+
+/* Active link underline */
+.section-links a.active {
+    text-decoration: underline;
+}
+
+/* Hover effect */
+.section-links a:hover {
+    text-decoration: underline; 
+    color: black;
+}
+
+/* Common Hover Box Styling */
+.hover-box {
+    position: relative;
+}
+
+/* Media Styles for Hover Effects (images + videos) */
+.hover-box img,
+.hover-box video {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    width: 288px;
+    height: 162px;
+}
+
+/* Media below the word */
+.hover-box.bottom img,
+.hover-box.bottom video {
+    top: 100%;   /* Appears just below the word */
+    right: 0%;
+}
+
+/* Media to the left of the word */
+.hover-box.left img,
+.hover-box.left video {
+    top: 0;
+    right: 105%;
+}
+
+/* Media to the right of the word */
+.hover-box.right img,
+.hover-box.right video {
+    top: 0;
+    left: 105%;
+}
+
+/* Show the media when hovering */
+.hover-box:hover img,
+.hover-box:hover video {
+    display: block;
+}
+
+/* publish-content */
+.publish-content {
+    margin-top: auto;
+    width: 100%;
+    padding: 20px; /* top, right, bottom, left */
+    text-align: left;
+    font-size: 16px;
+    box-sizing: border-box; /* Prevents overflow from padding */
+}
+
+.publish-content a {
+    color: #000;
+    text-decoration: none;
+}
+
+/* Content Sections Styles */
+.bag1-content,
+  .bag2-content{
+    display: none;
+}
+
+.bag1-content p 
+.bag2-content p {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Container for the entire content */
+.content-wrapper {
+    width: 100%;
+    margin: 0 auto;
+}
+
+video,
+img {
+    clip-path: fill-box; 
+}
+
+/* Container for Overview section */
+.overview-container {
+    margin: 0 auto;
+}
+
+
+/* Center paragraphs */
+.bag1-content p,
+.publish-content p,
+.folder-text {
+  text-align: left;
+  width: 50%;
+}
+.folder-page_title {
+  font-family: "aktiv-grotesk-extended", sans-serif; 
+  font-size: 45px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+}
+/* Mobile (screen width 768px and below) */
+@media (max-width: 768px) {
+  .bag1-content p, 
+  .publish-content p, 
+  .folder-text {
+      text-align: left;   /* or keep left if you prefer */
+      width: 80%;           /* make it full width for mobile */
+      margin: 0 auto;       /* keep centered */
+  }
+  .folder-page_title{
+    font-size: 35px;
+    line-height: 40px;
+  }
+}
+.text-block {
+  position: relative; /* container for overlap */
+  width: 495px;
+  margin: 0 auto;
+}
+
+.left-text {
+  position: absolute;
+  top: 0;
+  left: -247px;  /* shift left to overlap margin area */
+  width: 230px;
+  margin: 0;
+  font-family: "Proxima Nova";
+  font-size: 14px;
+  font-style: italic;
+}
+
+.right-text {
+  width: 495px !important;
+  padding-left: 247px;
+  font-size: 14px;
+  margin: 0 auto;
+}
+.right2-text {
+  width: 495px !important;
+  margin: 0 auto;
+}
+.middle-text {
+  width: 495px !important;
+  padding-right: 247px;
+  margin: 0 auto;
+}
+.standard-text{
+  width: 495px !important;
+  margin: 0 auto;
+}
+.center-text{
+  text-align:center; 
+  margin: 0 auto;
+}
+.left-align-center-text{
+  width: 80%;
+  text-align: left;
+  margin: 0 auto;
+}
+.signature{
+  font-family: rafaella, sans-serif; 
+  font-weight: 400;
+  font-style: normal; 
+  font-size: 20px; 
+  width: 100%; 
+  text-align: center;
+  padding: 50px 0;
+}
+.video-padding {
+    padding: 50px 0;
+    width: 80%;
+    margin: 0 auto;
+    object-fit: contain;
+    display: flex;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- Overview Container -->
+<div class="overview-container">
+    <!-- Overview Section -->
+    <p class="folder-text" style ="text-align: center; margin: 0 auto;">The Art of Perspective</p>
+    <h1 class="folder-page_title--category text-center folder-page_title">A Season That Remembers&nbsp;</h1>
+    <p class="folder-text" style ="text-align: center; margin: 0 auto;">AI-Driven Expression</p>
+    <section class="overview-section">
+        
+        <!-- Redirect links -->
+        <div class="section-links">
+          <a href="#sectionstory" id="storyLink" onclick="toggleContent('story')" class="active">The Story</a>
+          <a href="#sectionprocess" id="processLink" onclick="toggleContent('process')">Process & Exploration</a>
+        </div>
+    </section>
+</div>
+
+<!-- Content Wrapper (for other sections) -->
+<div class="content-wrapper">
+  <!-- The Story Section Desktop Version -->
+  <div id="sectionstory" class ="sectionstory bag1-content" style="display: block;">
+    <div class="d-md-block d-none">
+      <div class="row no-gutters position-relative text-center">
+        <!-- Desktop Video -->
+        <div class="d-none d-md-block" style="width: 100%;">
+          <video autoplay loop muted playsinline webkit-playsinline style="width: 100%; height: auto; object-fit: contain;">
+            <source src="images/the-art-of-perspective-season-that-remembers/story-a1.mp4?$staticlink$" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+      <div class="code-spacing"></div>
+      <div class="text-block">
+        <p class="left-text">Hover to see the mood unfold</p>
+        <p class="right-text">
+          No one is really ever ready for Fall.<br>
+          And certainly not the people (us) who begin this season every year with the same unfounded certainty: <br>
+          time will be different.<br><br><br>
+        </p>
+      </div>
+
+      <p class="middle-text">And yet here it is again.<br>The sky bruises just a little earlier.<br>The light thins.<br>A new kind of quiet creeps in around the edges of everything.<br><br><br></p>
+
+      <p class="standard-text">“Developing an 
+          <span class="hover-box right">
+              <span style="color:black;cursor:pointer;font-weight: bold;">awareness of how the sun rises</span>
+              <video autoplay muted loop playsinline>
+                  <source src="images/the-art-of-perspective-season-that-remembers/story-a1.mp4?$staticlink$" type="video/mp4" />
+              </video>
+          </span> 
+          and the <br>
+          <span class="hover-box bottom">
+              <span style="color:black;cursor:pointer;font-weight: bold;">seasons change</span>
+              <video autoplay muted loop playsinline>
+                  <source src="images/the-art-of-perspective-season-that-remembers/story-c1.mp4?$staticlink$" type="video/mp4" />
+              </video>
+          </span> 
+          was one trigger for humankind’s acquiring of consciousness,”<br>photographer and architect Hiroshi Sugimoto once said.<br><br>A beautiful thought.<br><br>That we didn’t always know time was passing, we had to learn it. And now that we do, we cling to the seasons like they’re mile markers on a road we don’t remember getting on.
+      </p>
+      <p class="right-text"><br><br>Fall, in particular, reminds us that we’re no longer who we were in summer. Routines have shifted and anxieties have changed outfits. And maybe we’ve gotten just a bit better at being in the world.<br><br>Not more productive, just more 
+          <span class="hover-box left">
+              <span style="color:black;cursor:pointer;font-weight: bold;">in tune with our inner selves.</span>
+              <video autoplay muted loop playsinline>
+                  <source src="images/the-art-of-perspective-season-that-remembers/story-d1.mp4?$staticlink$" type="video/mp4" />
+              </video>
+          </span>
+          <span class="hover-box right">Not because we’re returning to anything, but because 
+              <span style="color:black;cursor:pointer;font-weight: bold;">we’re becoming something else entirely.<br>Again.<br><br></span>
+              <video autoplay muted loop playsinline>
+                  <source src="images/the-art-of-perspective-season-that-remembers/story-e1.mp4?$staticlink$" type="video/mp4" />
+              </video>
+          </span> 
+      </p>
+
+      <p class="right-text">No pivot. No grand narrative.
+          <span class="hover-box right">
+              <span style="color:black;cursor:pointer;font-weight: bold;">Just a slow reorientation.</span>
+              <video autoplay muted loop playsinline>
+                  <source src="images/the-art-of-perspective-season-that-remembers/story-f1.mp4?$staticlink$" type="video/mp4" />
+              </video>
+          </span>
+      </p>
+
+      <p class="standard-text"><br><br>And so, like Sugimoto’s imagined future, where even ruins know how to frame the horizon line, we too adjust to the passing. Not clinging to permanence, but participating in its slow, elegant redoing.</p>
+
+      <p class="middle-text"><br><br>The Fall 2025 collection is shaped by this very idea. 
+          <span class="hover-box right">
+              <span style="color:black;cursor:pointer;font-weight: bold;">A response to shifting routines,</span>
+              <video autoplay muted loop playsinline>
+                  <source src="images/the-art-of-perspective-season-that-remembers/story-g1.mp4?$staticlink$" type="video/mp4" />
+              </video>
+          </span> evolving intentions, and the clarity that arrives when the world begins to turn inward.<br><br><br>
+      </p>
+
+      <p class="middle-text">Let the season move you.<br>Explore the Fall collection:</p>
+      <div class="code-spacing"></div>
+      <div class ="signature">
+            With regards, 
+            <br>
+            Pedro
+      </div>
+      <div class="code-spacing"></div>
+      <div style="text-align: center;">
+        <a href="#sectionprocess" id="processLink" onclick="toggleContent('process')" style="text-decoration: underline;">Process & Exploration</a>
+      </div>
+    </div>
+      <!-- The Story Section Mobile Version -->
+    <div class="d-block d-md-none">
+      <div class="row no-gutters position-relative">
+          <!-- Mobile Video -->
+          <div class="d-block d-md-none" style="width: 100%; margin: 0 auto 50 auto;">
+            <video autoplay loop muted playsinline webkit-playsinline style="width: 100%; height: auto; object-fit: contain;">
+              <source src="images/the-art-of-perspective-season-that-remembers/story-a1-mobile.mp4?$staticlink$" type="video/mp4" />
+            </video>
+          </div>
+      </div>
+      <p>No one is really ever ready for Fall. And certainly not the people (us) who begin this season every year with the same unfounded certainty: this time will be different.<br><br></p>
+      <p>And yet here it is again. The sky bruises just a little earlier. The light thins. A new kind of quiet creeps in around the edges of everything.</p>
+      <video class="video-padding" autoplay muted loop playsinline>
+          <source src="images/the-art-of-perspective-season-that-remembers/story-g1.mp4?$staticlink$" type="video/mp4" />
+      </video>
+
+      <p>“Developing an <span style="color:black;font-weight: bold;">awareness of how the sun rises</span> and the <span style="color:black;font-weight: bold;">seasons change </span>was one trigger for humankind’s acquiring of consciousness,” 
+        photographer and architect Hiroshi Sugimoto once said. A beautiful thought.
+          That we didn’t always know time was passing, we had to learn it. 
+          And now that we do, we cling to the seasons like they’re mile markers on a road we don’t remember getting on.
+      </p>    
+
+      <video class="video-padding" autoplay muted loop playsinline>
+          <source src="images/the-art-of-perspective-season-that-remembers/story-d1.mp4?$staticlink$" type="video/mp4" />
+      </video>
+      <p>Fall, in particular, reminds us that we’re no longer who we were in summer. Routines have shifted and anxieties have changed outfits. 
+          And maybe we’ve gotten just a bit better at being in the world. Not more productive, just more <span style="color:black;font-weight: bold;">in tune with our inner selves. </span>Not because we’re returning to anything, but because 
+          <span style="color:black;font-weight: bold;">we’re becoming something else entirely. Again.</span>
+      </p>
+      <video class="video-padding" autoplay muted loop playsinline >
+          <source src="images/the-art-of-perspective-season-that-remembers/story-e1.mp4?$staticlink$" type="video/mp4" />
+      </video>
+      <p>No pivot. No grand narrative.Just a <span style="color:black;font-weight: bold;">slow reorientation.</span> </p>
+      <video class="video-padding" autoplay muted loop playsinline>
+          <source src="images/the-art-of-perspective-season-that-remembers/story-f1.mp4?$staticlink$" type="video/mp4" />
+      </video>
+      <p>And so, like Sugimoto’s imagined future, where even ruins know how to frame the horizon line, we too adjust to the passing. Not clinging to permanence, but participating in its slow, elegant redoing.<br><br></p>
+      <p>The Fall 2025 collection is shaped by this very idea.
+        <span style="color:black;font-weight: bold;">A response to shifting routines,</span>
+        evolving intentions, and the clarity that arrives when the world begins to turn inward.
+      </p>
+      <video class="video-padding" autoplay muted loop playsinline>
+          <source src="images/the-art-of-perspective-season-that-remembers/story-c1.mp4?$staticlink$" type="video/mp4" />
+      </video>
+      <p>Let the season move you.<br>Explore the Fall collection:</p>
+      <div class="code-spacing"></div>
+      <div class ="signature">
+            With regards, 
+            <br>
+            Pedro
+      </div>
+      <div class="code-spacing"></div>
+      <div style="text-align: center;">
+        <a href="#sectionprocess" id="processLink" onclick="toggleContent('process')" style="text-decoration: underline;">Process & Exploration</a>
+      </div>
+    </div>
+  </div>
+  <!-- Process Section -->
+  <div id="sectionprocess" class="sectionprocess bag2-content">
+    <div class="row no-gutters position-relative text-center">
+        <!-- Desktop Video -->
+        <div class="d-none d-md-block" style="width: 100%;">
+          <video autoplay loop muted playsinline webkit-playsinline style="width: 939px; height: 624px; object-fit: contain;">
+            <source src="images/the-art-of-perspective-season-that-remembers/process-a1.mp4?$staticlink$" type="video/mp4" />
+          </video>
+        </div>
+        <!-- Mobile Video -->
+        <div class="d-block d-md-none" style="width: 100%;">
+          <video autoplay loop muted playsinline webkit-playsinline style="width: 414px; height: 530px; object-fit: contain;">
+            <source src="images/the-art-of-perspective-season-that-remembers/process-a1-mobile.mp4?$staticlink$" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+      <p class="d-none d-md-block center-text">We begin with the script: a distilled map of mood, intent, and story.</p>
+      <p class="d-block d-md-none left-align-center-text">We begin with the script: a distilled map of mood,<br>intent, and story.</p>
+      <div class="code-spacing"></div>
+      <div class="row no-gutters position-relative text-center">
+        <!-- Desktop Video -->
+        <div class="d-none d-md-block" style="width: 100%;">
+          <video autoplay loop muted playsinline webkit-playsinline style="width: 677px; height: 352px; object-fit: contain;">
+            <source src="images/the-art-of-perspective-season-that-remembers/process-b1.mp4?$staticlink$" type="video/mp4" />
+          </video>
+        </div>
+        <!-- Mobile Video -->
+        <div class="d-block d-md-none" style="width: 100%;">
+          <video autoplay loop muted playsinline webkit-playsinline style="width: 347px; height: 181px; object-fit: contain;">
+            <source src="images/the-art-of-perspective-season-that-remembers/process-b1.mp4?$staticlink$" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+      <p class="d-none d-md-block center-text" style = "font-size: 10px;">Breaking down Hiroshi Sugimoto’s Photography style</p>
+      <p class="d-block d-md-none center-text" style = "font-size: 10px;">Breaking down Hiroshi Sugimoto’s Photography style</p>
+      <div class="code-spacing"></div>
+      <p class="d-none d-md-block center-text">Style is broken down, element by element: contrast, texture, composition, tone.<br>
+          These fragments serve as the building blocks for the prompts that speak to AI, guiding it<br>to render something more than an image.</p>
+      <p class="d-block d-md-none left-align-center-text">Style is broken down, element by element: contrast, texture, composition, tone.
+          These fragments serve as the building blocks for the prompts that speak to AI, guiding it to render something more than an image.</p>
+      <div class="code-spacing"></div>
+      <div class="row no-gutters position-relative text-center">
+        <!-- Desktop Video -->
+        <div class="d-none d-md-block" style="width: 100%;">
+          <img style="margin:0 auto ;width: 663px;height:627px" src="images/the-art-of-perspective-season-that-remembers/process-c1.webp?$staticlink$" alt="Example image">
+        </div>
+        <!-- Mobile Video -->
+        <div class="d-block d-md-none" style="width: 100%;">
+          <img style="width: 100%;height:auto" src="images/the-art-of-perspective-season-that-remembers/process-c1.webp?$staticlink$" alt="Example image">
+        </div>
+      </div>
+      <div class="code-spacing"></div>
+      <p class="d-none d-md-block center-text">A translation of thought, a visualization of intent.</p>
+      <p class="d-block d-md-none left-align-center-text">A translation of thought, a visualization of intent.</p>
+      <div class="code-spacing"></div>
+      <div class="row no-gutters position-relative text-center">
+        <!-- Desktop Video -->
+        <div class="d-none d-md-block" style="width: 100%;">
+          <video autoplay loop muted playsinline webkit-playsinline style="width: 677px; height: 381px; object-fit: contain;">
+            <source src="images/the-art-of-perspective-season-that-remembers/process-d1.mp4?$staticlink$" type="video/mp4" />
+          </video>
+        </div>
+        <!-- Mobile Video -->
+        <div class="d-block d-md-none" style="width: 100%;">
+          <video autoplay loop muted playsinline webkit-playsinline style="width: 347px; height: 195px; object-fit: contain;">
+            <source src="images/the-art-of-perspective-season-that-remembers/process-d1.mp4?$staticlink$" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+      <div class="code-spacing"></div>
+      <p class="d-none d-md-block center-text">Here, AI becomes a collaborator, a conduit through which our vision is amplified, reinterpreted, and realized.</p>
+      <p class="d-block d-md-none left-align-center-text" s>Here, AI becomes a collaborator, a conduit through which our vision is amplified, reinterpreted, and realized.</p>
+      <div class="code-spacing"></div>
+      <div class ="signature">
+            With regards, 
+            <br>
+            Pedro
+      </div>
+      <div class="code-spacing"></div>
+      <div style="text-align: center;">
+        <a href="#sectionprocess" id="processLink" onclick="toggleContent('story')" style="text-decoration: underline;">The Story</a>
+      </div>
+  </div>
+  <div class="code-spacing"></div>
+  <!-- Publish Content -->
+  <div class="publish-content">
+      <span style="font-size: 18px;">
+        Published on 22 September 2025
+        <br><br>
+        <a href="$url('Search-Show','cgid','pwnewarrivals')$">SHOP WOMEN'S NEW ARRIVALS</a> &gt;
+        <br>
+        <a href="$url('Search-Show','cgid','pmnewarrivals')$">SHOP MEN'S NEW ARRIVALS</a> &gt;
+    </span>
+  </div>
+</div>
+
+
+
+<script>
+  function toggleContent(type) {
+      // Hide both content sections initially
+      document.getElementById('sectionstory').style.display = 'none';
+      document.getElementById('sectionprocess').style.display = 'none';
+
+      // Remove active class from all links
+      document.getElementById('storyLink').classList.remove('active');
+      document.getElementById('processLink').classList.remove('active');
+
+      // Show the selected content based on the 'type' passed
+      if (type === 'story') {
+          document.getElementById('sectionstory').style.display = 'block';
+          document.getElementById('storyLink').classList.add('active');
+      } else if (type === 'process') {
+          document.getElementById('sectionprocess').style.display = 'block';
+          document.getElementById('processLink').classList.add('active');
+      }
+  }
+</script>
+
+</body>
+
+</html>

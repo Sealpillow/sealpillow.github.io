@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+   body,
+    html {
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+        /*background-color: #e8e8e8;*/
+        text-wrap: pretty;
+        height:auto; /* make the pedro banner visible at the top when scrolling*/
+    }
+    .folder-header {
+        visibility: hidden;
+        display: none;
+    }
+    .folder_post .folder-container .container {
+      display: none;
+    }
+
+    .page.parallax {
+        padding-top: 0px !important;
+    }
+    .hero-section {
+        width: 100%;
+        text-align: center;
+        padding: 80px 20px 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .subtitle {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .title {
+        font-family: "aktiv grotesk ex";
+        font-size: 48px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0 0 20px 0;
+    }
+
+    .chevron {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        opacity: 0.8;
+    }
+      video {
+    clip-path: fill-box; 
+  }
+    video:focus {
+      outline: none;
+      color: transparent;
+  }
+    a {
+    text-decoration: none; /* remove underline by default */
+    color: black;
+    }
+
+    p{
+        font-family: "proxima-nova";
+        font-size: 14px;
+        width: 100%;
+        margin: 0 auto 16px auto;
+        text-align: center;
+        font-weight: 400;
+        line-height: normal;
+
+    }
+    /* Container for Overview section */
+    .overview-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex; /* Add flexbox to center its content */
+        justify-content: center; /* Horizontally center content */
+        align-items: center; /* Vertically center content (if needed) */
+        height: 20vh; /* Optional: Center within full viewport height */
+    }
+.discover-container {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.discover-container h2 {
+    font-family:aktiv grotesk ex;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.discover-subtitle {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 40px;
+}
+
+.discover-grid {
+    display: flex;
+    justify-content: center;   /* center horizontally */
+    align-items: center;       /* center vertically */
+    gap: 20px;                 /* spacing between items */
+    margin: 0 auto;
+    width:50%;
+}
+@media (max-width: 767px) {
+    .discover-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        width: 80%; /* optional tuning */
+    }
+}
+.discover-item {
+text-align: center;
+opacity: 0.55;                /* default faded */
+transition: opacity 0.3s;
+}
+
+.discover-item img {
+    width: 55%;
+}
+
+/* Hover = full opacity */
+.discover-item:hover {
+    opacity: 1;
+}
+
+/* Active state = full opacity */
+.discover-item.active {
+    opacity: 1;
+}
+.discover-item a {
+    text-decoration: none;
+}
+.discover-label {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #bbb;
+    transition: color 0.3s;
+}
+
+.discover-item:hover .discover-label,
+.discover-item.active .discover-label {
+    color: #000;
+}
+
+
+.active-label {
+    color: #000;
+    font-weight: 500;
+}
+.doll-content {
+    display: none;
+}
+
+
+.image-content-container {
+    display: flex;
+    flex-wrap: wrap;
+    /*border-left: 1px solid black;  Outer left border */
+    border-top: 1px solid black;  /* Outer top border */
+}
+
+.media-box h1 {
+    font-family: aktiv grotesk ex;
+    font-size: 50px;
+    font-weight: 700;
+    padding-left: 10px;
+    border-bottom: 1px solid black;/* Shared bottom border */
+    margin-bottom: 0px;
+    
+}
+
+.media-box h1 span {
+    font-family:aktiv grotesk ex;
+    font-size: 20px;
+    font-weight: 400;
+    margin-left: 10px;
+    
+}
+
+.media-box {
+    flex: 0 0 50%;                 /* 50% width, two per row */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    border-bottom: 1px solid black; /* Shared bottom border */
+    box-sizing: border-box;
+}
+
+/* h2 stays at the top naturally */
+
+/* centers the p in the space below the h2 */
+.paragraph-wrapper {
+    flex: 1;                     /* takes up the remaining space */
+    display: flex;
+    justify-content: center;     /* center vertically */
+    align-items: center;         /* center horizontally */
+    text-align: center;
+    width:80%;
+    margin: 0 auto;
+}
+
+.paragraph-wrapper p {
+    margin: 0;
+}
+
+</style>
+</head>
+
+<body>
+
+
+<div class="hero-section d-block d-md-none">
+    <p class="subtitle">A New Winter Favourite Arrives</p>
+
+    <h1 class="title">
+        Meet The<br>
+        PEDRO Sidekicks
+    </h1>
+
+    <div class="chevron">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9L12 15L18 9"
+                stroke="black" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+</div>
+<!-- Web -->
+<div class="d-md-flex d-none js-vertical-slider" 
+    style="position: relative; width: 100%; overflow: hidden;">
+
+    <!-- Image Background -->
+    <img src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_01.webp?$staticlink$"
+        alt="Background Image"
+        style="width: 100%; height: 100%; object-fit: cover;">
+</div>
+
+<!-- Mobile -->
+<div class="container-fluid d-block d-md-none px-0" style ="margin-top: 20px;">
+    <!-- Top Image -->
+    <img loading ="lazy" 
+        src="images//meet-the-pedro-sidekicks/moru-gwp-editorial-mobile_01.webp?$staticlink$" 
+        alt="Top Image" 
+        class="img-fluid w-100"
+    />
+</div>
+
+<!-- Web -->
+<section class="block-1 d-md-block d-none">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        <p>
+            Winter has a way of making the world feel smaller and a habit of reshuffling moods.<br>
+            The season shifts, and with it comes the thrill of discovering subtle joys that feel entirely your own.
+        </p>
+        <p>
+            The PEDRO Sidekicks return this winter, reimagined and ready to charm. This four-part series <br>
+            combines collectible fun with personality-driven storytelling, each doll carrying seasonal flair and its <br>
+            own narrative, because even your holiday décor should have a story to tell.
+        </p>
+        <p>
+            This is retail therapy with lore.
+        </p>
+    </div>
+</section>
+
+<!-- Mobile -->
+<section class="block-1 d-block d-md-none">
+    <div class="position-relative text-center" style="margin: 100px auto;width: 73%;">
+        <p>
+            Winter has a way of making the world feel smaller and a habit of reshuffling moods.
+            The season shifts, and with it comes the thrill of discovering subtle joys that feel entirely your own.
+        </p>
+        <p>
+            The PEDRO Sidekicks return this winter, reimagined and ready to charm. This four-part series 
+            combines collectible fun with personality-driven storytelling, each doll carrying seasonal flair and its 
+            own narrative, because even your holiday décor should have a story to tell.
+        </p>
+        <p>
+            This is retail therapy with lore.
+        </p>
+    </div>
+</section>
+
+<!-- Web -->
+<div class="d-md-flex d-none" style="display:flex; justify-content:center; align-items:center;">
+
+    <video autoplay muted loop playsinline
+        style="width:30%; object-fit:cover; display:block; margin:0 auto;">
+        <source src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_02.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+</div>
+
+<!-- Mobile -->
+<div class="container-fluid d-block d-md-none px-0" style ="margin-top: 100px;">
+    <!-- Top Image -->
+    <video autoplay muted loop playsinline
+        style="width:100%; object-fit:cover; display:block; margin:0 auto;">
+        <source src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_02.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+</div>
+
+<div class="discover-container ">
+    <h2>Discover Their World</h2>
+    <p class="discover-subtitle">
+        Each doll carries their own story. Click to meet them where they live, think, and dream this winter.
+    </p>
+
+    <div class="discover-grid">
+
+        <div class="discover-item active">
+            <a href="#cloud" onclick="showDoll('cloud')" class="discover-link">
+                <img src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_03.webp?$staticlink$" alt="Cloud Doll">
+                <span class="discover-label" id="label-cloud">Cloud</span>
+            </a>
+        </div>
+
+        <div class="discover-item">
+            <a href="#marble" onclick="showDoll('marble')" class="discover-link">
+                <img src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_04.webp?$staticlink$" alt="Cloud Doll">
+                <span class="discover-label" id="label-marble">Marble</span>
+            </a>
+        </div>
+
+        <div class="discover-item">
+            <a href="#dover" onclick="showDoll('dover')" class="discover-link">
+                <img src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_05.webp?$staticlink$" alt="Cloud Doll">
+                <span class="discover-label" id="label-dover">Dover</span>
+            </a>
+        </div>
+
+        <div class="discover-item">
+            <a href="#frosty" onclick="showDoll('frosty')" class="discover-link">
+                <img src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_06.webp?$staticlink$" alt="Cloud Doll">
+                <span class="discover-label " id="label-frosty">Frosty</span>
+            </a>
+        </div>
+
+        
+
+    </div>
+</div>
+
+
+
+
+<div id="cloud-content" class="doll-content" style="display: block;">
+    <div class="image-content-container d-md-flex d-none" style="width: 100%; height: 100%;">
+        <div class="media-container" style="display: flex;">
+            <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; border-right: 1px solid black; ">
+                <img src="images//meet-the-pedro-sidekicks/cloud/moru-gwp-editorial_07.webp?$staticlink$" 
+                    alt="Bag" 
+                    style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+
+            <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; ">
+                <img src="images//meet-the-pedro-sidekicks/cloud/moru-gwp-editorial_08.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+        <div class="media-container" style="display: flex;">
+            <div class="media-box" style="border-right: 1px solid black;">
+                <h1>Cloud <span>The Dreamer</span></h1>
+
+                <!-- This wrapper will center the paragraph -->
+                <div class="paragraph-wrapper">
+                    <p>
+                        Cloud drifts through life as if the world were one long, half-written story. 
+                        Their mind is always elsewhere, and logic comes second if at all. Schedules exist only as suggestions, 
+                        and they float in and out of moments, leaving traces of inspiration behind. 
+                        People chase results, but Cloud inspires imagination, a fleeting spark that lingers long after they have moved on.
+                    </p>
+                </div>
+            </div>
+
+            <div class="media-box" style="align-items: center; ">
+                <img 
+                    src="images//meet-the-pedro-sidekicks/cloud/moru-gwp-editorial_09.webp?$staticlink$"
+                    alt="Bag"
+                    style="width: 70%; height: auto; object-fit: cover; margin: 30px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile -->
+    <div class="image-content-container d-block d-md-none" style="width: 100%; height: 100%;">
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; ">
+            <img src="images//meet-the-pedro-sidekicks/cloud/moru-gwp-editorial_07.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden;">
+            <img src="images//meet-the-pedro-sidekicks/cloud/moru-gwp-editorial_08.webp?$staticlink$" 
+            alt="Bag" 
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; border-bottom: 0px solid black;">
+            <h1>Cloud <span>The Dreamer</span></h1>
+        </div>
+        <div class="media-box" style="align-items: center;">
+            <img 
+                src="images//meet-the-pedro-sidekicks/cloud/moru-gwp-editorial_09.webp?$staticlink$"
+                alt="Bag"
+                style="width: 70%; height: auto; object-fit: cover; margin: 30px;">
+        </div>
+        <div class="media-container">
+            <div class="media-box">
+            <!-- This wrapper will center the paragraph -->
+                <div class="paragraph-wrapper" style="margin: 10% auto;">
+                    <p>
+                        Cloud drifts through life as if the world were one long, half-written story. 
+                        Their mind is always elsewhere, and logic comes second if at all. Schedules exist only as suggestions, 
+                        and they float in and out of moments, leaving traces of inspiration behind. 
+                        People chase results, but Cloud inspires imagination, a fleeting spark that lingers long after they have moved on.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="marble-content" class="doll-content">
+    <div class="image-content-container d-md-flex d-none" style="width: 100%; height: 100%;">
+        <div class="media-container" style="display: flex;">
+            <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; border-right: 1px solid black;">
+                <img src="images//meet-the-pedro-sidekicks/marble/moru-gwp-editorial_07.webp?$staticlink$" 
+                    alt="Bag" 
+                    style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+
+            <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; ">
+                <img src="images//meet-the-pedro-sidekicks/marble/moru-gwp-editorial_08.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+        <div class="media-container" style="display: flex;">
+            <div class="media-box" style="border-right: 1px solid black;">
+                <h1>Marble <span>The Mastermind</span></h1>
+
+                <!-- This wrapper will center the paragraph -->
+                <div class="paragraph-wrapper">
+                    <p>
+                        Marble has a talent for turning chaos into opportunity. Ideas spill from their notebooks as
+                        quickly as coffee spills from their cup, forming plans that somehow make sense only to them. 
+                        Short legs may slow their pace but never their ambition, and they manage to stay two steps ahead. 
+                        Following them is exhilarating, a little exhausting, but impossible to resist.
+                    </p>
+                </div>
+            </div>
+
+            <div class="media-box" style="align-items: center;  ">
+                <img 
+                    src="images//meet-the-pedro-sidekicks/marble/moru-gwp-editorial_09.webp?$staticlink$"
+                    alt="Bag"
+                    style="width: 70%; height: auto; object-fit: cover; margin: 30px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile -->
+    <div class="image-content-container d-block d-md-none" style="width: 100%; height: 100%; ">
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden;">
+            <img src="images//meet-the-pedro-sidekicks/marble/moru-gwp-editorial_07.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden;">
+            <img src="images//meet-the-pedro-sidekicks/marble/moru-gwp-editorial_08.webp?$staticlink$" 
+            alt="Bag" 
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; border-bottom: 0px solid black;">
+            <h1>Marble <span>The Mastermind</span></h1>
+        </div>
+        <div class="media-box" style="align-items: center;">
+            <img 
+                src="images//meet-the-pedro-sidekicks/marble/moru-gwp-editorial_09.webp?$staticlink$"
+                alt="Bag"
+                style="width: 70%; height: auto; object-fit: cover; margin: 30px;">
+        </div>
+        <div class="media-container">
+            <div class="media-box">
+            <!-- This wrapper will center the paragraph -->
+                <div class="paragraph-wrapper" style="margin: 10% auto;">
+                    <p>
+                        Marble has a talent for turning chaos into opportunity. Ideas spill from their notebooks as
+                        quickly as coffee spills from their cup, forming plans that somehow make sense only to them. 
+                        Short legs may slow their pace but never their ambition, and they manage to stay two steps ahead. 
+                        Following them is exhilarating, a little exhausting, but impossible to resist.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="dover-content" class="doll-content">
+    <div class="image-content-container d-md-flex d-none" style="width: 100%; height: 100%;">
+        <div class="media-container" style="display: flex;">
+            <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; border-right: 1px solid black;">
+                <img src="images//meet-the-pedro-sidekicks/dover/moru-gwp-editorial_07.webp?$staticlink$" 
+                    alt="Bag" 
+                    style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+
+            <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; ">
+                <img src="images//meet-the-pedro-sidekicks/dover/moru-gwp-editorial_08.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+
+        <div class="media-container" style="display: flex;">
+            <div class="media-box" style="border-right: 1px solid black;">
+                <h1>Dover <span>The Overthinker</span></h1>
+
+                <!-- This wrapper will center the paragraph -->
+                <div class="paragraph-wrapper">
+                    <p>
+                        Dover lives in a mind of constant motion where every thought, conversation, and scenario is examined, catalogued, and annotated. 
+                        To spend time with Dover is to enter a labyrinth of ideas that somehow guides you exactly where you need to be. 
+                        Overthinking is their art, precise and deliberate, even when it seems excessive.
+                    </p>
+                </div>
+            </div>
+
+            <div class="media-box" style="align-items: center; ">
+                <img 
+                    src="images//meet-the-pedro-sidekicks/dover/moru-gwp-editorial_09.webp?$staticlink$"
+                    alt="Bag"
+                    style="width: 70%; height: auto; object-fit: cover; margin: 30px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile -->
+    <div class="image-content-container d-block d-md-none" style="width: 100%; height: 100%; ">
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden;">
+            <img src="images//meet-the-pedro-sidekicks/dover/moru-gwp-editorial_07.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden;">
+            <img src="images//meet-the-pedro-sidekicks/dover/moru-gwp-editorial_08.webp?$staticlink$" 
+            alt="Bag" 
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; border-bottom: 0px solid black;">
+            <h1>Dover <span>The Overthinker</span></h1>
+        </div>
+        <div class="media-box" style="align-items: center;">
+            <img 
+                src="images//meet-the-pedro-sidekicks/dover/moru-gwp-editorial_09.webp?$staticlink$"
+                alt="Bag"
+                style="width: 70%; height: auto; object-fit: cover; margin: 30px;">
+        </div>
+        <div class="media-container">
+            <div class="media-box">
+            <!-- This wrapper will center the paragraph -->
+                <div class="paragraph-wrapper" style="margin: 10% auto;">
+                    <p>
+                        Dover lives in a mind of constant motion where every thought, conversation, and scenario is examined, catalogued, and annotated. 
+                        To spend time with Dover is to enter a labyrinth of ideas that somehow guides you exactly where you need to be. 
+                        Overthinking is their art, precise and deliberate, even when it seems excessive.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="frosty-content" class="doll-content">
+    <div class="image-content-container d-md-flex d-none" style="width: 100%; height: 100%;">
+        <div class="media-container" style="display: flex;">
+            <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden;border-right: 1px solid black;">
+                <img src="images//meet-the-pedro-sidekicks/frosty/moru-gwp-editorial_07.webp?$staticlink$" 
+                    alt="Bag" 
+                    style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+
+            <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; ">
+                <img src="images//meet-the-pedro-sidekicks/frosty/moru-gwp-editorial_08.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>    
+        <div class="media-container" style="display: flex;">
+            <div class="media-box" style="border-right: 1px solid black;">
+                <h1>Frosty <span>The Hidden Gem</span></h1>
+
+                <!-- This wrapper will center the paragraph -->
+                <div class="paragraph-wrapper">
+                    <p>
+                        Frosty drifts through the world like a whisper, never where anyone expects them,
+                        yet somehow always in the loop. Their life is a careful collection of overlooked treasures,
+                        a rare book here, a forgotten plant there, a secret or two tucked away for safekeeping.
+                        Off the grid by choice and unforgettable by default, meeting them is always a sign of serendipity.
+                    </p>
+                </div>
+            </div>
+
+            <div class="media-box" style="align-items: center; ">
+                <img 
+                    src="images//meet-the-pedro-sidekicks/frosty/moru-gwp-editorial_09.webp?$staticlink$"
+                    alt="Bag"
+                    style="width: 70%; height: auto; object-fit: cover; margin: 30px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile -->
+    <div class="image-content-container d-block d-md-none" style="width: 100%; height: 100%; ">
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden;">
+            <img src="images//meet-the-pedro-sidekicks/frosty/moru-gwp-editorial_07.webp?$staticlink$" 
+                alt="Bag" 
+                style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden;">
+            <img src="images//meet-the-pedro-sidekicks/frosty/moru-gwp-editorial_08.webp?$staticlink$" 
+            alt="Bag" 
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="media-box" style="flex: 0 0 50%; position: relative; overflow: hidden; border-bottom: 0px solid black;">
+            <h1>Frosty <span>The Hidden Gem</span></h1>
+        </div>
+        <div class="media-box" style="align-items: center;">
+            <img 
+                src="images//meet-the-pedro-sidekicks/frosty/moru-gwp-editorial_09.webp?$staticlink$"
+                alt="Bag"
+                style="width: 70%; height: auto; object-fit: cover; margin: 30px;">
+        </div>
+        <div class="media-container">
+            <div class="media-box">
+            <!-- This wrapper will center the paragraph -->
+                <div class="paragraph-wrapper" style="margin: 10% auto;">
+                    <p>
+                        Frosty drifts through the world like a whisper, never where anyone expects them,
+                        yet somehow always in the loop. Their life is a careful collection of overlooked treasures,
+                        a rare book here, a forgotten plant there, a secret or two tucked away for safekeeping.
+                        Off the grid by choice and unforgettable by default, meeting them is always a sign of serendipity.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Web -->
+<div class="full-video d-md-block d-none" style="width: 100%; margin-top: 0;">
+    <video autoplay muted loop playsinline style=" width: 100%; object-fit: cover; border-bottom: 1px solid black;">
+        <source src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_10.mp4?$staticlink$" type="video/mp4">
+            Your browser does not support the video tag.
+    </video>
+</div>
+
+<!-- Mobile-->
+<div class="full-video d-block d-md-none" style="width: 100%; margin-top: 0;">
+    <video autoplay muted loop playsinline style=" width: 100%; object-fit: cover; border-bottom: 1px solid black;">
+        <source src="images//meet-the-pedro-sidekicks/moru-gwp-editorial-mobile_10.mp4?$staticlink$" type="video/mp4">
+            Your browser does not support the video tag.
+    </video>
+</div>
+
+<!-- Block 1: Text -->
+<section class="block-1 d-lg-block d-none d-md-none">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        <p>
+            The full Moru series is now available online and in-store,<br>
+            with Frosty offered exclusively to PEDRO Members.
+        </p>
+    </div>
+</section>
+
+<section class="block-1 d-block d-md-none d-md-block d-none d-lg-none">
+    <div class="position-relative text-center" style="margin-top: 100px;">
+        <p>
+            The full Moru series is now available online and in-store,<br>
+            with Frosty offered exclusively to PEDRO Members.            
+        </p>
+    </div>
+</section>
+
+<!-- Web -->
+<div class="d-md-flex d-none" style="display:flex; justify-content:center; align-items:center;">
+
+    <video autoplay muted loop playsinline
+        style="width:70%; object-fit:cover; display:block; margin:0 auto;">
+        <source src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_11.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+</div>
+
+<!-- Mobile -->
+<div class="container-fluid d-block d-md-none px-0" style ="margin-top: 100px;">
+    <!-- Top Image -->
+    <video autoplay muted loop playsinline
+        style="width:70%; object-fit:cover; display:block; margin:0 auto;">
+        <source src="images//meet-the-pedro-sidekicks/moru-gwp-editorial_11.mp4?$staticlink$" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+
+<!-- Block 1: Text -->
+<section class="block-1 d-lg-block d-none d-md-none">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        <p>
+            This winter, consider personality part of the present.
+        </p>
+    </div>
+</section>
+
+<section class="block-1 d-block d-md-none d-md-block d-none d-lg-none">
+    <div class="position-relative text-center" style="margin: 100px 0px;">
+        <p>
+            This winter, consider personality part of the present.
+        </p>
+    </div>
+</section>
+<!-- Publish Content -->
+<div class="publish-content" style = "padding-left: 40px;">
+    <span style="font-size: 18px;">
+        Published on 8 December 2025
+        <br><br>
+        <a href="$url('Search-Show','cgid','pwnewarrivals')$">SHOP WOMEN'S NEW ARRIVALS</a> &gt;
+        <br>
+        <a href="$url('Search-Show','cgid','pmnewarrivals')$">SHOP MEN'S NEW ARRIVALS</a> &gt;
+    </span>
+</div> 
+
+
+
+<script>
+function showDoll(name) {
+    // Hide all content sections
+    const allContent = document.querySelectorAll('.doll-content');
+    allContent.forEach(c => c.style.display = 'none');
+
+    // Remove active styling on all labels
+    const allLabels = document.querySelectorAll('.discover-label');
+    allLabels.forEach(l => l.classList.remove('active-label'));
+
+    // Remove active from all items
+    const allItems = document.querySelectorAll('.discover-item');
+    allItems.forEach(i => i.classList.remove('active'));
+
+    // Show selected content
+    const section = document.getElementById(name + '-content');
+    section.style.display = 'block';
+
+    // Activate the discover-item
+    const targetItem = document.querySelector(`a[onclick="showDoll('${name}')"]`).closest('.discover-item');
+    targetItem.classList.add('active');
+
+
+}
+</script>
+
+</body>
+
+</html>

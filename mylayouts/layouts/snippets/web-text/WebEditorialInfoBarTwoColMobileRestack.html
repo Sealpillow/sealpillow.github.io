@@ -1,0 +1,142 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Editorial Info Bar */
+.editorial-info-bar {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 32px 40px 28px;
+}
+
+/* Editorial Info Bar__Inner */
+.editorial-info-bar__inner {
+  display: flex;
+}
+
+/* Editorial Info Bar__Left > Editorial Info Bar__Right */
+.editorial-info-bar__left,
+.editorial-info-bar__right {
+  width: 50%;
+}
+
+/* Editorial Info Bar__Right */
+.editorial-info-bar__right {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-align: right;
+}
+
+/* Info Top Row */
+.info-top-row {
+  display: flex;
+  font-size: 13px;
+  justify-content: space-between;
+  letter-spacing: 0.04em;
+  margin-bottom: 28px;
+}
+
+/* Info Body Text */
+.info-body-text {
+  font-size: 11.5px;
+  line-height: 1.65;
+  max-width: 100%;
+}
+
+/* Info Mobile Header > Info Mobile Title > Info Mobile Subtitle */
+.info-mobile-header,
+.info-mobile-title,
+.info-mobile-subtitle {
+  display: none;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Editorial Info Bar */
+  .editorial-info-bar {
+    padding: 24px 22px 28px;
+  }
+
+  /* Editorial Info Bar__Inner */
+  .editorial-info-bar__inner {
+    flex-direction: column;
+  }
+
+  /* Editorial Info Bar__Left */
+  .editorial-info-bar__left {
+    width: 100%;
+  }
+
+  /* Editorial Info Bar__Right > Info Top Row */
+  .editorial-info-bar__right,
+    .info-top-row {
+    display: none;
+  }
+
+  /* Info Mobile Header */
+  .info-mobile-header {
+    align-items: flex-start;
+    display: flex;
+    font-size: 12.5px;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+
+  /* Info Mobile Title */
+  .info-mobile-title {
+    display: block;
+    line-height: 1.4;
+  }
+
+  /* Info Mobile Subtitle */
+  .info-mobile-subtitle {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  /* Info Body Text */
+  .info-body-text {
+    font-size: 11px;
+    line-height: 1.7;
+  }
+}
+</style>
+
+<div class="editorial-info-bar">
+    <div class="editorial-info-bar__inner">
+
+        <div class="editorial-info-bar__left">
+
+            <!-- Desktop: title + subtitle in one row -->
+            <div class="info-top-row">
+                <span>Collection Title</span>
+                <span>Product / Subtitle</span>
+            </div>
+
+            <!-- Mobile: large title left + season right -->
+            <div class="info-mobile-header">
+                <div class="info-mobile-title">
+                    Collection<br>Title
+                </div>
+                <span>Season'YY</span>
+            </div>
+
+            <!-- Mobile: subtitle as its own block -->
+            <div class="info-mobile-subtitle">
+                Product / Subtitle
+            </div>
+
+            <!-- Body text (both breakpoints) -->
+            <p class="info-body-text">
+                Editorial description text goes here. Describe the collection concept,
+                inspiration, or narrative. Sits below the title row on desktop,
+                and below the subtitle on mobile.
+            </p>
+
+        </div>
+
+        <!-- Desktop only: season/date label right-aligned -->
+        <div class="editorial-info-bar__right">
+            Season'YY
+        </div>
+
+    </div>
+</div>

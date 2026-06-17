@@ -1,0 +1,80 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Question Row */
+.question-row {
+  align-items: start;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin: 0 auto 25px;
+}
+
+/* Q Label */
+.q-label {
+  justify-self: end;
+  padding-right: 20%;
+}
+
+/* Question Text */
+.question-text {
+  font-weight: 500;
+  justify-self: end;
+  width: 49%;
+}
+
+/* Answer Row */
+.answer-row {
+  font-weight: 400;
+  margin: 0 auto 50px;
+  width: 33%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Question Row */
+  .question-row {
+    grid-template-columns: auto 1fr;
+    margin: 0 auto 50px;
+    width: 90%;
+  }
+
+  /* Q Label */
+  .q-label {
+    padding: 0;
+  }
+
+  /* Empty Column */
+  .empty-column {
+    display: none;
+  }
+
+  /* Answer Row */
+  .answer-row {
+    width: 90%;
+  }
+}
+</style>
+
+<!-- Q&A block: Q label column + question on desktop, stacks on mobile -->
+<section class="qna">
+
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            Question goes here. Keep it concise and direct.
+        </div>
+        <div class="empty-column"></div>
+    </div>
+
+    <div class="answer-row">
+        <p>
+            First paragraph of the answer goes here.
+        </p>
+        <p>
+            Second paragraph of the answer goes here, if needed.
+        </p>
+    </div>
+
+</section>
+
+<!-- Repeat .qna section for each additional Q&A pair -->

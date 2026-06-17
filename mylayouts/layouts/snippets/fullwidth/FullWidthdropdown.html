@@ -1,0 +1,87 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* Body */
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* Dropdown1 */
+.dropdown1 {
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  cursor: pointer;
+  padding: 14px;
+}
+
+/* Dropdown1 Content */
+.dropdown1-content {
+  display: none;
+  padding: 15px;
+}
+
+/* Dropdown1 Content > A */
+.dropdown1-content a {
+  color: #000;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* Arrow > Rotate */
+.arrow.rotate {
+  transform: rotate(180deg);
+}
+
+/* Arrow */
+.arrow {
+  height: 1em;
+  transition: transform 0.3s ease;
+  width: 1em;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Dropdown1 > Dropdown1 Content */
+  .dropdown1,
+      .dropdown1-content {
+    text-align: center;
+  }
+}
+
+/* Collection */
+#collection {
+  scroll-margin-top: 100px;
+}
+</style>
+
+<!-- dropdown1 -->
+
+<!-- Dropdown (Desktop and Mobile) -->
+<div class="dropdown1 d-block" onclick="toggleDropdown()">
+    <span style="font-size:14px;font-weight:500;">HORSE PRINT</span>
+    <svg class="arrow" id="arrow-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+</div>
+
+<!-- Dropdown Content (Shared for Desktop & Mobile) -->
+<div class="dropdown1-content" id="dropdown1-content">
+    <a href="#icon" style="font-size:14px;font-weight:500;line-height:2">ICON</a>
+    <br>
+    <a href="#demi" style="font-size:14px;font-weight:500;line-height:2">DEMI</a>
+    <br>
+    <a href="#jatte" style="font-size:14px;font-weight:500;line-height:2">JATTE</a>
+</div>
+
+
+
+<script>
+    function toggleDropdown() {
+        const content = document.getElementById("dropdown1-content");
+        const arrow = document.getElementById("arrow-icon");
+
+        const isOpen = content.style.display === "block";
+        content.style.display = isOpen ? "none" : "block";
+        arrow.classList.toggle("rotate", !isOpen);
+    }
+</script>

@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEDRO — Personal Style Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* Root */
+:root {
+  --charcoal: #2A2520; --gold: #B8962E; --gold-light: #D4AF6A;
+  --cream: #F5F0E8; --sand: #E8DED0; --warm-gray: #8C7B6E;
+  --rust: #9B4F2A; --sage: #6B7B5E; --deep: #1A1510;
+}
+
+/* Body > Html */
+body, html {
+  overflow-x: hidden; height: auto;
+}
+
+/* Page > Parallax */
+.page.parallax {
+  padding-top: 0px !important;
+}
+
+/* Folder Header > Folder_Post > Folder Container > Container */
+.folder-header, .folder_post .folder-container .container {
+  display: none !important;
+}
+
+/* * */
+* {
+  margin: 0; padding: 0; box-sizing: border-box;
+}
+
+/* Main Body */
+.main-body {
+  font-family: 'Montserrat', sans-serif; background: var(--cream); color: var(--charcoal); overflow-x: hidden;
+}
+
+/* Header Inner */
+.header-inner {
+  text-align: center; padding: 60px 20px 40px; position: relative;
+}
+
+/* Header Inner */
+.header-inner::after {
+  content: ''; display: block; width: 60px; height: 1px; background: var(--gold); margin: 24px auto 0;
+}
+
+/* Brand */
+.brand {
+  font-family: 'Cormorant Garamond', serif; font-size: 50px; font-weight: 300; color: var(--charcoal);
+}
+
+/* Tagline */
+.tagline {
+  font-size: 0.65rem; letter-spacing: 0.35em; color: var(--warm-gray); text-transform: uppercase; margin-top: 8px; font-weight: 400;
+}
+
+/* Main Content */
+.main-content {
+  width: 80%; margin: 0 auto; padding: 0 24px 80px;
+}
+
+/* Question Block */
+.question-block {
+  animation: fadeSlide 0.5s ease both;
+  border-bottom: 1px solid var(--sand);
+  margin-bottom: 56px;
+  padding-bottom: 48px;
+}
+
+/* Question Block > Last Of Type */
+.question-block:last-of-type {
+  border-bottom: none;
+}
+
+/* Keyframes > Fadeslide */
+@keyframes fadeSlide {
+  /* From */
+  from {
+    opacity: 0; transform: translateY(18px);
+  }
+
+  /* To */
+  to {
+    opacity: 1; transform: translateY(0);
+  }
+}
+
+/* Question Label */
+.question-label {
+  font-size: 0.6rem; letter-spacing: 0.35em; color: var(--gold); text-transform: uppercase; margin-bottom: 12px; font-weight: 600;
+}
+
+/* Question Title */
+.question-title {
+  font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 300; line-height: 1.25; margin-bottom: 12px; color: var(--charcoal);
+}
+
+/* Question Subtitle */
+.question-subtitle {
+  font-size: 0.68rem; color: var(--warm-gray); line-height: 1.7; letter-spacing: 0.04em; margin-bottom: 32px; max-width: 520px;
+}
+
+/* Options Grid */
+.options-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px;
+}
+
+/* Option Card */
+.option-card {
+  border: 1px solid var(--sand); background: white; padding: 28px 20px 22px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;
+}
+
+/* Option Card */
+.option-card::before {
+  content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--gold); transition: width 0.3s ease;
+}
+
+/* Option Card */
+.option-card:hover {
+  border-color: var(--warm-gray); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+
+/* Option Card */
+.option-card:hover::before {
+  width: 100%;
+}
+
+/* Option Card > Selected */
+.option-card.selected {
+  border-color: var(--charcoal); background: var(--charcoal);
+}
+
+/* Option Card > Selected */
+.option-card.selected::before {
+  width: 100%; background: var(--gold-light);
+}
+
+/* Skin Swatch */
+.skin-swatch {
+  width: 40px; height: 40px; border-radius: 50%; margin-bottom: 14px; border: 2px solid rgba(255,255,255,0.6); box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: transform 0.2s;
+}
+
+/* Option Card > Skin Swatch */
+.option-card:hover .skin-swatch {
+  transform: scale(1.1);
+}
+
+/* Color Palette */
+.color-palette {
+  display: flex; gap: 5px; margin-bottom: 14px;
+}
+
+/* Color Dot */
+.color-dot {
+  width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.5); flex-shrink: 0;
+}
+
+/* Option Icon */
+.option-icon {
+  font-size: 2rem; margin-bottom: 14px; display: block;
+}
+
+/* Option Name */
+.option-name {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400; margin-bottom: 6px; color: var(--charcoal); transition: color 0.3s;
+}
+
+/* Option Card > Selected > Option Name */
+.option-card.selected .option-name {
+  color: var(--cream);
+}
+
+/* Option Desc */
+.option-desc {
+  font-size: 0.68rem; color: var(--warm-gray); line-height: 1.6; letter-spacing: 0.03em; transition: color 0.3s;
+}
+
+/* Option Card > Selected > Option Desc */
+.option-card.selected .option-desc {
+  color: var(--sand);
+}
+
+/* Check Badge */
+.check-badge {
+  position: absolute; top: 12px; right: 12px; width: 20px; height: 20px; border-radius: 50%; background: var(--gold); color: white; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;
+}
+
+/* Option Card > Selected > Check Badge */
+.option-card.selected .check-badge {
+  opacity: 1;
+}
+
+/* Submit Row */
+.submit-row {
+  border-top: 1px solid var(--sand);
+  padding: 48px 0 0;
+  text-align: center;
+}
+
+/* Submit Hint */
+.submit-hint {
+  color: var(--warm-gray);
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  transition: opacity 0.4s;
+}
+
+/* Qns Btn */
+.qns-btn {
+  font-family: 'Montserrat', sans-serif; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; font-weight: 600; padding: 14px 36px; border: none; cursor: pointer; transition: all 0.3s ease;
+}
+
+/* Qns Btn Primary */
+.qns-btn-primary {
+  background: var(--charcoal); color: var(--cream);
+}
+
+/* Qns Btn Primary */
+.qns-btn-primary:hover {
+  background: var(--deep); transform: translateX(3px);
+}
+
+/* Qns Btn Primary > Disabled */
+.qns-btn-primary:disabled {
+  background: var(--sand); color: var(--warm-gray); cursor: default; transform: none;
+}
+
+/* Qns Btn Ghost */
+.qns-btn-ghost {
+  background: transparent; color: var(--warm-gray); border: 1px solid var(--sand);
+}
+
+/* Qns Btn Ghost */
+.qns-btn-ghost:hover {
+  border-color: var(--warm-gray); color: var(--charcoal);
+}
+
+/* Progress Strip */
+.progress-strip {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 52px;
+}
+
+/* Progress Pip */
+.progress-pip {
+  background: var(--sand);
+  border-radius: 2px;
+  flex: 1;
+  height: 3px;
+  max-width: 80px;
+  transition: background 0.4s ease;
+}
+
+/* Progress Pip > Filled */
+.progress-pip.filled {
+  background: var(--gold);
+}
+
+/* Keyframes > Shake */
+@keyframes shake {
+  /* 0 > 100 */
+  0%,100% {
+    transform:translateX(0)
+  }
+
+  /* 20 */
+  20% {
+    transform:translateX(-5px)
+  }
+
+  /* 40 */
+  40% {
+    transform:translateX(5px)
+  }
+
+  /* 60 */
+  60% {
+    transform:translateX(-3px)
+  }
+
+  /* 80 */
+  80% {
+    transform:translateX(3px)
+  }
+}
+
+/* Question Block > Needs Answer */
+.question-block.needs-answer {
+  animation: shake 0.4s ease;
+}
+
+/* Question Block > Needs Answer > Question Label */
+.question-block.needs-answer .question-label {
+  color: var(--rust);
+}
+
+/* Results Panel */
+#results-panel {
+  display: none; animation: fadeSlide 0.6s ease;
+}
+
+/* Results Header */
+.results-header {
+  text-align: center; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--sand);
+}
+
+/* Filter Tags */
+.filter-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px;
+}
+
+/* Tag */
+.tag {
+  font-size: 0.6rem; letter-spacing: 0.15em; padding: 5px 14px; border: 1px solid var(--gold); color: var(--gold); text-transform: uppercase; font-weight: 500;
+}
+
+/* Products Grid */
+.products-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px;
+}
+
+/* A > Product Card */
+a.product-card {
+  display: block; text-decoration: none; color: inherit; background: white; border: 1px solid var(--sand); overflow: hidden; transition: all 0.3s ease; animation: fadeUp 0.5s ease both;
+}
+
+/* A > Product Card */
+a.product-card:hover {
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1); transform: translateY(-4px);
+}
+
+/* Keyframes > Fadeup */
+@keyframes fadeUp {
+  /* From */
+  from {
+    opacity: 0; transform: translateY(20px);
+  }
+
+  /* To */
+  to {
+    opacity: 1; transform: translateY(0);
+  }
+}
+
+/* Product Image */
+.product-image {
+  width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 5rem; position: relative; overflow: hidden;
+}
+
+/* Product Image > Picture */
+.product-image picture {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+
+/* Product Image > Picture > Img */
+.product-image picture img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform 0.4s ease;
+}
+
+/* A > Product Card > Product Image > Picture > Img */
+a.product-card:hover .product-image picture img {
+  transform: scale(1.04);
+}
+
+/* Product Badge */
+.product-badge {
+  position: absolute; top: 12px; left: 12px; font-size: 0.55rem; letter-spacing: 0.2em; padding: 4px 10px; text-transform: uppercase; font-weight: 600;
+}
+
+/* Badge New */
+.badge-new {
+  background: var(--charcoal); color: var(--cream);
+}
+
+/* Badge Sale */
+.badge-sale {
+  background: var(--rust); color: white;
+}
+
+/* Badge Limited */
+.badge-limited {
+  background: var(--gold); color: white;
+}
+
+/* Product Info */
+.product-info {
+  padding: 20px;
+}
+
+/* Product Category */
+.product-category {
+  font-size: 0.55rem; letter-spacing: 0.25em; color: var(--warm-gray); text-transform: uppercase; margin-bottom: 6px;
+}
+
+/* Product Name */
+.product-name {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400; margin-bottom: 4px; color: var(--charcoal);
+}
+
+/* Product Desc */
+.product-desc {
+  font-size: 0.65rem; color: var(--warm-gray); line-height: 1.6; margin-bottom: 14px;
+}
+
+/* Product Footer */
+.product-footer {
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+/* Product Price */
+.product-price {
+  font-size: 0.85rem; font-weight: 600; color: var(--charcoal); letter-spacing: 0.05em;
+}
+
+/* Product Price > Currency */
+.product-price .currency {
+  font-size: 0.7rem; font-weight: 400; color: var(--warm-gray);
+}
+
+/* Qns Btn Wish */
+.qns-btn-wish {
+  width: 30px; height: 30px; border: 1px solid var(--sand); background: none; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; color: var(--warm-gray);
+}
+
+/* Qns Btn Wish */
+.qns-btn-wish:hover {
+  border-color: var(--rust); color: var(--rust);
+}
+
+/* No Results */
+.no-results {
+  text-align: center; padding: 60px 20px; color: var(--warm-gray);
+}
+
+/* No Results > Icon */
+.no-results .icon {
+  font-size: 3rem; margin-bottom: 16px;
+}
+
+/* No Results > P */
+.no-results p {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300;
+}
+
+/* Persona Card */
+.persona-card {
+  display: flex; gap: 0; border: 1px solid var(--sand); overflow: hidden; margin-bottom: 48px; animation: fadeSlide 0.7s ease;
+}
+
+/* Persona Visual */
+.persona-visual {
+  flex: 0 0 340px; min-height: 320px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+
+/* Persona Visual > Canvas */
+.persona-visual canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+
+/* Persona Visual > Picture */
+.persona-visual picture {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;
+}
+
+/* Persona Visual > Picture > Img */
+.persona-visual picture img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; transition: transform 0.6s ease;
+}
+
+/* Persona Card > Persona Visual > Picture > Img */
+.persona-card:hover .persona-visual picture img {
+  transform: scale(1.04);
+}
+
+/* Persona Visual Emoji */
+.persona-visual-emoji {
+  position: relative; z-index: 2; font-size: 5rem; filter: drop-shadow(0 4px 20px rgba(0,0,0,0.18)); animation: floatEmoji 4s ease-in-out infinite;
+}
+
+/* Keyframes > Floatemoji */
+@keyframes floatEmoji {
+  /* 0 > 100 */
+  0%, 100% {
+    transform: translateY(0px);
+  }
+
+  /* 50 */
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Persona Info */
+.persona-info {
+  flex: 1; padding: 40px 44px; display: flex; flex-direction: column; justify-content: center; background: white;
+}
+
+/* Persona Eyebrow */
+.persona-eyebrow {
+  font-size: 0.55rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 10px;
+}
+
+/* Persona Name */
+.persona-name {
+  font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 300; line-height: 1.1; color: var(--charcoal); margin-bottom: 16px;
+}
+
+/* Persona Name > Em */
+.persona-name em {
+  font-style: italic; color: var(--gold);
+}
+
+/* Persona Divider */
+.persona-divider {
+  width: 40px; height: 1px; background: var(--gold); margin-bottom: 16px;
+}
+
+/* Persona Desc */
+.persona-desc {
+  font-size: 0.72rem; color: var(--warm-gray); line-height: 1.85; letter-spacing: 0.03em; margin-bottom: 24px; max-width: 380px;
+}
+
+/* Persona Traits */
+.persona-traits {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+
+/* Persona Trait */
+.persona-trait {
+  font-size: 0.58rem; letter-spacing: 0.15em; padding: 5px 14px; background: var(--cream); border: 1px solid var(--sand); color: var(--charcoal); text-transform: uppercase; font-weight: 500;
+}
+
+/* Mode Badge */
+.mode-badge {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; padding: 5px 12px; border-radius: 2px; margin-bottom: 20px;
+}
+
+/* Mode Badge > Score */
+.mode-badge.score {
+  background: #EAF0E8; color: var(--sage); border: 1px solid var(--sage);
+}
+
+/* Mode Badge > Persona */
+.mode-badge.persona {
+  background: #F0EAE0; color: var(--gold); border: 1px solid var(--gold);
+}
+
+/* Mode Badge */
+.mode-badge::before {
+  content: '●'; font-size: 0.5rem;
+}
+
+/* Action Bar */
+.action-bar {
+  display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 36px 0; padding: 28px 32px; background: white; border: 1px solid var(--sand);
+}
+
+/* Action Bar Label */
+.action-bar-label {
+  font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--warm-gray); font-weight: 600; margin-right: 4px;
+}
+
+/* Share Divider */
+.share-divider {
+  width: 1px; height: 24px; background: var(--sand); margin: 0 4px;
+}
+
+/* Qns Btn Share */
+.qns-btn-share {
+  display: flex; align-items: center; gap: 7px; font-family: 'Montserrat', sans-serif; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; padding: 10px 20px; border: 1px solid var(--sand); background: white; cursor: pointer; transition: all 0.25s ease; text-decoration: none; color: var(--charcoal); white-space: nowrap;
+}
+
+/* Qns Btn Share > Svg */
+.qns-btn-share svg {
+  flex-shrink: 0;
+}
+
+/* Qns Btn Share */
+.qns-btn-share:hover {
+  transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+/* Qns Btn Share > Facebook */
+.qns-btn-share.facebook:hover {
+  border-color: #1877F2; color: #1877F2;
+}
+
+/* Qns Btn Share > Instagram */
+.qns-btn-share.instagram:hover {
+  border-color: #E1306C; color: #E1306C;
+}
+
+/* Qns Btn Share > Twitter */
+.qns-btn-share.twitter:hover {
+  border-color: #000; color: #000;
+}
+
+/* Qns Btn Share > Whatsapp */
+.qns-btn-share.whatsapp:hover {
+  border-color: #25D366; color: #25D366;
+}
+
+/* Qns Btn Share > Pinterest */
+.qns-btn-share.pinterest:hover {
+  border-color: #E60023; color: #E60023;
+}
+
+/* Qns Btn Share > Download */
+.qns-btn-share.download {
+  background: var(--charcoal); color: var(--cream); border-color: var(--charcoal);
+}
+
+/* Qns Btn Share > Download */
+.qns-btn-share.download:hover {
+  background: var(--deep); border-color: var(--deep); color: var(--cream); box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--charcoal); color: var(--cream); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 12px 28px; opacity: 0; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; z-index: 9999; white-space: nowrap;
+}
+
+/* Toast > Show */
+.toast.show {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+
+/* Restart Row */
+.restart-row {
+  text-align: center; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--sand);
+}
+
+/* Restart Row > P */
+.restart-row p {
+  font-size: 0.65rem; color: var(--warm-gray); letter-spacing: 0.1em; margin-bottom: 16px;
+}
+
+/* Mobile — max-width: 720px */
+@media (max-width: 720px) {
+  /* Main Content */
+  .main-content {
+    width: 95%;
+  }
+
+  /* Persona Card */
+  .persona-card {
+    flex-direction: column;
+  }
+
+  /* Persona Visual */
+  .persona-visual {
+    flex: 0 0 240px; min-height: 240px;
+  }
+
+  /* Persona Info */
+  .persona-info {
+    padding: 28px 24px;
+  }
+
+  /* Action Bar */
+  .action-bar {
+    padding: 20px 16px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="main-body">
+  <div class="header-inner">
+    <div class="brand">PEDRO</div>
+    <div class="tagline">Personal Style Finder</div>
+  </div>
+
+  <div class="main-content">
+    <!-- Quiz form: all questions visible at once -->
+    <div id="quiz-form">
+      <div class="progress-strip" id="progressStrip"></div>
+      <div id="questionBlocks"></div>
+      <div class="submit-row">
+        <div class="submit-hint" id="submitHint">Answer all questions to reveal your picks</div>
+        <button class="qns-btn qns-btn-primary" id="submitBtn" onclick="showResults()" disabled>
+          View My Picks →
+        </button>
+      </div>
+    </div>
+
+    <!-- Results panel -->
+    <div id="results-panel">
+      <div id="modeBadge"></div>
+      <div id="personaCard" class="persona-card"></div>
+      <div class="action-bar" id="actionBar">
+        <span class="action-bar-label">Share</span>
+        <button class="qns-btn-share facebook" onclick="shareToFacebook()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+        <button class="qns-btn-share instagram" onclick="shareToInstagram()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          Instagram
+        </button>
+        <button class="qns-btn-share twitter" onclick="shareToTwitter()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          X / Twitter
+        </button>
+        <button class="qns-btn-share whatsapp" onclick="shareToWhatsApp()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </button>
+        <button class="qns-btn-share pinterest" onclick="shareToPinterest()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+          Pinterest
+        </button>
+        <div class="share-divider"></div>
+        <button class="qns-btn-share download" onclick="downloadPDF()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+      </div>
+      <div class="results-header">
+        <div class="question-label">Curated For You</div>
+        <div class="question-title">Your Perfect Selections</div>
+        <div class="filter-tags" id="filterTags"></div>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+      <div class="restart-row">
+        <p>Not quite right? Refine your preferences</p>
+        <button class="qns-btn qns-btn-ghost" onclick="restart()">Start Over</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// MODE TOGGLE
+// ══════════════════════════════════════════════════════════════
+const RECOMMENDATION_MODE = 'score'; // 'score' | 'persona'
+const SHOW_MODE_BADGE = true;
+
+// ══════════════════════════════════════════════════════════════
+// QUESTION SCHEMA
+// ══════════════════════════════════════════════════════════════
+const questionSchema = [
+  {
+    key: 'qns1',
+    title: 'What is your skin tone?',
+    subtitle: "We'll match colours and materials that complement your natural complexion.",
+    selectMode: 'single',
+    options: [
+      { value:'fair',   name:'Fair',   colorSwatch:'#F8E0C8', desc:'Porcelain to light beige; cool or warm undertones' },
+      { value:'light',  name:'Light',  colorSwatch:'#E8C89A', desc:'Ivory to golden beige; neutral undertones' },
+      { value:'medium', name:'Medium', colorSwatch:'#C8956C', desc:'Olive to caramel; warm or neutral undertones' },
+      { value:'tan',    name:'Tan',    colorSwatch:'#A0714F', desc:'Bronze to honey; warm golden undertones' },
+      { value:'deep',   name:'Deep',   colorSwatch:'#5C3D2E', desc:'Mahogany to ebony; rich cool or warm undertones' },
+    ]
+  },
+  {
+    key: 'qns2',
+    title: 'How would you describe your lifestyle?',
+    subtitle: 'Your daily rhythm shapes the pieces that will serve you best.',
+    selectMode: 'multi',
+    options: [
+      { value:'professional', name:'Professional', icon:'💼', desc:'Office-forward, polished, boardroom-ready' },
+      { value:'active',       name:'Active',       icon:'🏃', desc:'On the move — gym, outdoors, errands' },
+      { value:'social',       name:'Social',       icon:'🥂', desc:'Dinners, events, evenings out' },
+      { value:'traveller',    name:'Traveller',    icon:'✈️', desc:'Jet-set, versatile, always on the go' },
+    ]
+  },
+  {
+    key: 'qns3',
+    title: 'Which colour palette speaks to you?',
+    subtitle: "Choose the tones you're naturally drawn to when you shop.",
+    selectMode: 'multi',
+    options: [
+      { value:'neutrals',   name:'Neutrals',    colorSwatches:['#E8E0D6','#C4B8A8','#8C7B6E','#2A2520'], desc:'Cream, beige, camel, stone, charcoal & black' },
+      { value:'earthtones', name:'Earth Tones', colorSwatches:['#9B4F2A','#B8962E','#6B7B5E','#7A5C40'], desc:'Terracotta, rust, olive, ochre & tobacco' },
+      { value:'pastels',    name:'Pastels',     colorSwatches:['#F2CDD8','#D8EAF2','#D8F0E0','#F0E8D0'], desc:'Blush, powder blue, sage & butter yellow' },
+      { value:'bold',       name:'Bold & Vivid',colorSwatches:['#C0392B','#1A3A6B','#1A6B3A','#8B2FC9'], desc:'Deep red, cobalt, emerald & violet' },
+    ]
+  },
+  {
+    key: 'qns4',
+    title: 'How do you approach getting dressed?',
+    subtitle: 'Your dressing style tells us what kind of accessories will complete your wardrobe.',
+    selectMode: 'single',
+    options: [
+      { value:'minimalist', name:'Minimalist',     icon:'🤍', desc:'Clean outfits, few pieces, letting quality speak' },
+      { value:'statement',  name:'Statement Maker',icon:'✨', desc:'Bold pairings, standout accessories, heads turn' },
+      { value:'comfort',    name:'Comfort First',  icon:'🌿', desc:'Ease of wear without sacrificing style' },
+      { value:'eclectic',   name:'Eclectic Mixer', icon:'🎨', desc:'Textures, layers, unexpected combinations' },
+    ]
+  },
+];
+
+// ── State ─────────────────────────────────────────────────────
+const answers = Object.fromEntries(questionSchema.map(q => [q.key, []]));
+const totalSteps = questionSchema.length;
+
+// ── Build progress pips ───────────────────────────────────────
+function renderProgressStrip() {
+  document.getElementById('progressStrip').innerHTML =
+    questionSchema.map((_, i) => `<div class="progress-pip" id="pip-${i}"></div>`).join('');
+}
+
+function updateProgressPips() {
+  questionSchema.forEach((q, i) => {
+    const pip = document.getElementById(`pip-${i}`);
+    if (pip) pip.classList.toggle('filled', answers[q.key].length > 0);
+  });
+}
+
+// ── Build option card HTML ────────────────────────────────────
+function renderOptionCard(q, opt) {
+  let visual = '';
+  if (opt.colorSwatch) {
+    visual = `<div class="skin-swatch" style="background:${opt.colorSwatch};"></div>`;
+  } else if (opt.colorSwatches) {
+    visual = `<div class="color-palette">${opt.colorSwatches.map(c => `<div class="color-dot" style="background:${c};"></div>`).join('')}</div>`;
+  } else if (opt.icon) {
+    visual = `<span class="option-icon">${opt.icon}</span>`;
+  }
+  return `
+    <div class="option-card" data-q="${q.key}" data-v="${opt.value}" onclick="selectCard(this)">
+      <div class="check-badge">✓</div>
+      ${visual}
+      <div class="option-name">${opt.name}</div>
+      <div class="option-desc">${opt.desc}</div>
+    </div>`;
+}
+
+// ── Build all question blocks at once ─────────────────────────
+function renderQuestionBlocks() {
+  document.getElementById('questionBlocks').innerHTML = questionSchema.map((q, i) => {
+    const modeLabel = q.selectMode === 'single' ? 'Choose one' : 'Select all that apply';
+    return `
+      <div class="question-block" id="block-${q.key}">
+        <div class="question-label" id="label-${q.key}">Question ${i + 1} of ${totalSteps} &nbsp;·&nbsp; ${modeLabel}</div>
+        <div class="question-title">${q.title}</div>
+        <div class="question-subtitle">${q.subtitle}</div>
+        <div class="options-grid">${q.options.map(opt => renderOptionCard(q, opt)).join('')}</div>
+      </div>`;
+  }).join('');
+}
+
+renderProgressStrip();
+renderQuestionBlocks();
+
+// ── Interaction ───────────────────────────────────────────────
+function selectCard(card) {
+  const qKey = card.dataset.q, val = card.dataset.v;
+  const schema = questionSchema.find(s => s.key === qKey);
+  if (schema.selectMode === 'single') {
+    document.querySelectorAll(`[data-q="${qKey}"]`).forEach(c => c.classList.remove('selected'));
+    answers[qKey] = [val];
+    card.classList.add('selected');
+  } else {
+    const idx = answers[qKey].indexOf(val);
+    if (idx === -1) { answers[qKey].push(val); card.classList.add('selected'); }
+    else            { answers[qKey].splice(idx, 1); card.classList.remove('selected'); }
+  }
+  updateProgressPips();
+  updateSubmitState();
+}
+
+function updateSubmitState() {
+  const allAnswered = questionSchema.every(q => answers[q.key].length > 0);
+  const btn = document.getElementById('submitBtn');
+  const hint = document.getElementById('submitHint');
+  btn.disabled = !allAnswered;
+
+  if (allAnswered) {
+    hint.textContent = 'All done — your style picks are ready!';
+    hint.style.color = 'var(--gold)';
+
+    const combo = [
+      'quiz',
+      answers.qns1.join('-'),
+      answers.qns2.join('-'),
+      answers.qns3.join('-'),
+      answers.qns4.join('-'),
+    ].join('-');
+
+    btn.setAttribute('data-content-analytic', JSON.stringify({
+      contentId:   combo,
+      contentType: 'asset',
+    }));
+
+  } else {
+    const remaining = questionSchema.filter(q => answers[q.key].length === 0).length;
+    hint.textContent = `${remaining} question${remaining > 1 ? 's' : ''} remaining`;
+    hint.style.color = '';
+    btn.removeAttribute('data-content-analytic');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PRODUCT DATABASE
+// ══════════════════════════════════════════════════════════════
+const products = [
+  // ── BAGS ──────────────────────────────────────────────────────
+  { id:1,  type:'bags',
+    qns1:['fair','light'], qns2:['professional'], qns3:['neutrals'], qns4:['minimalist','statement'],
+    personas:['polished','serene'],
+    name:'The Structured Tote',        desc:'Full-grain leather, hand-stitched edge detailing',        price:'680', currency:'SGD', emoji:'👜', bg:'#EDE8E0', badge:'new',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940001_TAN-ID')$",   analytics:{contentId:"product_image_1",  contentType:"asset"} },
+
+  { id:2,  type:'bags',
+    qns1:['fair','light','medium'], qns2:['social'], qns3:['neutrals','pastels'], qns4:['statement','minimalist'],
+    personas:['social','serene'],
+    name:'The Evening Clutch',         desc:'Satin finish with 18k gold clasp closure',                price:'420', currency:'SGD', emoji:'👛', bg:'#E8E0D8', badge:'limited',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940002_GOLD-ID')$",  analytics:{contentId:"product_image_2",  contentType:"asset"} },
+
+  { id:3,  type:'bags',
+    qns1:['medium','tan'], qns2:['active','traveller'], qns3:['earthtones','neutrals'], qns4:['comfort','eclectic'],
+    personas:['wanderer','active'],
+    name:'The Canvas Shopper',         desc:'Coated canvas with leather trim & tan piping',            price:'285', currency:'SGD', emoji:'🛍️', bg:'#EAE4DA',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940003_NAT-ID')$",   analytics:{contentId:"product_image_3",  contentType:"asset"} },
+
+  { id:4,  type:'bags',
+    qns1:['light','medium','tan'], qns2:['professional'], qns3:['neutrals','earthtones'], qns4:['minimalist'],
+    personas:['polished','wanderer'],
+    name:'The Portfolio Bag',          desc:'Pebbled calfskin, padded laptop sleeve',                  price:'340', currency:'SGD', emoji:'💼', bg:'#DFD8CE',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940004_BRN-ID')$",   analytics:{contentId:"product_image_4",  contentType:"asset"} },
+
+  { id:5,  type:'bags',
+    qns1:['fair','light'], qns2:['active','social'], qns3:['pastels','neutrals'], qns4:['comfort','eclectic'],
+    personas:['serene','social'],
+    name:'The Mini Crossbody',         desc:'Vegan leather, adjustable chain strap',                   price:'95',  currency:'SGD', emoji:'👝', bg:'#E6E0D6',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940005_BLK-ID')$",   analytics:{contentId:"product_image_5",  contentType:"asset"} },
+
+  { id:6,  type:'bags',
+    qns1:['medium','tan','deep'], qns2:['professional'], qns3:['bold','neutrals'], qns4:['statement','minimalist'],
+    personas:['polished','vivid'],
+    name:'The Architectural Tote',     desc:'Rigid shell, suede interior, matte black hardware',       price:'920', currency:'SGD', emoji:'🖤', bg:'#D8D4D0', badge:'new',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940006_BLK-ID')$",   analytics:{contentId:"product_image_6",  contentType:"asset"} },
+
+  { id:7,  type:'bags',
+    qns1:['fair','light','medium'], qns2:['social'], qns3:['bold','pastels'], qns4:['statement','eclectic'],
+    personas:['vivid','eclectic','social'],
+    name:'The Geometric Clutch',       desc:'Box-shaped, perspex accent, structured silhouette',       price:'195', currency:'SGD', emoji:'💠', bg:'#E0DCE8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940007_BLU-ID')$",   analytics:{contentId:"product_image_7",  contentType:"asset"} },
+
+  { id:8,  type:'bags',
+    qns1:['medium','tan','deep'], qns2:['traveller'], qns3:['neutrals','bold'], qns4:['comfort','minimalist'],
+    personas:['wanderer','active'],
+    name:'The Tech Backpack',          desc:'Nylon weave, magnetic closures, waterproof lining',       price:'550', currency:'SGD', emoji:'🎒', bg:'#D4D0CC', badge:'new',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940008_GRY-ID')$",   analytics:{contentId:"product_image_8",  contentType:"asset"} },
+
+  { id:9,  type:'bags',
+    qns1:['light','medium'], qns2:['professional','active'], qns3:['neutrals'], qns4:['minimalist'],
+    personas:['polished','active'],
+    name:'The Minimal Shoulder',       desc:'Clean lines, micro-pebbled leather, hidden pockets',      price:'220', currency:'SGD', emoji:'🖤', bg:'#DCDAD6',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940009_BLK-ID')$",   analytics:{contentId:"product_image_9",  contentType:"asset"} },
+
+  { id:10, type:'bags',
+    qns1:['fair','medium'], qns2:['active','social'], qns3:['pastels','bold'], qns4:['eclectic','comfort'],
+    personas:['eclectic','social'],
+    name:'The Urban Baguette',         desc:'Recycled nylon, sleek zip top, adjustable strap',         price:'88',  currency:'SGD', emoji:'📦', bg:'#D8D6E0',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940010_LAV-ID')$",   analytics:{contentId:"product_image_10",  contentType:"asset"} },
+
+  { id:11, type:'bags',
+    qns1:['tan','deep'], qns2:['active','traveller'], qns3:['earthtones'], qns4:['eclectic','comfort'],
+    personas:['romantic','wanderer'],
+    name:'The Wicker Basket Bag',      desc:'Handwoven rattan with leather handles',                   price:'75',  currency:'SGD', emoji:'🧺', bg:'#E8DFC8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940011_NAT-ID')$",   analytics:{contentId:"product_image_11",  contentType:"asset"} },
+
+  { id:12, type:'bags',
+    qns1:['medium','tan','deep'], qns2:['traveller','social'], qns3:['earthtones','bold'], qns4:['eclectic','statement'],
+    personas:['romantic','eclectic','wanderer'],
+    name:'The Embroidered Tote',       desc:'Canvas base with folk-art floral embroidery',             price:'165', currency:'SGD', emoji:'🌸', bg:'#EAE0CC',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940012_MLT-ID')$",   analytics:{contentId:"product_image_12",  contentType:"asset"} },
+
+  { id:13, type:'bags',
+    qns1:['tan','deep'], qns2:['social'], qns3:['earthtones','bold'], qns4:['statement','eclectic'],
+    personas:['romantic','vivid'],
+    name:'The Fringe Pouch',           desc:'Suede, hand-cut fringe, tassel drawstring',               price:'140', currency:'SGD', emoji:'🌾', bg:'#E2D8C0',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940013_TAN-ID')$",   analytics:{contentId:"product_image_13",  contentType:"asset"} },
+
+  { id:14, type:'bags',
+    qns1:['medium','tan'], qns2:['active','social'], qns3:['earthtones'], qns4:['eclectic'],
+    personas:['eclectic','romantic'],
+    name:'The Patchwork Hobo',         desc:'Mixed leather patches, brass grommets',                   price:'210', currency:'SGD', emoji:'🌈', bg:'#DCCEB8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940014_MLT-ID')$",   analytics:{contentId:"product_image_14",  contentType:"asset"} },
+
+  { id:15, type:'bags',
+    qns1:['deep','tan'], qns2:['traveller','social'], qns3:['earthtones','bold'], qns4:['statement'],
+    personas:['romantic','wanderer'],
+    name:'The Tooled Leather Satchel', desc:'Hand-tooled floral motifs, aged brass hardware',          price:'680', currency:'SGD', emoji:'🌺', bg:'#D8CDB4', badge:'limited',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940015_BRN-ID')$",   analytics:{contentId:"product_image_15",  contentType:"asset"} },
+
+  { id:16, type:'bags',
+    qns1:['light','medium'], qns2:['active'], qns3:['neutrals','earthtones'], qns4:['comfort'],
+    personas:['active'],
+    name:'The Canvas Crossbody',       desc:'Lightweight wax canvas, clip buckle closure',             price:'65',  currency:'SGD', emoji:'🎽', bg:'#D8E0D8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940016_GRN-ID')$",   analytics:{contentId:"product_image_16",  contentType:"asset"} },
+
+  { id:17, type:'bags',
+    qns1:['medium','tan','deep'], qns2:['active','traveller'], qns3:['neutrals','bold'], qns4:['comfort','minimalist'],
+    personas:['active','wanderer'],
+    name:'The Nylon Duffel',           desc:'Ripstop nylon, padded handles, shoe compartment',         price:'195', currency:'SGD', emoji:'🏋️', bg:'#D0D8D4',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940017_GRY-ID')$",   analytics:{contentId:"product_image_17",  contentType:"asset"} },
+
+  { id:18, type:'bags',
+    qns1:['light','medium'], qns2:['active','professional'], qns3:['neutrals'], qns4:['minimalist','comfort'],
+    personas:['active','polished'],
+    name:'The Commuter Pack',          desc:'Reflective panels, breathable back system',               price:'175', currency:'SGD', emoji:'🚴', bg:'#D4DCE4', badge:'new',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940018_BLACK-ID')$", analytics:{contentId:"product_image_18",  contentType:"asset"} },
+
+  { id:19, type:'bags',
+    qns1:['medium','tan'], qns2:['professional','active'], qns3:['neutrals','bold'], qns4:['minimalist','comfort'],
+    personas:['active','polished'],
+    name:'The Hybrid Tote Pack',       desc:'Converts from backpack to tote, padded laptop slot',      price:'230', currency:'SGD', emoji:'⚡', bg:'#CCE0D8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940019_BLK-ID')$",   analytics:{contentId:"product_image_19",  contentType:"asset"} },
+
+  { id:20, type:'bags',
+    qns1:['tan','deep'], qns2:['traveller'], qns3:['earthtones','neutrals'], qns4:['comfort','eclectic'],
+    personas:['wanderer','romantic'],
+    name:'The Premium Carryall',       desc:'Cordura shell, TSA-friendly design, leather base',        price:'580', currency:'SGD', emoji:'🌍', bg:'#D0DCD8', badge:'new',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940020_OLV-ID')$",   analytics:{contentId:"product_image_20",  contentType:"asset"} },
+
+  // ── SHOES ─────────────────────────────────────────────────────
+  { id:21, type:'shoes',
+    qns1:['fair','light'], qns2:['professional'], qns3:['neutrals','pastels'], qns4:['minimalist'],
+    personas:['serene','polished'],
+    name:'The Court Pump',             desc:'Nappa leather, 70mm heel, almond toe',                    price:'580', currency:'SGD', emoji:'👠', bg:'#EDE0D8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940021_NUD-ID')$",   analytics:{contentId:"product_image_21",  contentType:"asset"} },
+
+  { id:22, type:'shoes',
+    qns1:['fair','light','medium'], qns2:['social','active'], qns3:['pastels','neutrals'], qns4:['comfort','minimalist'],
+    personas:['serene','social'],
+    name:'The Ballet Flat',            desc:'Soft lambskin, grosgrain bow, cushioned sole',            price:'245', currency:'SGD', emoji:'🩰', bg:'#E8DDD8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940022_PNK-ID')$",   analytics:{contentId:"product_image_22",  contentType:"asset"} },
+
+  { id:23, type:'shoes',
+    qns1:['fair','light'], qns2:['social'], qns3:['pastels','bold'], qns4:['statement'],
+    personas:['social','vivid'],
+    name:'The Slingback Kitten',       desc:'Suede finish, pearl-tip pin buckle, 45mm heel',           price:'720', currency:'SGD', emoji:'✨', bg:'#E0D8E8', badge:'limited',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940023_SLV-ID')$",   analytics:{contentId:"product_image_23",  contentType:"asset"} },
+
+  { id:24, type:'shoes',
+    qns1:['medium','tan'], qns2:['professional'], qns3:['neutrals','earthtones'], qns4:['minimalist','eclectic'],
+    personas:['polished','romantic'],
+    name:'The Oxford Brogue',          desc:'Polished calfskin, leather sole, wingtip detail',         price:'360', currency:'SGD', emoji:'👞', bg:'#DDD6CC',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940024_BRN-ID')$",   analytics:{contentId:"product_image_24",  contentType:"asset"} },
+
+  { id:25, type:'shoes',
+    qns1:['medium','tan','deep'], qns2:['active','traveller'], qns3:['earthtones','neutrals'], qns4:['comfort'],
+    personas:['wanderer','romantic','active'],
+    name:'The Canvas Loafer',          desc:'Rubber sole, woven upper, slip-on style',                 price:'85',  currency:'SGD', emoji:'🥿', bg:'#E4DDD4',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940025_NAT-ID')$",   analytics:{contentId:"product_image_25",  contentType:"asset"} },
+
+  { id:26, type:'shoes',
+    qns1:['tan','deep'], qns2:['social'], qns3:['bold','neutrals'], qns4:['statement'],
+    personas:['vivid','social'],
+    name:'The Sculptural Mule',        desc:'Architectural block heel, square toe, patent finish',     price:'840', currency:'SGD', emoji:'💎', bg:'#D8D4E0', badge:'new',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940026_BLK-ID')$",   analytics:{contentId:"product_image_26",  contentType:"asset"} },
+
+  { id:27, type:'shoes',
+    qns1:['light','medium'], qns2:['professional'], qns3:['neutrals','bold'], qns4:['minimalist','statement'],
+    personas:['polished'],
+    name:'The Minimal Chelsea',        desc:'Elastic gusset, stacked heel, sleek silhouette',          price:'320', currency:'SGD', emoji:'🖤', bg:'#DCDAE0',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940027_BLK-ID')$",   analytics:{contentId:"product_image_27",  contentType:"asset"} },
+
+  { id:28, type:'shoes',
+    qns1:['fair','light','medium'], qns2:['active','social'], qns3:['neutrals','pastels'], qns4:['comfort','minimalist'],
+    personas:['active','serene'],
+    name:'The Sock Sneaker',           desc:'Knit upper, cloud-sole technology, seamless toe',         price:'210', currency:'SGD', emoji:'⚡', bg:'#D4D8E4', badge:'new',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940028_WHT-ID')$",   analytics:{contentId:"product_image_28",  contentType:"asset"} },
+
+  { id:29, type:'shoes',
+    qns1:['medium','tan','deep'], qns2:['active','traveller'], qns3:['bold','neutrals'], qns4:['comfort','eclectic'],
+    personas:['active','wanderer'],
+    name:'The Slider',                 desc:'Molded EVA footbed, adjustable strap',                    price:'68',  currency:'SGD', emoji:'🌊', bg:'#D0DCE4',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940029_BLU-ID')$",   analytics:{contentId:"product_image_29",  contentType:"asset"} },
+
+  { id:30, type:'shoes',
+    qns1:['light','medium'], qns2:['traveller','active'], qns3:['neutrals','bold'], qns4:['comfort','minimalist'],
+    personas:['wanderer','active'],
+    name:'The Travel Sneaker',         desc:'Packable, ultra-light, leather-free construction',        price:'255', currency:'SGD', emoji:'✈️', bg:'#D8DCE8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940030_GRY-ID')$",   analytics:{contentId:"product_image_30",  contentType:"asset"} },
+
+  { id:31, type:'shoes',
+    qns1:['tan','deep'], qns2:['active','traveller'], qns3:['earthtones'], qns4:['comfort','eclectic'],
+    personas:['romantic','wanderer'],
+    name:'The Braided Sandal',         desc:'Leather braid straps, cork footbed, flat sole',           price:'78',  currency:'SGD', emoji:'🌿', bg:'#E0D8C4',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940031_TAN-ID')$",   analytics:{contentId:"product_image_31",  contentType:"asset"} },
+
+  { id:32, type:'shoes',
+    qns1:['medium','tan'], qns2:['social'], qns3:['earthtones','pastels'], qns4:['eclectic','statement'],
+    personas:['eclectic','romantic'],
+    name:'The Embellished Wedge',      desc:'Beaded ankle strap, jute wedge, raffia finish',           price:'185', currency:'SGD', emoji:'🌸', bg:'#DCD2BA',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940032_MLT-ID')$",   analytics:{contentId:"product_image_32",  contentType:"asset"} },
+
+  { id:33, type:'shoes',
+    qns1:['tan','deep'], qns2:['active','social'], qns3:['earthtones','bold'], qns4:['eclectic'],
+    personas:['eclectic','romantic'],
+    name:'The Suede Ankle Boot',       desc:'Fringed shaft, stacked wooden heel, pull-on',             price:'295', currency:'SGD', emoji:'🍂', bg:'#D8CEB8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940033_TAN-ID')$",   analytics:{contentId:"product_image_33",  contentType:"asset"} },
+
+  { id:34, type:'shoes',
+    qns1:['medium','tan','deep'], qns2:['traveller','active'], qns3:['earthtones','neutrals'], qns4:['comfort'],
+    personas:['wanderer','romantic'],
+    name:'The Espadrille',             desc:'Jute-rope sole, canvas upper, lace-up tie',               price:'120', currency:'SGD', emoji:'🌞', bg:'#E4D8BE',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940034_NAT-ID')$",   analytics:{contentId:"product_image_34",  contentType:"asset"} },
+
+  { id:35, type:'shoes',
+    qns1:['deep','tan'], qns2:['social','professional'], qns3:['earthtones','bold'], qns4:['statement','eclectic'],
+    personas:['romantic','vivid'],
+    name:'The Tooled Mule',            desc:'Hand-embossed leather, stacked heel, open toe',           price:'520', currency:'SGD', emoji:'🌺', bg:'#DDD0B4', badge:'limited',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940035_BRN-ID')$",   analytics:{contentId:"product_image_35",  contentType:"asset"} },
+
+  { id:36, type:'shoes',
+    qns1:['fair','light','medium'], qns2:['active'], qns3:['neutrals','pastels'], qns4:['comfort'],
+    personas:['active','serene'],
+    name:'The Classic Runner',         desc:'Mesh upper, rubber outsole, arch support',                price:'95',  currency:'SGD', emoji:'👟', bg:'#D0DCD4',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940036_WHT-ID')$",   analytics:{contentId:"product_image_36",  contentType:"asset"} },
+
+  { id:37, type:'shoes',
+    qns1:['medium','tan','deep'], qns2:['active','traveller'], qns3:['earthtones','bold'], qns4:['comfort','eclectic'],
+    personas:['active','wanderer','eclectic'],
+    name:'The Trail Sneaker',          desc:'Waterproof membrane, grip sole, lace-lock system',        price:'235', currency:'SGD', emoji:'🏔️', bg:'#C8D8D0', badge:'new',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940037_GRN-ID')$",   analytics:{contentId:"product_image_37",  contentType:"asset"} },
+
+  { id:38, type:'shoes',
+    qns1:['fair','light'], qns2:['active','social'], qns3:['bold','pastels'], qns4:['statement','eclectic'],
+    personas:['vivid','eclectic'],
+    name:'The Platform Sneaker',       desc:'Chunky sole, retro cupsole, padded collar',               price:'195', currency:'SGD', emoji:'⚡', bg:'#CCE0E8',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940038_WHT-ID')$",   analytics:{contentId:"product_image_38",  contentType:"asset"} },
+
+  { id:39, type:'shoes',
+    qns1:['light','medium'], qns2:['professional','active'], qns3:['neutrals'], qns4:['minimalist','comfort'],
+    personas:['polished','active'],
+    name:'The Smart Trainer',          desc:'Leather-look upper, business-casual silhouette',          price:'265', currency:'SGD', emoji:'💼', bg:'#D0D8E4',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940039_GRY-ID')$",   analytics:{contentId:"product_image_39",  contentType:"asset"} },
+
+  { id:40, type:'shoes',
+    qns1:['deep','tan'], qns2:['social','active'], qns3:['bold','neutrals'], qns4:['statement'],
+    personas:['vivid','social'],
+    name:'The Limited Collab Sneaker', desc:'Premium suede, numbered edition, custom box',             price:'620', currency:'SGD', emoji:'🌟', bg:'#C8D4DC', badge:'limited',
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+    link:"$url('Product-Show','pid','PW4-95940040_BLK-ID')$",   analytics:{contentId:"product_image_40",  contentType:"asset"} },
+];
+
+// ── Persona Engine ────────────────────────────────────────────
+const personas = [
+  {
+    id:'serene', name:'The Serene', subtitle:'Soul',
+    tagline:'Quiet luxury, effortless grace',
+    desc:"You move through the world with an unhurried elegance. Soft palettes, fluid silhouettes, and carefully chosen pieces define your aesthetic — each item chosen with intention rather than impulse.",
+    emoji:'🕊️', traits:['Soft Minimalism','Quiet Luxury','Effortless Ease'],
+    palette:['#F2EDE6','#D8CECC','#B0A8A2','#8C8078'],
+    combos:['fair-*-pastels-comfort','light-*-pastels-comfort'],
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+  },
+  {
+    id:'polished', name:'The Polished', subtitle:'Edge',
+    tagline:'Power dressed, impeccably sharp',
+    desc:'You command attention before you speak. Crisp tailoring, structured bags, and a muted-to-monochrome palette communicate authority and taste in equal measure.',
+    emoji:'🖤', traits:['Structural','Authoritative','Refined'],
+    palette:['#2A2520','#4A4440','#8C7B6E','#D8D0C8'],
+    combos:['*-professional-neutrals-minimalist','*-professional-neutrals-statement'],
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+  },
+  {
+    id:'wanderer', name:'The Golden', subtitle:'Wanderer',
+    tagline:'Rooted in earth, free in spirit',
+    desc:'Adventure is your wardrobe brief. You layer textures, collect stories in travel-worn leather, and dress as though you might board a flight to anywhere at any moment.',
+    emoji:'🌍', traits:['Worldly','Textured','Free-Spirited'],
+    palette:['#9B4F2A','#B8962E','#6B7B5E','#E8DFC8'],
+    combos:['tan-traveller-earthtones-comfort','tan-traveller-earthtones-eclectic','medium-traveller-earthtones-*','deep-traveller-earthtones-*','*-traveller-earthtones-*'],
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+  },
+  {
+    id:'vivid', name:'The Vivid', subtitle:'Force',
+    tagline:'Colour is your power — wield it',
+    desc:"You don't blend in — you define the room. Rich, saturated hues and bold accessories are your language. Every outfit is a deliberate declaration.",
+    emoji:'⚡', traits:['Bold','Intentional','Commanding'],
+    palette:['#C0392B','#1A3A6B','#8B2FC9','#1A6B3A'],
+    combos:['*-*-bold-statement'],
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+  },
+  {
+    id:'social', name:'The Social', subtitle:'Butterfly',
+    tagline:'Every evening is an occasion',
+    desc:'You live for the moment when the lights soften and conversation sparkles. Your style is festive without being loud — evening-ready, always luminous.',
+    emoji:'🥂', traits:['Luminous','Event-Ready','Celebratory'],
+    palette:['#D4AF6A','#E8E0D8','#B8962E','#F5F0E8'],
+    combos:['*-social-pastels-*','*-social-bold-*'],
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+  },
+  {
+    id:'active', name:'The Active', subtitle:'Minimalist',
+    tagline:'Form follows function, beautifully',
+    desc:'Performance meets polish in your world. You refuse to choose between comfort and style — your wardrobe works as hard as you do, and looks exceptional doing it.',
+    emoji:'🏃', traits:['Functional','Clean Lines','Modern Ease'],
+    palette:['#D0DCD4','#8C7B6E','#C8D8D0','#2A2520'],
+    combos:['*-active-*-comfort','*-active-*-minimalist'],
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+  },
+  {
+    id:'romantic', name:'The Earthy', subtitle:'Romantic',
+    tagline:'Warm, textured, deeply felt',
+    desc:'You gravitate toward the handcrafted and the heirloom. Earth tones ground you; intricate details speak your language. Your style feels like something discovered, not bought.',
+    emoji:'🌿', traits:['Handcrafted','Warm Palette','Soulful'],
+    palette:['#7A5C40','#9B4F2A','#B8962E','#E8DFC8'],
+    combos:['tan-*-earthtones-eclectic','tan-*-earthtones-comfort','deep-*-earthtones-eclectic','deep-*-earthtones-comfort','medium-*-earthtones-eclectic','medium-*-earthtones-comfort'],
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+  },
+  {
+    id:'eclectic', name:'The Eclectic', subtitle:'Curator',
+    tagline:'Rules were made to be layered',
+    desc:'Your wardrobe is an ongoing creative experiment. You mix eras, textures, and stories with the confidence of someone who knows that taste is personal — and yours is unmistakable.',
+    emoji:'🎨', traits:['Inventive','Layered','Unexpected'],
+    palette:['#9B4F2A','#1A3A6B','#6B7B5E','#D4AF6A'],
+    combos:['*-*-*-eclectic'],
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+  },
+  {
+    id:'refined', name:'The Refined', subtitle:'Classic',
+    tagline:'Timeless taste, never trending',
+    desc:'You understand that true style is not seasonal. Enduring silhouettes, quality materials, and a considered palette form the backbone of a wardrobe built to last.',
+    emoji:'🌹', traits:['Timeless','Considered','Classic'],
+    palette:['#E8DED0','#C4B8A8','#8C7B6E','#2A2520'],
+    combos:['*-*-*-*'],
+    imgMobile: '../../media/portrait.jpg', imgDesktop: '../../media/landscape.jpg',
+  },
+];
+
+function resolvePersona() {
+  const keys = questionSchema.map(q => q.key);
+  for (const persona of personas) {
+    for (const combo of persona.combos) {
+      const segments = combo.split('-');
+      const matched = segments.every((seg, i) => {
+        if (seg === '*') return true;
+        const key = keys[i];
+        return key && answers[key] && answers[key].includes(seg);
+      });
+      if (matched) return persona;
+    }
+  }
+  return personas[personas.length - 1];
+}
+
+function drawPersonaCanvas(el, pal) {
+  const ctx=el.getContext('2d'), W=el.width=el.offsetWidth||340, H=el.height=el.offsetHeight||320;
+  const g=ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,pal[0]); g.addColorStop(1,pal[1]);
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  for(let i=0;i<5;i++){ctx.beginPath();const r=40+Math.random()*80,x=Math.random()*W,y=Math.random()*H,cg=ctx.createRadialGradient(x,y,0,x,y,r);cg.addColorStop(0,pal[2]+'55');cg.addColorStop(1,pal[3]+'00');ctx.fillStyle=cg;ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+  ctx.strokeStyle=pal[2]+'22'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+
+function buildPersonaCard(p) {
+  document.getElementById('personaCard').innerHTML = `
+    <div class="persona-visual" id="personaVisual">
+      <canvas id="personaCanvas"></canvas>
+      <picture>
+        <source media="(min-width:768px)" srcset="${p.imgDesktop||''}">
+        <img src="${p.imgMobile||''}" alt="${p.name} ${p.subtitle}" loading="eager"
+             onerror="this.closest('picture').style.display='none';var el=document.getElementById('personaFallbackEmoji');if(el)el.style.display='flex';">
+      </picture>
+      <div class="persona-visual-emoji" id="personaFallbackEmoji" style="display:none">${p.emoji}</div>
+    </div>
+    <div class="persona-info">
+      <div class="persona-eyebrow">Your Style Persona</div>
+      <div class="persona-name">${p.name} <em>${p.subtitle}</em></div>
+      <div class="persona-divider"></div>
+      <div class="persona-desc">${p.desc}</div>
+      <div class="persona-traits">${p.traits.map(t=>`<span class="persona-trait">${t}</span>`).join('')}</div>
+    </div>`;
+  requestAnimationFrame(() => { const c=document.getElementById('personaCanvas'); if(c) drawPersonaCanvas(c,p.palette); });
+}
+
+// ══════════════════════════════════════════════════════════════
+// SHOW RESULTS
+// ══════════════════════════════════════════════════════════════
+function showResults() {
+  // Validate all answered — highlight any missed
+  let allGood = true;
+  questionSchema.forEach(q => {
+    const block = document.getElementById(`block-${q.key}`);
+    if (answers[q.key].length === 0) {
+      allGood = false;
+      block.classList.remove('needs-answer');
+      void block.offsetWidth; // reflow to retrigger animation
+      block.classList.add('needs-answer');
+      setTimeout(() => block.classList.remove('needs-answer'), 600);
+    }
+  });
+  if (!allGood) {
+    // Scroll to first unanswered
+    const first = questionSchema.find(q => answers[q.key].length === 0);
+    if (first) document.getElementById(`block-${first.key}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  document.getElementById('quiz-form').style.display = 'none';
+  buildResults();
+  document.getElementById('results-panel').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function buildResults() {
+  const persona = resolvePersona();
+  buildPersonaCard(persona);
+
+  const modeEl = document.getElementById('modeBadge');
+  if (SHOW_MODE_BADGE) {
+    modeEl.innerHTML = RECOMMENDATION_MODE === 'persona'
+      ? `<span class="mode-badge persona">Persona-based curation</span>`
+      : `<span class="mode-badge score">Answer score matching</span>`;
+  } else {
+    modeEl.innerHTML = '';
+  }
+
+  const tagMap = {};
+  questionSchema.forEach(q => q.options.forEach(o => { tagMap[o.value] = o.name; }));
+  document.getElementById('filterTags').innerHTML =
+    Object.values(answers).flat().map(v => `<span class="tag">${tagMap[v]||v}</span>`).join('');
+
+  let scored = [];
+  if (RECOMMENDATION_MODE === 'persona') {
+    scored = products.filter(p => p.personas.includes(persona.id));
+  } else {
+    const calcScore = p => {
+      let s = 0;
+      if (answers.qns1.some(v => p.qns1 && p.qns1.includes(v))) s += 3;
+      if (answers.qns2.some(v => p.qns2 && p.qns2.includes(v))) s += 3;
+      if (answers.qns3.some(v => p.qns3 && p.qns3.includes(v))) s += 2;
+      if (answers.qns4.some(v => p.qns4 && p.qns4.includes(v))) s += 2;
+      return s;
+    };
+    const withScores = products.map(p => ({ ...p, score: calcScore(p) }));
+    scored = withScores.filter(p => p.score >= 4).sort((a, b) => b.score - a.score);
+    if (scored.length < 4) scored = withScores.filter(p => p.score >= 2).sort((a, b) => b.score - a.score);
+  }
+
+  const TYPE_ORDER = ['shoes', 'bags', 'accessories'];
+  scored.sort((a, b) => (TYPE_ORDER.indexOf(a.type) === -1 ? 99 : TYPE_ORDER.indexOf(a.type)) - (TYPE_ORDER.indexOf(b.type) === -1 ? 99 : TYPE_ORDER.indexOf(b.type)));
+
+  const bClass = { new:'badge-new', sale:'badge-sale', limited:'badge-limited' };
+  const bLabel = { new:'New In', sale:'On Sale', limited:'Limited Ed.' };
+  const grid = document.getElementById('productsGrid');
+
+  if (!scored.length) {
+    grid.innerHTML = '<div class="no-results"><div class="icon">🔍</div><p>No items match — try broadening your preferences.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = scored.map((p, i) => {
+    const aAttr = p.analytics ? ` data-content-analytic='${JSON.stringify(p.analytics)}'` : '';
+    return `<a href="${p.link||'#'}" class="product-card" style="animation-delay:${i*0.07}s"${aAttr}>
+      <div class="product-image" style="background:${p.bg}">
+        <picture>
+          <source media="(min-width:768px)" srcset="${p.imgDesktop||''}">
+          <img src="${p.imgMobile||''}" alt="${p.name}" loading="lazy"
+               onerror="this.closest('picture').replaceWith(Object.assign(document.createElement('span'),{textContent:'${p.emoji}',style:'font-size:4rem;line-height:1;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;'}))">
+        </picture>
+        ${p.badge ? `<span class="product-badge ${bClass[p.badge]}">${bLabel[p.badge]}</span>` : ''}
+      </div>
+      <div class="product-info">
+        <div class="product-category">${p.type==='bags'?'Bags':'Shoes'}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-footer">
+          <div class="product-price"><span class="currency">${p.currency} </span>${p.price}</div>
+          <button class="qns-btn-wish" onclick="toggleWish(event,this)">&#9825;</button>
+        </div>
+      </div></a>`;
+  }).join('');
+}
+
+// ── Share ─────────────────────────────────────────────────────
+function getShareText(){const p=resolvePersona();return `I just discovered my style persona: ${p.name} ${p.subtitle} — "${p.tagline}" ✨ Find yours at PEDRO Style Finder!`;}
+function getShareUrl(){return window.location.href;}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+function shareToFacebook(){window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}&quote=${encodeURIComponent(getShareText())}`,'_blank','width=600,height=460');}
+function shareToTwitter(){window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}&url=${encodeURIComponent(getShareUrl())}`,'_blank','width=600,height=460');}
+function shareToWhatsApp(){window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText()+' '+getShareUrl())}`,'_blank');}
+function shareToPinterest(){window.open(`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(getShareUrl())}&description=${encodeURIComponent(getShareText())}`,'_blank','width=750,height=550');}
+function shareToInstagram(){
+  const text=getShareText();
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>showToast('Caption copied — paste it on Instagram!'));}
+  else{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Caption copied — paste it on Instagram!');}
+}
+
+// ── PDF Download ──────────────────────────────────────────────
+async function downloadPDF() {
+  const btn = document.querySelector('.qns-btn-share.download');
+  const originalHTML = btn.innerHTML;
+  if(!document.getElementById('spin-style')){const s=document.createElement('style');s.id='spin-style';s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(s);}
+  btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0"/></svg> Generating…`;
+  btn.disabled=true;
+  try {
+    const {jsPDF}=window.jspdf, persona=resolvePersona();
+    let scored=[];
+    if(RECOMMENDATION_MODE==='persona'){
+      scored=products.filter(p=>p.personas.includes(persona.id));
+    } else {
+      const calcScore=p=>{let s=0;if(answers.qns1.some(v=>p.qns1&&p.qns1.includes(v)))s+=3;if(answers.qns2.some(v=>p.qns2&&p.qns2.includes(v)))s+=3;if(answers.qns3.some(v=>p.qns3&&p.qns3.includes(v)))s+=2;if(answers.qns4.some(v=>p.qns4&&p.qns4.includes(v)))s+=2;return s;};
+      scored=products.map(p=>({...p,score:calcScore(p)})).filter(p=>p.score>=4).sort((a,b)=>b.score-a.score);
+      if(scored.length<4)scored=products.map(p=>({...p,score:calcScore(p)})).filter(p=>p.score>=2).sort((a,b)=>b.score-a.score);
+    }
+    const bLabel={new:'New In',sale:'On Sale',limited:'Limited Ed.'}, bColor={new:'#2A2520',sale:'#9B4F2A',limited:'#B8962E'};
+    const tagMap={};questionSchema.forEach(q=>q.options.forEach(o=>{tagMap[o.value]=o.name;}));
+    const tagsHTML=Object.values(answers).flat().map(v=>`<span style="font-size:8px;letter-spacing:0.12em;padding:4px 12px;border:1px solid #B8962E;color:#B8962E;text-transform:uppercase;font-weight:500;display:inline-block;margin:2px;">${tagMap[v]||v}</span>`).join('');
+    const cardsHTML=scored.map(p=>`
+      <div style="background:white;border:1px solid #E8DED0;overflow:hidden;">
+        <div style="width:100%;padding-top:100%;position:relative;background:${p.bg};">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;line-height:1;">${p.emoji}</div>
+          ${p.badge?`<div style="position:absolute;top:8px;left:8px;font-size:7px;letter-spacing:0.15em;padding:3px 8px;text-transform:uppercase;font-weight:600;background:${bColor[p.badge]};color:white;">${bLabel[p.badge]}</div>`:''}
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-size:7px;letter-spacing:0.2em;color:#8C7B6E;text-transform:uppercase;margin-bottom:4px;">${p.type==='bags'?'Bags':'Shoes'}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:400;color:#2A2520;margin-bottom:4px;line-height:1.2;">${p.name}</div>
+          <div style="font-size:8px;color:#8C7B6E;line-height:1.5;margin-bottom:10px;">${p.desc}</div>
+          <div style="font-size:11px;font-weight:600;color:#2A2520;"><span style="font-size:8px;font-weight:400;color:#8C7B6E;">${p.currency} </span>${p.price}</div>
+        </div></div>`).join('');
+    const snap=document.createElement('div');
+    snap.style.cssText='position:fixed;left:-9999px;top:0;width:960px;background:#F5F0E8;font-family:Montserrat,sans-serif;color:#2A2520;padding:40px;box-sizing:border-box;';
+    snap.innerHTML=`
+      <div style="text-align:center;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid #E8DED0;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;letter-spacing:0.06em;color:#2A2520;">PEDRO</div>
+        <div style="font-size:9px;letter-spacing:0.35em;color:#8C7B6E;text-transform:uppercase;margin-top:6px;">Personal Style Finder</div>
+      </div>
+      <div style="display:flex;border:1px solid #E8DED0;overflow:hidden;margin-bottom:32px;background:white;">
+        <div style="width:220px;min-height:220px;flex-shrink:0;background:linear-gradient(135deg,${persona.palette[0]},${persona.palette[1]});display:flex;align-items:center;justify-content:center;">
+          <div style="font-size:72px;line-height:1;">${persona.emoji}</div>
+        </div>
+        <div style="padding:32px 36px;flex:1;min-width:0;">
+          <div style="font-size:8px;letter-spacing:0.35em;color:#B8962E;text-transform:uppercase;font-weight:600;margin-bottom:8px;">YOUR STYLE PERSONA</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;line-height:1.1;margin-bottom:12px;color:#2A2520;">${persona.name} <em style="font-style:italic;color:#B8962E;">${persona.subtitle}</em></div>
+          <div style="width:36px;height:1px;background:#B8962E;margin-bottom:14px;"></div>
+          <div style="font-size:10px;color:#8C7B6E;line-height:1.75;margin-bottom:18px;">${persona.desc}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">${persona.traits.map(t=>`<span style="font-size:8px;letter-spacing:0.12em;padding:4px 12px;background:#F5F0E8;border:1px solid #E8DED0;color:#2A2520;text-transform:uppercase;font-weight:500;">${t}</span>`).join('')}</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:8px;letter-spacing:0.35em;color:#B8962E;text-transform:uppercase;font-weight:600;margin-bottom:8px;">CURATED FOR YOU</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#2A2520;margin-bottom:12px;">Your Perfect Selections</div>
+        <div>${tagsHTML}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;">${cardsHTML}</div>
+      <div style="text-align:center;padding-top:20px;border-top:1px solid #E8DED0;">
+        <div style="font-size:8px;letter-spacing:0.25em;color:#8C7B6E;text-transform:uppercase;">pedro.com · Style Finder</div>
+      </div>`;
+    document.body.appendChild(snap);
+    await new Promise(r=>setTimeout(r,600));
+    const canvas=await html2canvas(snap,{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#F5F0E8',logging:false,width:960,windowWidth:960,scrollX:0,scrollY:0});
+    document.body.removeChild(snap);
+    const pdfW=210,pageHmm=297,pxPerMm=canvas.width/pdfW,pageHpx=pageHmm*pxPerMm;
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    let offsetPx=0,page=0;
+    while(offsetPx<canvas.height){const sliceHpx=Math.min(pageHpx,canvas.height-offsetPx);const sc=document.createElement('canvas');sc.width=canvas.width;sc.height=Math.ceil(sliceHpx);sc.getContext('2d').drawImage(canvas,0,offsetPx,canvas.width,sliceHpx,0,0,canvas.width,sliceHpx);if(page>0)pdf.addPage();pdf.addImage(sc.toDataURL('image/jpeg',0.95),'JPEG',0,0,pdfW,sliceHpx/pxPerMm);offsetPx+=sliceHpx;page++;}
+    pdf.save(`PEDRO_${persona.name.replace(/\s+/g,'_')}_${persona.subtitle}_Style.pdf`);
+    showToast('PDF saved successfully!');
+  } catch(err){console.error(err);showToast('Could not generate PDF — try again.');}
+  finally{btn.innerHTML=originalHTML;btn.disabled=false;}
+}
+
+function toggleWish(e,b){e.preventDefault();const on=b.innerHTML==='&#9825;';b.innerHTML=on?'&#9829;':'&#9825;';b.style.color=on?'#9B4F2A':'';b.style.borderColor=on?'#9B4F2A':'';}
+
+function restart() {
+  questionSchema.forEach(q => answers[q.key] = []);
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.progress-pip').forEach(p => p.classList.remove('filled'));
+  document.getElementById('submitBtn').disabled = true;
+  const hint = document.getElementById('submitHint');
+  hint.textContent = 'Answer all questions to reveal your picks';
+  hint.style.color = '';
+  document.getElementById('results-panel').style.display = 'none';
+  document.getElementById('quiz-form').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

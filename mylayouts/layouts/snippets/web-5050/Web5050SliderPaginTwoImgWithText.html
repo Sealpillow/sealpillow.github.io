@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Responsive Image & Text Slider</title>
+<style>
+/* Body */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0 auto;
+  max-width: 1000px;
+  padding: 20px;
+}
+
+/* Image Container Pair > A */
+.image-container-pair a {
+  display: none;
+}
+
+/* Image Container Pair > A */
+.image-container-pair a.active {
+  display: block;
+}
+
+/* Folder_Post > Folder Container > Container */
+.folder_post .folder-container .container {
+  display: none !important;
+}
+
+/* Image Pair */
+.image-pair {
+  display: flex;
+  gap: 10px;
+}
+
+/* Image Container Pair */
+.image-container-pair {
+  height: auto;
+  overflow: visible;
+  position: relative;
+  width: 50%;
+}
+
+/* Content Area */
+.content-area {
+  display: flex;
+}
+
+/* Text Content */
+.text-content {
+  width: 50%;
+}
+
+/* Slider Controls */
+.slider-controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  margin: 18px;
+  width: 50%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Page > Parallax */
+  .page.parallax {
+    padding-top: 50px !important;
+  }
+
+  /* Image Pair */
+  .image-pair {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* Image Container Pair */
+  .image-container-pair {
+    height: auto;
+    width: 100%;
+  }
+
+  /* Left Image */
+  #left-image {
+    order: 1;
+  }
+
+  /* Right Image */
+  #right-image {
+    order: 2;
+  }
+
+  /* Content Area */
+  .content-area {
+    flex-direction: column;
+  }
+
+  /* Text Content */
+  .text-content {
+    order: 3;
+    width: 100%;
+  }
+
+  /* Slider Controls */
+  .slider-controls {
+    justify-content: center;
+    margin: 10px 0px 10px 0px;
+    order: 4;
+    width: 100%;
+  }
+}
+
+/* Image Container Pair > Img */
+.image-container-pair img {
+  height: auto;
+  left: 0;
+  position: relative;
+  top: 0;
+  transition: opacity 0.5s ease;
+  width: 100%;
+}
+
+/* Image Container Pair > Img */
+.image-container-pair img:not(.active) {
+  opacity: 0;
+}
+
+/* Text Slide */
+.text-slide {
+  display: none;
+  transition: opacity 0.5s ease;
+}
+
+/* Text Slide */
+.text-slide.active {
+  display: block;
+}
+
+/* Dot Container */
+.dot-container {
+  align-items: end;
+  display: flex;
+  gap: 15px;
+  margin-bottom:5%
+  margin-top: 20px;
+}
+
+/* Dot */
+.dot {
+  background-color: #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 14px;
+  transition: all 0.3s ease;
+  width: 14px;
+}
+
+/* Dot */
+.dot.active {
+  background-color: #333;
+  transform: scale(1.2);
+}
+
+/* Dot */
+.dot:hover:not(.active) {
+  background-color: #aaa;
+}
+</style>
+</style>
+</head>
+<body>
+    <!-- Top image pair -->
+    <div class="image-pair" style="margin:18px;">
+        <div class="image-container-pair" id="left-image">
+            <a class="active" href="$url('Product-Show','pid','PW2-75210161-5_BROWN')$" data-content-analytic='{"contentId": "jatte-3d-editorial_01 mobile", "contentType": "asset", "itemId": "jatte-3d-editorial_01"}' data-set="0">
+                <img src="https://picsum.photos/800/600?random=1" alt="" class="active" data-set="0">
+            </a>
+            <a href="$url('Product-Show','pid','PW2-75210161_BLACK')$" data-content-analytic='{"contentId": "jatte-3d-editorial_03 mobile", "contentType": "asset", "itemId": "jatte-3d-editorial_03"}' data-set="1">
+                <img src="https://picsum.photos/800/600?random=3" alt="" data-set="1">
+            </a>
+            <!--<a href="$url('Product-Show','pid','PW2-75210161_WHITE')$" data-content-analytic='{"contentId": "jatte-3d-editorial_05 mobile", "contentType": "asset", "itemId": "jatte-3d-editorial_05"}'>
+                <img src="../../media/portrait.jpg" alt="" data-set="1">
+            </a> -->
+        </div>
+        <div class="image-container-pair" id="right-image">
+            <a class="active" href="$url('Product-Show','pid','PW2-75210161-5_BROWN')$" data-content-analytic='{"contentId": "jatte-3d-editorial_02 mobile", "contentType": "asset", "itemId": "jatte-3d-editorial_02"}' data-set="0">
+                <img src="https://picsum.photos/800/600?random=2" alt="" class="active" data-set="0">
+            </a>
+            <a href="$url('Product-Show','pid','PW2-75210161_BLACK')$" data-content-analytic='{"contentId": "jatte-3d-editorial_04 mobile", "contentType": "asset", "itemId": "jatte-3d-editorial_04"}' data-set="1">
+                <img src="https://picsum.photos/800/600?random=4" alt="" data-set="1">
+            </a>
+
+            <!--<a href="$url('Product-Show','pid','PW2-75210161_WHITE')$" data-content-analytic='{"contentId": "jatte-3d-editorial_05 mobile", "contentType": "asset", "itemId": "jatte-3d-editorial_05"}'>
+                <img src="../../media/portrait.jpg" alt="" data-set="1">
+            </a> -->
+        </div>
+    </div>
+    <!-- Content area with text and slider controls -->
+    <div class="content-area">
+        <div class="text-content" style="margin:18px;">
+            <div class="text-slide active" data-set="0" >
+                <h2 style="font-family:aktiv-grotesk-extended; font-size: 20px;font-weight:400;">01 Jatte Brown</h2>
+                <p style="font-family:proxima-nova; font-size: 14px; width:80%">Rendered in an earthy brown, the Jatte embodies effortless sophistication with subtle nods to heritage.
+                    Nuanced texture and soft sheen evoke natural tones, transforming classic allure into a contemporary vision.</p>
+            </div>
+            <div class="text-slide" data-set="1">
+                <h2 style="font-family:aktiv-grotesk-extended; font-size: 20px;font-weight:400;">02 Jatte Black</h2>
+                <p style="font-family:proxima-nova; font-size: 14px; width:80%">A sleek answer to a cultivated ease of living, where darkness becomes a design language of its own, bold yet understated.
+                    The Jatte in black commands attention through its minimalist geometry and clean-lined silhouette.</p>
+            </div>
+        </div>
+
+        <div class="slider-controls">
+            <div class="dot-container">
+                <div class="dot active" data-set="0"></div>
+                <div class="dot" data-set="1"></div>
+                <!--<div class="dot" data-set="2"></div>-->
+            </div>
+        </div>
+    </div>
+</body>
+
+
+<script>
+    const dots = document.querySelectorAll('.dot');
+    const leftImages = document.querySelectorAll('#left-image img');
+    const rightImages = document.querySelectorAll('#right-image img');
+    const textSlides = document.querySelectorAll('.text-slide');
+    const leftAnchors = document.querySelectorAll('#left-image a');
+    const rightAnchors = document.querySelectorAll('#right-image a');
+
+    dots.forEach(dot => {
+        dot.addEventListener('click', function() {
+            const setIndex = this.getAttribute('data-set');
+            
+            // Update active dot
+            dots.forEach(d => d.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update left image and anchor
+            leftImages.forEach((img, index) => {
+                const anchor = leftAnchors[index];
+                img.classList.toggle('active', img.getAttribute('data-set') === setIndex);
+                anchor.classList.toggle('active', img.getAttribute('data-set') === setIndex);
+            });
+            
+            // Update right image and anchor
+            rightImages.forEach((img, index) => {
+                const anchor = rightAnchors[index];
+                img.classList.toggle('active', img.getAttribute('data-set') === setIndex);
+                anchor.classList.toggle('active', img.getAttribute('data-set') === setIndex);
+            });
+            
+            // Update text content
+            textSlides.forEach(text => {
+                text.classList.toggle('active', text.getAttribute('data-set') === setIndex);
+            });
+        });
+    });
+
+    // Optional auto-advance
+    let currentSet = 0;
+    const totalSets = dots.length;
+
+    function autoAdvance() {
+        currentSet = (currentSet + 1) % totalSets;
+        document.querySelector(`.dot[data-set="${currentSet}"]`).click();
+    }
+
+    // Uncomment to enable auto-advance every 5 seconds
+    // setInterval(autoAdvance, 5000);
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

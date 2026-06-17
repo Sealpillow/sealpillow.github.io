@@ -1,0 +1,62 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Flexi Col Image2 */
+.flexi-col-image2 {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+/* Flexi Col Image Right2 > A > Flexi Col Image Left2 */
+.flexi-col-image-right2 a,
+.flexi-col-image-left2 a {
+  display: block;
+  width: 100%;
+}
+
+/* Flexi Col Image Right2 */
+.flexi-col-image-right2 {
+  width: 100%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Flexi Col Image2 */
+  .flexi-col-image2 {
+    display: grid;
+    grid-template-columns: none;
+    grid-template-rows: 0.5fr 0.5fr;
+  }
+
+  /* Flexi Col Image Left2 */
+  .flexi-col-image-left2 {
+    justify-self: end;
+    order: 1;
+    width: 60%;
+  }
+
+  /* Flexi Col Image Right2 */
+  .flexi-col-image-right2 {
+    order: 2;
+    width: 100%;
+  }
+}
+</style>
+<div class="flexi-col-image2" style="width: 100%; margin-bottom: 100px;" >
+    <!-- Left side: one small images -->
+    <div class="flexi-col-image-left2">
+        <picture>
+            <source srcset="../../media/landscape.jpg" media="(min-width: 768px)">
+            <img src="../../media/landscape.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+        </picture>      
+    </div>
+
+    <!-- Right side: One large image -->
+    <div class="flexi-col-image-right2" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PM2-26390004_BLACK" href="$url('Product-Show','pid','PM2-26390004_BLACK')$">
+            <picture>
+                <source srcset="../../media/landscape.jpg" media="(min-width: 768px)">
+                <img src="../../media/landscape.jpg" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>    
+    </div>
+</div>

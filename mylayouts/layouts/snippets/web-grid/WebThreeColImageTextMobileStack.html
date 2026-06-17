@@ -1,0 +1,91 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Side By Side 3 Container — All */
+.side-by-side-3-container *,
+.side-by-side-3-container *::before,
+.side-by-side-3-container *::after {
+  box-sizing: border-box;
+}
+
+/* Side By Side 3 Container */
+.side-by-side-3-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: space-between;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Side By Side 3 Container > A */
+.side-by-side-3-container a {
+  display: block;
+  flex: 1 1 30%;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Side By Side 3 Container > Img */
+.side-by-side-3-container img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Side By Side 3 Text Container */
+.side-by-side-3-text-container {
+  color: black;
+  font-family: 'proxima-nova';
+  line-height: normal;
+  padding: 10px 0;
+}
+
+/* Side By Side 3 Text Container > Side By Side 3 Bottom Text */
+.side-by-side-3-text-container .side-by-side-3-bottom-text {
+  font-size: 20px;
+  padding-left: 5%;
+  text-align: left;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Side By Side 3 Container > A */
+  .side-by-side-3-container a {
+    flex: 1 1 100%;
+  }
+
+  /* Side By Side 3 Text Container > Side By Side 3 Bottom Text */
+  .side-by-side-3-text-container .side-by-side-3-bottom-text {
+    padding: 5%;
+    text-align: center;
+  }
+}
+</style>
+<p class="mt-6 mt-md-6 text-center text-md-left w-full ml-3" style="font-size: 30px; font-family: 'proxima-nova';">
+  Three-Way Styling
+</p>
+<div class="side-by-side-3-container">
+    <!-- Left Image -->
+    <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+        <img src="../../media/landscape.jpg" alt="Bag">
+        <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Shoulder</div>
+        </div>
+    </a>
+    <!-- Middle Image -->
+    <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+        <img src="../../media/landscape.jpg" alt="Bag">
+        <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Handheld</div>
+        </div>
+    </a>
+    <!-- Right Image -->
+    <a href="$url('Product-Show', 'pid','PW2-75210189_RED')$">
+        <img src="../../media/landscape.jpg" alt="Bag">
+        <div class="side-by-side-3-text-container">
+            <div class="side-by-side-3-bottom-text">Crossbody</div>
+        </div>
+    </a>
+</div>
