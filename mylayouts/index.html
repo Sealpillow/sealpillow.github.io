@@ -322,6 +322,10 @@
   <button class="pill" data-filter="hover">Hover</button>
   <button class="pill" data-filter="sliders">Slider</button>
   <button class="pill" data-filter="scroll">Scroll</button>
+  <button class="pill" data-filter="editorial">Editorial</button>
+  <button class="pill" data-filter="product">Product</button>
+  <button class="pill" data-filter="link">Link / CTA</button>
+  <button class="pill" data-filter="redirects">Redirects</button>
   <button class="pill" data-filter="special">Special</button>
   <span class="count-badge" id="count-badge">-- items</span>
 </div>
@@ -457,6 +461,7 @@ const layouts = [
   { file:"web-grid/WebTitleThreeColMobileStackWithLink.html", name:"Title + Three-Col - Mobile Stack (With Link)", platform:"web", tags:["3-col","text","link"], layout:"Three Column", mobile:"Mobile stack", desc:"Title header above three columns with links. Stacks on mobile." },
   { file:"web-grid/WebFourColEqualHeightMobileStack.html", name:"Four-Col Equal Height - Mobile Stack (2×2)", platform:"web", tags:["4-col","grid"], layout:"Four Column", mobile:"2×2 grid", desc:"Four equal-height columns on desktop, collapses to a 2×2 grid on mobile." },
   { file:"web-grid/snippet-multigrid-products.html", name:"Multi-Grid Products", platform:"web", tags:["grid","product"], layout:"Multi Grid", mobile:"--", desc:"Multi-column product grid snippet." },
+  { file:"web-grid/WebImageTextImageSandwich.html", name:"Image | Text | Image Sandwich", platform:"web", tags:["editorial","3-col","text"], layout:"Three Column", mobile:"Mobile stack", desc:"Two portrait images flanking a central text column — editorial 3-col sandwich." },
   // WEB IMAGE
   { file:"web-image/WebImageLeftImageTextRightMobileStackWithLink.html", name:"Img Left, Img+Text Right - Mobile Stack (Link)", platform:"web", tags:["text","link"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Image left, image with text right. Link included. Stacks on mobile." },
   { file:"web-image/WebImageLeftLargeRightSmallMobileStack.html", name:"Img Left Large, Right Small - Mobile Stack", platform:"web", tags:["asymmetric"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Larger image left, smaller right. Stacks on mobile." },
@@ -466,6 +471,8 @@ const layouts = [
   { file:"web-image/WebTopDownMobileTopDownDiffSize.html", name:"Top-Down - Mobile Top-Down, Different Sizes", platform:"web", tags:["stacked"], layout:"Top Down", mobile:"Top-down (diff size)", desc:"Vertically stacked layout adapting to different image sizes on mobile." },
   { file:"web-image/WebSingleImageNarrowDesktopWideMobile.html", name:"Single Image - Narrow Desktop, Wide Mobile", platform:"web", tags:["centered"], layout:"Single Image", mobile:"Wide", desc:"Single image constrained on desktop, full-width on mobile." },
   { file:"web-image/WebSingleVIdeoNarrowDesktopWideMobile.html", name:"Single Video - Narrow Desktop, Wide Mobile", platform:"web", tags:["video"], layout:"Single Video", mobile:"Wide", desc:"Single video constrained on desktop, full-width on mobile." },
+{ file:"web-image/WebStaggeredOffsetStack.html", name:"Staggered Offset Stack", platform:"web", tags:["editorial"], layout:"Staggered", mobile:"Mobile stack", desc:"Vertically stacked images alternating left and right with breathing negative space." },
+{ file:"web-image/WebHangingFloatingCaption.html", name:"Hanging / Floating Caption", platform:"web", tags:["editorial","text"], layout:"Caption", mobile:"Mobile stack", desc:"Short caption offset outside the image boundary into the negative space." },
   // WEB TEXT
   { file:"web-text/WebTitleLeftTextRightMobileStack.html", name:"Title Left, Text Right - Mobile Stack", platform:"web", tags:["text"], layout:"Text Split", mobile:"Mobile stack", desc:"Title left, body text right. Stacks on mobile." },
   { file:"web-text/WebTitleRightTextLeftMobileStack.html", name:"Title Right, Text Left - Mobile Stack", platform:"web", tags:["text"], layout:"Text Split", mobile:"Mobile stack", desc:"Title right, body text left. Stacks on mobile." },
@@ -473,6 +480,9 @@ const layouts = [
   { file:"web-text/WebEditorialInfoBarTwoColMobileRestack.html", name:"Editorial Info Bar - Two Col (Mobile Restack)", platform:"web", tags:["text","editorial"], layout:"Info Bar", mobile:"Mobile restack", desc:"Editorial info bar in two columns. Restacks on mobile." },
   { file:"web-text/WebEditorialNavLeftLogoRight.html", name:"Editorial - Nav Left, Logo Right", platform:"web", tags:["text","editorial"], layout:"Editorial Nav", mobile:"--", desc:"Editorial navigation bar with logo on the right." },
   { file:"web-text/snippet-section-header-tabs.html", name:"Section Header - Tabs", platform:"web", tags:["tabs"], layout:"Section Header", mobile:"--", desc:"Section header with tab navigation." },
+  { file:"web-text/WebChapterSectionDivider.html", name:"Chapter / Section Divider", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Full width", desc:"Full-width text-only break with a large chapter number, short label and thin rule." },
+  { file:"web-text/WebEditorialTextOpener.html", name:"Editorial Text Opener", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Full width", desc:"Large intro paragraph spanning the full width with eyebrow and body copy below." },
+  { file:"web-text/WebEditorialCreditsStrip.html", name:"Editorial Credits Strip", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Mobile stack", desc:"Slim horizontal credits row: photographer, stylist, talent, location." },
   // FULL WIDTH
   { file:"fullwidth/FullWidthVideo.html", name:"Full Width - Video", platform:"fullwidth", tags:["video"], layout:"Full Width", mobile:"Full width", desc:"Full-width video background." },
   { file:"fullwidth/FullWidthVideoWithTextBelow.html", name:"Full Width - Video with Text Below", platform:"fullwidth", tags:["video","text"], layout:"Full Width", mobile:"Full width", desc:"Full-width video with a text block below." },
@@ -484,7 +494,8 @@ const layouts = [
   { file:"fullwidth/FullWidthImageTextBtmRightWithRedirectOverlay.html", name:"Full Width - Image, Text Btm Right + Redirect Overlay", platform:"fullwidth", tags:["overlay","link"], layout:"Full Width", mobile:"Full width", desc:"Full-width image with text anchored bottom-right and a redirect overlay." },
   { file:"fullwidth/FullWidthPositionSectionLink.html", name:"Full Width - Position Section Link", platform:"fullwidth", tags:["link"], layout:"Full Width", mobile:"Full width", desc:"Full-width layout with a positioned section link." },
   { file:"fullwidth/FullWidthdropdown.html", name:"Full Width - Dropdown", platform:"fullwidth", tags:["interactive"], layout:"Full Width", mobile:"Full width", desc:"Full-width layout with a dropdown component." },
-  // HOVER
+  { file:"fullwidth/FullWidthHeroCentredText.html", name:"Full Width - Hero Centred Text", platform:"fullwidth", tags:["editorial","overlay"], layout:"Full Width", mobile:"Full width", desc:"100vh image with title, rule and subtitle centred — magazine cover hero." },
+// HOVER
   { file:"hover/HoverImageSwap.html", name:"Hover - Image Swap", platform:"hover", tags:["hover","product"], layout:"Hover", mobile:"--", desc:"Three-column product grid where hovering each image crossfades to an alternate view." },
   { file:"hover/5050hover.html", name:"50/50 - Hover", platform:"hover", tags:["hover","5050"], layout:"50/50 Hover", mobile:"--", desc:"50/50 split with hover interaction." },
   { file:"hover/HoverGreyOutParagraph.html", name:"Hover - Grey Out Paragraph", platform:"hover", tags:["hover","text"], layout:"Hover", mobile:"--", desc:"Hovering an item greys out surrounding paragraph text." },
@@ -729,6 +740,10 @@ function applyFilters() {
       if (currentFilter==='sliders')   return item.platform==='sliders';
       if (currentFilter==='special')   return item.platform==='special';
       if (currentFilter==='scroll')    return item.tags.includes('scroll') || item.tags.includes('sticky');
+      if (currentFilter==='editorial') return item.tags.includes('editorial');
+      if (currentFilter==='product')   return item.tags.includes('product');
+      if (currentFilter==='link')      return item.tags.includes('link');
+      if (currentFilter==='redirects') return item.platform==='redirects';
       return true;
     });
   }
