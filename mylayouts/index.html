@@ -317,7 +317,9 @@
   <button class="pill" data-filter="5050">50/50 Split</button>
   <button class="pill" data-filter="flexi">Flexi</button>
   <button class="pill" data-filter="collage">Collage/Grid</button>
+  <button class="pill" data-filter="image">Image</button>
   <button class="pill" data-filter="video">Video</button>
+  <button class="pill" data-filter="text">Text</button>
   <button class="pill" data-filter="fullwidth">Full Width</button>
   <button class="pill" data-filter="hover">Hover</button>
   <button class="pill" data-filter="sliders">Slider</button>
@@ -739,6 +741,15 @@ function applyFilters() {
       if (currentFilter==='hover')     return item.platform==='hover';
       if (currentFilter==='sliders')   return item.platform==='sliders';
       if (currentFilter==='special')   return item.platform==='special';
+      if (currentFilter==='image') {
+        const f = item.file;
+        const imgFolders = ['web-5050/','web-flexi/','web-grid/','web-image/','desktop/','mobile/','hover/'];
+        if (imgFolders.some(c => f.includes(c))) return true;
+        if (f.includes('fullwidth/') && !item.tags.includes('video')) return true;
+        if (f.includes('sliders/')) return true;
+        return item.tags.includes('image');
+      }
+      if (currentFilter==='text')      return item.tags.includes('text');
       if (currentFilter==='scroll')    return item.tags.includes('scroll') || item.tags.includes('sticky');
       if (currentFilter==='editorial') return item.tags.includes('editorial');
       if (currentFilter==='product')   return item.tags.includes('product');
