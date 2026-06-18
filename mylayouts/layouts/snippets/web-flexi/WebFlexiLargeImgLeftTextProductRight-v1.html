@@ -1,0 +1,136 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Flexi Layout */
+.flexi-layout {
+  display: grid;
+  gap: 4rem;
+  grid-template-areas:
+    "imageLarge text"
+    "imageLarge product"
+    "bottom bottom";
+  grid-template-columns: 1fr 1fr;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+/* Flexi Text Block */
+.flexi-text-block {
+  grid-area: text;
+  max-width: 420px;
+}
+
+/* Flexi Text Block > H2 */
+.flexi-text-block h2 {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Flexi Text Block > P */
+.flexi-text-block p {
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Flexi Caption */
+.flexi-caption {
+  color: #888;
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.5rem;
+}
+
+/* Flexi Image > Img */
+.flexi-image img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+/* Flexi Image Large */
+.flexi-image-large {
+  grid-area: imageLarge;
+}
+
+/* Flexi Image Product */
+.flexi-image-product {
+  grid-area: product;
+  max-width: 320px;
+  position: relative;
+}
+
+/* Flexi Image Bottom */
+.flexi-image-bottom {
+  grid-area: bottom;
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 420px;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Flexi Layout */
+  .flexi-layout {
+    gap: 2.5rem;
+    grid-template-areas:
+      "imageLarge"
+      "text"
+      "product"
+      "bottom";
+    grid-template-columns: 1fr;
+    padding: 2rem 1.5rem;
+  }
+
+  /* Flexi Text Block */
+  .flexi-text-block {
+    max-width: 100%;
+  }
+
+  /* Flexi Image Product, Flexi Image Bottom */
+  .flexi-image-product,
+  .flexi-image-bottom {
+    max-width: 100%;
+  }
+
+  /* Flexi Image Product */
+  .flexi-image-product {
+    padding-right: 30%;
+  }
+
+  /* Flexi Image Bottom */
+  .flexi-image-bottom {
+    padding-left: 30%;
+  }
+}
+</style>
+
+<div class="flexi-layout">
+  <!-- Large image (left) -->
+  <div class="flexi-image flexi-image-large">
+    <img src="../../media/landscape.jpg" alt="Model holding bag">
+  </div>
+
+  <!-- Text block (top right) -->
+  <div class="flexi-text-block">
+    <h2>Title Here</h2>
+    <p>
+      Written has a way of making the world feel smaller and a habit of reshaping
+      moods. The season shifts, and with it comes the thrill of discovering subtle joys
+      that feel entirely your own. The PEDRO selection reflects this pursuit—designed
+      to charm, to feel personal, to be worn and carried with ease.
+    </p>
+  </div>
+
+  <!-- Product image (bottom right) -->
+  <div class="flexi-image flexi-image-product">
+    <span class="flexi-caption">LUNA MINI • VINTAGE</span>
+    <img src="../../media/landscape.jpg" alt="Bag flatlay">
+  </div>
+
+  <!-- Bottom centered image -->
+  <div class="flexi-image flexi-image-bottom">
+    <img src="../../media/landscape.jpg" alt="Model with shoulder bag">
+  </div>
+</div>

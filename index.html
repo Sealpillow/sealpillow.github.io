@@ -22,7 +22,8 @@
     --charcoal: #2e2a26;
     --gold: #b89a6a;
     --muted: #7a7268;
-    --rule: rgba(26, 23, 20, 0.12);
+    --surface: #231f1b;
+    --rule-light: rgba(245, 240, 232, 0.1);
   }
 
   html {
@@ -31,8 +32,8 @@
 
   body {
     font-family: 'Montserrat', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
+    background: var(--ink);
+    color: var(--cream);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -46,20 +47,20 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
-    opacity: 0.4;
+    opacity: 0.6;
   }
 
   ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bone); }
+  ::-webkit-scrollbar-track { background: var(--surface); }
   ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 0; }
 
   .nav-bar {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(245, 240, 232, 0.92);
+    background: rgba(26, 23, 20, 0.96);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule-light);
     padding: 0 60px;
     display: flex;
     justify-content: space-between;
@@ -72,7 +73,7 @@
     font-size: 18px;
     font-weight: 300;
     letter-spacing: 0.15em;
-    color: var(--ink);
+    color: var(--cream);
     text-decoration: none;
   }
 
@@ -116,12 +117,12 @@
     font-weight: 300;
     letter-spacing: 0.08em;
     line-height: 0.9;
-    color: var(--ink);
+    color: var(--cream);
   }
 
   .hero-title em {
     font-style: italic;
-    color: var(--charcoal);
+    color: var(--gold);
   }
 
   .header-rule {
@@ -156,15 +157,15 @@
     justify-content: flex-end;
     padding: 40px 36px;
     min-height: 260px;
-    background: #fff;
+    background: var(--surface);
     text-decoration: none;
     overflow: hidden;
     transition: box-shadow 0.4s ease, transform 0.4s ease;
-    border: 1px solid var(--rule);
+    border: 1px solid var(--rule-light);
   }
 
   .nav-card:hover {
-    box-shadow: 0 20px 60px rgba(26, 23, 20, 0.14);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     transform: translateY(-4px);
   }
 
@@ -172,7 +173,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(184, 154, 106, 0.04) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(184, 154, 106, 0.06) 0%, transparent 60%);
     transition: opacity 0.4s ease;
     opacity: 0;
   }
@@ -186,7 +187,7 @@
     font-size: 72px;
     font-weight: 300;
     letter-spacing: -0.02em;
-    color: rgba(184, 154, 106, 0.15);
+    color: rgba(184, 154, 106, 0.12);
     line-height: 1;
     position: absolute;
     top: 24px;
@@ -195,7 +196,7 @@
   }
 
   .nav-card:hover .card-num {
-    color: rgba(184, 154, 106, 0.3);
+    color: rgba(184, 154, 106, 0.28);
   }
 
   .card-label {
@@ -213,7 +214,7 @@
     font-weight: 400;
     letter-spacing: 0.03em;
     line-height: 1.1;
-    color: var(--ink);
+    color: var(--cream);
     margin-bottom: 12px;
   }
 
@@ -232,7 +233,7 @@
     font-weight: 500;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: var(--ink);
+    color: var(--cream);
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -245,7 +246,7 @@
   }
 
   .site-footer {
-    border-top: 1px solid var(--rule);
+    border-top: 1px solid var(--rule-light);
     padding: 28px 60px;
     display: flex;
     justify-content: space-between;
@@ -271,7 +272,7 @@
   }
 
   .footer-about:hover {
-    color: var(--ink);
+    color: var(--cream);
   }
 
   @keyframes fadeDown {
@@ -297,7 +298,6 @@
 
 <nav class="nav-bar">
   <a href="index.html" class="nav-logo">Portfolio</a>
-  <a href="about.html" class="nav-link">About</a>
 </nav>
 
 <main class="hero">
