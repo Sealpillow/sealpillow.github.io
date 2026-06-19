@@ -600,6 +600,20 @@ const IFRAME_W = 1280;
 const CARD_W   = 280;
 const SCALE    = CARD_W / IFRAME_W;
 
+function scaleCardPreviews() {
+  const firstPreview = document.querySelector('#grid .card-preview');
+  if (!firstPreview) return;
+  const cardW = firstPreview.offsetWidth;
+  const scale = cardW / 1280;
+  const h = Math.round(180 / scale);
+  document.querySelectorAll('#grid .card-preview iframe').forEach(f => {
+    f.style.transform = `scale(${scale})`;
+    f.style.height = h + 'px';
+  });
+}
+
+window.addEventListener('resize', scaleCardPreviews);
+
 function renderCards(items) {
   const grid  = document.getElementById('grid');
   const badge = document.getElementById('count-badge');
@@ -671,6 +685,8 @@ function renderCards(items) {
 
       grid.appendChild(card);
     });
+
+    requestAnimationFrame(scaleCardPreviews);
   });
 }
 
