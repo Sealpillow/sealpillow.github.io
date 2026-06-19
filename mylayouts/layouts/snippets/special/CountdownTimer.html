@@ -1,0 +1,110 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* Countdown Wrap */
+.countdown-wrap {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 60px 40px;
+  text-align: center;
+}
+
+/* Countdown Eyebrow */
+.countdown-eyebrow {
+  font-family: proxima-nova;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  margin-bottom: 32px;
+  text-transform: uppercase;
+}
+
+/* Countdown Timer */
+.countdown-timer {
+  align-items: flex-start;
+  display: flex;
+  gap: 24px;
+}
+
+/* Countdown Unit */
+.countdown-unit {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  min-width: 56px;
+}
+
+/* Countdown Number */
+.countdown-number {
+  font-family: proxima-nova;
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Countdown Label */
+.countdown-label {
+  color: #999;
+  font-family: proxima-nova;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+/* Countdown Sep */
+.countdown-sep {
+  color: #ccc;
+  font-family: proxima-nova;
+  font-size: 36px;
+  font-weight: 300;
+  margin-top: 6px;
+}
+</style>
+
+<div class="countdown-wrap">
+  <p class="countdown-eyebrow">Campaign Launches In</p>
+  <div class="countdown-timer">
+    <div class="countdown-unit">
+      <span class="countdown-number" id="cd-days">00</span>
+      <span class="countdown-label">Days</span>
+    </div>
+    <span class="countdown-sep">:</span>
+    <div class="countdown-unit">
+      <span class="countdown-number" id="cd-hours">00</span>
+      <span class="countdown-label">Hours</span>
+    </div>
+    <span class="countdown-sep">:</span>
+    <div class="countdown-unit">
+      <span class="countdown-number" id="cd-mins">00</span>
+      <span class="countdown-label">Minutes</span>
+    </div>
+    <span class="countdown-sep">:</span>
+    <div class="countdown-unit">
+      <span class="countdown-number" id="cd-secs">00</span>
+      <span class="countdown-label">Seconds</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var target = new Date('2026-09-01T00:00:00');
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function tick() {
+    var diff = target - Date.now();
+    if (diff <= 0) { diff = 0; }
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-days').textContent  = pad(d);
+    document.getElementById('cd-hours').textContent = pad(h);
+    document.getElementById('cd-mins').textContent  = pad(m);
+    document.getElementById('cd-secs').textContent  = pad(s);
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>

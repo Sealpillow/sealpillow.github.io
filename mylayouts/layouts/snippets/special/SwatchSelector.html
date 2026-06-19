@@ -1,0 +1,93 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* Swatch Container */
+.swatch-container {
+  max-width: 360px;
+  padding: 24px;
+}
+
+/* Swatch Image Wrap */
+.swatch-image-wrap {
+  overflow: hidden;
+  position: relative;
+}
+
+/* Swatch Image Wrap > Img */
+.swatch-image-wrap img {
+  display: block;
+  height: auto;
+  transition: opacity 0.3s ease;
+  width: 100%;
+}
+
+/* Swatch Info */
+.swatch-info {
+  margin-top: 14px;
+}
+
+/* Swatch Name */
+.swatch-name {
+  font-family: proxima-nova;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+/* Swatch Color Name */
+.swatch-color-name {
+  color: #666;
+  font-family: proxima-nova;
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+
+/* Swatch Options */
+.swatch-options {
+  display: flex;
+  gap: 8px;
+}
+
+/* Swatch Dot */
+.swatch-dot {
+  border-radius: 50%;
+  cursor: pointer;
+  height: 22px;
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  transition: outline-color 0.2s ease;
+  width: 22px;
+}
+
+/* Swatch Dot — Active */
+.swatch-dot.active {
+  outline-color: #000;
+}
+</style>
+
+<div class="swatch-container">
+  <div class="swatch-image-wrap">
+    <img id="swatchImg" src="../../media/portrait.jpg" alt="">
+  </div>
+  <div class="swatch-info">
+    <p class="swatch-name">Product Name</p>
+    <p class="swatch-color-name" id="swatchColorName">Black</p>
+    <div class="swatch-options">
+      <div class="swatch-dot active" style="background:#1a1a1a;" data-color="Black"    data-img="../../media/portrait.jpg"></div>
+      <div class="swatch-dot"        style="background:#c8b49a;" data-color="Camel"    data-img="../../media/landscape.jpg"></div>
+      <div class="swatch-dot"        style="background:#8b6b5a;" data-color="Tan"      data-img="../../media/portrait.jpg"></div>
+      <div class="swatch-dot"        style="background:#e8e0d8; border: 1px solid #ccc;" data-color="Cream" data-img="../../media/landscape.jpg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.swatch-dot').forEach(function(dot) {
+  dot.addEventListener('click', function() {
+    document.querySelectorAll('.swatch-dot').forEach(function(d) { d.classList.remove('active'); });
+    dot.classList.add('active');
+    document.getElementById('swatchImg').src = dot.dataset.img;
+    document.getElementById('swatchColorName').textContent = dot.dataset.color;
+  });
+});
+</script>

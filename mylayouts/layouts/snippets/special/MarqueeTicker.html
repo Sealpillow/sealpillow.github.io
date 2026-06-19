@@ -1,0 +1,54 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* Ticker Wrap */
+.ticker-wrap {
+  background: #000;
+  overflow: hidden;
+  padding: 11px 0;
+  width: 100%;
+}
+
+/* Ticker Track */
+.ticker-track {
+  animation: ticker-scroll 18s linear infinite;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Ticker Item */
+.ticker-item {
+  color: #fff;
+  display: inline-block;
+  font-family: proxima-nova;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  padding: 0 40px;
+  text-transform: uppercase;
+}
+
+/* Ticker Item > Bullet */
+.ticker-item::after {
+  content: '•';
+  margin-left: 40px;
+  opacity: 0.5;
+}
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+</style>
+
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item">New Arrivals</span>
+    <span class="ticker-item">Free Shipping Above $150</span>
+    <span class="ticker-item">Summer Collection</span>
+    <span class="ticker-item">Shop Now</span>
+    <span class="ticker-item">New Arrivals</span>
+    <span class="ticker-item">Free Shipping Above $150</span>
+    <span class="ticker-item">Summer Collection</span>
+    <span class="ticker-item">Shop Now</span>
+  </div>
+</div>

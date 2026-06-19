@@ -1,0 +1,61 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* Read More Wrap */
+.read-more-wrap {
+  margin: 0 auto;
+  max-width: 640px;
+  padding: 40px 20px;
+}
+
+/* Read More Text */
+.read-more-text {
+  color: #333;
+  font-family: proxima-nova;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+/* Read More Text — Collapsed */
+.read-more-text.collapsed {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  display: -webkit-box;
+  overflow: hidden;
+}
+
+/* Read More Toggle */
+.read-more-toggle {
+  background: none;
+  border: none;
+  border-bottom: 1px solid #000;
+  cursor: pointer;
+  font-family: proxima-nova;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  margin-top: 14px;
+  padding: 0 0 2px;
+  text-transform: uppercase;
+}
+</style>
+
+<div class="read-more-wrap">
+  <p class="read-more-text collapsed" id="readMoreText">
+    There is a kind of dressing that requires no explanation — it simply exists, certain of itself, unhurried by trend or occasion. This season, we looked to the essentials. To the things that endure — leather that softens with time, forms that never overclaim. The collection is an exercise in restraint, where every element earns its place. Each silhouette is resolved. Nothing is provisional. Nothing is still searching for what it wants to be. In a world that rewards noise, we returned to the quiet conviction of well-made things.
+  </p>
+  <button class="read-more-toggle" id="readMoreBtn">Read more</button>
+</div>
+
+<script>
+document.getElementById('readMoreBtn').addEventListener('click', function() {
+  var t = document.getElementById('readMoreText');
+  var btn = document.getElementById('readMoreBtn');
+  if (t.classList.contains('collapsed')) {
+    t.classList.remove('collapsed');
+    btn.textContent = 'Read less';
+  } else {
+    t.classList.add('collapsed');
+    btn.textContent = 'Read more';
+  }
+});
+</script>

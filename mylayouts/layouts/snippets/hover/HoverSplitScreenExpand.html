@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hover Split Screen Expand</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Split Screen */
+.split-screen {
+  display: flex;
+  height: 70vh;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Split Panel */
+.split-panel {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  transition: flex 0.5s ease;
+}
+
+/* Split Screen > Panel — Shrink on Parent Hover */
+.split-screen:hover .split-panel {
+  flex: 0.65;
+}
+
+/* Split Panel — Expand on Self Hover */
+.split-panel:hover {
+  flex: 1.35 !important;
+}
+
+/* Split Panel > Img */
+.split-panel img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  width: 100%;
+}
+
+/* Split Panel > Img — Hover */
+.split-panel:hover img {
+  transform: scale(1.04);
+}
+
+/* Split Label */
+.split-label {
+  bottom: 24px;
+  color: #fff;
+  font-family: proxima-nova, sans-serif;
+  font-size: 11px;
+  left: 20px;
+  letter-spacing: 0.2em;
+  position: absolute;
+  text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<div class="split-screen">
+  <div class="split-panel">
+    <img src="../../media/portrait.jpg" alt="">
+    <span class="split-label">New Arrivals</span>
+  </div>
+  <div class="split-panel">
+    <img src="../../media/portrait.jpg" alt="">
+    <span class="split-label">Featured</span>
+  </div>
+</div>
+
+</body>
+</html>

@@ -464,6 +464,7 @@ const layouts = [
   { file:"web-grid/WebFourColEqualHeightMobileStack.html", name:"Four-Col Equal Height - Mobile Stack (2×2)", platform:"web", tags:["4-col","grid"], layout:"Four Column", mobile:"2×2 grid", desc:"Four equal-height columns on desktop, collapses to a 2×2 grid on mobile." },
   { file:"web-grid/snippet-multigrid-products.html", name:"Multi-Grid Products", platform:"web", tags:["grid","product"], layout:"Multi Grid", mobile:"--", desc:"Multi-column product grid snippet." },
   { file:"web-grid/WebImageTextImageSandwich.html", name:"Image | Text | Image Sandwich", platform:"web", tags:["editorial","3-col","text"], layout:"Three Column", mobile:"Mobile stack", desc:"Two portrait images flanking a central text column — editorial 3-col sandwich." },
+  { file:"web-grid/WebProductCard.html", name:"Product Card Grid", platform:"web", tags:["product","grid"], layout:"Four Column", mobile:"2×2 grid", desc:"Four-up product card grid with image, name, price and optional tag badge. Scales to 2×2 on mobile." },
   // WEB IMAGE
   { file:"web-image/WebImageLeftImageTextRightMobileStackWithLink.html", name:"Img Left, Img+Text Right - Mobile Stack (Link)", platform:"web", tags:["text","link"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Image left, image with text right. Link included. Stacks on mobile." },
   { file:"web-image/WebImageLeftLargeRightSmallMobileStack.html", name:"Img Left Large, Right Small - Mobile Stack", platform:"web", tags:["asymmetric"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Larger image left, smaller right. Stacks on mobile." },
@@ -505,6 +506,7 @@ const layouts = [
   { file:"hover/HoverTextAppearImageFullScreen.html", name:"Hover - Text Appear, Full Screen Image", platform:"hover", tags:["hover","text"], layout:"Hover", mobile:"--", desc:"Text appears on hover over a full-screen image." },
   { file:"hover/HoverTextAppearImageVideoBtmLeftRight.html", name:"Hover - Text Appear, Video Btm Left/Right", platform:"hover", tags:["hover","video","text"], layout:"Hover", mobile:"--", desc:"Text appears on hover with video anchored bottom left/right." },
   { file:"hover/underlinehoverv2.html", name:"Underline Hover (v2)", platform:"hover", tags:["hover","text"], layout:"Hover", mobile:"--", desc:"Underline animation on text hover. v2." },
+  { file:"hover/HoverSplitScreenExpand.html", name:"Hover - Split Screen Expand", platform:"hover", tags:["hover"], layout:"Hover", mobile:"--", desc:"Two image panels side by side — hovering one expands it while the other contracts." },
   // SLIDERS
   { file:"sliders/scroll-video-scrubber.html", name:"Scroll Video Scrubber", platform:"sliders", tags:["slider","video","scroll"], layout:"Slider", mobile:"Full width", desc:"Video that scrubs forward/backward on scroll." },
   { file:"sliders/splide-auto-scroll-static.html", name:"Splide - Auto Scroll Static", platform:"sliders", tags:["slider","carousel"], layout:"Splide", mobile:"Full width", desc:"Splide carousel with auto-scroll, static items." },
@@ -543,7 +545,14 @@ const layouts = [
   { file:"special/quiz-multi-hybrid-base.html", name:"Quiz - Multi Hybrid Base", platform:"special", tags:["quiz","interactive"], layout:"Quiz", mobile:"Full width", desc:"Base template for a multi-answer hybrid quiz." },
   { file:"special/question.html", name:"Question Component", platform:"special", tags:["interactive"], layout:"Interactive", mobile:"Full width", desc:"Interactive question component." },
   { file:"special/tableformatting.html", name:"Table Formatting", platform:"special", tags:["text","table"], layout:"Table", mobile:"Full width", desc:"Styled table formatting template." },
-  { file:"special/timeline.html", name:"Timeline", platform:"special", tags:["text","timeline"], layout:"Timeline", mobile:"Full width", desc:"Vertical timeline layout." }
+  { file:"special/timeline.html", name:"Timeline", platform:"special", tags:["text","timeline"], layout:"Timeline", mobile:"Full width", desc:"Vertical timeline layout." },
+  { file:"special/AnnouncementBar.html", name:"Announcement Bar", platform:"special", tags:["banner","interactive"], layout:"Banner", mobile:"Full width", desc:"Slim dismissible top banner for shipping promotions or campaign messages." },
+  { file:"special/MarqueeTicker.html", name:"Marquee Ticker", platform:"special", tags:["interactive"], layout:"Ticker", mobile:"Full width", desc:"Infinitely looping CSS marquee strip for announcements or brand messaging." },
+  { file:"special/CountdownTimer.html", name:"Countdown Timer", platform:"special", tags:["interactive"], layout:"Timer", mobile:"Full width", desc:"Days / hours / minutes / seconds countdown to a target date. JS-driven." },
+  { file:"special/AccordionFAQ.html", name:"Accordion / FAQ", platform:"special", tags:["interactive"], layout:"Accordion", mobile:"Full width", desc:"Expandable FAQ sections with rotating plus/cross icon — one open at a time." },
+  { file:"special/ReadMoreToggle.html", name:"Read More Toggle", platform:"special", tags:["interactive","text"], layout:"Text Toggle", mobile:"Full width", desc:"Long text collapsed to 3 lines with a Read more / Read less toggle." },
+  { file:"special/StickyCTABar.html", name:"Sticky CTA Bar", platform:"special", tags:["sticky","link"], layout:"Sticky", mobile:"Full width", desc:"Product name, price and Add to Bag button fixed to the bottom after scroll threshold." },
+  { file:"special/SwatchSelector.html", name:"Swatch Selector", platform:"special", tags:["interactive","product"], layout:"Swatch", mobile:"Full width", desc:"Colour dot swatches that swap the product image and update the displayed colour name." }
 ];
 
 // prepend base path so all relative hrefs/srcs resolve from portfolio root
@@ -723,40 +732,42 @@ document.querySelectorAll('.vp-btn').forEach(btn => {
 });
 
 // FILTER + SEARCH
-let currentFilter = 'all';
+const activeFilters = new Set();
 let currentSearch = '';
+
+function itemMatchesFilter(item, f) {
+  if (f==='web')       return item.platform==='web';
+  if (f==='desktop')   return item.platform==='desktop';
+  if (f==='mobile')    return item.platform==='mobile';
+  if (f==='5050')      return item.tags.includes('5050');
+  if (f==='flexi')     return item.tags.includes('flexi');
+  if (f==='collage')   return item.tags.includes('collage')||item.tags.includes('grid');
+  if (f==='video')     return item.tags.includes('video');
+  if (f==='fullwidth') return item.platform==='fullwidth';
+  if (f==='hover')     return item.platform==='hover';
+  if (f==='sliders')   return item.platform==='sliders';
+  if (f==='special')   return item.platform==='special';
+  if (f==='image') {
+    const file = item.file;
+    const imgFolders = ['web-5050/','web-flexi/','web-grid/','web-image/','desktop/','mobile/','hover/'];
+    if (imgFolders.some(c => file.includes(c))) return true;
+    if (file.includes('fullwidth/') && !item.tags.includes('video')) return true;
+    if (file.includes('sliders/')) return true;
+    return item.tags.includes('image');
+  }
+  if (f==='text')      return item.tags.includes('text');
+  if (f==='scroll')    return item.tags.includes('scroll') || item.tags.includes('sticky');
+  if (f==='editorial') return item.tags.includes('editorial');
+  if (f==='product')   return item.tags.includes('product');
+  if (f==='link')      return item.tags.includes('link');
+  if (f==='redirects') return item.platform==='redirects';
+  return false;
+}
 
 function applyFilters() {
   let items = layouts;
-  if (currentFilter !== 'all') {
-    items = items.filter(item => {
-      if (currentFilter==='web')       return item.platform==='web';
-      if (currentFilter==='desktop')   return item.platform==='desktop';
-      if (currentFilter==='mobile')    return item.platform==='mobile';
-      if (currentFilter==='5050')      return item.tags.includes('5050');
-      if (currentFilter==='flexi')     return item.tags.includes('flexi');
-      if (currentFilter==='collage')   return item.tags.includes('collage')||item.tags.includes('grid');
-      if (currentFilter==='video')     return item.tags.includes('video');
-      if (currentFilter==='fullwidth') return item.platform==='fullwidth';
-      if (currentFilter==='hover')     return item.platform==='hover';
-      if (currentFilter==='sliders')   return item.platform==='sliders';
-      if (currentFilter==='special')   return item.platform==='special';
-      if (currentFilter==='image') {
-        const f = item.file;
-        const imgFolders = ['web-5050/','web-flexi/','web-grid/','web-image/','desktop/','mobile/','hover/'];
-        if (imgFolders.some(c => f.includes(c))) return true;
-        if (f.includes('fullwidth/') && !item.tags.includes('video')) return true;
-        if (f.includes('sliders/')) return true;
-        return item.tags.includes('image');
-      }
-      if (currentFilter==='text')      return item.tags.includes('text');
-      if (currentFilter==='scroll')    return item.tags.includes('scroll') || item.tags.includes('sticky');
-      if (currentFilter==='editorial') return item.tags.includes('editorial');
-      if (currentFilter==='product')   return item.tags.includes('product');
-      if (currentFilter==='link')      return item.tags.includes('link');
-      if (currentFilter==='redirects') return item.platform==='redirects';
-      return true;
-    });
+  if (activeFilters.size > 0) {
+    items = items.filter(item => [...activeFilters].some(f => itemMatchesFilter(item, f)));
   }
   if (currentSearch.trim()) {
     const q = currentSearch.toLowerCase();
@@ -770,11 +781,26 @@ function applyFilters() {
   renderCards(items);
 }
 
+function syncPillStates() {
+  document.querySelectorAll('.pill').forEach(p => {
+    if (p.dataset.filter === 'all') {
+      p.classList.toggle('active', activeFilters.size === 0);
+    } else {
+      p.classList.toggle('active', activeFilters.has(p.dataset.filter));
+    }
+  });
+}
+
 document.querySelectorAll('.pill').forEach(pill => {
   pill.addEventListener('click', () => {
-    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    currentFilter = pill.dataset.filter;
+    const f = pill.dataset.filter;
+    if (f === 'all') {
+      activeFilters.clear();
+    } else {
+      if (activeFilters.has(f)) activeFilters.delete(f);
+      else activeFilters.add(f);
+    }
+    syncPillStates();
     applyFilters();
   });
 });

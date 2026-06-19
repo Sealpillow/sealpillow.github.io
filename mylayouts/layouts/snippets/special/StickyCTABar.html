@@ -1,0 +1,89 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* Demo Content */
+.demo-content {
+  font-family: proxima-nova;
+  height: 140vh;
+  padding: 40px 24px;
+}
+
+/* Demo Content > P */
+.demo-content p {
+  color: #999;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+/* Sticky CTA */
+.sticky-cta {
+  align-items: center;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  left: 0;
+  opacity: 0;
+  padding: 14px 24px;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  transform: translateY(100%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 100;
+}
+
+/* Sticky CTA — Visible */
+.sticky-cta.visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
+/* Sticky CTA Name */
+.sticky-cta-name {
+  font-family: proxima-nova;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Sticky CTA Price */
+.sticky-cta-price {
+  color: #666;
+  font-family: proxima-nova;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* Sticky CTA Btn */
+.sticky-cta-btn {
+  background: #000;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-family: proxima-nova;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  padding: 12px 28px;
+  text-transform: uppercase;
+}
+</style>
+
+<div class="demo-content">
+  <p>↓ Scroll down to trigger the sticky CTA bar</p>
+</div>
+
+<div class="sticky-cta" id="stickyCTA">
+  <div>
+    <p class="sticky-cta-name">Product Name</p>
+    <p class="sticky-cta-price">$120.00</p>
+  </div>
+  <button class="sticky-cta-btn">Add to Bag</button>
+</div>
+
+<script>
+window.addEventListener('scroll', function() {
+  document.getElementById('stickyCTA').classList.toggle('visible', window.scrollY > 160);
+});
+</script>
