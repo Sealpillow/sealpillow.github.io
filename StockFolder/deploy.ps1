@@ -12,7 +12,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $StockFolder = $PSScriptRoot
-$RepoRoot    = Split-Path $StockFolder -Parent
+$RepoRoot    = "C:\Users\brian.lua\OneDrive - Charles & Keith\Desktop\sealpillow.github.io"
 $OutDir      = Join-Path $RepoRoot "stocks"
 $JsonSrc     = Join-Path $StockFolder "json"
 $JsonOut     = Join-Path $OutDir "json"
