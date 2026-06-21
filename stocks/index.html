@@ -332,7 +332,7 @@ input[type=file]{display:none}
 .cmp-section-row td{padding:10px 11px;background:rgba(79,142,247,.08);color:#dbe6fb;font-size:11px;font-weight:700;letter-spacing:.04em;border-top:1px solid rgba(79,142,247,.14);border-bottom:1px solid rgba(79,142,247,.14)}
 .cmp-table-wrap td.metric-label,.cmp-table-wrap th.metric-label{color:var(--mu);font-size:12px;font-weight:600;background:var(--sf2);position:sticky;left:0;z-index:3;border-right:1px solid var(--bd)}
 .cmp-table-wrap th.cmp-stock-head{min-width:140px}
-.table-wrap,.cmp-table-wrap{scrollbar-width:thin;scrollbar-color:#3f6090 #131724;cursor:grab;touch-action:pan-y}
+.table-wrap,.cmp-table-wrap{scrollbar-width:thin;scrollbar-color:#3f6090 #131724;cursor:grab;touch-action:pan-x}
 .table-wrap.dragging,.cmp-table-wrap.dragging{cursor:grabbing;user-select:none}
 .table-wrap::-webkit-scrollbar,.cmp-table-wrap::-webkit-scrollbar{height:12px;width:12px}
 .table-wrap::-webkit-scrollbar-track,.cmp-table-wrap::-webkit-scrollbar-track{background:#131724}
@@ -501,7 +501,7 @@ input[type=file]{display:none}
 
 /* PROGRESS STRIP */
 .prog-wrap{margin-top:14px}
-.prog-strip,.cal-strip{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#3f6090 #131724;cursor:grab;user-select:none;touch-action:pan-y}
+.prog-strip,.cal-strip{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#3f6090 #131724;cursor:grab;user-select:none;touch-action:pan-x}
 .prog-strip.dragging,.cal-strip.dragging{cursor:grabbing}
 .prog-strip::-webkit-scrollbar,.cal-strip::-webkit-scrollbar{height:12px}
 .prog-strip::-webkit-scrollbar-track,.cal-strip::-webkit-scrollbar-track{background:#131724}
@@ -6296,6 +6296,7 @@ function bindDragScroll(scope=document){
     wrap.dataset.dragBound="1";
     let pointerId=null,startX=0,startLeft=0,moved=false;
     wrap.addEventListener("pointerdown",e=>{
+      if(e.pointerType==="touch")return;
       if(e.pointerType==="mouse"&&e.button!==0)return;
       if(e.target.closest("button,input,label,a,.tab,select,.no-drag,.metric-label"))return;
       pointerId=e.pointerId;
