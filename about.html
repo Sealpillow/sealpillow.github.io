@@ -554,6 +554,195 @@
 
   .footer-back:hover { color: var(--ink); }
 
+  /* Section progress nav */
+  .section-nav {
+    position: fixed;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .section-nav-track {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--rule);
+    transform: translateX(-50%);
+    z-index: 0;
+  }
+
+  .section-nav-progress {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 1px;
+    height: 0%;
+    background: var(--gold);
+    transform: translateX(-50%);
+    z-index: 1;
+    transition: height 0.15s ease;
+  }
+
+  .section-nav-dot {
+    position: relative;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .section-nav-dot::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-light);
+    background: var(--cream);
+    transition: all 0.2s ease;
+  }
+
+  .section-nav-dot:hover::after,
+  .section-nav-dot.active::after {
+    background: var(--gold);
+    border-color: var(--gold);
+    transform: scale(1.3);
+  }
+
+  .section-nav-label {
+    position: absolute;
+    left: calc(100% + 6px);
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .section-nav-dot:hover .section-nav-label,
+  .section-nav-dot.active .section-nav-label {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .section-nav-mobile {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    background: rgba(245, 240, 232, 0.92);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--rule);
+    padding: 10px 24px 16px;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .section-nav-mobile-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .section-nav-mobile-label {
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    transition: color 0.2s ease;
+    line-height: 1;
+    flex: 1;
+    text-align: center;
+  }
+
+  .section-nav-mobile-label.active {
+    color: var(--gold);
+  }
+
+  .section-nav-mobile-dots-row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .section-nav-mobile-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    transform: translateY(-50%);
+    background: var(--rule);
+  }
+
+  .section-nav-mobile-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 1px;
+    width: 0%;
+    background: var(--gold);
+    transition: width 0.15s ease;
+  }
+
+  .section-nav-mobile-dot {
+    position: relative;
+    z-index: 2;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .section-nav-mobile-dot::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-light);
+    background: var(--cream);
+    transition: all 0.2s ease;
+  }
+
+  .section-nav-mobile-dot.active::after {
+    background: var(--gold);
+    border-color: var(--gold);
+    transform: scale(1.3);
+  }
+
+  @media (max-width: 900px) {
+    .section-nav { display: none; }
+    .section-nav-mobile { display: flex; }
+    body { padding-bottom: 72px; }
+  }
+
   @keyframes fadeDown {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -604,6 +793,41 @@
 </head>
 <body>
 
+<nav class="section-nav" aria-label="Page sections">
+  <div class="section-nav-track"></div>
+  <div class="section-nav-progress"></div>
+  <button class="section-nav-dot" data-target="section-intro">
+    <span class="section-nav-label">Intro</span>
+  </button>
+  <button class="section-nav-dot" data-target="section-profile">
+    <span class="section-nav-label">Profile</span>
+  </button>
+  <button class="section-nav-dot" data-target="section-resume">
+    <span class="section-nav-label">Resume</span>
+  </button>
+  <button class="section-nav-dot" data-target="section-contact">
+    <span class="section-nav-label">Contact</span>
+  </button>
+</nav>
+
+<nav class="section-nav-mobile" aria-label="Page sections">
+  <div class="section-nav-mobile-labels">
+    <span class="section-nav-mobile-label" data-target="section-intro">Intro</span>
+    <span class="section-nav-mobile-label" data-target="section-profile">Profile</span>
+    <span class="section-nav-mobile-label" data-target="section-resume">Resume</span>
+    <span class="section-nav-mobile-label" data-target="section-contact">Contact</span>
+  </div>
+  <div class="section-nav-mobile-dots-row">
+    <div class="section-nav-mobile-track">
+      <div class="section-nav-mobile-progress"></div>
+    </div>
+    <button class="section-nav-mobile-dot" data-target="section-intro"></button>
+    <button class="section-nav-mobile-dot" data-target="section-profile"></button>
+    <button class="section-nav-mobile-dot" data-target="section-resume"></button>
+    <button class="section-nav-mobile-dot" data-target="section-contact"></button>
+  </div>
+</nav>
+
 <nav class="nav-bar">
   <div class="nav-left">
     <a href="index.html" class="nav-logo">Brian Lua</a>
@@ -613,17 +837,16 @@
   </div>
 </nav>
 
-<section class="hero">
+<section class="hero" id="section-intro">
   <div class="hero-left">
     <span class="eyebrow">About Me</span>
     <h1 class="hero-name">Brian <em>Lua</em><br>Zhi Heng</h1>
     <div class="hero-rule"></div>
-    <p class="hero-tagline">Software development, frontend engineering, business analysis, and data automation across e-commerce, government, and research domains.</p>
+    <p class="hero-tagline">I build and ship things for the web, currently running storefront delivery and automation at Charles &amp; Keith across 20+ markets.</p>
   </div>
   <div class="hero-right">
-    <p class="hero-intro">I am currently working as an IT Business Analyst at Charles &amp; Keith, with experience across frontend development, software engineering, business analysis, and data-focused work. My background spans e-commerce storefront delivery, enterprise platform administration, and research-driven projects, with practice in both hands-on technical execution and translating business requirements into implementation.</p>
-    <p class="hero-intro">I graduated from Nanyang Technological University in 2025 with a degree in Computer Science, and I am comfortable moving between coding, platform administration, and analytical work. This portfolio serves as supporting evidence of my front-end experience, particularly in responsive implementation and user-facing digital presentation.</p>
-    <p class="hero-intro">I am open to opportunities where I can contribute to software, digital product, business analysis, frontend, or data-related work, especially in roles that value both technical understanding and practical execution.</p>
+    <p class="hero-intro">I'm an IT Business Analyst at Charles &amp; Keith, where I build and maintain homepage, editorial, and campaign storefront experiences on Salesforce Commerce Cloud across 20+ international markets. I also built the team's QA automation tool from scratch using Playwright and Python, covering checkout flows, asset validation, and content checks across every storefront.</p>
+    <p class="hero-intro">I graduated from NTU in 2025 with a degree in Computer Science. I work best when a role involves both building things and thinking about how they should work, whether that's writing code, mapping out requirements, or improving a process.</p>
     <div class="hero-contact">
       <span class="hero-contact-item">Singapore</span>
       <span class="hero-contact-sep">·</span>
@@ -636,25 +859,25 @@
   </div>
 </section>
 
-<section class="profile-section">
+<section class="profile-section" id="section-profile">
 <div class="about-content">
     <div class="content-block">
       <span class="block-label">Profile</span>
       <h2 class="block-heading">Current <em>focus</em></h2>
-      <p class="block-body">My current role at Charles &amp; Keith combines business analysis with hands-on frontend delivery. I build and maintain Salesforce Commerce Cloud storefront experiences — homepage, editorial, and campaign pages — through HTML, CSS, and JavaScript, while handling platform administration, requirement gathering, and stakeholder coordination across 20+ international storefronts.</p>
+      <p class="block-body">My current role at Charles &amp; Keith covers business analysis and hands-on frontend delivery. I build and maintain homepage, editorial, and campaign pages on Salesforce Commerce Cloud through HTML, CSS, and JavaScript, while handling platform administration, requirement gathering, and stakeholder coordination across 20+ international storefronts.</p>
       <p class="block-body">I also built an end-to-end QA test automation tool using Playwright and Python to reduce manual regression effort across markets, covering checkout flows, asset validation, content checks, and navigation verification. This work has strengthened my interest in frontend implementation, especially where business needs, structured thinking, and user-facing presentation intersect in a live e-commerce environment.</p>
     </div>
 
     <div class="content-block">
       <span class="block-label">Approach</span>
       <h2 class="block-heading">How I <em>work</em></h2>
-      <p class="block-body">I value work that is clear, structured, and practical. My approach is shaped by analytical thinking, careful implementation, and an interest in how digital experiences are delivered in a way that is both functional and polished.</p>
+      <p class="block-body">I tend to pick things up on my own when something interests me. Most of what I know about frontend came from building things and figuring out why they weren't working.</p>
     </div>
 
     <div class="content-block">
       <span class="block-label">Core Areas</span>
       <h2 class="block-heading">What I <em>do</em></h2>
-      <p class="block-body">This portfolio highlights selected front-end and user-facing work, while the resume sections below provide a broader view of experience across software, business analysis, enterprise systems, and project delivery.</p>
+      <p class="block-body">Business analysis, SFCC storefront delivery, and platform administration at Charles &amp; Keith, with QA automation across 20+ markets.</p>
       <div class="tags-wrap">
         <span class="tag">Business Analysis</span>
         <span class="tag">Front-End Development</span>
@@ -664,14 +887,12 @@
         <span class="tag">Playwright</span>
         <span class="tag">QA Automation</span>
         <span class="tag">Requirements Gathering</span>
-        <span class="tag">Platform Administration</span>
-        <span class="tag">User-Facing Digital Work</span>
       </div>
     </div>
   </div>
 </section>
 
-<section class="resume-section">
+<section class="resume-section" id="section-resume">
   <div class="resume-grid">
     <div class="resume-sidebar">
       <div class="resume-card">
@@ -726,7 +947,7 @@
           <ul class="resume-list">
             <li>Developed and maintained homepage, editorial, and campaign storefront experiences through HTML, CSS, and JavaScript on Salesforce Commerce Cloud across 20+ international storefronts.</li>
             <li>Owned SFCC Business Manager administration across content assets, site preferences, and catalog-related configuration while supporting zero-downtime launches.</li>
-            <li>Built a Playwright-based QA test automation tool with a Tkinter UI — covering registered and guest checkout flows, asset validation, content text checks, and navigation verification across 20+ international storefronts.</li>
+            <li>Built a Playwright-based QA test automation tool with a Tkinter UI, covering registered and guest checkout flows, asset validation, content text checks, and navigation verification across 20+ international storefronts.</li>
             <li>Gathered and translated business requirements from marketing and operations stakeholders into clearer functional specifications and delivery priorities.</li>
             <li>Partnered with backend engineering teams on feature scoping, implementation planning, and platform improvements.</li>
           </ul>
@@ -774,10 +995,10 @@
   </div>
 </section>
 
-<section class="cta-section">
+<section class="cta-section" id="section-contact">
   <div class="cta-left">
     <h2 class="cta-heading">Open to <br><em>opportunities</em></h2>
-    <p class="cta-sub">Interested in roles across software, frontend development, digital product, business analysis, and user-facing implementation.<br>View selected projects or get in touch.</p>
+    <p class="cta-sub">Interested in roles close to the product, whether that's frontend, business analysis, or somewhere in between.<br>View selected projects or get in touch.</p>
   </div>
   <div class="cta-visual" aria-hidden="true">
     <img class="cta-gif" src="cute-pikachu.gif" alt="">
@@ -794,5 +1015,47 @@
   <a href="myportfolio/" class="footer-back">View My Work &rarr;</a>
 </footer>
 
+<script>
+  (function(){
+    const dots = Array.from(document.querySelectorAll('.section-nav-dot'));
+    const progress = document.querySelector('.section-nav-progress');
+    const mobileDots = Array.from(document.querySelectorAll('.section-nav-mobile-dot'));
+    const mobileProgress = document.querySelector('.section-nav-mobile-progress');
+    const sections = dots.map(d => document.getElementById(d.dataset.target));
+
+    [...dots, ...mobileDots].forEach(dot => {
+      dot.addEventListener('click', () => {
+        const target = document.getElementById(dot.dataset.target);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    function update() {
+      const scrollY = window.scrollY;
+      const winH = window.innerHeight;
+      let activeIndex = 0;
+
+      sections.forEach((sec, i) => {
+        if (!sec) return;
+        if (scrollY >= sec.offsetTop - winH * 0.4) activeIndex = i;
+      });
+
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
+
+      const navH = dots[dots.length - 1].offsetTop - dots[0].offsetTop;
+      const filled = navH > 0 ? (dots[activeIndex].offsetTop - dots[0].offsetTop) / navH * 100 : 0;
+      progress.style.height = filled + '%';
+
+      const mobileLabels = Array.from(document.querySelectorAll('.section-nav-mobile-label'));
+      mobileDots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
+      mobileLabels.forEach((lbl, i) => lbl.classList.toggle('active', i === activeIndex));
+      const mobileStep = activeIndex / (mobileDots.length - 1) * 100;
+      mobileProgress.style.width = mobileStep + '%';
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+</script>
 </body>
 </html>
