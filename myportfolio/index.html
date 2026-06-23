@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio</title>
+<title>Brian Lua - Portfolio</title>
+<meta name="description" content="Frontend portfolio of Brian Lua — editorial pages, campaign layouts, and interactive builds on Salesforce Commerce Cloud.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sealpillow.github.io/myportfolio/">
+<meta property="og:title" content="Brian Lua - Portfolio">
+<meta property="og:description" content="Editorial pages, campaign layouts, and interactive builds on Salesforce Commerce Cloud.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
@@ -16,13 +22,14 @@
   }
 
   :root {
-    --cream: #f5f0e8;
-    --bone: #ede8dc;
-    --ink: #1a1714;
-    --charcoal: #2e2a26;
-    --gold: #b89a6a;
-    --muted: #7a7268;
-    --rule: rgba(26, 23, 20, 0.12);
+    --cream: #f0ebe3;
+    --bone: #1e1b18;
+    --ink: #141210;
+    --charcoal: #1e1b18;
+    --gold: #c8a96e;
+    --muted: #8a8078;
+    --rule: rgba(255, 255, 255, 0.08);
+    --surface: #1e1b18;
   }
 
   html {
@@ -31,8 +38,8 @@
 
   body {
     font-family: 'Montserrat', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
+    background: var(--ink);
+    color: var(--cream);
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -56,7 +63,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(245, 240, 232, 0.92);
+    background: rgba(20, 18, 16, 0.96);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--rule);
     padding: 0 60px;
@@ -77,7 +84,7 @@
     font-size: 18px;
     font-weight: 300;
     letter-spacing: 0.15em;
-    color: var(--ink);
+    color: var(--cream);
     text-decoration: none;
     transition: color 0.2s ease;
   }
@@ -139,12 +146,12 @@
     font-weight: 300;
     letter-spacing: 0.08em;
     line-height: 0.9;
-    color: var(--ink);
+    color: var(--cream);
   }
 
   .site-title em {
     font-style: italic;
-    color: var(--charcoal);
+    color: var(--gold);
   }
 
   .header-rule {
@@ -169,7 +176,7 @@
 
   .intro-shell {
     border: 1px solid var(--rule);
-    background: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.04);
     backdrop-filter: blur(10px);
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
@@ -201,7 +208,7 @@
     font-weight: 400;
     letter-spacing: 0.03em;
     line-height: 1.05;
-    color: var(--ink);
+    color: var(--cream);
   }
 
   .intro-text {
@@ -210,7 +217,7 @@
     font-weight: 300;
     letter-spacing: 0.04em;
     line-height: 1.9;
-    color: var(--charcoal);
+    color: var(--muted);
   }
 
   .intro-meta {
@@ -238,7 +245,7 @@
     font-size: 24px;
     font-weight: 400;
     letter-spacing: 0.03em;
-    color: var(--ink);
+    color: var(--cream);
     line-height: 1;
   }
 
@@ -263,7 +270,7 @@
 
   .project-card {
     position: relative;
-    background: #fff;
+    background: var(--surface);
     overflow: hidden;
     cursor: pointer;
     text-decoration: none;
@@ -271,7 +278,7 @@
   }
 
   .project-card:hover {
-    box-shadow: 0 20px 60px rgba(26, 23, 20, 0.14);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     transform: translateY(-3px);
     z-index: 2;
   }
@@ -317,7 +324,7 @@
   .iframe-veil {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(245, 240, 232, 0.04) 12%, rgba(245, 240, 232, 0.64) 100%);
+    background: linear-gradient(180deg, rgba(20, 18, 16, 0.04) 12%, rgba(20, 18, 16, 0.72) 100%);
     transition: opacity 0.4s ease;
   }
 
@@ -336,7 +343,7 @@
     justify-content: space-between;
     align-items: flex-end;
     gap: 16px;
-    background: #fff;
+    background: var(--surface);
   }
 
   .card-title-wrap {
@@ -358,7 +365,7 @@
     font-size: 18px;
     font-weight: 400;
     letter-spacing: 0.03em;
-    color: var(--ink);
+    color: var(--cream);
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
@@ -379,7 +386,7 @@
   }
 
   .card-url:hover {
-    color: var(--ink);
+    color: var(--cream);
   }
 
   .feature-tags {
@@ -401,34 +408,14 @@
     white-space: nowrap;
   }
 
-  .feature-tag--media {
-    border: 1px solid #b88d3b;
-    background: #fff4dd;
-    color: #7d5a12;
-  }
-
-  .feature-tag--layout {
-    border: 1px solid #7f776b;
-    background: #f0ebe3;
-    color: #4f473d;
-  }
-
-  .feature-tag--interaction {
-    border: 1px solid #b56a2f;
-    background: #fff0e3;
-    color: #8a4313;
-  }
-
-  .feature-tag--logic {
-    border: 1px solid #647856;
-    background: #edf5e8;
-    color: #3f5333;
-  }
-
+  .feature-tag--media,
+  .feature-tag--layout,
+  .feature-tag--interaction,
+  .feature-tag--logic,
   .feature-tag--story {
-    border: 1px solid #9e5a4a;
-    background: #fbe9e4;
-    color: #743626;
+    border: 1px solid rgba(200,169,110,0.35);
+    background: rgba(200,169,110,0.08);
+    color: #c8a96e;
   }
 
   .card-actions {
@@ -470,7 +457,7 @@
   .btn-open {
     padding: 0 18px;
     height: 36px;
-    border: 1px solid var(--ink);
+    border: 1px solid rgba(255,255,255,0.25);
     background: transparent;
     cursor: pointer;
     font-family: 'Montserrat', sans-serif;
@@ -478,14 +465,14 @@
     font-weight: 500;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: var(--ink);
+    color: var(--cream);
     transition: all 0.25s ease;
     white-space: nowrap;
   }
 
   .btn-open:hover {
-    background: var(--ink);
-    color: var(--cream);
+    background: var(--cream);
+    color: var(--ink);
   }
 
   .project-card:focus-visible,
@@ -606,7 +593,7 @@
   }
 
   .footer-about:hover {
-    color: var(--ink);
+    color: var(--cream);
   }
 
   .footer-count {
@@ -641,7 +628,165 @@
   .project-card:nth-child(8) { animation: fadeUp 0.6s ease 0.45s both; }
   .project-card:nth-child(n+9) { animation: fadeUp 0.6s ease 0.5s both; }
 
+  /* Filter bar */
+  .filter-bar {
+    padding: 20px 60px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .filter-search-wrap {
+    position: relative;
+    flex: 0 0 220px;
+  }
+
+  .filter-search-wrap svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 13px;
+    height: 13px;
+    stroke: var(--muted);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+
+  .filter-search {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--rule);
+    padding: 8px 12px 8px 30px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--cream);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .filter-search:focus { border-color: var(--gold); }
+  .filter-search::placeholder { color: var(--muted); }
+
+  .filter-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .filter-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .filter-btn.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--cream);
+  }
+
+  .filter-count {
+    margin-left: auto;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Featured / View all toggle */
+  .view-toggle-wrap {
+    padding: 40px 60px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .view-toggle-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .view-toggle-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cream);
+    background: transparent;
+    border: 1px solid var(--rule);
+    padding: 10px 24px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .view-toggle-btn:hover {
+    border-color: var(--cream);
+    background: var(--cream);
+    color: var(--ink);
+  }
+
   @media (max-width: 768px) {
+    .view-toggle-wrap { padding: 24px 24px 0; flex-direction: column; align-items: flex-start; }
+  }
+
+  .no-results {
+    grid-column: 1 / -1;
+    padding: 60px 0;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  /* Lightbox prev/next */
+  .lb-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lb-counter {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.35);
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .lb-btn:disabled {
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    .filter-bar { padding: 16px 24px; }
+    .filter-search-wrap { flex: 0 0 100%; }
+    .filter-count { margin-left: 0; }
     .site-header { padding: 50px 24px 40px; }
     .nav-bar { padding: 0 24px; }
     .nav-left { gap: 20px; }
@@ -722,6 +867,27 @@
   </div>
 </section>
 
+<div class="view-toggle-wrap" id="viewToggleWrap">
+  <span class="view-toggle-label" id="viewToggleLabel">Featured Works</span>
+  <button class="view-toggle-btn" id="viewToggleBtn">View All Projects</button>
+</div>
+
+<div class="filter-bar" id="filterBar" style="display:none">
+  <div class="filter-search-wrap">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="filter-search" id="searchInput" type="text" placeholder="Search projects...">
+  </div>
+  <div class="filter-btns">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="media">Media</button>
+    <button class="filter-btn" data-filter="layout">Layout</button>
+    <button class="filter-btn" data-filter="interaction">Interaction</button>
+    <button class="filter-btn" data-filter="story">Story</button>
+    <button class="filter-btn" data-filter="logic">Logic</button>
+  </div>
+  <span class="filter-count" id="filterCount"></span>
+</div>
+
 <main class="grid-wrapper">
   <div class="projects-grid" id="projectsGrid"></div>
 </main>
@@ -738,6 +904,11 @@
   <div class="lightbox-header">
     <span class="lightbox-title" id="lightboxTitle"></span>
     <div class="lightbox-controls">
+      <div class="lb-nav">
+        <button class="lb-btn" id="lbPrev" type="button">← Prev</button>
+        <span class="lb-counter" id="lbCounter"></span>
+        <button class="lb-btn" id="lbNext" type="button">Next →</button>
+      </div>
       <button class="lb-btn" id="lbNewTab" type="button">Open in New Tab -></button>
       <button class="lb-btn close" type="button" onclick="closeLightbox()">Close</button>
     </div>
@@ -749,6 +920,7 @@
   const projects = [
     {
       title: "Material Story",
+      featured: true,
       file: "editorials/material-story.html",
       live: "",
       features: [
@@ -761,6 +933,7 @@
     },
     {
       title: "Design Philosophy - Demi",
+      featured: true,
       file: "editorials/design-philosophy-demi.html",
       live: "",
       features: [
@@ -773,6 +946,7 @@
     },
     {
       title: "Versatility in One - III",
+      featured: true,
       file: "editorials/versatility-in-one-v3.html",
       live: "",
       features: [
@@ -784,6 +958,7 @@
     },
     {
       title: "The Art of Perspective",
+      featured: true,
       file: "editorials/the-art-of-perspective-season-that-remembers.html",
       live: "",
       features: [
@@ -817,6 +992,7 @@
     },
     {
       title: "ARI SG Exclusive - Spirit of the Island",
+      featured: true,
       file: "editorials/ari-sg-exclusive-spirit-of-the-island.html",
       live: "",
       features: [
@@ -1032,6 +1208,7 @@
     },
     {
       title: "Future in Hand",
+      featured: true,
       file: "editorials/future-in-hand.html",
       live: "",
       features: [
@@ -1063,28 +1240,63 @@
     }
   ];
 
+  let activeFilter = 'all';
+  let searchQuery = '';
+  let currentLightboxIndex = -1;
+  let showAll = false;
+
+  function getFiltered() {
+    let list = showAll ? projects : projects.filter(p => p.featured);
+    return list.filter(p => {
+      const matchesFilter = activeFilter === 'all' || p.features.some(f => f.type === activeFilter);
+      const matchesSearch = !searchQuery || p.title.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesFilter && matchesSearch;
+    });
+  }
+
   function openLightbox(index) {
-    const project = projects[index];
+    currentLightboxIndex = index;
+    const filtered = getFiltered();
+    const project = filtered[index];
     document.getElementById('lightboxTitle').textContent = project.title;
     document.getElementById('lightboxFrame').src = project.file;
     document.getElementById('lbNewTab').onclick = () => window.open(project.file, '_blank');
     document.getElementById('lightbox').classList.add('active');
     document.body.style.overflow = 'hidden';
+    updateLightboxNav();
+  }
+
+  function updateLightboxNav() {
+    const filtered = getFiltered();
+    document.getElementById('lbPrev').disabled = currentLightboxIndex <= 0;
+    document.getElementById('lbNext').disabled = currentLightboxIndex >= filtered.length - 1;
+    document.getElementById('lbCounter').textContent = `${currentLightboxIndex + 1} / ${filtered.length}`;
   }
 
   function closeLightbox() {
     document.getElementById('lightbox').classList.remove('active');
     document.getElementById('lightboxFrame').src = '';
     document.body.style.overflow = '';
+    currentLightboxIndex = -1;
   }
 
   function renderProjects() {
+    const filtered = getFiltered();
     const grid = document.getElementById('projectsGrid');
-    const count = projects.length;
-    document.getElementById('navCount').textContent = `${count} Projects`;
-    document.getElementById('footerCount').textContent = `${count} Works`;
+    grid.innerHTML = '';
 
-    projects.forEach((project, index) => {
+    document.getElementById('navCount').textContent = `${filtered.length} Projects`;
+    document.getElementById('footerCount').textContent = `${filtered.length} Works`;
+    document.getElementById('filterCount').textContent = activeFilter === 'all' && !searchQuery
+      ? `${filtered.length} projects`
+      : `${filtered.length} of ${projects.length}`;
+
+    if (!filtered.length) {
+      grid.innerHTML = '<p class="no-results">No projects match your filters.</p>';
+      return;
+    }
+
+    filtered.forEach((project, index) => {
       const num = String(index + 1).padStart(2, '0');
       const card = document.createElement('article');
       card.className = 'project-card';
@@ -1104,11 +1316,7 @@
         ? `<a class="card-url" href="${project.live}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${project.live.replace(/^https?:\/\//, '')}</a>`
         : `<span class="card-url">Local preview</span>`;
       const featureTags = (project.features || [])
-        .map(feature => {
-          const type = feature.type || 'layout';
-          const label = feature.label || '';
-          return `<span class="feature-tag feature-tag--${type}">${label}</span>`;
-        })
+        .map(f => `<span class="feature-tag feature-tag--${f.type || 'layout'}">${f.label || ''}</span>`)
         .join('');
 
       card.innerHTML = `
@@ -1133,21 +1341,67 @@
           </div>
         </div>
       `;
-
       grid.appendChild(card);
     });
   }
 
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      closeLightbox();
+  // Featured / view all toggle
+  document.getElementById('viewToggleBtn').addEventListener('click', () => {
+    showAll = !showAll;
+    const label = document.getElementById('viewToggleLabel');
+    const btn = document.getElementById('viewToggleBtn');
+    const filterBar = document.getElementById('filterBar');
+    if (showAll) {
+      label.textContent = 'All Works';
+      btn.textContent = 'Show Featured Only';
+      filterBar.style.display = '';
+    } else {
+      label.textContent = 'Featured Works';
+      btn.textContent = 'View All Projects';
+      filterBar.style.display = 'none';
+      activeFilter = 'all';
+      searchQuery = '';
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
+      document.getElementById('searchInput').value = '';
     }
+    renderProjects();
+  });
+
+  // Filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeFilter = btn.dataset.filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderProjects();
+    });
+  });
+
+  // Search
+  document.getElementById('searchInput').addEventListener('input', e => {
+    searchQuery = e.target.value.trim();
+    renderProjects();
+  });
+
+  // Lightbox prev/next buttons
+  document.getElementById('lbPrev').addEventListener('click', () => {
+    if (currentLightboxIndex > 0) openLightbox(currentLightboxIndex - 1);
+  });
+  document.getElementById('lbNext').addEventListener('click', () => {
+    const filtered = getFiltered();
+    if (currentLightboxIndex < filtered.length - 1) openLightbox(currentLightboxIndex + 1);
+  });
+
+  // Keyboard nav
+  document.addEventListener('keydown', event => {
+    if (!document.getElementById('lightbox').classList.contains('active')) return;
+    if (event.key === 'Escape') closeLightbox();
+    if (event.key === 'ArrowLeft') { if (currentLightboxIndex > 0) openLightbox(currentLightboxIndex - 1); }
+    if (event.key === 'ArrowRight') { const f = getFiltered(); if (currentLightboxIndex < f.length - 1) openLightbox(currentLightboxIndex + 1); }
   });
 
   document.getElementById('lightbox').addEventListener('click', event => {
-    if (event.target.id === 'lightbox') {
-      closeLightbox();
-    }
+    if (event.target.id === 'lightbox') closeLightbox();
   });
 
   renderProjects();

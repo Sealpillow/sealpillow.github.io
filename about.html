@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About - Portfolio</title>
+<title>Brian Lua - About</title>
+<meta name="description" content="About Brian Lua — IT Business Analyst at Charles &amp; Keith, NTU Computer Science graduate, frontend developer and QA automation builder based in Singapore.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sealpillow.github.io/about.html">
+<meta property="og:title" content="Brian Lua - About">
+<meta property="og:description" content="IT Business Analyst at Charles &amp; Keith, NTU Computer Science graduate, frontend developer and QA automation builder based in Singapore.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
@@ -16,8 +22,8 @@
   }
 
   :root {
-    --cream: #f5f0e8;
-    --bone: #ede8dc;
+    --cream: #e2dbd0;
+    --bone: #d8d0c4;
     --ink: #1a1714;
     --charcoal: #2e2a26;
     --gold: #b89a6a;
@@ -743,6 +749,53 @@
     body { padding-bottom: 72px; }
   }
 
+  /* Back to top */
+  .back-to-top {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 90;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--rule);
+    background: rgba(245, 240, 232, 0.92);
+    backdrop-filter: blur(8px);
+    color: var(--text-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.2s ease, color 0.2s ease;
+    pointer-events: none;
+  }
+
+  .back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .back-to-top:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .back-to-top svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (max-width: 900px) {
+    .back-to-top { bottom: 88px; right: 16px; }
+  }
+
   @keyframes fadeDown {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -1010,12 +1063,24 @@
   </div>
 </section>
 
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
 <footer class="site-footer">
   <span class="footer-mark">About</span>
   <a href="myportfolio/" class="footer-back">View My Work &rarr;</a>
 </footer>
 
 <script>
+  (function(){
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      backToTop.classList.toggle('visible', window.scrollY > 300);
+    }, { passive: true });
+    backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  })();
+
   (function(){
     const dots = Array.from(document.querySelectorAll('.section-nav-dot'));
     const progress = document.querySelector('.section-nav-progress');
