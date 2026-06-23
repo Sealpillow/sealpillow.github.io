@@ -77,4 +77,15 @@ Insert new entries under the matching comment block:
 
 ## What I need from you
 
-Given one or more filenames like `special/MyComponent.html`, generate the correct entry line(s) ready to paste into the array. Infer `name`, `tags`, `layout`, `mobile`, and `desc` from the filename. If the filename is ambiguous, ask me one clarifying question before generating.
+I will paste the HTML snippet code. Read it and generate the correct entry line ready to paste into the array.
+
+From the code, determine:
+- **`file`** — I will tell you the filename and category folder (e.g. `special/MyComponent.html`)
+- **`name`** — derive from what the layout actually does visually (not just the filename). Look at the HTML structure, class names, and content to understand the layout pattern
+- **`platform`** — infer from the layout type and whether it has responsive/mobile handling
+- **`tags`** — pick from the tag reference above based on what the snippet contains
+- **`layout`** — short label describing the pattern type
+- **`mobile`** — look for `@media` queries or mobile-specific logic to determine mobile behaviour
+- **`desc`** — one sentence describing what it renders and any key behaviour
+
+If the snippet code is unclear or could be categorised multiple ways, ask one clarifying question before generating the entry.
