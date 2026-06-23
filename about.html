@@ -1105,6 +1105,10 @@
         if (scrollY >= sec.offsetTop - winH * 0.4) activeIndex = i;
       });
 
+      if (scrollY + winH >= document.documentElement.scrollHeight - 20) {
+        activeIndex = sections.length - 1;
+      }
+
       dots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
 
       const navH = dots[dots.length - 1].offsetTop - dots[0].offsetTop;
