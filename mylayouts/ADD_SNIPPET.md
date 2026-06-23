@@ -75,6 +75,16 @@ Insert new entries under the matching comment block:
 
 ---
 
+## `common` flag (optional)
+
+Add `essential:true` if this is a frequently used snippet. It will appear in the **Essentials** view shown on page load. Only flag it if it's a go-to layout you reach for regularly.
+
+```js
+{ file:"special/MyComponent.html", ..., essential:true }
+```
+
+---
+
 ## What I need from you
 
 I will paste the HTML snippet code. Read it and generate the correct entry line ready to paste into the array.
