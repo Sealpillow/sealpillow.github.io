@@ -1,0 +1,297 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  .hotspot-wrap {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  .hotspot-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Hotspot dot */
+  .hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+
+  .hotspot-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  }
+
+  .hotspot-dot::before,
+  .hotspot-dot::after {
+    content: '';
+    position: absolute;
+    background: #1a1a1a;
+    border-radius: 2px;
+    transition: transform 0.25s ease;
+  }
+
+  /* Plus icon */
+  .hotspot-dot::before {
+    width: 1.5px;
+    height: 10px;
+  }
+
+  .hotspot-dot::after {
+    width: 10px;
+    height: 1.5px;
+  }
+
+  .hotspot:hover .hotspot-dot,
+  .hotspot.active .hotspot-dot {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+  }
+
+  .hotspot:hover .hotspot-dot::before,
+  .hotspot.active .hotspot-dot::before {
+    transform: rotate(45deg);
+  }
+
+  .hotspot:hover .hotspot-dot::after,
+  .hotspot.active .hotspot-dot::after {
+    transform: rotate(45deg);
+  }
+
+  /* Pulse ring */
+  .hotspot-dot::after {
+    animation: none;
+  }
+
+  .hotspot-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    animation: pulse 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes pulse {
+    0%   { transform: scale(1);   opacity: 0.6; }
+    70%  { transform: scale(1.6); opacity: 0; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+
+  /* Tooltip */
+  .hotspot-tooltip {
+    position: absolute;
+    bottom: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    padding: 14px 16px;
+    min-width: 180px;
+    max-width: 220px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+    white-space: normal;
+  }
+
+  /* Tooltip arrow */
+  .hotspot-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #fff;
+  }
+
+  .hotspot:hover .hotspot-tooltip,
+  .hotspot.active .hotspot-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* data-tip="left": tooltip to the left of the dot */
+  .hotspot[data-tip="left"] .hotspot-tooltip {
+    bottom: 50%;
+    left: auto;
+    right: calc(100% + 14px);
+    transform: translateX(0) translateY(50%) translateY(6px);
+  }
+
+  .hotspot[data-tip="left"] .hotspot-tooltip::after {
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    border-top-color: transparent;
+    border-left-color: #fff;
+  }
+
+  .hotspot[data-tip="left"]:hover .hotspot-tooltip,
+  .hotspot[data-tip="left"].active .hotspot-tooltip {
+    transform: translateX(0) translateY(50%);
+  }
+
+  /* data-tip="right": tooltip to the right of the dot */
+  .hotspot[data-tip="right"] .hotspot-tooltip {
+    bottom: 50%;
+    left: calc(100% + 14px);
+    transform: translateX(0) translateY(50%) translateY(6px);
+  }
+
+  .hotspot[data-tip="right"] .hotspot-tooltip::after {
+    top: 50%;
+    left: auto;
+    right: 100%;
+    transform: translateY(-50%);
+    border-top-color: transparent;
+    border-right-color: #fff;
+  }
+
+  .hotspot[data-tip="right"]:hover .hotspot-tooltip,
+  .hotspot[data-tip="right"].active .hotspot-tooltip {
+    transform: translateX(0) translateY(50%);
+  }
+
+  /* data-tip="above-left": tooltip above, pinned to left */
+  .hotspot[data-tip="above-left"] .hotspot-tooltip {
+    left: 0;
+    transform: translateX(0) translateY(6px);
+  }
+
+  .hotspot[data-tip="above-left"] .hotspot-tooltip::after {
+    left: 20px;
+    transform: none;
+  }
+
+  .hotspot[data-tip="above-left"]:hover .hotspot-tooltip,
+  .hotspot[data-tip="above-left"].active .hotspot-tooltip {
+    transform: translateX(0) translateY(0);
+  }
+
+  /* data-tip="above-right": tooltip above, pinned to right */
+  .hotspot[data-tip="above-right"] .hotspot-tooltip {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(6px);
+  }
+
+  .hotspot[data-tip="above-right"] .hotspot-tooltip::after {
+    left: auto;
+    right: 20px;
+    transform: none;
+  }
+
+  .hotspot[data-tip="above-right"]:hover .hotspot-tooltip,
+  .hotspot[data-tip="above-right"].active .hotspot-tooltip {
+    transform: translateX(0) translateY(0);
+  }
+
+  /* data-tip="below": tooltip below dot */
+  .hotspot[data-tip="below"] .hotspot-tooltip {
+    bottom: auto;
+    top: calc(100% + 14px);
+    transform: translateX(-50%) translateY(-6px);
+  }
+
+  .hotspot[data-tip="below"] .hotspot-tooltip::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: #fff;
+  }
+
+  .hotspot[data-tip="below"]:hover .hotspot-tooltip,
+  .hotspot[data-tip="below"].active .hotspot-tooltip {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .hotspot-label {
+    font-family: proxima-nova, 'Helvetica Neue', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    margin: 0 0 5px;
+  }
+
+  .hotspot-desc {
+    font-family: proxima-nova, 'Helvetica Neue', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+  }
+</style>
+
+<div class="hotspot-wrap">
+  <img src="../../media/product-landscape-3.jpg" alt="Product image">
+
+  <!-- Hotspot 1 -->
+  <div class="hotspot" data-tip="left" style="top: 45%; left: 35%;">
+    <div class="hotspot-dot">
+      <div class="hotspot-ring"></div>
+    </div>
+    <div class="hotspot-tooltip">
+      <p class="hotspot-label">Material</p>
+      <p class="hotspot-desc">Crafted from full-grain leather with a soft suede lining.</p>
+    </div>
+  </div>
+
+  <!-- Hotspot 2 -->
+  <div class="hotspot" data-tip="above" style="top: 54%; left: 55%;">
+    <div class="hotspot-dot">
+      <div class="hotspot-ring"></div>
+    </div>
+    <div class="hotspot-tooltip">
+      <p class="hotspot-label">Detail</p>
+      <p class="hotspot-desc">Adjustable gold-tone buckle with engraved brand logo.</p>
+    </div>
+  </div>
+
+  <!-- Hotspot 3 -->
+  <div class="hotspot" data-tip="right" style="top: 68%; left: 65%;">
+    <div class="hotspot-dot">
+      <div class="hotspot-ring"></div>
+    </div>
+    <div class="hotspot-tooltip">
+      <p class="hotspot-label">Sole</p>
+      <p class="hotspot-desc">Slip-resistant rubber outsole with 4cm block heel.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Touch support — tap to toggle on mobile
+  document.querySelectorAll('.hotspot').forEach(function(h) {
+    h.addEventListener('click', function(e) {
+      var isActive = h.classList.contains('active');
+      document.querySelectorAll('.hotspot').forEach(function(x) { x.classList.remove('active'); });
+      if (!isActive) h.classList.add('active');
+      e.stopPropagation();
+    });
+  });
+
+  document.addEventListener('click', function() {
+    document.querySelectorAll('.hotspot').forEach(function(h) { h.classList.remove('active'); });
+  });
+</script>
