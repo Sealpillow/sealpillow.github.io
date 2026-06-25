@@ -1,0 +1,202 @@
+﻿<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= SPLIDE CSS ================= -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+
+<!-- ================= SPLIDE JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js"></script>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+
+<style>
+
+  /* Apply overflow-x: hidden globally */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Or apply to specific container (if needed) */
+  .carousel-container {
+    overflow-x: hidden;
+  }
+
+  /* Ensure Splide wrapper doesn't overflow */
+  .splide {
+    overflow-x: hidden;
+  }
+
+  /* General image styling */
+  .carousel-container img {
+    width: 100%;           /* Each image fills 25% of container */
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+ /* ================= SLIDER ================= */
+.slider-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.slide-content {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  position: relative;
+}
+
+.slide-content a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#carouselExploreSlider1 .slide-content img,
+#carouselExploreSlider1 .slide-content video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Text Overlay - Bottom Left */
+.slide-text {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: white;
+  z-index: 10;
+}
+
+/* Hide arrows & pagination */
+.splide__arrows,
+.splide__pagination {
+  display: none;
+}
+
+/* Drag cursor */
+.splide__track {
+  cursor: grab;
+}
+.splide__track:active {
+  cursor: grabbing;
+}
+
+</style>
+
+<!-- Slider-->
+<div class="slider-container">
+  <div class="splide" id="carouselExploreSlider1">
+    <div class="splide__track">
+      <ul class="splide__list"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  function createSplideSliderCarousel({ sliderId, slides, options = {} }) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+
+    const list = slider.querySelector('.splide__list');
+
+    slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'splide__slide';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slide-content';
+
+      // Create media HTML
+      let mediaHtml = '';
+      if (slide.type === 'video') {
+        mediaHtml = `
+          <video autoplay muted loop playsinline>
+            <source src="${slide.src}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        mediaHtml = `<img src="${slide.src}" alt="${slide.alt || ''}">`;
+      }
+
+      // Add overlay text if exists
+      if (slide.title || slide.description) {
+        mediaHtml += `
+          <div class="slide-text" style="color:${slide.textColor || '#fff'}">
+            ${slide.title ? `<h3>${slide.title}</h3>` : ''}
+            ${slide.description ? `<p>${slide.description}</p>` : ''}
+          </div>
+        `;
+      }
+
+      // Wrap in anchor if url exists
+      if (slide.url) {
+        if(slide.analytics){
+            wrapper.innerHTML = `<a href="${slide.url}" data-content-analytic='{"contentId": "${slide.analytics}", "contentType": "asset"}'>${mediaHtml}</a>`;
+        }
+        else{
+            wrapper.innerHTML = `<a href="${slide.url}">${mediaHtml}</a>`;
+        }
+      } else {
+        wrapper.innerHTML = mediaHtml;
+      }
+
+      li.appendChild(wrapper);
+      list.appendChild(li);
+    });
+
+    // Initialize Splide
+    const splide = new Splide(`#${sliderId}`, {
+      type: 'loop',
+      drag: 'free',
+      focus: 'center',
+      perPage: 3,
+      
+      autoScroll: {
+        speed: 1,
+        pauseOnHover: true,
+        pauseOnFocus: false,
+      },
+      arrows: false,
+      pagination: false,
+      breakpoints: {
+        1024: { perPage: 2 },
+        640: { perPage: 2 },
+      },
+      ...options,
+    });
+
+    splide.mount(window.splide.Extensions);
+  }
+
+    /* ================= SLIDER DATA ================= */
+
+
+    createSplideSliderCarousel({
+      sliderId: 'carouselExploreSlider1',
+      slides: [
+        { type: 'image', src: "../../media/portrait-1.jpg", url: "$url('Product-Show', 'pid','PW2-76390057-9_CAMEL')$", analytics: "c_newarrival_pw_modelimage_1"},
+        { type: 'image', src: "../../media/product-portrait-2.jpg", url: "$url('Product-Show', 'pid','PW1-65110103_COGNAC')$", analytics: "c_newarrival_pw_productimage_2"},
+        { type: 'image', src: "../../media/product-portrait-2.jpg", url: "$url('Product-Show', 'pid','PW2-75060138_BEIGE')$", analytics: "c_newarrival_pw_productimage_3"},
+        { type: 'image', src: "../../media/product-portrait-2.jpg", url: "$url('Product-Show', 'pid','PW1-66210006_L.TAUP')$", analytics: "c_newarrival_pw_productimage_4"},
+        { type: 'image', src: "../../media/portrait-2.jpg", url: "$url('Product-Show', 'pid','PM2-26320282_SAND')$", analytics: "c_newarrival_pm_modelimage_1"},
+        { type: 'image', src: "../../media/product-portrait-2.jpg", url: "$url('Product-Show', 'pid','PM1-86380213_LTA.EM')$", analytics: "c_newarrival_pm_productimage_2"},
+        { type: 'image', src: "../../media/product-portrait-2.jpg", url: "$url('Product-Show', 'pid','PM2-25210270_DK.BRW')$", analytics: "c_newarrival_pm_productimage_3"},
+        { type: 'image', src: "../../media/product-portrait-2.jpg", url: "$url('Product-Show', 'pid','PM1-65110332_DBW.BU')$", analytics: "c_newarrival_pm_productimage_4"}
+      ],
+      options: {
+        perPage: 4,
+      }
+    });
+
+  
+});
+</script>

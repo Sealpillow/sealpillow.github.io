@@ -1,0 +1,229 @@
+﻿<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+<style>
+  /* Bottom left text */
+  .curated-bottom-left {
+    position: absolute;
+    bottom: 47px;
+    left: 16px;
+    font-weight: 600;
+    font-size: 22px;
+  }
+
+  .curated-bottom-left-discover {
+    position: absolute;
+    bottom: 28px;
+    left: 16px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .custom-col {
+    flex: 0 0 33%;
+    max-width: 33%;
+  }
+  .explore-content-container2{
+    padding-bottom: 2rem;
+  }
+  @media (max-width: 768px) {
+    .custom-col {
+      flex: 0 0 95%;
+      max-width: 95%;
+    }
+    .explore-content-container2{
+      padding-bottom: 0rem;
+    }
+  }
+  .explore-content-container2 a {
+    position: relative; /* This is needed for the ::after pseudo-element to position correctly */
+    text-decoration: none; /* Removes the default underline */
+  }
+
+
+  .explore-content-container2 a .curated-bottom-left-discover {
+    position: relative;
+    display: inline-block; 
+  }
+
+
+  .explore-content-container2 a .curated-bottom-left-discover::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1.5px; /* Underline thickness */
+    left: 0;
+    bottom: 3px;
+    transition: width 0.3s ease; /* Smooth transition for the animation */
+  }
+
+  .explore-content-container2 a:hover .curated-bottom-left-discover::after {
+    width: 100%; /* Expands to full width on hover */
+  }
+  .underline-white::after {
+    background-color: white;
+  }
+
+  .underline-black::after {
+    background-color: black;
+  }
+  .explore-content-container2 video {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    filter: grayscale(0); 
+  }
+</style>
+<!--TITLE-->
+<!-- TITLE -->
+<div style="background-color:#f8f8f8;">
+  <div class="text-center" style="font-size:30px;padding:2rem 0;">
+    CURATED BY THE HOUSE
+  </div>
+</div>
+
+<!-- DYNAMIC CONTAINER -->
+<div
+  id="curatedContainer"
+  class="explore-content-container2 row no-gutters justify-content-center w-100"
+  style="background-color:#f8f8f8;">
+</div>
+
+
+<script>
+const curatedData = [
+  {
+    title: "DESIGN PHILOSOPHY",
+    discoverText: "Discover More",
+    textColor: "black",
+    underlineColor: "black",
+    link: "$url('Page-Show','cid','design-philosophy')$",
+    analytics: {
+      contentId: "d_designphilosophy_pw_productimage_1",
+      contentType: "asset"
+    },
+    media: {
+      type: "image",
+      desktop: "../../media/portrait-1.jpg",
+      mobile: "../../media/portrait-1.jpg"
+    }
+  },
+  {
+    title: "MATERIAL STORY",
+    discoverText: "Discover More",
+    textColor: "white",
+    underlineColor: "white",
+    tabLink: {
+      page: "material-story",
+      tab: "denim"
+    },
+    analytics: {
+      contentId: "d_materialstory_pm_modelimage_1",
+      contentType: "asset"
+    },
+    media: {
+      type: "image",
+      desktop: "../../media/portrait-2.jpg",
+      mobile: "../../media/portrait-2.jpg"
+    }
+  },
+  {
+    title: "VERSATILITY IN ONE",
+    discoverText: "Discover More",
+    textColor: "black",
+    underlineColor: "black",
+    link: "$url('Page-Show','cid','versatility-in-one')$",
+    analytics: {
+      contentId: "d_versatilityinone_pw_modelvideo_1",
+      contentType: "asset"
+    },
+    media: {
+      type: "video",
+      desktop: "../../media/portrait_video-2.mp4",
+      mobile: "../../media/portrait_video-2.mp4"
+    }
+  }
+];
+
+const container = document.getElementById("curatedContainer");
+
+curatedData.forEach(item => {
+  const col = document.createElement("div");
+  col.className = "custom-col w-100 border-0 pl-2 pr-2 pb-0";
+  col.style.backgroundColor = "#f8f8f8";
+
+  const a = document.createElement("a");
+
+  if (item.link) {
+    a.href = item.link;
+  }
+
+  if (item.tabLink) {
+    a.href = "#";
+    a.classList.add("js-tab-link");
+    a.dataset.tab = item.tabLink.tab;
+    a.dataset.page = item.tabLink.page;
+    if (item.tabLink.subtab) {
+      a.dataset.subtab = item.tabLink.subtab;
+    }
+  }
+
+  a.dataset.contentAnalytic = JSON.stringify(item.analytics);
+
+  /* MEDIA */
+  if (item.media.type === "video") {
+    a.innerHTML += `
+      <video class="d-md-block d-none" playsinline autoplay loop muted>
+        <source src="${item.media.desktop}" type="video/mp4">
+      </video>
+      <video class="d-md-none d-block" playsinline autoplay loop muted>
+        <source src="${item.media.mobile}" type="video/mp4">
+      </video>
+    `;
+  } else {
+    a.innerHTML += `
+      <img src="${item.media.desktop}" class="border-0 img-fluid w-100 d-md-block d-none"/>
+      <img src="${item.media.mobile}" class="border-0 img-fluid w-100 d-md-none d-block"/>
+    `;
+  }
+
+  /* TEXT OVERLAY */
+  a.innerHTML += `
+    <div style="position:relative">
+      <div class="curated-bottom-left" style="color:${item.textColor}">
+        ${item.title}
+      </div>
+      <div class="curated-bottom-left-discover underline-${item.underlineColor}" style="color:${item.textColor}">
+        ${item.discoverText}
+      </div>
+    </div>
+  `;
+
+  col.appendChild(a);
+  container.appendChild(col);
+});
+
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  document.querySelectorAll('.js-tab-link').forEach(link => {
+    const tab    = link.dataset.tab;
+    const subtab = link.dataset.subtab;
+    const page   = link.dataset.page;
+
+    if (!tab || !page) return;
+
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const countryCode = pathParts[0];
+
+    let hash = `#tab=${tab}`;
+    if (subtab) hash += `&subtab=${subtab}`;
+
+    link.href = `/${countryCode}/${page}.html${hash}`;
+  });
+
+});
+</script>

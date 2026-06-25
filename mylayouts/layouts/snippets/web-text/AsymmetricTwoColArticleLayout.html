@@ -1,0 +1,257 @@
+﻿<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+<!-- Splide CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+
+<!-- Splide JS -->
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<style>
+/* ===== Layout ===== */
+.journal_container {
+  width: 85%;
+  margin: 0 auto;
+}
+
+.journal_container-heading {
+  font-size: 30px;
+  font-weight: 500;
+  text-align: center;
+  margin: 3rem 0 2rem;
+}
+
+@media (max-width: 767px) {
+  .journal_container-heading {
+    font-size: 26px;
+  }
+}
+
+/* ===== Text Blocks ===== */
+.journal_info,
+.journal_container-right_content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.journal_container-left_content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.journal_container-left_content h5 {
+    font-size: 13px;
+    font-weight: bold;
+    width: 95%;
+}
+
+.journal_info h5,
+.journal_container-right_content h5 {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.journal_info p,
+.journal_container-right_content p {
+  font-size: 13px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .journal_info,
+  .journal_container-right_content {
+    text-align: center;
+    width: 70%;
+    margin: 0 auto;
+  }
+}
+
+/* ===== Pagination Styling ===== */
+#journalSlider .splide__pagination {
+  bottom: -1.5em;
+}
+
+#journalSlider .splide__pagination__page {
+  width: 30px;
+  height: 4px;
+  background-color: #ccc;
+  margin: 0 8px;
+  border-radius: 2px;
+  transition: background-color 0.3s;
+}
+
+#journalSlider .splide__pagination__page.is-active {
+  background-color: #000;
+}
+
+/* Override for journal carousel */
+.js-scroll-carousel-journal .splide__pagination__page {
+  width: 20px;
+  height: 4px;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.js-scroll-carousel-journal .splide__pagination__page.is-active {
+  background: #000;
+}
+</style>
+
+<div class="journal_container">
+
+  <!-- Heading (single responsive version) -->
+  <div class="journal_container-heading">
+    PEDRO JOURNAL
+  </div>
+
+  <!-- ===== Desktop Layout — add d-none d-md-block in production ===== -->
+  <div class="js-scroll-carousel-journal" data-speed="0.5">
+    <div class="d-inline-flex w-100">
+      <div class="row" id="journal-section"></div>
+
+    </div>
+  </div>
+
+  <!-- ===== Mobile Slider — add d-md-none in production ===== -->
+  <div id="journalSlider" class="splide" style="margin-top:8px">
+    <div class="splide__track">
+      <ul class="splide__list" id="journal-slider-list"></ul>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="mt-5 mb-5 text-center">
+    <a href="$url('Search-ShowContent', 'fdid','thejournal')$">
+      <div class="text-uppercase">Discover More</div>
+    </a>
+  </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const journalEntries = [
+    {
+      imgDesktop: "../../media/landscape-1.jpg",
+      imgMobile: "../../media/landscape-1.jpg",
+      title: "THE SPLASH",
+      description: "Inspired by the sun-drenched ease of coastal living, Summer 2026 captures the fluid space between the shoreline and the refined tempo of the city.",
+      link: "$url('Page-show','cid','the-splash-summer26')$",
+      analytics: {
+        contentId: "h_journal_generic_modelimage_1",
+        contentType: "asset"
+      },
+    },
+    {
+      imgDesktop: "../../media/portrait-1.jpg",
+      imgMobile: "../../media/portrait-1.jpg",
+      title: "YANA BOVENISTIER: DUAL NARRATIVES",
+      description: "While Yana Bovenistier's career h as been defined by her ability to inhabit different characters in front of the lens, it is her other role, motherhood, which has brought her into her most authentic self.",
+      link: "$url('Page-show','cid','yana-on-motherhood')$",
+      analytics: {
+        contentId: "h_journal_generic_modelimage_2",
+        contentType: "asset"
+      },
+    },
+    {
+      imgDesktop: "../../media/product-portrait-2.jpg",
+      imgMobile: "../../media/product-portrait-2.jpg",
+      title: "THE DEMI: PASTEL EDITION",
+      description: "An evolution of a classic, the Demi returns in a palette of pastel hues that introduce a lighter, more playful mood. ",
+      link: "$url('Page-show','cid','summer-demi-pastel-edition')$",
+      analytics: {
+        contentId: "h_journal_generic_productimage_3",
+        contentType: "asset"
+      },
+    },
+  ];
+
+  /* ===== Desktop Layout ===== */
+  const container = document.getElementById("journal-section");
+
+  const left = `
+    <div class="col-md-7 position-relative">
+      <div class="row mb-4">
+        <div class="col-12">
+          <a href="${journalEntries[0].link}"
+            data-content-analytic='{"contentId":"${journalEntries[0].analytics.contentId}",
+                                    "contentType":"${journalEntries[0].analytics.contentType}"}'>
+            <img loading="lazy" class="w-100"
+                 src="${journalEntries[0].imgDesktop}"
+                 alt="${journalEntries[0].title}">
+          </a>
+        </div>
+        <div class="col-12 journal_container-left_content mt-3">
+          <h5>${journalEntries[0].title}</h5>
+          <p>${journalEntries[0].description}</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const right = `
+    <div class="col-md-5 position-relative">
+      ${journalEntries.slice(1).map(item => `
+        <div class="row mb-4">
+          <div class="col-md-5 p-0">
+            <a href="${item.link}"
+              data-content-analytic='{"contentId":"${item.analytics.contentId}",
+                                      "contentType":"${item.analytics.contentType}"}'>
+              <img loading="lazy" class="w-100"
+                   src="${item.imgDesktop}"
+                   alt="${item.title}">
+            </a>
+          </div>
+          <div class="col-md-7 journal_info">
+            <h5>${item.title}</h5>
+            <p>${item.description}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  if (container) {
+    container.innerHTML = left + right;
+  }
+
+  /* ===== Mobile Slider ===== */
+  const sliderList = document.getElementById("journal-slider-list");
+
+  if (sliderList) {
+    sliderList.innerHTML = journalEntries.map(item => `
+      <li class="splide__slide">
+        <a href="${item.link}" 
+          data-content-analytic='{"contentId":"${item.analytics.contentId}",
+                                  "contentType":"${item.analytics.contentType}"}'>
+          <img loading="lazy" class="w-100"
+               src="${item.imgMobile}"
+               alt="${item.title}"
+               data-content-id="${item.contentId}">
+        </a>
+        <div class="journal_info mt-3">
+          <h5>${item.title}</h5>
+          <p>${item.description}</p>
+        </div>
+      </li>
+    `).join("");
+  }
+
+  /* ===== Init Splide (mobile only visible anyway) ===== */
+  if (document.getElementById('journalSlider')) {
+    new Splide('#journalSlider', {
+      type: 'loop',
+      perPage: 1,
+      autoplay: true,
+      interval: 4000,
+      arrows: false,
+      pagination: true,
+      speed: 800,
+    }).mount();
+  }
+
+});
+</script>

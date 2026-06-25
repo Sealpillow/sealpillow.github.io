@@ -85,13 +85,28 @@ Add `essential:true` if this is a frequently used snippet. It will appear in the
 
 ---
 
+## Filename naming convention
+
+Filenames must describe the **layout pattern**, not the content or campaign it was built for.
+
+**Good** — describes structure/behaviour:
+`ThreeColEditorialTileGrid.html` `FadeSliderTextOverlay.html` `AsymmetricTwoColArticleLayout.html` `FourColProductGridMobileCarousel.html`
+
+**Avoid** — describes content/campaign:
+`CuratedByTheHouseGrid.html` `NewArrivalAutoCarousel.html` `JournalEditorialLayout.html`
+
+Use PascalCase. Pattern: `[ColCount][ContentType][Behaviour][MobileVariant].html`
+Examples: `TwoColImageTextMobileStack` · `SyncedCarouselProductGrid` · `AutoScrollDragFreeCarousel`
+
+---
+
 ## What I need from you
 
 I will paste the HTML snippet code. Read it and generate the correct entry line ready to paste into the array.
 
 From the code, determine:
-- **`file`** — I will tell you the filename and category folder (e.g. `special/MyComponent.html`)
-- **`name`** — derive from what the layout actually does visually (not just the filename). Look at the HTML structure, class names, and content to understand the layout pattern
+- **`file`** — suggest a layout-pattern filename in PascalCase (see naming convention above) and confirm the category folder
+- **`name`** — human-readable version of the filename; describe the layout pattern, not the content
 - **`platform`** — infer from the layout type and whether it has responsive/mobile handling
 - **`tags`** — pick from the tag reference above based on what the snippet contains
 - **`layout`** — short label describing the pattern type
