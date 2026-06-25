@@ -75,7 +75,7 @@ Insert new entries under the matching comment block:
 
 ---
 
-## `common` flag (optional)
+## `essential` flag (optional)
 
 Add `essential:true` if this is a frequently used snippet. It will appear in the **Essentials** view shown on page load. Only flag it if it's a go-to layout you reach for regularly.
 
