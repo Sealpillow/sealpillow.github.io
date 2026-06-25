@@ -445,22 +445,6 @@
     animation: fadeUp 1s ease 0.5s both;
   }
 
-  .cta-visual {
-    position: absolute;
-    left: 69%;
-    top: 61%;
-    transform: translate(-50%, -42%);
-    width: 150px;
-    pointer-events: none;
-  }
-
-  .cta-gif {
-    display: block;
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 14px 24px rgba(26, 23, 20, 0.08));
-  }
 
   .cta-left {
     display: flex;
@@ -796,6 +780,13 @@
     .back-to-top { bottom: 88px; right: 16px; }
   }
 
+  @keyframes pgFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  body { animation: pgFadeIn 0.25s ease both; }
+
   @keyframes fadeDown {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -818,12 +809,6 @@
     .hero-tagline { max-width: 100%; }
     .profile-section { padding: 50px 24px; }
     .resume-section { padding: 50px 24px; }
-    .cta-visual {
-      position: static;
-      transform: none;
-      width: min(180px, 48%);
-      margin: 16px 0 0 auto;
-    }
     .resume-grid { grid-template-columns: 1fr; gap: 24px; }
     .cta-section {
       grid-template-columns: 1fr;
@@ -885,7 +870,9 @@
   <div class="nav-left">
     <a href="index.html" class="nav-logo">Brian Lua</a>
     <div class="nav-links">
+      <a href="about.html" class="nav-link active">About</a>
       <a href="myportfolio/" class="nav-link">Work</a>
+      <a href="mylayouts/" class="nav-link">Layouts</a>
     </div>
   </div>
 </nav>
@@ -1053,9 +1040,6 @@
     <h2 class="cta-heading">Open to <br><em>opportunities</em></h2>
     <p class="cta-sub">Interested in roles close to the product, whether that's frontend, business analysis, or somewhere in between.<br>View selected projects or get in touch.</p>
   </div>
-  <div class="cta-visual" aria-hidden="true">
-    <img class="cta-gif" src="cute-pikachu.gif" alt="">
-  </div>
   <div class="cta-actions">
     <a href="mailto:luatan68@hotmail.com" class="btn-primary">Get in Touch -></a>
     <a href="myportfolio/" class="btn-secondary">View Work</a>
@@ -1125,6 +1109,18 @@
     window.addEventListener('scroll', update, { passive: true });
     update();
   })();
+</script>
+<script>
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank') return;
+    e.preventDefault();
+    document.body.style.transition = 'opacity 0.2s ease';
+    document.body.style.opacity = '0';
+    setTimeout(function() { window.location.href = href; }, 200);
+  });
 </script>
 </body>
 </html>

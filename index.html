@@ -281,6 +281,13 @@
     color: var(--cream);
   }
 
+  @keyframes pgFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  body { animation: pgFadeIn 0.25s ease both; }
+
   @keyframes fadeDown {
     from { opacity: 0; transform: translateY(-20px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -304,6 +311,11 @@
 
 <nav class="nav-bar">
   <a href="index.html" class="nav-logo">Brian Lua</a>
+  <div style="display:flex;gap:32px;align-items:center;">
+    <a href="about.html" class="nav-link">About</a>
+    <a href="myportfolio/" class="nav-link">Work</a>
+    <a href="mylayouts/" class="nav-link">Layouts</a>
+  </div>
 </nav>
 
 <main class="hero">
@@ -343,5 +355,17 @@
   <span class="footer-mark">Brian Lua</span>
 </footer>
 
+<script>
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank') return;
+    e.preventDefault();
+    document.body.style.transition = 'opacity 0.2s ease';
+    document.body.style.opacity = '0';
+    setTimeout(function() { window.location.href = href; }, 200);
+  });
+</script>
 </body>
 </html>

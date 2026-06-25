@@ -340,16 +340,15 @@
     padding: 20px 24px 22px;
     border-top: 1px solid var(--rule);
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 16px;
+    flex-direction: column;
+    gap: 14px;
     background: var(--surface);
   }
 
   .card-title-wrap {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 10px;
     min-width: 0;
   }
 
@@ -426,36 +425,28 @@
   }
 
   .btn-icon {
-    width: 36px;
+    padding: 0 16px;
     height: 36px;
-    border: 1px solid var(--rule);
+    border: 1px solid rgba(255,255,255,0.25);
     background: transparent;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cream);
     transition: all 0.25s ease;
-    color: var(--muted);
+    white-space: nowrap;
   }
 
   .btn-icon:hover {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(184, 154, 106, 0.06);
-  }
-
-  .btn-icon svg {
-    width: 14px;
-    height: 14px;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    background: var(--cream);
+    color: var(--ink);
   }
 
   .btn-open {
-    padding: 0 18px;
+    padding: 0 16px;
     height: 36px;
     border: 1px solid rgba(255,255,255,0.25);
     background: transparent;
@@ -475,9 +466,45 @@
     color: var(--ink);
   }
 
+  .btn-live {
+    padding: 0 16px;
+    height: 36px;
+    border: 1px solid rgba(200,169,110,0.35);
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .btn-live::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e05252;
+    flex-shrink: 0;
+  }
+
+  .btn-live:hover {
+    background: rgba(200,169,110,0.1);
+    border-color: var(--gold);
+    color: var(--cream);
+  }
+
   .project-card:focus-visible,
   .btn-icon:focus-visible,
   .btn-open:focus-visible,
+  .btn-live:focus-visible,
   .nav-link:focus-visible,
   .footer-about:focus-visible,
   .lb-btn:focus-visible {
@@ -662,7 +689,7 @@
     width: 100%;
     background: rgba(255,255,255,0.06);
     border: 1px solid var(--rule);
-    padding: 8px 12px 8px 30px;
+    padding: 8px 28px 8px 30px;
     font-family: 'Montserrat', sans-serif;
     font-size: 10px;
     font-weight: 400;
@@ -674,6 +701,14 @@
 
   .filter-search:focus { border-color: var(--gold); }
   .filter-search::placeholder { color: var(--muted); }
+
+  .search-clear {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: var(--muted);
+    font-size: 13px; line-height: 1; padding: 2px 4px; display: none; transition: color 0.2s ease;
+  }
+  .search-clear:hover { color: var(--cream); }
+  .search-clear.visible { display: block; }
 
   .filter-btns {
     display: flex;
@@ -796,8 +831,7 @@
     .intro-copy, .intro-meta { padding: 22px 20px; }
     .grid-wrapper { padding: 24px; }
     .projects-grid { grid-template-columns: 1fr; gap: 2px; }
-    .card-footer { flex-direction: column; align-items: flex-start; }
-    .card-actions { width: 100%; justify-content: space-between; }
+    .card-actions { width: 100%; }
     .site-footer { padding: 30px 24px; flex-direction: column; gap: 12px; text-align: center; }
     .lightbox-header {
       height: auto;
@@ -810,6 +844,12 @@
     .lightbox-controls { width: 100%; flex-wrap: wrap; }
     .footer-right { flex-direction: column; gap: 8px; }
   }
+
+  @keyframes pgFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  body { animation: pgFadeIn 0.25s ease both; }
 </style>
 </head>
 <body>
@@ -819,6 +859,8 @@
     <a href="../index.html" class="nav-logo">Brian Lua</a>
     <div class="nav-links">
       <a href="../about.html" class="nav-link">About</a>
+      <a href="../myportfolio/" class="nav-link active">Work</a>
+      <a href="../mylayouts/" class="nav-link">Layouts</a>
     </div>
   </div>
   <span class="nav-count" id="navCount"></span>
@@ -876,6 +918,7 @@
   <div class="filter-search-wrap">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input class="filter-search" id="searchInput" type="text" placeholder="Search projects...">
+    <button class="search-clear" id="searchClear" type="button" aria-label="Clear search">✕</button>
   </div>
   <div class="filter-btns">
     <button class="filter-btn active" data-filter="all">All</button>
@@ -1198,7 +1241,7 @@
     {
       title: "On the Move with Jones Backpack",
       file: "editorials/on-the-move-with-jones-backpack.html",
-      live: "",
+      live: "https://www.pedroshoes.com/sg/thejournal/conversations/on-the-move-with-jones-backpack.html",
       features: [
         { label: "Video", type: "media" },
         { label: "Hover", type: "interaction" },
@@ -1313,8 +1356,8 @@
       });
 
       const liveLink = project.live
-        ? `<a class="card-url" href="${project.live}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${project.live.replace(/^https?:\/\//, '')}</a>`
-        : `<span class="card-url">Local preview</span>`;
+        ? `<a class="btn-live" href="${project.live}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Live ↗</a>`
+        : ``;
       const featureTags = (project.features || [])
         .map(f => `<span class="feature-tag feature-tag--${f.type || 'layout'}">${f.label || ''}</span>`)
         .join('');
@@ -1329,15 +1372,13 @@
           <div class="card-title-wrap">
             <span class="card-title">${project.title}</span>
             <div class="card-meta">
-              ${liveLink}
               <div class="feature-tags">${featureTags}</div>
             </div>
           </div>
           <div class="card-actions">
-            <button class="btn-icon" type="button" aria-label="Open ${project.title} in fullscreen preview" onclick="event.stopPropagation(); openLightbox(${index})">
-              <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-            </button>
-            <button class="btn-open" type="button" onclick="event.stopPropagation(); window.open('${project.file}', '_blank')">Open -></button>
+            <button class="btn-icon" type="button" onclick="event.stopPropagation(); openLightbox(${index})">Preview</button>
+            <button class="btn-open" type="button" onclick="event.stopPropagation(); window.open('${project.file}', '_blank')">New Tab</button>
+            ${liveLink}
           </div>
         </div>
       `;
@@ -1378,9 +1419,17 @@
   });
 
   // Search
+  const searchClear = document.getElementById('searchClear');
   document.getElementById('searchInput').addEventListener('input', e => {
     searchQuery = e.target.value.trim();
+    searchClear.classList.toggle('visible', e.target.value.length > 0);
     renderProjects();
+  });
+  searchClear.addEventListener('click', () => {
+    const input = document.getElementById('searchInput');
+    input.value = '';
+    input.dispatchEvent(new Event('input'));
+    input.focus();
   });
 
   // Lightbox prev/next buttons
@@ -1405,6 +1454,18 @@
   });
 
   renderProjects();
+</script>
+<script>
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank') return;
+    e.preventDefault();
+    document.body.style.transition = 'opacity 0.2s ease';
+    document.body.style.opacity = '0';
+    setTimeout(function() { window.location.href = href; }, 200);
+  });
 </script>
 </body>
 </html>
