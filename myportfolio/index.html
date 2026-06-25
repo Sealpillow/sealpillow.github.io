@@ -112,15 +112,7 @@
     color: var(--gold);
   }
 
-  .nav-count {
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .site-header {
+.site-header {
     position: relative;
     padding: 80px 60px 60px;
     display: flex;
@@ -757,11 +749,21 @@
   }
 
   .view-toggle-label {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
     font-size: 9px;
     font-weight: 500;
     letter-spacing: 0.35em;
     text-transform: uppercase;
     color: var(--gold);
+  }
+
+  .view-toggle-count {
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--muted);
   }
 
   .view-toggle-btn {
@@ -823,10 +825,8 @@
     .filter-search-wrap { flex: 0 0 100%; }
     .filter-count { margin-left: 0; }
     .site-header { padding: 50px 24px 40px; }
-    .nav-bar { padding: 10px 24px 8px; height: auto; flex-wrap: wrap; row-gap: 6px; }
-    .nav-left { flex: 1 1 100%; justify-content: space-between; }
-    .nav-left { gap: 16px; }
-    #navCount { flex: 1 1 100%; text-align: center; }
+    .nav-bar { padding: 0 24px; }
+    .nav-left { gap: 20px; }
     .intro-panel { padding: 24px 24px 0; }
     .intro-shell { grid-template-columns: 1fr; }
     .intro-copy { border-right: none; border-bottom: 1px solid var(--rule); }
@@ -865,7 +865,6 @@
       <a href="../mylayouts/" class="nav-link">Layouts</a>
     </div>
   </div>
-  <span class="nav-count" id="navCount"></span>
 </nav>
 
 <header class="site-header">
@@ -912,7 +911,7 @@
 </section>
 
 <div class="view-toggle-wrap" id="viewToggleWrap">
-  <span class="view-toggle-label" id="viewToggleLabel">Featured Works</span>
+  <span class="view-toggle-label"><span id="viewToggleLabel">Featured Works</span><span class="view-toggle-count" id="viewToggleCount"></span></span>
   <button class="view-toggle-btn" id="viewToggleBtn">View All Projects</button>
 </div>
 
@@ -1330,11 +1329,16 @@
     const grid = document.getElementById('projectsGrid');
     grid.innerHTML = '';
 
-    document.getElementById('navCount').textContent = `${filtered.length} Projects`;
     document.getElementById('footerCount').textContent = `${filtered.length} Works`;
-    document.getElementById('filterCount').textContent = activeFilter === 'all' && !searchQuery
-      ? `${filtered.length} projects`
-      : `${filtered.length} of ${projects.length}`;
+    const countEl = document.getElementById('filterCount');
+    if (activeFilter === 'all' && !searchQuery) {
+      countEl.textContent = '';
+      countEl.style.display = 'none';
+    } else {
+      countEl.textContent = `${filtered.length} of ${projects.length}`;
+      countEl.style.display = '';
+    }
+    document.getElementById('viewToggleCount').textContent = `${filtered.length} projects`;
 
     if (!filtered.length) {
       grid.innerHTML = '<p class="no-results">No projects match your filters.</p>';
