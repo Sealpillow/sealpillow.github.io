@@ -236,6 +236,13 @@
   .drawer-controls {
     padding: 8px 20px; border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: #0e0e0e;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 600px) {
+    .drawer-controls { padding: 8px 14px; gap: 6px; }
+    .vp-group { flex: 0 0 100%; }
+    .vp-label { display: none; }
+    .vp-size-display { display: none; }
   }
   .vp-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-right: 4px; }
   .vp-btn {
@@ -253,11 +260,11 @@
   .meta-item label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 2px; }
   .meta-item span  { font-size: 11px; color: var(--text-secondary); font-family: var(--mono); }
   .drawer-stage {
-    flex: 1; overflow: hidden; position: relative; background: #1a1a1a;
-    display: flex; align-items: flex-start; justify-content: center; padding: 16px;
+    flex: 1; min-height: 0; overflow: hidden; position: relative; background: #1a1a1a;
+    display: flex; align-items: stretch; justify-content: center; padding: 16px;
   }
   .stage-inner {
-    position: relative; height: 100%; background: #fff;
+    position: relative; min-height: 0; background: #fff;
     border-radius: 3px; overflow: hidden;
     box-shadow: 0 4px 32px rgba(0,0,0,0.6);
     transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
@@ -564,16 +571,14 @@ const layouts = [
   { file:"hover/underlinehoverv2.html", name:"Underline Hover (v2)", platform:"hover", tags:["hover","text"], layout:"Hover", mobile:"--", desc:"Underline animation on text hover. v2." },
   { file:"hover/HoverSplitScreenExpand.html", name:"Hover - Split Screen Expand", platform:"hover", tags:["hover","image"], layout:"Hover", mobile:"--", desc:"Two image panels side by side — hovering one expands it while the other contracts." },
   // SLIDERS
-  { file:"sliders/scroll-video-scrubber.html", name:"Scroll Video Scrubber", platform:"sliders", tags:["slider","video","scroll"], layout:"Slider", mobile:"Full width", desc:"Video that scrubs forward/backward on scroll." },
-  { file:"sliders/splide-auto-scroll-static.html", name:"Splide - Auto Scroll Static", platform:"sliders", tags:["slider","image"], layout:"Splide", mobile:"Full width", desc:"Splide carousel with auto-scroll, static items.", essential:true },
-  { file:"sliders/splide-auto-scroll-with-links.html", name:"Splide - Auto Scroll with Links", platform:"sliders", tags:["slider","link","image"], layout:"Splide", mobile:"Full width", desc:"Splide carousel with auto-scroll and linked items." },
-  { file:"sliders/splide-carousel-drag-free.html", name:"Splide Carousel - Drag Free", platform:"sliders", tags:["slider","image"], layout:"Splide", mobile:"Full width", desc:"Splide carousel with free drag behaviour." },
-  { file:"sliders/splide-carousel-responsive-src.html", name:"Splide Carousel - Responsive Src", platform:"sliders", tags:["slider","image"], layout:"Splide", mobile:"Full width", desc:"Splide carousel with responsive image sources." },
-  { file:"sliders/splide-carousel-round-pagination.html", name:"Splide Carousel - Round Pagination", platform:"sliders", tags:["slider","image"], layout:"Splide", mobile:"Full width", desc:"Splide carousel with round pagination dots." },
-  { file:"sliders/splide-carousel-text-below.html", name:"Splide Carousel - Text Below", platform:"sliders", tags:["slider","text","image"], layout:"Splide", mobile:"Full width", desc:"Splide carousel with text content below each slide." },
-  { file:"sliders/splide-carousel-with-pagination.html", name:"Splide Carousel - With Pagination", platform:"sliders", tags:["slider","image"], layout:"Splide", mobile:"Full width", desc:"Splide carousel with standard pagination.", essential:true },
-  { file:"sliders/swiper-multi-per-view.html", name:"Swiper - Multi Per View", platform:"sliders", tags:["slider","image"], layout:"Swiper", mobile:"Full width", desc:"Swiper carousel showing multiple slides per view." },
-  { file:"sliders/swiper-single-autoplay.html", name:"Swiper - Single Autoplay", platform:"sliders", tags:["slider","image"], layout:"Swiper", mobile:"Full width", desc:"Swiper carousel with single slide and autoplay." },
+  { file:"sliders/ScrollVideoScrubber.html", name:"Scroll Video Scrubber", platform:"sliders", tags:["slider","video","scroll"], layout:"Slider", mobile:"Full width", desc:"Video that scrubs forward/backward on scroll." },
+  { file:"sliders/AutoScrollStatic.html", name:"Auto Scroll – Static", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Auto-scrolling carousel, static items.", essential:true },
+  { file:"sliders/AutoScrollWithLinks.html", name:"Auto Scroll – With Links", platform:"sliders", tags:["slider","link","image"], layout:"Slider", mobile:"Full width", desc:"Auto-scrolling carousel with linked items." },
+  { file:"sliders/CarouselDragFree.html", name:"Carousel – Drag Free", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with free drag behaviour." },
+  { file:"sliders/CarouselResponsiveSrc.html", name:"Carousel – Responsive Src", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with responsive image sources." },
+  { file:"sliders/CarouselRoundPagination.html", name:"Carousel – Round Pagination", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with round pagination dots." },
+  { file:"sliders/CarouselTextBelow.html", name:"Carousel – Text Below", platform:"sliders", tags:["slider","text","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with text content below each slide." },
+  { file:"sliders/CarouselWithPagination.html", name:"Carousel – With Pagination", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with standard pagination.", essential:true },
   { file:"sliders/FadeSliderTextOverlay.html", name:"Fade Slider – Text Overlay", platform:"sliders", tags:["slider","banner","text","hover","interactive","link","image"], layout:"Slider Banner", mobile:"Responsive images", desc:"Full-width fade-transition carousel with text and discovery links overlaid on editorial imagery.", essential:true },
   { file:"sliders/AutoScrollDragFreeCarousel.html", name:"Auto-Scroll Drag-Free Carousel", platform:"sliders", tags:["slider","product","interactive","link","scroll","image"], layout:"Auto-Scroll Carousel", mobile:"2 items visible", desc:"Horizontally auto-scrolling carousel with free-drag interaction and no visible pagination controls.", essential:true },
   // REDIRECTS
@@ -665,19 +670,21 @@ function extraTagHTML(tags) {
 }
 
 
-const IFRAME_W = 1280;
-const CARD_W   = 280;
-const SCALE    = CARD_W / IFRAME_W;
+const IFRAME_W        = 1280;
+const IFRAME_W_MOBILE = 390;
+const CARD_W          = 280;
+const SCALE           = CARD_W / IFRAME_W;
 
 function scaleCardPreviews() {
   const firstPreview = document.querySelector('#grid .card-preview');
   if (!firstPreview) return;
   const cardW = firstPreview.offsetWidth;
-  const scale = cardW / 1280;
-  const h = Math.round(180 / scale);
   document.querySelectorAll('#grid .card-preview iframe').forEach(f => {
+    const pw    = parseInt(f.dataset.previewW || IFRAME_W);
+    const scale = cardW / pw;
+    const h     = Math.round(180 / scale);
     f.style.transform = `scale(${scale})`;
-    f.style.height = h + 'px';
+    f.style.height    = h + 'px';
   });
 }
 
@@ -712,12 +719,16 @@ function renderCards(items) {
       const card = document.createElement('div');
       card.className = 'card';
 
+      const previewW     = item.platform === 'mobile' ? IFRAME_W_MOBILE : IFRAME_W;
+      const previewScale = (CARD_W / previewW).toFixed(5);
+
       card.innerHTML = `
         <div class="card-preview" id="prev-${CSS.escape(item.file)}">
           <iframe
             loading="lazy"
             src="${item.file}"
-            style="transform:scale(${SCALE.toFixed(5)});width:${IFRAME_W}px;height:900px;"
+            style="transform:scale(${previewScale});width:${previewW}px;height:900px;"
+            data-preview-w="${previewW}"
             sandbox="allow-same-origin allow-scripts"
             tabindex="-1"
             aria-hidden="true"
@@ -801,11 +812,21 @@ function openDrawer(item) {
           '.d-flex{display:flex!important}',
           '.d-inline{display:inline!important}',
           '.d-inline-block{display:inline-block!important}',
+          // d-md-* defaults: mobile-first (< 768px)
           '.d-md-none{display:block!important}',
+          '.d-md-block{display:none!important}',
+          '.d-md-flex{display:none!important}',
+          '.d-md-inline{display:none!important}',
+          '.d-md-inline-block{display:none!important}',
+          // d-md-* at desktop (>= 768px)
+          '@media(min-width:768px){',
+          '.d-md-none{display:none!important}',
           '.d-md-block{display:block!important}',
           '.d-md-flex{display:flex!important}',
           '.d-md-inline{display:inline!important}',
           '.d-md-inline-block{display:inline-block!important}',
+          '}',
+          // d-sm-* overrides for small screens
           '@media(max-width:767.98px){',
           '.d-sm-none{display:none!important}',
           '.d-sm-block{display:block!important}',

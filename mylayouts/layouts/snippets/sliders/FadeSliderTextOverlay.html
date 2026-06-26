@@ -1,81 +1,99 @@
-﻿<link rel="preload" as="style" href="https://use.typekit.net/jwn1ofo.css" onload="this.rel='stylesheet'">
+<link rel="preload" as="style" href="https://use.typekit.net/jwn1ofo.css" onload="this.rel='stylesheet'">
 <link rel="preload" as="image" href="../../media/landscape-1.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="../../media/landscape-2.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="../../media/portrait-1.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="../../media/portrait-2.jpg" fetchpriority="high">
 
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ================= SPLIDE CSS ================= -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+
+<!-- ================= SPLIDE JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
 
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 
 <style>
 .page,
 .page.parallax {
-  padding-top: 0px !important;
+  padding-top: 0 !important;
 }
 
 .parallax-container {
   position: relative;
   width: 100vw;
-  height: 100%;
 }
 
-.parallax-banner-swiper {
-  width: 100%;
+/* ── Splide base ── */
+.parallax-splide .splide__track {
   overflow: hidden;
 }
 
-.swiper-wrapper {
-  width: 100%;
-  height: 100%;
-}
-
-.swiper-slide {
-  flex-shrink: 0;
-  width: 100%;
+.parallax-splide .splide__slide {
   position: relative;
 }
 
-.swiper-wrapper img,
-.swiper-wrapper video {
+.parallax-splide .splide__slide a {
+  display: block;
+  position: relative;
+}
+
+.parallax-splide .splide__slide img,
+.parallax-splide .splide__slide video {
   width: 100%;
-  height: 100%;
+  display: block;
   object-fit: cover;
-  clip-path: fill-box;
+  height: 100%;
 }
 
-/* Pagination bottom-right */
-.parallax-banner-pagination {
+/* ── Hide arrows ── */
+.parallax-splide .splide__arrows {
+  display: none;
+}
+
+/* ── Pagination — bar style, bottom-right ── */
+.parallax-splide .splide__pagination {
   position: absolute;
-  bottom: 20px !important;
+  bottom: 20px;
   right: 2.5rem;
-  left: auto !important;
-  width: auto !important;
+  left: auto;
+  top: auto;
+  width: auto;
   display: flex;
-  gap: 0px;
+  gap: 7px;
   z-index: 10;
+  padding: 0;
 }
 
-.parallax-banner-pagination .swiper-pagination-bullet {
+.parallax-splide .splide__pagination__page {
   width: 28px;
   height: 4px;
   border: none;
   outline: none;
   border-radius: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background: rgba(128, 128, 128, 0.5);
   opacity: 1;
   transition: all 0.3s ease;
+  margin: 0;
+  padding: 0;
+  transform: none !important;
 }
 
-.parallax-banner-pagination .swiper-pagination-bullet-active {
+.parallax-splide .splide__pagination__page.is-active {
   height: 6px;
 }
 
-/* Overlay text */
+/* Active bullet colour — driven by data-pagination-color on the slider root */
+.parallax-splide[data-pagination-color="white"] .splide__pagination__page.is-active {
+  background-color: #fff;
+}
+.parallax-splide[data-pagination-color="black"] .splide__pagination__page.is-active {
+  background-color: #000;
+}
+
+/* ── Overlay text ── */
 .parallax-banner-text-overlay {
   position: absolute;
   bottom: 20px;
@@ -102,53 +120,33 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 0%;
+  width: 0;
   height: 1px;
-  background: #000;
   transition: width 0.35s ease;
 }
 
-.underline-black::after {
-  background: #000;
-}
+.underline-white::after { background: #fff; }
+.underline-black::after { background: #000; }
 
-.underline-white::after {
-  background: #fff;
-}
-
-.parallax-container .swiper-slide a:hover .parallax-banner-bottom-left-discover::after {
+.parallax-container .splide__slide a:hover .parallax-banner-bottom-left-discover::after {
   width: 100%;
-}
-
-/* Active bullet â€” color driven by data-pagination-color attribute */
-.parallax-banner-swiper-desktop[data-pagination-color="white"] .swiper-pagination-bullet-active,
-.parallax-banner-swiper-mobile[data-pagination-color="white"] .swiper-pagination-bullet-active {
-  background-color: white;
-}
-
-.parallax-banner-swiper-desktop[data-pagination-color="black"] .swiper-pagination-bullet-active,
-.parallax-banner-swiper-mobile[data-pagination-color="black"] .swiper-pagination-bullet-active {
-  background-color: black;
-}
-
-/* Inactive bullets */
-.parallax-banner-swiper .swiper-pagination .swiper-pagination-bullet:not(.swiper-pagination-bullet-active) {
-  background-color: grey;
 }
 </style>
 
 <div class="parallax-container js-vertical-slider">
 
-  <!-- Desktop Swiper -->
-  <div class="swiper parallax-banner-swiper-desktop d-none d-md-block">
-    <div class="swiper-wrapper" id="parallax-banner-slides-desktop"></div>
-    <div class="swiper-pagination parallax-banner-pagination parallax-banner-pagination-desktop"></div>
+  <!-- Desktop slider -->
+  <div class="splide parallax-splide d-none d-md-block" id="fade-slider-desktop">
+    <div class="splide__track">
+      <ul class="splide__list" id="fade-slides-desktop"></ul>
+    </div>
   </div>
 
-  <!-- Mobile Swiper -->
-  <div class="swiper parallax-banner-swiper-mobile d-block d-md-none">
-    <div class="swiper-wrapper" id="parallax-banner-slides-mobile"></div>
-    <div class="swiper-pagination parallax-banner-pagination parallax-banner-pagination-mobile"></div>
+  <!-- Mobile slider -->
+  <div class="splide parallax-splide d-block d-md-none" id="fade-slider-mobile">
+    <div class="splide__track">
+      <ul class="splide__list" id="fade-slides-mobile"></ul>
+    </div>
   </div>
 
 </div>
@@ -163,7 +161,7 @@ const desktopSlides = [
     link: "$url('Page-Show', 'cid', 'metro-med')$",
     analytics: { contentId: "a_mainbanner_pm_modelimage_1", contentType: "asset" },
     media: { type: "image", src: "../../media/landscape-1.jpg" },
-    autoplaytimer: "5000"
+    autoplaytimer: 5000
   },
   {
     title: "GRANO ENGRAINED",
@@ -173,7 +171,7 @@ const desktopSlides = [
     tabLink: { page: "material-story", tab: "grano" },
     analytics: { contentId: "a_mainbanner_pw_productimage_2", contentType: "asset" },
     media: { type: "image", src: "../../media/landscape-2.jpg" },
-    autoplaytimer: "5000"
+    autoplaytimer: 5000
   },
   // Add more desktop slides here
 ];
@@ -187,7 +185,7 @@ const mobileSlides = [
     link: "$url('Page-Show', 'cid', 'metro-med')$",
     analytics: { contentId: "a_mainbanner_pm_modelimage_1", contentType: "asset" },
     media: { type: "image", src: "../../media/portrait-1.jpg" },
-    autoplaytimer: "5000"
+    autoplaytimer: 5000
   },
   {
     title: "METRO MED",
@@ -197,25 +195,22 @@ const mobileSlides = [
     link: "$url('Page-Show', 'cid', 'metro-med')$",
     analytics: { contentId: "a_mainbanner_pm_modelimage_1", contentType: "asset" },
     media: { type: "image", src: "../../media/portrait-2.jpg" },
-    autoplaytimer: "5000"
+    autoplaytimer: 5000
   },
   // Add more mobile slides here
 ];
 
 function buildSlideHTML(slide) {
-  const src = slide.media.src;
-  const mediaHTML = slide.media.type === "image"
-    ? `<img src="${src}" alt="${slide.title}">`
-    : `<video autoplay muted loop><source src="${src}" type="video/mp4"></video>`;
+  const mediaHTML = slide.media.type === 'image'
+    ? `<img src="${slide.media.src}" alt="${slide.title}">`
+    : `<video autoplay muted loop playsinline><source src="${slide.media.src}" type="video/mp4"></video>`;
 
-  let href = "#";
-  let extraAttrs = "";
+  let href = '#';
+  let extraAttrs = '';
   if (slide.link) {
     href = slide.link;
   } else if (slide.tabLink) {
-    href = "#";
-    extraAttrs = `class="js-tab-link" data-tab="${slide.tabLink.tab}" data-page="${slide.tabLink.page}"
-      ${slide.tabLink.subtab ? `data-subtab="${slide.tabLink.subtab}"` : ""}`;
+    extraAttrs = `class="js-tab-link" data-tab="${slide.tabLink.tab}" data-page="${slide.tabLink.page}"${slide.tabLink.subtab ? ` data-subtab="${slide.tabLink.subtab}"` : ''}`;
   }
 
   return `
@@ -226,78 +221,65 @@ function buildSlideHTML(slide) {
         <div class="parallax-banner-bottom-left">${slide.title}</div>
         <div class="parallax-banner-bottom-left-discover underline-${slide.textColor}">${slide.discoverText}</div>
       </div>
-    </a>
-  `;
+    </a>`;
 }
 
-function renderSlides(slides, wrapperId) {
-  const wrapper = document.getElementById(wrapperId);
+function renderSlides(slides, listId) {
+  const list = document.getElementById(listId);
   slides.forEach(slide => {
-    const slideEl = document.createElement('div');
-    slideEl.className = 'swiper-slide';
-    slideEl.setAttribute('data-swiper-autoplay', slide.autoplaytimer);
-    slideEl.setAttribute('data-pagination-color', slide.paginationColor || 'white');
-    slideEl.innerHTML = buildSlideHTML(slide);
-    wrapper.appendChild(slideEl);
+    const li = document.createElement('li');
+    li.className = 'splide__slide';
+    li.dataset.autoplaytimer   = slide.autoplaytimer || 5000;
+    li.dataset.paginationColor = slide.paginationColor || 'white';
+    li.innerHTML = buildSlideHTML(slide);
+    list.appendChild(li);
   });
 }
 
-function initSwiper(selector, paginationEl, slides) {
-  const swiper = new Swiper(selector, {
-    slidesPerView: 1,
-    effect: 'fade',
-    fadeEffect: { crossFade: true },
-    speed: 800,
-    loop: true,
-    autoplay: {
-      delay: 5000,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: false
-    },
-    pagination: {
-      el: paginationEl,
-      clickable: true
-    },
-    on: {
-      afterInit: function () {
-        const color = slides[0].paginationColor || 'white';
-        this.el.setAttribute('data-pagination-color', color);
-      },
-      slideChange: function () {
-        const currentSlide = this.slides[this.activeIndex];
-        const autoplaytimer = currentSlide.dataset.swiperAutoplay || 5000;
-        this.params.autoplay.delay = autoplaytimer;
-        this.autoplay.stop();
-        this.autoplay.start();
-
-        // â† use realIndex to look up original data, not the cloned DOM slide
-        const color = slides[this.realIndex].paginationColor || 'white';
-        this.el.setAttribute('data-pagination-color', color);
-      }
-    }
+function initSplide(sliderId, slides) {
+  const splide = new Splide(`#${sliderId}`, {
+    type        : 'fade',
+    rewind      : true,
+    speed       : 800,
+    arrows      : false,
+    pagination  : true,
+    autoplay    : true,
+    interval    : slides[0] ? slides[0].autoplaytimer : 5000,
+    pauseOnHover: false,
+    pauseOnFocus: false,
   });
-  return swiper;
+
+  const el = splide.root;
+  el.setAttribute('data-pagination-color', slides[0] ? slides[0].paginationColor : 'white');
+
+  splide.on('moved', function(newIndex) {
+    const slide = slides[newIndex];
+    if (!slide) return;
+    el.setAttribute('data-pagination-color', slide.paginationColor || 'white');
+    splide.options.interval = slide.autoplaytimer || 5000;
+  });
+
+  splide.mount();
+  return splide;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.js-tab-link').forEach(link => {
-    const tab    = link.dataset.tab;
-    const subtab = link.dataset.subtab;
-    const page   = link.dataset.page;
+  document.querySelectorAll('.js-tab-link').forEach(function(link) {
+    var tab    = link.dataset.tab;
+    var subtab = link.dataset.subtab;
+    var page   = link.dataset.page;
     if (!tab || !page) return;
-
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const countryCode = pathParts[0];
-
-    let hash = `#tab=${tab}`;
-    if (subtab) hash += `&subtab=${subtab}`;
-    link.href = `/${countryCode}/${page}.html${hash}`;
+    var pathParts = window.location.pathname.split('/').filter(Boolean);
+    var countryCode = pathParts[0];
+    var hash = '#tab=' + tab;
+    if (subtab) hash += '&subtab=' + subtab;
+    link.href = '/' + countryCode + '/' + page + '.html' + hash;
   });
 });
 
-renderSlides(desktopSlides, 'parallax-banner-slides-desktop');
-renderSlides(mobileSlides, 'parallax-banner-slides-mobile');
+renderSlides(desktopSlides, 'fade-slides-desktop');
+renderSlides(mobileSlides,  'fade-slides-mobile');
 
-const desktopSwiper = initSwiper('.parallax-banner-swiper-desktop', '.parallax-banner-pagination-desktop', desktopSlides);
-const mobileSwiper  = initSwiper('.parallax-banner-swiper-mobile',  '.parallax-banner-pagination-mobile',  mobileSlides);
+var desktopSplide = initSplide('fade-slider-desktop', desktopSlides);
+var mobileSplide  = initSplide('fade-slider-mobile',  mobileSlides);
 </script>
