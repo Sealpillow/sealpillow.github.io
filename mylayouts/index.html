@@ -410,6 +410,7 @@
     <div class="drawer-title" id="drawer-title">--</div>
     <div class="drawer-actions">
       <button class="drawer-btn drawer-btn-ghost" id="drawer-copy">Copy path</button>
+      <button class="drawer-btn drawer-btn-ghost" id="drawer-reload" title="Reload preview">↺</button>
       <a class="drawer-btn drawer-btn-primary" id="drawer-open" href="#" target="_blank">Open</a>
     </div>
     <button class="drawer-close" id="drawer-close">x</button>
@@ -839,6 +840,12 @@ function closeDrawer() {
 }
 
 document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+document.getElementById('drawer-reload').addEventListener('click', () => {
+  stageLoader.classList.remove('hidden');
+  const src = drawerIframe.src;
+  drawerIframe.src = 'about:blank';
+  requestAnimationFrame(() => { drawerIframe.src = src; });
+});
 drawerBackdrop.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeDrawer(); });
 
