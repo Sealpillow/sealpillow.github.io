@@ -128,6 +128,7 @@
     overflow: hidden; background: #111;
     border-bottom: 1px solid var(--border); flex-shrink: 0;
   }
+  .card-preview.mobile-preview { height: 300px; }
   .card-preview iframe {
     position: absolute; top: 0; left: 0;
     width: 1280px; height: 900px;
@@ -344,10 +345,10 @@
   html { overflow-x: hidden; }
 
   @media (max-width: 600px) {
-    header       { padding: 14px 16px; gap: 12px; }
+    header       { padding: 14px 32px; gap: 12px; }
     .search-wrap { flex: 1 1 auto; min-width: 0; margin-left: 0; }
-    .filter-bar  { padding: 8px 16px; }
-    .grid-wrap   { padding: 16px 14px 60px; }
+    .filter-bar  { padding: 8px 32px; }
+    .grid-wrap   { padding: 16px 32px 60px; }
   }
 </style>
 </head>
@@ -690,9 +691,9 @@ function scaleCardPreviews() {
   document.querySelectorAll('#grid .card-preview iframe').forEach(f => {
     const pw    = parseInt(f.dataset.previewW || IFRAME_W);
     const scale = cardW / pw;
-    const h     = Math.round(180 / scale);
+    const prevH = (f.closest('.card-preview') || {}).offsetHeight || 180;
     f.style.transform = `scale(${scale})`;
-    f.style.height    = h + 'px';
+    f.style.height    = Math.round(prevH / scale) + 'px';
   });
 }
 
@@ -731,7 +732,7 @@ function renderCards(items) {
       const previewScale = (CARD_W / previewW).toFixed(5);
 
       card.innerHTML = `
-        <div class="card-preview" id="prev-${CSS.escape(item.file)}">
+        <div class="card-preview${item.platform === 'mobile' ? ' mobile-preview' : ''}" id="prev-${CSS.escape(item.file)}">
           <iframe
             loading="lazy"
             src="${item.file}"
