@@ -341,6 +341,14 @@
     to   { opacity: 1; }
   }
   body { animation: pgFadeIn 0.25s ease both; }
+  html { overflow-x: hidden; }
+
+  @media (max-width: 600px) {
+    header       { padding: 14px 16px; gap: 12px; }
+    .search-wrap { flex: 1 1 auto; min-width: 0; margin-left: 0; }
+    .filter-bar  { padding: 8px 16px; }
+    .grid-wrap   { padding: 16px 14px 60px; }
+  }
 </style>
 </head>
 <body>
@@ -412,7 +420,7 @@
     </div>
     <div class="vp-group" id="vp-group">
       <span class="vp-label">Viewport</span>
-      <button class="vp-btn active" data-w="100%"   data-label="Full width">Full</button>
+
       <button class="vp-btn" data-w="1280px" data-label="1280px">Desktop</button>
       <button class="vp-btn" data-w="768px"  data-label="768px">Tablet</button>
       <button class="vp-btn" data-w="375px"  data-label="375px">Mobile</button>
@@ -671,7 +679,7 @@ function extraTagHTML(tags) {
 
 
 const IFRAME_W        = 1280;
-const IFRAME_W_MOBILE = 390;
+const IFRAME_W_MOBILE = 375;
 const CARD_W          = 280;
 const SCALE           = CARD_W / IFRAME_W;
 
@@ -803,41 +811,20 @@ function openDrawer(item) {
     stageLoader.classList.add('hidden');
     try {
       const doc = drawerIframe.contentDocument;
+      const activeW = (document.querySelector('.vp-btn.active') || {}).dataset.w || '1280px';
       if (doc && !doc.getElementById('__bs-shim')) {
         const s = doc.createElement('style');
         s.id = '__bs-shim';
-        s.textContent = [
-          '.d-none{display:none!important}',
-          '.d-block{display:block!important}',
-          '.d-flex{display:flex!important}',
-          '.d-inline{display:inline!important}',
-          '.d-inline-block{display:inline-block!important}',
-          // d-md-* defaults: mobile-first (< 768px)
-          '.d-md-none{display:block!important}',
-          '.d-md-block{display:none!important}',
-          '.d-md-flex{display:none!important}',
-          '.d-md-inline{display:none!important}',
-          '.d-md-inline-block{display:none!important}',
-          // d-md-* at desktop (>= 768px)
-          '@media(min-width:768px){',
-          '.d-md-none{display:none!important}',
-          '.d-md-block{display:block!important}',
-          '.d-md-flex{display:flex!important}',
-          '.d-md-inline{display:inline!important}',
-          '.d-md-inline-block{display:inline-block!important}',
-          '}',
-          // d-sm-* overrides for small screens
-          '@media(max-width:767.98px){',
-          '.d-sm-none{display:none!important}',
-          '.d-sm-block{display:block!important}',
-          '}'
-        ].join('');
+        s.textContent = buildBsShimCSS(vpIsMobile(activeW));
         doc.head.appendChild(s);
       }
+      updateIframeViewport(activeW);
     } catch(e) {}
   };
 
-  setViewport('100%', 'Full width');
+  if      (item.platform === 'mobile')  setViewport('375px',  '375px');
+  else if (item.platform === 'desktop') setViewport('1280px', '1280px');
+  else                                  setViewport('1280px', '1280px');
   drawer.classList.add('open');
   drawerBackdrop.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -854,10 +841,88 @@ document.getElementById('drawer-close').addEventListener('click', closeDrawer);
 drawerBackdrop.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeDrawer(); });
 
+function buildBsShimCSS(isMobileVP) {
+  if (isMobileVP) {
+    return [
+      '.d-none{display:none!important}',
+      '.d-block{display:block!important}',
+      '.d-flex{display:flex!important}',
+      '.d-inline{display:inline!important}',
+      '.d-inline-block{display:inline-block!important}',
+      '.d-md-none{display:block!important}',
+      '.d-md-block{display:none!important}',
+      '.d-md-flex{display:none!important}',
+      '.d-md-inline{display:none!important}',
+      '.d-md-inline-block{display:none!important}',
+      '.d-sm-none{display:none!important}',
+      '.d-sm-block{display:block!important}',
+    ].join('');
+  } else {
+    return [
+      '.d-none{display:none!important}',
+      '.d-block{display:block!important}',
+      '.d-flex{display:flex!important}',
+      '.d-inline{display:inline!important}',
+      '.d-inline-block{display:inline-block!important}',
+      '.d-md-none{display:none!important}',
+      '.d-md-block{display:block!important}',
+      '.d-md-flex{display:flex!important}',
+      '.d-md-inline{display:inline!important}',
+      '.d-md-inline-block{display:inline-block!important}',
+      '.d-sm-none{display:block!important}',
+      '.d-sm-block{display:none!important}',
+    ].join('');
+  }
+}
+
+function vpIsMobile(w) {
+  return parseInt(w) < 768;
+}
+
+function updateIframeViewport(w) {
+  try {
+    const doc = drawerIframe.contentDocument;
+    if (!doc) return;
+    const px = parseInt(w) || 1280;
+    let meta = doc.querySelector('meta[name="viewport"]');
+    if (!meta) {
+      meta = doc.createElement('meta');
+      meta.name = 'viewport';
+      doc.head.appendChild(meta);
+    }
+    meta.setAttribute('content', `width=${px}`);
+  } catch(e) {}
+}
+
 function setViewport(w, label) {
-  stageInner.style.width = w;
   document.getElementById('vp-size-display').textContent = label;
   document.querySelectorAll('.vp-btn').forEach(b => b.classList.toggle('active', b.dataset.w===w));
+
+  const availW  = (stageInner.parentElement.clientWidth || 900) - 32;
+  const targetW = parseInt(w) || availW;
+  const scale   = availW / targetW;
+
+  if (scale < 1) {
+    stageInner.style.width             = availW + 'px';
+    const stageH                       = stageInner.offsetHeight || 600;
+    drawerIframe.style.width           = targetW + 'px';
+    drawerIframe.style.height          = Math.ceil(stageH / scale) + 'px';
+    drawerIframe.style.transform       = `scale(${scale})`;
+    drawerIframe.style.transformOrigin = 'top left';
+  } else {
+    stageInner.style.width             = targetW + 'px';
+    drawerIframe.style.width           = '100%';
+    drawerIframe.style.height          = '100%';
+    drawerIframe.style.transform       = '';
+    drawerIframe.style.transformOrigin = '';
+  }
+
+  try {
+    const doc = drawerIframe.contentDocument;
+    const shim = doc && doc.getElementById('__bs-shim');
+    if (shim) shim.textContent = buildBsShimCSS(vpIsMobile(w));
+  } catch(e) {}
+  updateIframeViewport(w);
 }
 
 document.querySelectorAll('.vp-btn').forEach(btn => {
