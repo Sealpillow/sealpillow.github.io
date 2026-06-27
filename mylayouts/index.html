@@ -237,6 +237,22 @@
     z-index: 201;
   }
   .drawer.open { transform: translateX(0); }
+  /* Drag handle pill — swipe-to-close affordance on mobile */
+  @media (max-width: 640px) {
+    .drawer::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 8px;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 48px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.18);
+      pointer-events: none;
+      z-index: 1;
+    }
+  }
   .drawer-header {
     padding: 14px 20px; border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 12px; flex-shrink: 0; background: #111;
@@ -972,6 +988,18 @@ document.getElementById('drawer-reload').addEventListener('click', () => {
 });
 drawerBackdrop.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeDrawer(); });
+
+// Swipe right to close on mobile (right-side drawer dismisses when pushed rightward)
+let _swipeStartX = 0, _swipeStartY = 0;
+drawer.addEventListener('touchstart', e => {
+  _swipeStartX = e.touches[0].clientX;
+  _swipeStartY = e.touches[0].clientY;
+}, { passive: true });
+drawer.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - _swipeStartX;
+  const dy = e.changedTouches[0].clientY - _swipeStartY;
+  if (dx > 80 && Math.abs(dx) > Math.abs(dy)) closeDrawer();
+}, { passive: true });
 
 // Generates a CSS string that overrides Bootstrap responsive display utilities
 // to match the selected viewport (mobile vs desktop). This is injected into the snippet iframe
