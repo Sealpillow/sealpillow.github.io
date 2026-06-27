@@ -237,21 +237,9 @@
     z-index: 201;
   }
   .drawer.open { transform: translateX(0); }
-  /* Drag handle pill — swipe-to-close affordance on mobile */
+  /* Swipe hint text — swipe-to-close affordance on mobile */
   @media (max-width: 640px) {
-    .drawer::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 8px;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 48px;
-      border-radius: 2px;
-      background: rgba(255,255,255,0.18);
-      pointer-events: none;
-      z-index: 1;
-    }
+    #drawer-swipe-hint { display: inline; }
   }
   .drawer-header {
     padding: 14px 20px; border-bottom: 1px solid var(--border);
@@ -467,7 +455,7 @@
     </div>
   </div>
   <div style="padding:5px 20px;border-bottom:1px solid var(--border);text-align:center;background:#0e0e0e;">
-    <span style="font-size:10px;color:var(--text-secondary);font-family:var(--mono);">Preview blank? Tap <span style="color:var(--accent);">↻</span> to reload.</span>
+    <span style="font-size:10px;color:var(--text-secondary);font-family:var(--mono);">Preview blank? Tap <span style="color:var(--accent);">↻</span> to reload.<span id="drawer-swipe-hint" style="display:none;"> &nbsp;·&nbsp; Swipe <span style="color:var(--accent);">→</span> to close.</span></span>
   </div>
   <div class="drawer-meta" id="drawer-meta"></div>
   <div class="drawer-stage" id="drawer-stage">
