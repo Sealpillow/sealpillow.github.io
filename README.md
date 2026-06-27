@@ -113,24 +113,6 @@ See [`mylayouts/ADD_SNIPPET.md`](mylayouts/ADD_SNIPPET.md) for naming convention
 
 ---
 
-### `stocks/index.html` — Stock Dividend Tracker
-
-Personal dashboard for SGX dividend cycle analysis and portfolio planning.
-
-- **Overview grid**: 5-column summary cards (takeaways + start steps)
-- **Position calculator**: 6-column input grid with +/− stepper controls; outputs auto-calculate
-- **Dividend calendar**: 12-month timeline with hover tooltips per cell
-- **Setup map**: SVG visualisation with interactive hover/click points and legend
-- **Planner board**: timeline with markers (watch, dip, exit, ex-div)
-- **Comparison table**: sticky left column, drag-to-scroll horizontal layout
-- **Registry form modal**: add/edit tickers with text, select, date picker, and checkbox inputs
-- Per-ticker sparklines (stability, annual payout)
-- Status chips with colour coding (good / warn / bad)
-- Backdrop-blur modals and topbar (blur 14px)
-- Dark blue theme (`#0c0f1a`); responsive down to 600px
-
----
-
 ## Adding a portfolio project
 
 Add an entry to the `projects` array in `myportfolio/index.html`:
