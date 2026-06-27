@@ -199,6 +199,25 @@
 
   /* EMPTY */
   .empty { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--text-muted); }
+
+  /* PAGINATION */
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 28px 0 20px; }
+  #pagination-top { padding: 4px 0 20px; }
+  .page-btn {
+    padding: 5px 14px; font-size: 11px; font-family: var(--mono);
+    border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
+    border-radius: 4px; cursor: pointer; transition: border-color .15s, color .15s;
+  }
+  .page-btn:hover:not(:disabled) { border-color: var(--border-active); color: var(--text-primary); }
+  .page-btn:disabled { opacity: 0.3; cursor: default; }
+  .page-info { font-size: 11px; font-family: var(--mono); color: var(--text-secondary); padding: 0 2px; }
+  .page-input {
+    width: 36px; text-align: center; font-size: 11px; font-family: var(--mono);
+    background: var(--surface); color: var(--text-primary);
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 4px 0; outline: none;
+  }
+  .page-input:focus { border-color: var(--accent); }
   .empty span { display: block; font-size: 28px; margin-bottom: 10px; }
   .empty p { font-size: 13px; }
 
@@ -382,7 +401,7 @@
   <button class="pill" data-filter="text">Text</button>
   <button class="pill" data-filter="fullwidth">Full Width</button>
   <button class="pill" data-filter="hover">Hover</button>
-  <button class="pill" data-filter="sliders">Slider</button>
+  <button class="pill" data-filter="carousel">Carousel</button>
   <button class="pill" data-filter="scroll">Scroll</button>
   <button class="pill" data-filter="editorial">Editorial</button>
   <button class="pill" data-filter="product">Product</button>
@@ -401,7 +420,9 @@
 </div>
 
 <div class="grid-wrap">
+  <div class="pagination" id="pagination-top"></div>
   <div class="grid" id="grid"></div>
+  <div class="pagination" id="pagination"></div>
 </div>
 
 <div class="drawer-backdrop" id="drawer-backdrop"></div>
@@ -584,16 +605,15 @@ const layouts = [
   { file:"hover/underlinehoverv2.html", name:"Underline Hover (v2)", platform:"hover", tags:["hover","text"], layout:"Hover", mobile:"--", desc:"Underline animation on text hover. v2." },
   { file:"hover/HoverSplitScreenExpand.html", name:"Hover - Split Screen Expand", platform:"hover", tags:["hover","image"], layout:"Hover", mobile:"--", desc:"Two image panels side by side — hovering one expands it while the other contracts." },
   // SLIDERS
-  { file:"sliders/ScrollVideoScrubber.html", name:"Scroll Video Scrubber", platform:"sliders", tags:["slider","video","scroll"], layout:"Slider", mobile:"Full width", desc:"Video that scrubs forward/backward on scroll." },
-  { file:"sliders/AutoScrollStatic.html", name:"Auto Scroll – Static", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Auto-scrolling carousel, static items.", essential:true },
-  { file:"sliders/AutoScrollWithLinks.html", name:"Auto Scroll – With Links", platform:"sliders", tags:["slider","link","image"], layout:"Slider", mobile:"Full width", desc:"Auto-scrolling carousel with linked items." },
-  { file:"sliders/CarouselDragFree.html", name:"Carousel – Drag Free", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with free drag behaviour." },
-  { file:"sliders/CarouselResponsiveSrc.html", name:"Carousel – Responsive Src", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with responsive image sources." },
-  { file:"sliders/CarouselRoundPagination.html", name:"Carousel – Round Pagination", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with round pagination dots." },
-  { file:"sliders/CarouselTextBelow.html", name:"Carousel – Text Below", platform:"sliders", tags:["slider","text","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with text content below each slide." },
-  { file:"sliders/CarouselWithPagination.html", name:"Carousel – With Pagination", platform:"sliders", tags:["slider","image"], layout:"Slider", mobile:"Full width", desc:"Carousel with standard pagination.", essential:true },
-  { file:"sliders/FadeSliderTextOverlay.html", name:"Fade Slider – Text Overlay", platform:"sliders", tags:["slider","banner","text","hover","interactive","link","image"], layout:"Slider Banner", mobile:"Responsive images", desc:"Full-width fade-transition carousel with text and discovery links overlaid on editorial imagery.", essential:true },
-  { file:"sliders/AutoScrollDragFreeCarousel.html", name:"Auto-Scroll Drag-Free Carousel", platform:"sliders", tags:["slider","product","interactive","link","scroll","image"], layout:"Auto-Scroll Carousel", mobile:"2 items visible", desc:"Horizontally auto-scrolling carousel with free-drag interaction and no visible pagination controls.", essential:true },
+  { file:"sliders/CarouselAutoScrollStaticNoLink.html", name:"Carousel – Auto Scroll Static No Link", platform:"sliders", tags:["slider","image"], layout:"Carousel", mobile:"Full width", desc:"Auto-scrolling carousel, static items.", essential:true },
+  { file:"sliders/CarouselAutoScrollStaticWithLink.html", name:"Carousel – Auto Scroll Static With Link", platform:"sliders", tags:["slider","link","image"], layout:"Carousel", mobile:"Full width", desc:"Auto-scrolling carousel with linked items." },
+  { file:"sliders/CarouselDragFree.html", name:"Carousel – Drag Free", platform:"sliders", tags:["slider","image"], layout:"Carousel", mobile:"Full width", desc:"Carousel with free drag behaviour." },
+  { file:"sliders/CarouselResponsiveSrc.html", name:"Carousel – Responsive Src", platform:"sliders", tags:["slider","image"], layout:"Carousel", mobile:"Full width", desc:"Carousel with responsive image sources." },
+  { file:"sliders/CarouselRoundPagination.html", name:"Carousel – Round Pagination", platform:"sliders", tags:["slider","image"], layout:"Carousel", mobile:"Full width", desc:"Carousel with round pagination dots." },
+  { file:"sliders/CarouselTextBelow.html", name:"Carousel – Text Below", platform:"sliders", tags:["slider","text","image"], layout:"Carousel", mobile:"Full width", desc:"Carousel with text content below each slide." },
+  { file:"sliders/CarouselWithPagination.html", name:"Carousel – With Pagination", platform:"sliders", tags:["slider","image"], layout:"Carousel", mobile:"Full width", desc:"Carousel with standard pagination.", essential:true },
+  { file:"sliders/FadeSliderTextOverlay.html", name:"Fade Slider – Text Overlay", platform:"sliders", tags:["slider","banner","text","hover","interactive","link","image"], layout:"Carousel Banner", mobile:"Responsive images", desc:"Full-width fade-transition carousel with text and discovery links overlaid on editorial imagery.", essential:true },
+  { file:"sliders/CarouselAutoScrollDragFree.html", name:"Carousel – Auto Scroll Drag Free", platform:"sliders", tags:["slider","product","interactive","link","image"], layout:"Auto-Scroll Carousel", mobile:"2 items visible", desc:"Horizontally auto-scrolling carousel with free-drag interaction and no visible pagination controls.", essential:true },
   // REDIRECTS
   { file:"redirects/WebMultiPanelSectionNav.html", name:"Multi-Panel Section Nav", platform:"redirects", tags:["tabs","link"], layout:"Section Nav", mobile:"Full width", desc:"Tab nav bar that switches between full content panels with an animated underline active state." },
   { file:"redirects/inlinetab.html", name:"Inline Tab", platform:"redirects", tags:["tabs"], layout:"Tab", mobile:"Full width", desc:"Inline tab component." },
@@ -610,6 +630,7 @@ const layouts = [
   { file:"special/multivideocontrol-base.html", name:"Multi Video Control - Base", platform:"special", tags:["video"], layout:"Video Control", mobile:"Full width", desc:"Base multi-video control component." },
   { file:"special/multivideocontrol-fullscr-forward.html", name:"Multi Video Control - Full Screen Forward", platform:"special", tags:["video"], layout:"Video Control", mobile:"Full width", desc:"Multi-video control with full-screen forward behaviour." },
   { file:"special/removeBlackBorderFromVideo.html", name:"Remove Black Border from Video", platform:"special", tags:["video"], layout:"Video Utility", mobile:"Full width", desc:"Removes the letterbox border from a video element." },
+  { file:"sliders/ScrollVideoScrubber.html", name:"Scroll Video Scrubber", platform:"special", tags:["video","scroll"], layout:"Scroll Effect", mobile:"Full width", desc:"Video that scrubs forward/backward on scroll." },
   { file:"special/scrollvid.html", name:"Scroll Video", platform:"special", tags:["scroll","video"], layout:"Scroll Effect", mobile:"Full width", desc:"Video that plays as the user scrolls." },
   { file:"special/ScrollZoomInOutDynamic.html", name:"Scroll Zoom In/Out - Dynamic", platform:"special", tags:["scroll","video"], layout:"Scroll Effect", mobile:"Full width", desc:"Dynamic scroll-driven zoom in/out effect." },
   { file:"special/ScrollZoomInOutStatic.html", name:"Scroll Zoom In/Out - Static", platform:"special", tags:["scroll"], layout:"Scroll Effect", mobile:"Full width", desc:"Static scroll-driven zoom in/out effect." },
@@ -641,7 +662,7 @@ function platformTag(p) {
   if (p==='mobile')    return ['tag-mobile','Mobile'];
   if (p==='fullwidth') return ['tag-layout','Full Width'];
   if (p==='hover')     return ['tag-layout','Hover'];
-  if (p==='sliders')   return ['tag-layout','Slider'];
+  if (p==='sliders')   return ['tag-layout','Carousel'];
   if (p==='redirects') return ['tag-layout','Redirect'];
   if (p==='special')   return ['tag-layout','Special'];
   return ['tag-web','Web'];
@@ -687,6 +708,10 @@ const IFRAME_W        = 1280;
 const IFRAME_W_MOBILE = 375;
 const CARD_W          = 280;
 const SCALE           = CARD_W / IFRAME_W;
+const ITEMS_PER_PAGE  = 20;
+
+let currentPage       = 1;
+let allFilteredItems  = [];
 
 function scaleCardPreviews() {
   const firstPreview = document.querySelector('#grid .card-preview');
@@ -703,21 +728,42 @@ function scaleCardPreviews() {
 
 window.addEventListener('resize', scaleCardPreviews);
 
-function renderCards(items) {
-  const grid  = document.getElementById('grid');
-  const badge = document.getElementById('count-badge');
-  grid.innerHTML = '';
-  badge.textContent = `${items.length} layout${items.length!==1?'s':''}`;
+const PLATFORM_ORDER = ['web','desktop','mobile','fullwidth','hover','sliders','redirects','special'];
 
-  if (!items.length) {
+function renderCards(items) {
+  allFilteredItems = [...items].sort((a, b) =>
+    PLATFORM_ORDER.indexOf(a.platform) - PLATFORM_ORDER.indexOf(b.platform)
+  );
+  currentPage = 1;
+  renderPage();
+}
+
+function renderPage() {
+  const grid        = document.getElementById('grid');
+  const badge       = document.getElementById('count-badge');
+  const paginationEl    = document.getElementById('pagination');
+  const paginationTopEl = document.getElementById('pagination-top');
+  grid.innerHTML           = '';
+  paginationEl.innerHTML   = '';
+  paginationTopEl.innerHTML= '';
+
+  const total      = allFilteredItems.length;
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  badge.textContent = `${total} layout${total!==1?'s':''}`;
+
+  if (!total) {
     grid.innerHTML = '<div class="empty"><span>&#128269;</span><p>No layouts match your search.</p></div>';
     return;
   }
 
+  const start     = (currentPage - 1) * ITEMS_PER_PAGE;
+  const end       = Math.min(start + ITEMS_PER_PAGE, total);
+  const pageItems = allFilteredItems.slice(start, end);
+
   const grouped = {};
-  items.forEach(item => { (grouped[item.platform]=grouped[item.platform]||[]).push(item); });
+  pageItems.forEach(item => { (grouped[item.platform]=grouped[item.platform]||[]).push(item); });
   const order  = ['web','desktop','mobile','fullwidth','hover','sliders','redirects','special'];
-  const labels = { web:'Web', desktop:'Desktop', mobile:'Mobile', fullwidth:'Full Width', hover:'Hover', sliders:'Sliders', redirects:'Redirects', special:'Special' };
+  const labels = { web:'Web', desktop:'Desktop', mobile:'Mobile', fullwidth:'Full Width', hover:'Hover', sliders:'Carousels', redirects:'Redirects', special:'Special' };
 
   order.forEach(platform => {
     const group = grouped[platform];
@@ -778,9 +824,52 @@ function renderCards(items) {
 
       grid.appendChild(card);
     });
-
-    requestAnimationFrame(scaleCardPreviews);
   });
+
+  requestAnimationFrame(scaleCardPreviews);
+
+  if (totalPages > 1) {
+    [paginationTopEl, paginationEl].forEach(el => {
+      const prev = document.createElement('button');
+      prev.className = 'page-btn';
+      prev.textContent = '← Prev';
+      prev.disabled = currentPage === 1;
+      prev.addEventListener('click', () => { currentPage--; renderPage(); window.scrollTo({top:0,behavior:'smooth'}); });
+
+      const input = document.createElement('input');
+      input.className = 'page-input';
+      input.type = 'text';
+      input.value = currentPage;
+      input.setAttribute('aria-label', 'Page number');
+      input.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        const p = parseInt(input.value);
+        if (p >= 1 && p <= totalPages && p !== currentPage) {
+          currentPage = p;
+          renderPage();
+          window.scrollTo({top:0,behavior:'smooth'});
+        } else {
+          input.value = currentPage;
+        }
+      });
+      input.addEventListener('blur', () => { input.value = currentPage; });
+
+      const total = document.createElement('span');
+      total.className = 'page-info';
+      total.textContent = `/ ${totalPages}`;
+
+      const next = document.createElement('button');
+      next.className = 'page-btn';
+      next.textContent = 'Next →';
+      next.disabled = currentPage === totalPages;
+      next.addEventListener('click', () => { currentPage++; renderPage(); window.scrollTo({top:0,behavior:'smooth'}); });
+
+      el.appendChild(prev);
+      el.appendChild(input);
+      el.appendChild(total);
+      el.appendChild(next);
+    });
+  }
 }
 
 // DRAWER
@@ -955,7 +1044,7 @@ function itemMatchesFilter(item, f) {
   if (f==='video')     return item.tags.includes('video');
   if (f==='fullwidth') return item.platform==='fullwidth';
   if (f==='hover')     return item.platform==='hover';
-  if (f==='sliders')   return item.platform==='sliders';
+  if (f==='carousel')  return item.platform==='sliders';
   if (f==='special')   return item.platform==='special';
   if (f==='image') return item.tags.includes('image');
   if (f==='text')      return item.tags.includes('text');
