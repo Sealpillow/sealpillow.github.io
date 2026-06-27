@@ -1057,6 +1057,8 @@
 </footer>
 
 <script>
+  // ── Back-to-top button
+  // Becomes visible after scrolling 300px; clicking smooth-scrolls back to the top.
   (function(){
     const backToTop = document.getElementById('backToTop');
     window.addEventListener('scroll', () => {
@@ -1065,13 +1067,16 @@
     backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   })();
 
+  // ── Section progress navigation (desktop: fixed left dots | mobile: fixed bottom bar)
+  // Both navs share the same 4-section list and active-index logic.
   (function(){
-    const dots = Array.from(document.querySelectorAll('.section-nav-dot'));
-    const progress = document.querySelector('.section-nav-progress');
-    const mobileDots = Array.from(document.querySelectorAll('.section-nav-mobile-dot'));
-    const mobileProgress = document.querySelector('.section-nav-mobile-progress');
-    const sections = dots.map(d => document.getElementById(d.dataset.target));
+    const dots         = Array.from(document.querySelectorAll('.section-nav-dot'));
+    const progress     = document.querySelector('.section-nav-progress');       // vertical gold line (desktop)
+    const mobileDots   = Array.from(document.querySelectorAll('.section-nav-mobile-dot'));
+    const mobileProgress = document.querySelector('.section-nav-mobile-progress'); // horizontal gold line (mobile)
+    const sections     = dots.map(d => document.getElementById(d.dataset.target)); // actual <section> elements
 
+    // Clicking any dot (desktop or mobile) smooth-scrolls to the matching section
     [...dots, ...mobileDots].forEach(dot => {
       dot.addEventListener('click', () => {
         const target = document.getElementById(dot.dataset.target);
@@ -1084,33 +1089,41 @@
       const winH = window.innerHeight;
       let activeIndex = 0;
 
+      // A section becomes active when its top edge passes 40% from the top of the viewport
       sections.forEach((sec, i) => {
         if (!sec) return;
         if (scrollY >= sec.offsetTop - winH * 0.4) activeIndex = i;
       });
 
+      // Force the last section active if the user has scrolled to the very bottom
       if (scrollY + winH >= document.documentElement.scrollHeight - 20) {
         activeIndex = sections.length - 1;
       }
 
+      // Update desktop dot active states
       dots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
 
+      // Fill the vertical progress line proportionally between the first and last dot positions
       const navH = dots[dots.length - 1].offsetTop - dots[0].offsetTop;
       const filled = navH > 0 ? (dots[activeIndex].offsetTop - dots[0].offsetTop) / navH * 100 : 0;
       progress.style.height = filled + '%';
 
+      // Update mobile dot/label active states
       const mobileLabels = Array.from(document.querySelectorAll('.section-nav-mobile-label'));
       mobileDots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
       mobileLabels.forEach((lbl, i) => lbl.classList.toggle('active', i === activeIndex));
+
+      // Fill the horizontal mobile progress line as a percentage of sections traversed
       const mobileStep = activeIndex / (mobileDots.length - 1) * 100;
       mobileProgress.style.width = mobileStep + '%';
     }
 
     window.addEventListener('scroll', update, { passive: true });
-    update();
+    update(); // run once on load to set initial state
   })();
 </script>
 <script>
+  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank)
   document.addEventListener('click', function(e) {
     var link = e.target.closest('a');
     if (!link) return;

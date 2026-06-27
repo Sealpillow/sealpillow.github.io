@@ -961,6 +961,13 @@
 </div>
 
 <script>
+  // ─────────────────────────────────────────────
+  // PROJECTS DATA ARRAY
+  // Each object registers one editorial/project page.
+  // Fields: title, file (path to HTML), live (URL or ""), features[] ({label, type}), optional featured:true
+  // feature type values: "media" | "interaction" | "layout" | "logic" | "story"
+  // featured:true → shown in the default "Featured Works" view
+  // ─────────────────────────────────────────────
   const projects = [
     {
       title: "Material Story",
@@ -1284,11 +1291,16 @@
     }
   ];
 
-  let activeFilter = 'all';
-  let searchQuery = '';
-  let currentLightboxIndex = -1;
-  let showAll = false;
+  // ─────────────────────────────────────────────
+  // STATE
+  // ─────────────────────────────────────────────
+  let activeFilter = 'all';         // currently active feature-type filter button
+  let searchQuery = '';             // current search input value
+  let currentLightboxIndex = -1;   // index within the filtered array; -1 means closed
+  let showAll = false;              // false = Featured only, true = all projects
 
+  // Returns the subset of projects matching the current showAll, activeFilter, and searchQuery state.
+  // Filter is OR logic on feature types — a project matches if any of its features has the selected type.
   function getFiltered() {
     let list = showAll ? projects : projects.filter(p => p.featured);
     return list.filter(p => {
@@ -1298,6 +1310,12 @@
     });
   }
 
+  // ─────────────────────────────────────────────
+  // LIGHTBOX
+  // ─────────────────────────────────────────────
+
+  // Opens the fullscreen lightbox for the project at `index` within the current filtered list.
+  // Locks body scroll and wires the "Open in New Tab" button to the current project's file.
   function openLightbox(index) {
     currentLightboxIndex = index;
     const filtered = getFiltered();
@@ -1310,6 +1328,7 @@
     updateLightboxNav();
   }
 
+  // Refreshes the Prev/Next disabled state and the "X / total" counter based on the current index.
   function updateLightboxNav() {
     const filtered = getFiltered();
     document.getElementById('lbPrev').disabled = currentLightboxIndex <= 0;
@@ -1317,6 +1336,7 @@
     document.getElementById('lbCounter').textContent = `${currentLightboxIndex + 1} / ${filtered.length}`;
   }
 
+  // Closes lightbox, clears the iframe src (stops the page running in background), restores scroll.
   function closeLightbox() {
     document.getElementById('lightbox').classList.remove('active');
     document.getElementById('lightboxFrame').src = '';
@@ -1324,6 +1344,13 @@
     currentLightboxIndex = -1;
   }
 
+  // ─────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────
+
+  // Rebuilds the project grid from scratch using the current filtered list.
+  // Each card gets a zero-padded index number (01, 02…), an iframe thumbnail,
+  // feature tags, and action buttons (Preview, New Tab, Live).
   function renderProjects() {
     const filtered = getFiltered();
     const grid = document.getElementById('projectsGrid');
@@ -1361,6 +1388,7 @@
         }
       });
 
+      // Only render the Live button if a live URL exists for this project
       const liveLink = project.live
         ? `<a class="btn-live" href="${project.live}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Live ↗</a>`
         : ``;
@@ -1392,7 +1420,12 @@
     });
   }
 
-  // Featured / view all toggle
+  // ─────────────────────────────────────────────
+  // CONTROLS
+  // ─────────────────────────────────────────────
+
+  // Featured ↔ All toggle: switches showAll, updates label/button text,
+  // shows/hides the filter bar, and resets filters when returning to Featured.
   document.getElementById('viewToggleBtn').addEventListener('click', () => {
     showAll = !showAll;
     const label = document.getElementById('viewToggleLabel');
@@ -1401,11 +1434,11 @@
     if (showAll) {
       label.textContent = 'All Works';
       btn.textContent = 'Show Featured Only';
-      filterBar.style.display = '';
+      filterBar.style.display = '';           // reveal filter bar in All mode
     } else {
       label.textContent = 'Featured Works';
       btn.textContent = 'View All Projects';
-      filterBar.style.display = 'none';
+      filterBar.style.display = 'none';       // hide filter bar in Featured mode
       activeFilter = 'all';
       searchQuery = '';
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
@@ -1414,7 +1447,7 @@
     renderProjects();
   });
 
-  // Filter buttons
+  // Feature-type filter buttons (single-select — clicking a new one deactivates the previous)
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       activeFilter = btn.dataset.filter;
@@ -1424,7 +1457,7 @@
     });
   });
 
-  // Search
+  // Search by project title; clear button appears when there is input
   const searchClear = document.getElementById('searchClear');
   document.getElementById('searchInput').addEventListener('input', e => {
     searchQuery = e.target.value.trim();
@@ -1438,7 +1471,7 @@
     input.focus();
   });
 
-  // Lightbox prev/next buttons
+  // Lightbox Prev / Next buttons navigate within the current filtered list
   document.getElementById('lbPrev').addEventListener('click', () => {
     if (currentLightboxIndex > 0) openLightbox(currentLightboxIndex - 1);
   });
@@ -1447,7 +1480,7 @@
     if (currentLightboxIndex < filtered.length - 1) openLightbox(currentLightboxIndex + 1);
   });
 
-  // Keyboard nav
+  // Keyboard shortcuts while lightbox is open: Escape closes, Left/Right navigates
   document.addEventListener('keydown', event => {
     if (!document.getElementById('lightbox').classList.contains('active')) return;
     if (event.key === 'Escape') closeLightbox();
@@ -1455,13 +1488,15 @@
     if (event.key === 'ArrowRight') { const f = getFiltered(); if (currentLightboxIndex < f.length - 1) openLightbox(currentLightboxIndex + 1); }
   });
 
+  // Clicking the lightbox backdrop (not its children) also closes it
   document.getElementById('lightbox').addEventListener('click', event => {
     if (event.target.id === 'lightbox') closeLightbox();
   });
 
-  renderProjects();
+  renderProjects(); // initial render on page load
 </script>
 <script>
+  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank)
   document.addEventListener('click', function(e) {
     var link = e.target.closest('a');
     if (!link) return;

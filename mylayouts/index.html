@@ -477,7 +477,12 @@
 </div>
 
 <script>
-const BASE = 'layouts/snippets/';
+// ─────────────────────────────────────────────
+// LAYOUTS DATA ARRAY
+// Each object registers one snippet file.
+// Fields: file, name, platform, tags, layout, mobile, desc, optional essential:true
+// ─────────────────────────────────────────────
+const BASE = 'layouts/snippets/'; // prepended to every file path so iframes load relative to this page
 const layouts = [
   // DESKTOP
   { file:"desktop/DesktopFlexi2ColEditorialImgLeftItemRight.html", name:"Flexi 2-Col Editorial - Img Left, Item Right", platform:"desktop", tags:["flexi","2-col","editorial","image"], layout:"Flexi 2 Column", mobile:"Desktop only", desc:"Editorial image left, content item right in a flexible two-column layout." },
@@ -654,9 +659,11 @@ const layouts = [
   { file:"special/ProductImageHoverReveal.html", name:"Product Image - Hover for Description", platform:"special", tags:["interactive","product","overlay","hover","image"], layout:"Hover Reveal", mobile:"Full width", desc:"Product image with 3 positioned hotspot circles. Hover reveals a label and description tooltip. Tap-to-toggle on mobile." }
 ];
 
-// prepend base path so all relative hrefs/srcs resolve from portfolio root
+// Prefix all file paths with BASE so iframe src resolves correctly from this page's location
 layouts.forEach(l => { l.file = BASE + l.file; });
 
+// Returns [cssClass, displayLabel] for the platform badge on each card.
+// CSS classes are defined in the <style> block above (tag-desktop, tag-mobile, tag-web, tag-layout).
 function platformTag(p) {
   if (p==='desktop')   return ['tag-desktop','Desktop'];
   if (p==='mobile')    return ['tag-mobile','Mobile'];
@@ -668,6 +675,8 @@ function platformTag(p) {
   return ['tag-web','Web'];
 }
 
+// Maps tag strings → [cssClass, chipLabel] for the extra badges shown on each card.
+// Only tags listed here get a visible chip; unknown tags are silently ignored.
 const FEATURE_MAP = {
   video:       ['tag-media',    'Video'],
   slider:      ['tag-interact', 'Slider'],
@@ -696,6 +705,7 @@ const FEATURE_MAP = {
   image:       ['tag-media',    'Image'],
 };
 
+// Builds the HTML string of extra tag chips for a card, filtering to only FEATURE_MAP-known tags.
 function extraTagHTML(tags) {
   return tags
     .filter(t => FEATURE_MAP[t])
@@ -704,15 +714,21 @@ function extraTagHTML(tags) {
 }
 
 
-const IFRAME_W        = 1280;
-const IFRAME_W_MOBILE = 375;
-const CARD_W          = 280;
-const SCALE           = CARD_W / IFRAME_W;
+// ─────────────────────────────────────────────
+// CARD GRID — CONSTANTS & STATE
+// ─────────────────────────────────────────────
+const IFRAME_W        = 1280; // desktop snippet viewport width
+const IFRAME_W_MOBILE = 375;  // mobile snippet viewport width
+const CARD_W          = 280;  // card thumbnail width (matches CSS minmax)
+const SCALE           = CARD_W / IFRAME_W; // default scale for desktop iframes (≈0.219)
 const ITEMS_PER_PAGE  = 20;
 
 let currentPage       = 1;
-let allFilteredItems  = [];
+let allFilteredItems  = []; // holds the full sorted+filtered list across all pages
 
+// Recalculates iframe scale for every card thumbnail after render or window resize.
+// Needed because the grid is fluid (auto-fill minmax) so card width changes with viewport.
+// Each iframe is rendered at full snippet width then scaled down with CSS transform to fit the card.
 function scaleCardPreviews() {
   const firstPreview = document.querySelector('#grid .card-preview');
   if (!firstPreview) return;
@@ -722,14 +738,21 @@ function scaleCardPreviews() {
     const scale = cardW / pw;
     const prevH = (f.closest('.card-preview') || {}).offsetHeight || 180;
     f.style.transform = `scale(${scale})`;
-    f.style.height    = Math.round(prevH / scale) + 'px';
+    f.style.height    = Math.round(prevH / scale) + 'px'; // compensate height so the iframe fills the card
   });
 }
 
 window.addEventListener('resize', scaleCardPreviews);
 
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+
+// Controls the order of section dividers in the grid (top → bottom)
 const PLATFORM_ORDER = ['web','desktop','mobile','fullwidth','hover','sliders','redirects','special'];
 
+// Entry point after any filter/search change.
+// Sorts all matching items by platform order, resets to page 1, then renders the first page.
 function renderCards(items) {
   allFilteredItems = [...items].sort((a, b) =>
     PLATFORM_ORDER.indexOf(a.platform) - PLATFORM_ORDER.indexOf(b.platform)
@@ -738,6 +761,9 @@ function renderCards(items) {
   renderPage();
 }
 
+// Renders the current page slice of allFilteredItems into the grid.
+// Groups items by platform and inserts a section-divider heading above each group.
+// Also builds the pagination controls (only shown when totalPages > 1).
 function renderPage() {
   const grid        = document.getElementById('grid');
   const badge       = document.getElementById('count-badge');
@@ -760,6 +786,7 @@ function renderPage() {
   const end       = Math.min(start + ITEMS_PER_PAGE, total);
   const pageItems = allFilteredItems.slice(start, end);
 
+  // Group the current page's items by platform so we can render section dividers
   const grouped = {};
   pageItems.forEach(item => { (grouped[item.platform]=grouped[item.platform]||[]).push(item); });
   const order  = ['web','desktop','mobile','fullwidth','hover','sliders','redirects','special'];
@@ -778,6 +805,7 @@ function renderPage() {
       const card = document.createElement('div');
       card.className = 'card';
 
+      // Mobile snippets use a 375px iframe; everything else uses 1280px desktop width
       const previewW     = item.platform === 'mobile' ? IFRAME_W_MOBILE : IFRAME_W;
       const previewScale = (CARD_W / previewW).toFixed(5);
 
@@ -872,7 +900,9 @@ function renderPage() {
   }
 }
 
-// DRAWER
+// ─────────────────────────────────────────────
+// DRAWER — right-side panel for full preview + code view
+// ─────────────────────────────────────────────
 const drawer         = document.getElementById('drawer');
 const drawerBackdrop = document.getElementById('drawer-backdrop');
 const drawerIframe   = document.getElementById('drawer-iframe');
@@ -906,6 +936,8 @@ function openDrawer(item) {
     try {
       const doc = drawerIframe.contentDocument;
       const activeW = (document.querySelector('.vp-btn.active') || {}).dataset.w || '1280px';
+      // Inject a Bootstrap display-utility shim so snippets that use .d-none/.d-md-block etc.
+      // respond correctly to the chosen viewport size without needing a real Bootstrap file.
       if (doc && !doc.getElementById('__bs-shim')) {
         const s = doc.createElement('style');
         s.id = '__bs-shim';
@@ -916,6 +948,7 @@ function openDrawer(item) {
     } catch(e) {}
   };
 
+  // Auto-select the most appropriate starting viewport for the snippet's platform
   if      (item.platform === 'mobile')  setViewport('375px',  '375px');
   else if (item.platform === 'desktop') setViewport('1280px', '1280px');
   else                                  setViewport('1280px', '1280px');
@@ -941,6 +974,9 @@ document.getElementById('drawer-reload').addEventListener('click', () => {
 drawerBackdrop.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeDrawer(); });
 
+// Generates a CSS string that overrides Bootstrap responsive display utilities
+// to match the selected viewport (mobile vs desktop). This is injected into the snippet iframe
+// so that .d-md-none / .d-md-block etc. behave as they would in a real responsive browser.
 function buildBsShimCSS(isMobileVP) {
   if (isMobileVP) {
     return [
@@ -979,6 +1015,8 @@ function vpIsMobile(w) {
   return parseInt(w) < 768;
 }
 
+// Overrides the viewport meta tag inside the drawer iframe so CSS media queries
+// fire at the correct breakpoints for the chosen viewport width.
 function updateIframeViewport(w) {
   try {
     const doc = drawerIframe.contentDocument;
@@ -994,22 +1032,27 @@ function updateIframeViewport(w) {
   } catch(e) {}
 }
 
+// Applies a viewport preset to the drawer preview.
+// If targetW is wider than the available stage space, the iframe is rendered at full width
+// then scaled down with CSS transform — same technique as the card thumbnails.
 function setViewport(w, label) {
   document.getElementById('vp-size-display').textContent = label;
   document.querySelectorAll('.vp-btn').forEach(b => b.classList.toggle('active', b.dataset.w===w));
 
-  const availW  = (stageInner.parentElement.clientWidth || 900) - 32;
+  const availW  = (stageInner.parentElement.clientWidth || 900) - 32; // usable stage width
   const targetW = parseInt(w) || availW;
   const scale   = availW / targetW;
 
   if (scale < 1) {
+    // Target is wider than stage — render at target width then scale down
     stageInner.style.width             = availW + 'px';
     const stageH                       = stageInner.offsetHeight || 600;
     drawerIframe.style.width           = targetW + 'px';
-    drawerIframe.style.height          = Math.ceil(stageH / scale) + 'px';
+    drawerIframe.style.height          = Math.ceil(stageH / scale) + 'px'; // expand height to compensate for scale
     drawerIframe.style.transform       = `scale(${scale})`;
     drawerIframe.style.transformOrigin = 'top left';
   } else {
+    // Target fits — no scaling needed
     stageInner.style.width             = targetW + 'px';
     drawerIframe.style.width           = '100%';
     drawerIframe.style.height          = '100%';
@@ -1029,10 +1072,16 @@ document.querySelectorAll('.vp-btn').forEach(btn => {
   btn.addEventListener('click', () => setViewport(btn.dataset.w, btn.dataset.label));
 });
 
+// ─────────────────────────────────────────────
 // FILTER + SEARCH
+// activeFilters is a Set of currently selected pill values (e.g. {'5050', 'image'}).
+// AND logic: all active filters must match for an item to show (uses .every()).
+// ─────────────────────────────────────────────
 const activeFilters = new Set();
 let currentSearch = '';
 
+// Returns true if this item satisfies filter f.
+// Some filters check platform (e.g. 'web', 'carousel'), others check item.tags.
 function itemMatchesFilter(item, f) {
   if (f==='essentials') return item.essential === true;
   if (f==='web')       return item.platform==='web';
@@ -1056,12 +1105,16 @@ function itemMatchesFilter(item, f) {
   return false;
 }
 
+// Runs after every filter pill click or search keystroke.
+// Filters run first (AND across all active pills), then search narrows further.
 function applyFilters() {
   let items = layouts;
   if (activeFilters.size > 0) {
+    // AND logic — item must satisfy every active filter
     items = items.filter(item => [...activeFilters].every(f => itemMatchesFilter(item, f)));
   }
   if (currentSearch.trim()) {
+    // Search matches against file path, display name, layout label, or any tag string
     const q = currentSearch.toLowerCase();
     items = items.filter(item =>
       item.file.toLowerCase().includes(q) ||
@@ -1073,6 +1126,8 @@ function applyFilters() {
   renderCards(items);
 }
 
+// Refreshes the .active class on all pills to match the current activeFilters Set.
+// 'All' pill is active only when no filters are selected.
 function syncPillStates() {
   document.querySelectorAll('.pill').forEach(p => {
     const f = p.dataset.filter;
@@ -1084,6 +1139,10 @@ function syncPillStates() {
   });
 }
 
+// Pill click logic:
+// - 'All'       → clears all active filters (shows everything)
+// - 'Essentials'→ clears all others and sets only 'essentials' (mutually exclusive)
+// - Any other   → removes 'essentials', then toggles this filter on/off (multi-select)
 document.querySelectorAll('.pill').forEach(pill => {
   pill.addEventListener('click', () => {
     const f = pill.dataset.filter;
@@ -1128,7 +1187,9 @@ document.querySelectorAll('.view-btn').forEach(btn => {
 activeFilters.add('essentials');
 applyFilters();
 
-// ── CODE VIEW
+// ─────────────────────────────────────────────
+// CODE VIEW — fetches the raw snippet file and splits it into CSS / HTML / JS tabs
+// ─────────────────────────────────────────────
 const codePanel    = document.getElementById('code-panel');
 const codePre      = document.getElementById('code-pre');
 const codeFilename = document.getElementById('code-filename');
@@ -1139,7 +1200,7 @@ const tabCode      = document.getElementById('tab-code');
 const codeCopyBtn  = document.getElementById('code-copy-btn');
 const langTabs     = document.querySelectorAll('.code-lang-tab');
 
-const splitCache = new Map();
+const splitCache = new Map(); // caches parsed {css, html, js} per file path to avoid re-fetching
 let currentFile = '';
 let currentLang = 'css';
 
@@ -1160,6 +1221,8 @@ function highlight(src, type) {
     .replace(/(&lt;)([\w-]+)/g,                  '$1<span class="hl-tag">$2</span>');
 }
 
+// Splits a raw HTML file string into its three parts.
+// Extracts <style> blocks → css, inline <script> blocks (no src attr) → js, everything else → html.
 function parseSections(src) {
   const css = [], js = [];
   const html = src
@@ -1177,6 +1240,9 @@ function showLang(lang) {
   codePre.innerHTML = sec ? highlight(sec, lang) : '<span class="hl-cmt">// (empty)</span>';
 }
 
+// Fetches and parses the snippet file, then displays the active language tab.
+// Uses splitCache to avoid re-fetching the same file.
+// Falls back to a helpful message if fetch fails (e.g. file:// protocol — needs Live Server).
 async function loadCode(file) {
   codeFilename.textContent = file;
   currentFile = file;
@@ -1226,6 +1292,8 @@ codeCopyBtn.addEventListener('click', () => {
   });
 });
 
+// Wraps the original openDrawer so that switching cards while the Code tab is open
+// immediately loads the new file's code without needing to click the Code tab again.
 const _origOpenDrawer = openDrawer;
 openDrawer = function(item) {
   currentFile = item.file;
@@ -1234,6 +1302,7 @@ openDrawer = function(item) {
 };
 </script>
 <script>
+  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank)
   document.addEventListener('click', function(e) {
     var link = e.target.closest('a');
     if (!link) return;
