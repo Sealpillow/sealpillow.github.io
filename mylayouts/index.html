@@ -324,6 +324,17 @@
     background: #0a0a0a;
   }
   .code-panel.visible { display: flex; }
+  .prompt-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; background: #0a0a0a; }
+  .prompt-panel.visible { display: flex; }
+  .prompt-scroll { flex: 1; overflow-y: auto; padding: 24px; }
+  .prompt-intro { font-family: var(--sans); font-size: 13px; color: var(--text-primary); line-height: 1.7; margin-bottom: 18px; }
+  .prompt-section { margin-bottom: 16px; }
+  .prompt-section:last-child { margin-bottom: 0; }
+  .prompt-heading { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 7px; font-family: var(--sans); }
+  .prompt-list { list-style: none; padding: 0; }
+  .prompt-list li { font-family: var(--sans); font-size: 13px; color: var(--text-secondary); line-height: 1.7; padding-left: 14px; position: relative; margin-bottom: 4px; }
+  .prompt-list li:last-child { margin-bottom: 0; }
+  .prompt-list li::before { content: '·'; position: absolute; left: 0; color: var(--text-muted); }
   .code-toolbar {
     display: flex; align-items: center; justify-content: space-between;
     padding: 8px 16px; border-bottom: 1px solid var(--border);
@@ -445,6 +456,7 @@
     <div class="view-tabs">
       <button class="view-tab active" id="tab-preview">Preview</button>
       <button class="view-tab" id="tab-code">Code</button>
+      <button class="view-tab" id="tab-prompt" style="display:none;">Prompt</button>
     </div>
     <div class="vp-group" id="vp-group">
       <span class="vp-label">Viewport</span>
@@ -477,6 +489,15 @@
     </div>
     <div class="code-scroll">
       <pre class="code-pre" id="code-pre"></pre>
+    </div>
+  </div>
+  <div class="prompt-panel" id="prompt-panel">
+    <div class="code-toolbar">
+      <span class="code-filename">AI Prompt</span>
+      <button class="code-copy-btn" id="prompt-copy-btn">Copy</button>
+    </div>
+    <div class="prompt-scroll">
+      <p class="prompt-text" id="prompt-text"></p>
     </div>
   </div>
 </div>
@@ -905,6 +926,16 @@ function renderPage() {
 }
 
 // ─────────────────────────────────────────────
+// PROMPTS — fetched once from prompts.json, keyed by snippet filename
+// ─────────────────────────────────────────────
+let promptsCache = null;
+let currentPrompt = '';
+fetch('layouts/prompts.json')
+  .then(r => r.ok ? r.json() : {})
+  .then(data => { promptsCache = data; })
+  .catch(() => { promptsCache = {}; });
+
+// ─────────────────────────────────────────────
 // DRAWER — right-side panel for full preview + code view
 // ─────────────────────────────────────────────
 const drawer         = document.getElementById('drawer');
@@ -912,6 +943,32 @@ const drawerBackdrop = document.getElementById('drawer-backdrop');
 const drawerIframe   = document.getElementById('drawer-iframe');
 const stageInner     = document.getElementById('stage-inner');
 const stageLoader    = document.getElementById('stage-loader');
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderPrompt(text) {
+  const lines = text.split('\n');
+  let html = '';
+  let inSection = false;
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) continue;
+    if (t.startsWith('### ')) {
+      if (inSection) html += '</ul></div>';
+      html += `<div class="prompt-section"><p class="prompt-heading">${escHtml(t.slice(4))}</p><ul class="prompt-list">`;
+      inSection = true;
+    } else if (t.startsWith('* ') || t.startsWith('- ')) {
+      html += `<li>${escHtml(t.slice(2))}</li>`;
+    } else {
+      if (inSection) { html += '</ul></div>'; inSection = false; }
+      html += `<p class="prompt-intro">${escHtml(t)}</p>`;
+    }
+  }
+  if (inSection) html += '</ul></div>';
+  return html;
+}
 
 function openDrawer(item) {
   document.getElementById('drawer-title').textContent = item.name;
@@ -930,6 +987,12 @@ function openDrawer(item) {
       setTimeout(() => document.getElementById('drawer-copy').textContent = 'Copy path', 1500);
     });
   };
+
+  const snippetPrompt = promptsCache && promptsCache[item.file.replace(BASE, '')];
+  currentPrompt = snippetPrompt || '';
+  tabPrompt.style.display = snippetPrompt ? '' : 'none';
+  document.getElementById('prompt-text').innerHTML = snippetPrompt ? renderPrompt(snippetPrompt) : '';
+  if (!snippetPrompt && tabPrompt.classList.contains('active')) setView('preview');
 
   stageLoader.classList.remove('hidden');
   drawerIframe.src = 'about:blank';
@@ -1213,6 +1276,8 @@ const vpGroup      = document.getElementById('vp-group');
 const drawerStage  = document.getElementById('drawer-stage');
 const tabPreview   = document.getElementById('tab-preview');
 const tabCode      = document.getElementById('tab-code');
+const tabPrompt    = document.getElementById('tab-prompt');
+const promptPanel  = document.getElementById('prompt-panel');
 const codeCopyBtn  = document.getElementById('code-copy-btn');
 const langTabs     = document.querySelectorAll('.code-lang-tab');
 
@@ -1287,16 +1352,20 @@ async function loadCode(file) {
 }
 
 function setView(mode) {
-  const isCode = mode === 'code';
-  tabPreview.classList.toggle('active', !isCode);
+  const isCode   = mode === 'code';
+  const isPrompt = mode === 'prompt';
+  tabPreview.classList.toggle('active', mode === 'preview');
   tabCode.classList.toggle('active', isCode);
-  drawerStage.style.display = isCode ? 'none' : '';
+  tabPrompt.classList.toggle('active', isPrompt);
+  drawerStage.style.display = (isCode || isPrompt) ? 'none' : '';
   codePanel.classList.toggle('visible', isCode);
-  vpGroup.classList.toggle('hidden', isCode);
+  promptPanel.classList.toggle('visible', isPrompt);
+  vpGroup.classList.toggle('hidden', isCode || isPrompt);
 }
 
 tabPreview.addEventListener('click', () => setView('preview'));
 tabCode.addEventListener('click', () => { setView('code'); if (currentFile) loadCode(currentFile); }); // loadCode is async, fire-and-forget is fine
+tabPrompt.addEventListener('click', () => setView('prompt'));
 langTabs.forEach(t => t.addEventListener('click', () => { if (!t.classList.contains('empty')) showLang(t.dataset.lang); }));
 
 codeCopyBtn.addEventListener('click', () => {
@@ -1305,6 +1374,14 @@ codeCopyBtn.addEventListener('click', () => {
   navigator.clipboard.writeText(split[currentLang] || '').then(() => {
     codeCopyBtn.textContent = 'Copied!';
     setTimeout(() => { codeCopyBtn.textContent = 'Copy'; }, 1500);
+  });
+});
+
+document.getElementById('prompt-copy-btn').addEventListener('click', () => {
+  if (!currentPrompt) return;
+  navigator.clipboard.writeText(currentPrompt).then(() => {
+    document.getElementById('prompt-copy-btn').textContent = 'Copied!';
+    setTimeout(() => { document.getElementById('prompt-copy-btn').textContent = 'Copy'; }, 1500);
   });
 });
 
