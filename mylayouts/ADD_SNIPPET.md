@@ -188,7 +188,11 @@ Use **PascalCase**. Pattern: `[Prefix][LayoutType][ContentDescription][MobileBeh
 
 ## What I need from you
 
-I will paste the HTML snippet code. Read it and generate the correct entry line ready to paste into the array.
+I will paste the HTML snippet code. Read it and generate **two outputs**:
+
+### 1. layouts array entry
+
+Generate the entry line ready to paste into the `layouts` array in `mylayouts/index.html`.
 
 From the code, determine:
 - **`file`** — suggest a layout-pattern filename in PascalCase (see naming convention above) and confirm the category folder
@@ -199,4 +203,74 @@ From the code, determine:
 - **`mobile`** — look for `@media` queries or mobile-specific logic to determine mobile behaviour
 - **`desc`** — one sentence describing what it renders and any key behaviour
 
-If the snippet code is unclear or could be categorised multiple ways, ask one clarifying question before generating the entry.
+### 2. prompts.json entry
+
+Generate the matching prompt entry ready to paste into `mylayouts/layouts/prompts.json`.
+
+- Key must exactly match the `file` value from the array entry above
+- Follow the prompt format and section rules defined in the **Adding a prompt entry** section below
+- Extract all technical details directly from the snippet code — class names, CSS values, JS function names, CDN URLs, breakpoints
+- Use `\n` for newlines in the JSON string value
+
+---
+
+Output both entries in clearly labelled code blocks so they can be copied and pasted separately.
+
+If the snippet code is unclear or could be categorised multiple ways, ask one clarifying question before generating either entry.
+
+---
+
+## Adding a prompt entry
+
+Each snippet has a matching entry in `mylayouts/layouts/prompts.json` keyed by its path relative to the `snippets/` folder (e.g. `"sliders/CarouselWithPagination.html"`).
+
+### Prompt format
+
+```
+Create a [description] using HTML, CSS, and [vanilla JavaScript / no JS].
+
+### Dependencies
+* CDN name and version (one per bullet)
+
+### Structure
+* Class names, CSS properties, HTML elements, specific values
+
+### Behaviour
+* JS functions, event listeners, logic
+
+### Responsive
+* @media breakpoints and what changes at each
+
+### Output Requirements
+* Return a complete HTML file
+* Separate HTML, CSS, and JavaScript into clearly commented sections
+* Use semantic HTML where appropriate
+* Do not use external JavaScript libraries other than those listed in Dependencies above
+* Write clean, reusable code
+* Load all dependency CSS and JS in <head>
+```
+
+### Section rules
+
+| Section | Include when |
+|---|---|
+| `### Dependencies` | Snippet uses any CDN (Bootstrap, Splide, Swiper, jQuery, etc.) |
+| `### Structure` | Always |
+| `### Behaviour` | Snippet has JavaScript |
+| `### Responsive` | Snippet has `@media` breakpoints or mobile-specific logic |
+| `### Output Requirements` | Always — use the exact bullets above, unchanged |
+
+### Writing good bullets
+
+- Be specific: class names, exact CSS values, element types, function names
+- No backtick formatting around values — plain text only (e.g. `display:grid` not `` `display:grid` ``)
+- One concern per bullet; keep bullets concise
+- For `### Dependencies`, list each CDN library on its own bullet with version (e.g. `* Bootstrap 4.6.2 CSS & JS CDN`)
+
+### JSON format
+
+In the JSON file, use `\n` for newlines within the string value:
+
+```json
+"category/FileName.html": "Create a ... using HTML, CSS, and vanilla JavaScript.\n\n### Dependencies\n* Bootstrap 4.6.2 CSS & JS CDN\n\n### Structure\n* .wrapper — display:grid; grid-template-columns:1fr 1fr\n\n### Output Requirements\n* Return a complete HTML file\n* Separate HTML, CSS, and JavaScript into clearly commented sections\n* Use semantic HTML where appropriate\n* Do not use external JavaScript libraries other than those listed in Dependencies above\n* Write clean, reusable code\n* Load all dependency CSS and JS in <head>"
+```

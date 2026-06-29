@@ -24,6 +24,7 @@ Personal portfolio site for Brian Lua — IT Business Analyst and frontend devel
 │   ├── index.html          # Searchable snippet viewer
 │   ├── ADD_SNIPPET.md      # Guide for adding new snippets
 │   └── layouts/
+│       ├── prompts.json    # Structured AI prompts keyed by snippet filename (~160 entries)
 │       ├── media/          # Placeholder images and videos for previewing snippets
 │       └── snippets/       # HTML snippet files organised by category (~160 files)
 │           ├── desktop/        web-5050/   web-center/
@@ -103,11 +104,38 @@ Searchable viewer for ~160 HTML layout snippets.
 - **View toggle**: Grid mode (280px min-width cards) and List mode (horizontal single-column)
 - **Pagination**: 20 items per page with prev/next and direct page input
 - Card hover: iframe preview loads with shimmer, Open button appears
-- **Drawer panel** (right-side modal): larger snippet preview, viewport controls (Desktop / Tablet / Mobile), code tabs (CSS / HTML / JS), copy code and copy path buttons
-- Viewport controls inject responsive CSS shims (Bootstrap display utilities) so mobile-only snippets render correctly at each size
-- Code view parses and splits the raw HTML file into CSS, HTML, and JS tabs; results cached per file
+- **Drawer panel** (right-side modal): larger snippet preview with three tabs:
+  - **Preview** — live iframe with viewport controls (Desktop / Tablet / Mobile) that inject Bootstrap responsive shims
+  - **Code** — raw HTML split into CSS / HTML / JS tabs; parsed and cached per file; copy button per tab
+  - **Prompt** — structured AI prompt for regenerating the snippet; copy button returns the raw prompt text
 - `layouts` array in the file: each entry has `file`, `name`, `platform`, `tags`, `layout`, `mobile`, `desc`, optional `essential`
 - iframe sandboxed with `allow-same-origin allow-scripts allow-popups allow-forms`
+
+### `mylayouts/layouts/prompts.json` — AI Prompts
+
+Flat JSON object keyed by snippet path (e.g. `"sliders/CarouselWithPagination.html"`). Each value is a structured prompt string with named sections:
+
+```
+Create a [description] using HTML, CSS, and [vanilla JavaScript / no JS].
+
+### Dependencies
+* CDN libraries (omitted if none)
+
+### Structure
+* CSS layout, class names, specific values
+
+### Behaviour
+* JS functions and event logic (omitted if no JS)
+
+### Responsive
+* Breakpoints and mobile behaviour (omitted if static)
+
+### Output Requirements
+* Return a complete HTML file
+* ...
+```
+
+Fetched once on page load and cached. The Prompt tab only appears in the drawer if an entry exists for that snippet.
 
 See [`mylayouts/ADD_SNIPPET.md`](mylayouts/ADD_SNIPPET.md) for naming conventions, platform/tag reference, and how to add new entries.
 
@@ -139,6 +167,18 @@ Place the HTML file in `myportfolio/editorials/` and add the entry to the array.
 ## Adding a layout snippet
 
 See [`mylayouts/ADD_SNIPPET.md`](mylayouts/ADD_SNIPPET.md) for the full entry format, platform values, tags reference, naming conventions, and instructions for using Claude to generate entries automatically from snippet code.
+
+---
+
+## Adding a prompt
+
+Add an entry to `mylayouts/layouts/prompts.json` keyed by the snippet's path relative to the `snippets/` folder:
+
+```json
+"sliders/MyNewCarousel.html": "Create a [description] using HTML, CSS, and vanilla JavaScript.\n\n### Dependencies\n* Splide 4.1.4 CSS & JS CDN\n\n### Structure\n* .carousel-wrap — ...\n\n### Behaviour\n* new Splide('#id', { ... }).mount()\n\n### Output Requirements\n* Return a complete HTML file\n* Separate HTML, CSS, and JavaScript into clearly commented sections\n* Use semantic HTML where appropriate\n* Do not use external JavaScript libraries other than those listed in Dependencies above\n* Write clean, reusable code\n* Load all dependency CSS and JS in <head>"
+```
+
+Use `\n` for newlines within the JSON string. Sections are optional — include only `### Dependencies`, `### Behaviour`, and `### Responsive` when they apply; `### Structure` and `### Output Requirements` are always included.
 
 Add an entry to the `layouts` array in `mylayouts/index.html`:
 
