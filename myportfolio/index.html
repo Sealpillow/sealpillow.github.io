@@ -833,6 +833,46 @@
     to   { opacity: 1; }
   }
   body { animation: pgFadeIn 0.25s ease both; }
+
+  /* Back to top */
+  .back-to-top {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 90;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--rule);
+    background: rgba(30, 27, 24, 0.92);
+    backdrop-filter: blur(8px);
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.2s ease, color 0.2s ease;
+    pointer-events: none;
+  }
+  .back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .back-to-top:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .back-to-top svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 </style>
 </head>
 <body>
@@ -1475,6 +1515,18 @@
   });
 
   renderProjects(); // initial render on page load
+</script>
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+<script>
+  (function(){
+    const btn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      btn.classList.toggle('visible', window.scrollY > 300);
+    }, { passive: true });
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  })();
 </script>
 <script>
   // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank)

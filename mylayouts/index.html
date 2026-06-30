@@ -120,7 +120,7 @@
     transition: border-color 0.15s, box-shadow 0.15s;
     display: flex; flex-direction: column;
   }
-  .card:hover { border-color: var(--border-active); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+  .card.hovered { border-color: var(--border-active); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
 
   /* IFRAME THUMBNAIL */
   .card-preview {
@@ -148,14 +148,14 @@
     display: flex; align-items: center; justify-content: center; gap: 8px;
     transition: background 0.15s;
   }
-  .card:hover .preview-overlay { background: rgba(0,0,0,0.5); }
+  .card.hovered .preview-overlay { background: rgba(0,0,0,0.5); }
   .preview-btn {
     opacity: 0; transform: translateY(4px);
     transition: opacity 0.15s, transform 0.15s;
     padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 600;
     cursor: pointer; font-family: var(--sans); border: none;
   }
-  .card:hover .preview-btn { opacity: 1; transform: translateY(0); }
+  .card.hovered .preview-btn { opacity: 1; transform: translateY(0); }
   .preview-btn-expand { background: var(--accent); color: #0e0e0e; }
   .preview-btn-open   { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2) !important; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
@@ -385,6 +385,46 @@
     .filter-bar  { padding: 8px 32px; }
     .grid-wrap   { padding: 16px 32px 60px; }
   }
+
+  /* Back to top */
+  .back-to-top {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 90;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    background: rgba(17, 17, 17, 0.92);
+    backdrop-filter: blur(8px);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.2s ease, color 0.2s ease;
+    pointer-events: none;
+  }
+  .back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .back-to-top:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .back-to-top svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 </style>
 </head>
 <body>
@@ -511,35 +551,31 @@
 const BASE = 'layouts/snippets/'; // prepended to every file path so iframes load relative to this page
 const layouts = [
   // DESKTOP
-  { file:"desktop/DesktopFlexi2ColEditorialImgLeftItemRight.html", name:"Flexi 2-Col Editorial - Img Left, Item Right", platform:"desktop", tags:["flexi","2-col","editorial","image"], layout:"Flexi 2 Column", mobile:"Desktop only", desc:"Editorial image left, content item right in a flexible two-column layout." },
   { file:"desktop/DesktopFlexi2ColFullImgLeftNarrowImgRight.html", name:"Flexi 2-Col - Full Img Left, Narrow Img Right", platform:"desktop", tags:["flexi","2-col","image"], layout:"Flexi 2 Column", mobile:"Desktop only", desc:"Full-bleed image left, narrower secondary image right." },
   { file:"desktop/DesktopFlexi2ColTextBlockImgOverlay.html", name:"Flexi 2-Col - Text Block, Img Overlay", platform:"desktop", tags:["flexi","2-col","overlay","image"], layout:"Flexi 2 Column", mobile:"Desktop only", desc:"Text block column alongside an image with overlay treatment." },
+  { file:"desktop/DesktopFlexi2ColEditorialImgLeftItemRight.html", name:"Flexi 2-Col Editorial - Img Left, Item Right", platform:"desktop", tags:["flexi","2-col","editorial","image"], layout:"Flexi 2 Column", mobile:"Desktop only", desc:"Editorial image left, content item right in a flexible two-column layout." },
+  { file:"desktop/DesktopOffsetPortraitLeftCaptionImgRight.html", name:"Offset Portrait Left - Caption + Img Right", platform:"desktop", tags:["editorial","text","image"], layout:"Offset Portrait", mobile:"Desktop only", desc:"Offset portrait image left with caption and image right." },
+  { file:"desktop/DesktopOffsetPortraitRightImgCaptionLeft.html", name:"Offset Portrait Right - Img + Caption Left", platform:"desktop", tags:["editorial","text","image"], layout:"Offset Portrait", mobile:"Desktop only", desc:"Offset portrait image right with image and caption left." },
+  { file:"desktop/DesktopSplit4060TitleLeftDescRight.html", name:"Split 40/60 - Title Left, Desc Right", platform:"desktop", tags:["text"], layout:"40/60 Split", mobile:"Desktop only", desc:"Asymmetric 40/60 split with title left and description right." },
   { file:"desktop/DesktopSplit5050FullImgLeftProductListRight.html", name:"Split 50/50 - Full Img Left, Product List Right", platform:"desktop", tags:["5050","product","image"], layout:"50/50 Split", mobile:"Desktop only", desc:"Full-bleed image left, product listing right." },
   { file:"desktop/DesktopSplit5050PoemTextLeftFullImgRight.html", name:"Split 50/50 - Poem Text Left, Full Img Right", platform:"desktop", tags:["5050","text","image"], layout:"50/50 Split", mobile:"Desktop only", desc:"Editorial poem-style text left, full image right." },
   { file:"desktop/DesktopSplit5050ProductImgListLeftImgRight.html", name:"Split 50/50 - Product Img List Left, Img Right", platform:"desktop", tags:["5050","product","image"], layout:"50/50 Split", mobile:"Desktop only", desc:"Product image list left, single large image right." },
   { file:"desktop/DesktopSplit5050TextWithImgBottomLeft.html", name:"Split 50/50 - Text with Img Bottom Left", platform:"desktop", tags:["5050","text","image"], layout:"50/50 Split", mobile:"Desktop only", desc:"Text block left with image anchored to the bottom." },
   { file:"desktop/DesktopTwoImgPairNumberedText.html", name:"Two Img Pair - Numbered Text", platform:"desktop", tags:["2-col","numbered","text","image"], layout:"Two Image Pair", mobile:"Desktop only", desc:"Two paired images with numbered text labels below each." },
-  { file:"desktop/DesktopSplit4060TitleLeftDescRight.html", name:"Split 40/60 - Title Left, Desc Right", platform:"desktop", tags:["text"], layout:"40/60 Split", mobile:"Desktop only", desc:"Asymmetric 40/60 split with title left and description right." },
-  { file:"desktop/DesktopOffsetPortraitLeftCaptionImgRight.html", name:"Offset Portrait Left - Caption + Img Right", platform:"desktop", tags:["editorial","text","image"], layout:"Offset Portrait", mobile:"Desktop only", desc:"Offset portrait image left with caption and image right." },
-  { file:"desktop/DesktopOffsetPortraitRightImgCaptionLeft.html", name:"Offset Portrait Right - Img + Caption Left", platform:"desktop", tags:["editorial","text","image"], layout:"Offset Portrait", mobile:"Desktop only", desc:"Offset portrait image right with image and caption left." },
   // MOBILE
   { file:"mobile/MobileFullWidthTwoImgStackNumbered.html", name:"Full Width - Two Img Stack, Numbered", platform:"mobile", tags:["stacked","numbered","image"], layout:"Full Width Stack", mobile:"Full width stack", desc:"Two stacked full-width images with numbered labels." },
   { file:"mobile/MobileHalfWidthPoemText.html", name:"Half Width - Poem Text", platform:"mobile", tags:["text","editorial"], layout:"Half Width", mobile:"Half width", desc:"Half-width editorial poem text. Mobile-native." },
+  { file:"mobile/MobileImgTextImgStack.html", name:"Img + Text + Img - Stack", platform:"mobile", tags:["stacked","text","image"], layout:"Stacked", mobile:"Stacked", desc:"Stacked layout: image, text block, image. Mobile-native." },
   { file:"mobile/MobileProductNumberedList.html", name:"Product Numbered List", platform:"mobile", tags:["product","numbered","image"], layout:"Numbered List", mobile:"Full width", desc:"Numbered product list. Mobile-native." },
   { file:"mobile/MobileSplit5050TitleLeftDescRight.html", name:"Split 50/50 - Title Left, Desc Right", platform:"mobile", tags:["5050","text"], layout:"50/50 Split", mobile:"50/50", desc:"Title left, description right in a mobile 50/50 split." },
   { file:"mobile/MobileSplit6535DescLeftTagRight.html", name:"Split 65/35 - Desc Left, Tag Right", platform:"mobile", tags:["text"], layout:"65/35 Split", mobile:"65/35", desc:"65/35 asymmetric split with description and tag text." },
   { file:"mobile/MobileThreeEditorialImgStackNumbered.html", name:"Three Editorial Img Stack - Numbered", platform:"mobile", tags:["stacked","numbered","editorial","image"], layout:"Three Image Stack", mobile:"Stacked", desc:"Three stacked editorial images with numbered indicators." },
-  { file:"mobile/MobileImgTextImgStack.html", name:"Img + Text + Img - Stack", platform:"mobile", tags:["stacked","text","image"], layout:"Stacked", mobile:"Stacked", desc:"Stacked layout: image, text block, image. Mobile-native." },
   // WEB 50/50
-  { file:"web-5050/Web5050ImageLeftImageTextBtmRightMobileStack-v1.html", name:"50/50 - Img Left, Img+Text Btm Right (v1)", platform:"web", tags:["5050","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Image left, right column has image with text anchored to the bottom. v1." },
   { file:"web-5050/Web5050ImageLeftImageTextBtmRightMobileStack.html", name:"50/50 - Img Left, Img+Text Btm Right", platform:"web", tags:["5050","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Image left, right column has image with text anchored to the bottom." },
+  { file:"web-5050/Web5050ImageLeftImageTextBtmRightMobileStack-v1.html", name:"50/50 - Img Left, Img+Text Btm Right (v1)", platform:"web", tags:["5050","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Image left, right column has image with text anchored to the bottom. v1." },
+  { file:"web-5050/Web5050ImgLeftNavVideoRightMobileStack.html", name:"50/50 - Img Left, Nav+Video Right", platform:"web", tags:["5050","video","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Image left, navigation with embedded video right. Stacks on mobile." },
   { file:"web-5050/Web5050ImageLeftTextRightMobileStackWithLink.html", name:"50/50 - Img Left, Text Right (with Link)", platform:"web", tags:["5050","text","link","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Standard 50/50 with image left and text+link right. Stacks on mobile.", essential:true },
   { file:"web-5050/Web5050ImageLeftVideoTextRightMobileStackNoLink.html", name:"50/50 - Img Left, Video+Text Right (No Link)", platform:"web", tags:["5050","video","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Image left with video and text on right. No link. Stacks on mobile." },
-  { file:"web-5050/Web5050ImageMobile5050NoLink.html", name:"50/50 Image - Mobile 50/50, No Link", platform:"web", tags:["5050","image"], layout:"50/50 Split", mobile:"50/50", desc:"50/50 image split that remains 50/50 on mobile. No link." },
-  { file:"web-5050/Web5050ImageMobileStackNoLink.html", name:"50/50 Image - Mobile Stack, No Link", platform:"web", tags:["5050","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 image split that stacks on mobile. No link." },
-  { file:"web-5050/Web5050ImageMobileStackWithLink.html", name:"50/50 Image - Mobile Stack, With Link", platform:"web", tags:["5050","link","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 image split that stacks on mobile. With link." },
-  { file:"web-5050/Web5050ImageMobileStackWithLinkAndText.html", name:"50/50 Image - Mobile Stack, Link + Text", platform:"web", tags:["5050","link","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 image with link and text overlay. Stacks on mobile." },
-  { file:"web-5050/Web5050ImageMobileStackWithLinkAndTextBelow.html", name:"50/50 Image - Mobile Stack, Link + Text Below", platform:"web", tags:["5050","link","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 image with link and text placed below. Stacks on mobile." },
   { file:"web-5050/Web5050ImageRightSplitMobileStackRightFirstWithLink.html", name:"50/50 - Img Right Split, Mobile Stack Right First (Link)", platform:"web", tags:["5050","link","image"], layout:"50/50 Split", mobile:"Mobile stack (right first)", desc:"Image right. On mobile, right column appears first. With link." },
   { file:"web-5050/Web5050ImageRightTextLeftMobileStackWithLink.html", name:"50/50 - Img Right, Text Left (with Link)", platform:"web", tags:["5050","text","link","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Reversed 50/50: text left, image right. With link. Stacks on mobile.", essential:true },
   { file:"web-5050/Web5050ImageStackLeftImageMidRightMobileStack.html", name:"50/50 - Img Stack Left, Img Mid-Right", platform:"web", tags:["5050","stacked","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Stacked images left, single mid-aligned image right." },
@@ -549,93 +585,98 @@ const layouts = [
   { file:"web-5050/Web5050LargeImgTwoProductsDesktopOnly-v2.html", name:"50/50 - Large Img, Two Products (Desktop Only, v2)", platform:"web", tags:["5050","product","image"], layout:"50/50 Split", mobile:"Desktop only", desc:"Large hero image alongside two product panels. Desktop-only. v2." },
   { file:"web-5050/Web5050LargeImgTwoProductsMobileStack-v1.html", name:"50/50 - Large Img, Two Products (Mobile Stack, v1)", platform:"web", tags:["5050","product","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Large hero image alongside two products. Stacks on mobile. v1." },
   { file:"web-5050/Web5050SliderPaginRightTextLeftMobileStack.html", name:"50/50 - Slider (Pagin Right), Text Left", platform:"web", tags:["5050","slider","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Slider with pagination right, text content left. Stacks on mobile." },
+  { file:"web-5050/Web5050SliderLeftNestedSliderTextRightMobileStack.html", name:"50/50 - Slider Left, Nested Slider+Text Right", platform:"web", tags:["5050","slider","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Slider left with nested slider and text right. Stacks on mobile." },
   { file:"web-5050/Web5050SliderPaginTwoImgWithText.html", name:"50/50 - Slider Pagination, Two Img with Text", platform:"web", tags:["5050","slider","text","image"], layout:"50/50 Split", mobile:"--", desc:"Two-image slider with pagination dots and text content." },
   { file:"web-5050/Web5050VideoLeftTextRightMobileStackNoLink.html", name:"50/50 - Video Left, Text Right (No Link)", platform:"web", tags:["5050","video","text"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Video left, text right. No link. Stacks on mobile." },
-  { file:"web-5050/Web5050VideoRightTextLeftMobileStackNoLink.html", name:"50/50 - Video Right, Text Left (No Link)", platform:"web", tags:["5050","video","text"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Text left, video right. No link. Stacks on mobile." },
   { file:"web-5050/Web5050VideoLeftTextRightMobileStackWithLink.html", name:"50/50 - Video Left, Text Right (With Link)", platform:"web", tags:["5050","video","text","link"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Video left, text with link right. Stacks on mobile.", essential:true },
+  { file:"web-5050/Web5050VideoRightTextLeftMobileStackNoLink.html", name:"50/50 - Video Right, Text Left (No Link)", platform:"web", tags:["5050","video","text"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Text left, video right. No link. Stacks on mobile." },
   { file:"web-5050/Web5050VideoRightTextLeftMobileStackWithLink.html", name:"50/50 - Video Right, Text Left (With Link)", platform:"web", tags:["5050","video","text","link"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Text left, video right. With link. Stacks on mobile.", essential:true },
+  { file:"web-5050/Web5050VideoTextLeftImageTextRightMobileStack.html", name:"50/50 - Video+Text Left, Img+Text Right", platform:"web", tags:["5050","video","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Video with text left, image with text right. Stacks on mobile." },
+  { file:"web-5050/Web5050ImageMobile5050NoLink.html", name:"50/50 Image - Mobile 50/50, No Link", platform:"web", tags:["5050","image"], layout:"50/50 Split", mobile:"50/50", desc:"50/50 image split that remains 50/50 on mobile. No link." },
+  { file:"web-5050/Web5050ImageMobileStackWithLinkAndText.html", name:"50/50 Image - Mobile Stack, Link + Text", platform:"web", tags:["5050","link","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 image with link and text overlay. Stacks on mobile." },
+  { file:"web-5050/Web5050ImageMobileStackWithLinkAndTextBelow.html", name:"50/50 Image - Mobile Stack, Link + Text Below", platform:"web", tags:["5050","link","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 image with link and text placed below. Stacks on mobile." },
+  { file:"web-5050/Web5050ImageMobileStackNoLink.html", name:"50/50 Image - Mobile Stack, No Link", platform:"web", tags:["5050","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 image split that stacks on mobile. No link." },
+  { file:"web-5050/Web5050ImageMobileStackWithLink.html", name:"50/50 Image - Mobile Stack, With Link", platform:"web", tags:["5050","link","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 image split that stacks on mobile. With link." },
   { file:"web-5050/Web5050VideoMobile5050NoLink.html", name:"50/50 Video - Mobile 50/50, No Link", platform:"web", tags:["5050","video"], layout:"50/50 Split", mobile:"50/50", desc:"50/50 video split that stays 50/50 on mobile. No link." },
   { file:"web-5050/Web5050VideoMobileStackNoLink.html", name:"50/50 Video - Mobile Stack, No Link", platform:"web", tags:["5050","video"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 video split that stacks on mobile. No link." },
   { file:"web-5050/Web5050VideoMobileStackWithLink.html", name:"50/50 Video - Mobile Stack, With Link", platform:"web", tags:["5050","video","link"], layout:"50/50 Split", mobile:"Mobile stack", desc:"50/50 video split that stacks on mobile. With link." },
-  { file:"web-5050/Web5050VideoTextLeftImageTextRightMobileStack.html", name:"50/50 - Video+Text Left, Img+Text Right", platform:"web", tags:["5050","video","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Video with text left, image with text right. Stacks on mobile." },
-  { file:"web-5050/Web5050SliderLeftNestedSliderTextRightMobileStack.html", name:"50/50 - Slider Left, Nested Slider+Text Right", platform:"web", tags:["5050","slider","text","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Slider left with nested slider and text right. Stacks on mobile." },
-  { file:"web-5050/Web5050ImgLeftNavVideoRightMobileStack.html", name:"50/50 - Img Left, Nav+Video Right", platform:"web", tags:["5050","video","image"], layout:"50/50 Split", mobile:"Mobile stack", desc:"Image left, navigation with embedded video right. Stacks on mobile." },
   // WEB CENTER
   { file:"web-center/WebCenterImageWithTextMobileNarrow.html", name:"Center - Image with Text (Mobile Narrow)", platform:"web", tags:["centered","text","image"], layout:"Centered", mobile:"Narrow", desc:"Centered image with text. Narrows on mobile." },
+  { file:"web-center/WebCenterPersonProfileQnA.html", name:"Center - Person Profile Q&A", platform:"web", tags:["centered","text","editorial"], layout:"Centered", mobile:"Centered", desc:"Centered person profile with Q&A format." },
+  { file:"web-center/WebCenterPhotoStackMobileSlider.html", name:"Center - Photo Stack (Mobile Slider)", platform:"web", tags:["centered","stacked","slider","image"], layout:"Centered", mobile:"Mobile slider", desc:"Centered stacked photos that convert to a slider on mobile." },
   { file:"web-center/WebCenterQuoteCaptionText.html", name:"Center - Quote + Caption Text", platform:"web", tags:["centered","text","editorial"], layout:"Centered", mobile:"Centered", desc:"Centered editorial quote with caption text below.", essential:true },
   { file:"web-center/WebCenterTitleDescText.html", name:"Center - Title + Desc Text", platform:"web", tags:["centered","text"], layout:"Centered", mobile:"Centered", desc:"Centered title and description text block." },
   { file:"web-center/WebCenterTitleDescTextWithLink.html", name:"Center - Title + Desc Text (With Link)", platform:"web", tags:["centered","text","link"], layout:"Centered", mobile:"Centered", desc:"Centered title and description text block with a CTA link.", essential:true },
-  { file:"web-center/WebCenterPersonProfileQnA.html", name:"Center - Person Profile Q&A", platform:"web", tags:["centered","text","editorial"], layout:"Centered", mobile:"Centered", desc:"Centered person profile with Q&A format." },
   { file:"web-center/WebCenterTitleMetaRow.html", name:"Center - Title + Meta Row", platform:"web", tags:["centered","text"], layout:"Centered", mobile:"Centered", desc:"Centered title with a metadata row below." },
-  { file:"web-center/WebCenterPhotoStackMobileSlider.html", name:"Center - Photo Stack (Mobile Slider)", platform:"web", tags:["centered","stacked","slider","image"], layout:"Centered", mobile:"Mobile slider", desc:"Centered stacked photos that convert to a slider on mobile." },
   // WEB FLEXI
-  { file:"web-flexi/WebFlexiTextProductLeftLargeImgRight-v1.html", name:"Flexi - Text+Product Left, Large Img Right (v1)", platform:"web", tags:["flexi","product","text","image"], layout:"Flexi", mobile:"--", desc:"Flexible layout: text and product listing left, large image right. v1." },
   { file:"web-flexi/WebFlexiLargeImgLeftTextProductRight-v1.html", name:"Flexi - Large Img Left, Text+Product Right (v1)", platform:"web", tags:["flexi","product","text","image"], layout:"Flexi", mobile:"--", desc:"Flexible layout: large image left, text and product listing right. v1." },
-  { file:"web-flexi/WebFlexi6040SliderTextAlternatingMobileStack.html", name:"Flexi 60/40 - Slider+Text Alternating", platform:"web", tags:["flexi","slider","text","image"], layout:"Flexi 60/40", mobile:"Mobile stack", desc:"Alternating 60/40 flexible layout with slider and text. Stacks on mobile." },
-  { file:"web-flexi/WebFlexi2to1ImgLeftLargeMobileHalfStack.html", name:"Flexi 2:1 - Img Left Large (Mobile Half Stack)", platform:"web", tags:["flexi","image"], layout:"Flexi 2:1", mobile:"Half stack", desc:"Flexible 2:1 ratio with large image left. Half-stacks on mobile." },
+  { file:"web-flexi/WebFlexiTextProductLeftLargeImgRight-v1.html", name:"Flexi - Text+Product Left, Large Img Right (v1)", platform:"web", tags:["flexi","product","text","image"], layout:"Flexi", mobile:"--", desc:"Flexible layout: text and product listing left, large image right. v1." },
   { file:"web-flexi/WebFlexi1to2ImgRightLargeMobileHalfStack.html", name:"Flexi 1:2 - Img Right Large (Mobile Half Stack)", platform:"web", tags:["flexi","image"], layout:"Flexi 1:2", mobile:"Half stack", desc:"Flexible 1:2 ratio with large image right. Half-stacks on mobile." },
+  { file:"web-flexi/WebFlexi2to1ImgLeftLargeMobileHalfStack.html", name:"Flexi 2:1 - Img Left Large (Mobile Half Stack)", platform:"web", tags:["flexi","image"], layout:"Flexi 2:1", mobile:"Half stack", desc:"Flexible 2:1 ratio with large image left. Half-stacks on mobile." },
+  { file:"web-flexi/WebFlexi6040SliderTextAlternatingMobileStack.html", name:"Flexi 60/40 - Slider+Text Alternating", platform:"web", tags:["flexi","slider","text","image"], layout:"Flexi 60/40", mobile:"Mobile stack", desc:"Alternating 60/40 flexible layout with slider and text. Stacks on mobile." },
   // WEB GRID
   { file:"web-grid/WebCollageGridHeroMidLargeSmallImg-v2.html", name:"Collage Grid - Hero Mid, Large + Small Img (v2)", platform:"web", tags:["collage","grid","image"], layout:"Collage Grid", mobile:"--", desc:"Collage grid with mid-hero image, large and small supporting images. v2." },
   { file:"web-grid/WebCollageGridHeroStaggeredLargeImg-v3.html", name:"Collage Grid - Hero Staggered Large Img (v3)", platform:"web", tags:["collage","grid","image"], layout:"Collage Grid", mobile:"--", desc:"Staggered collage grid with large hero image treatment. v3." },
   { file:"web-grid/WebCustomGridLargeImgLeftTextRight.html", name:"Custom Grid - Large Img Left, Text Right", platform:"web", tags:["grid","text","image"], layout:"Custom Grid", mobile:"--", desc:"Custom grid layout with large image left and text column right." },
+  { file:"web-grid/WebFourColEqualHeightMobileStack.html", name:"Four-Col Equal Height - Mobile Stack (2×2)", platform:"web", tags:["4-col","grid","image"], layout:"Four Column", mobile:"2×2 grid", desc:"Four equal-height columns on desktop, collapses to a 2×2 grid on mobile.", essential:true },
+  { file:"web-grid/FourColProductGridMobileCarousel.html", name:"Four-Col Product Grid – Mobile Carousel", platform:"web", tags:["grid","4-col","product","hover","text","interactive","image"], layout:"Product Grid", mobile:"Carousel on mobile", desc:"Four-column product grid on desktop that converts to an auto-scrolling carousel on mobile.", essential:true },
+  { file:"web-grid/WebImageTextImageSandwich.html", name:"Image | Text | Image Sandwich", platform:"web", tags:["editorial","3-col","text","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Two portrait images flanking a central text column — editorial 3-col sandwich." },
   { file:"web-grid/WebMultiColumnMobileCarousel.html", name:"Multi-Column - Mobile Carousel", platform:"web", tags:["multi-col","slider","image"], layout:"Multi Column", mobile:"Carousel", desc:"Multi-column layout that converts to a swipeable carousel on mobile.", essential:true },
+  { file:"web-grid/snippet-multigrid-products.html", name:"Multi-Grid Products", platform:"web", tags:["grid","product","image"], layout:"Multi Grid", mobile:"--", desc:"Multi-column product grid snippet." },
+  { file:"web-grid/WebProductCard.html", name:"Product Card Grid", platform:"web", tags:["product","grid","image"], layout:"Four Column", mobile:"2×2 grid", desc:"Four-up product card grid with image, name, price and optional tag badge. Scales to 2×2 on mobile." },
   { file:"web-grid/WebQnALabelGridMobileStack.html", name:"Q&A Label Grid - Mobile Stack", platform:"web", tags:["3-col","text"], layout:"Label Grid", mobile:"Mobile stack", desc:"Q&A content in a label grid layout. Stacks on mobile." },
+  { file:"web-grid/SyncedCarouselProductGrid.html", name:"Synced Carousel + Product Grid", platform:"web", tags:["grid","2-col","multi-col","product","slider","interactive","image"], layout:"Split Grid Carousel", mobile:"Mobile stack", desc:"Synchronized left carousel paired with a responsive product grid on the right.", essential:true },
   { file:"web-grid/WebThreeColEmptyImageTextMobileStack.html", name:"Three-Col - Empty + Image + Text (Mobile Stack)", platform:"web", tags:["3-col","text","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Three columns: one empty, one image, one text. Stacks on mobile." },
-  { file:"web-grid/WebThreeColImageGridMobileStack.html", name:"Three-Col Image Grid - Mobile Stack", platform:"web", tags:["3-col","grid","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Three-column image grid. Stacks on mobile." },
   { file:"web-grid/WebThreeColImageTextMobileStack.html", name:"Three-Col - Image + Text (Mobile Stack)", platform:"web", tags:["3-col","text","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Three columns each with image and text below. Stacks on mobile.", essential:true },
   { file:"web-grid/WebThreeColImageTextMobileStackEqualHeight.html", name:"Three-Col - Image + Text, Equal Height (Mobile Stack)", platform:"web", tags:["3-col","text","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Three-col image+text, equal height columns. Stacks on mobile." },
-  { file:"web-grid/WebTitleThreeColMobileStackWithLink.html", name:"Title + Three-Col - Mobile Stack (With Link)", platform:"web", tags:["3-col","text","link","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Title header above three columns with links. Stacks on mobile." },
-  { file:"web-grid/WebFourColEqualHeightMobileStack.html", name:"Four-Col Equal Height - Mobile Stack (2×2)", platform:"web", tags:["4-col","grid","image"], layout:"Four Column", mobile:"2×2 grid", desc:"Four equal-height columns on desktop, collapses to a 2×2 grid on mobile.", essential:true },
-  { file:"web-grid/snippet-multigrid-products.html", name:"Multi-Grid Products", platform:"web", tags:["grid","product","image"], layout:"Multi Grid", mobile:"--", desc:"Multi-column product grid snippet." },
-  { file:"web-grid/WebImageTextImageSandwich.html", name:"Image | Text | Image Sandwich", platform:"web", tags:["editorial","3-col","text","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Two portrait images flanking a central text column — editorial 3-col sandwich." },
   { file:"web-grid/ThreeColEditorialTileGrid.html", name:"Three-Col Editorial Tile Grid", platform:"web", tags:["grid","3-col","product","video","hover","link","image"], layout:"Grid 3-Col", mobile:"Mobile stack", desc:"Three editorial tiles with image or video content and hover-activated underline links.", essential:true },
-  { file:"web-grid/SyncedCarouselProductGrid.html", name:"Synced Carousel + Product Grid", platform:"web", tags:["grid","2-col","multi-col","product","slider","interactive","image"], layout:"Split Grid Carousel", mobile:"Mobile stack", desc:"Synchronized left carousel paired with a responsive product grid on the right.", essential:true },
-  { file:"web-grid/FourColProductGridMobileCarousel.html", name:"Four-Col Product Grid – Mobile Carousel", platform:"web", tags:["grid","4-col","product","hover","text","interactive","image"], layout:"Product Grid", mobile:"Carousel on mobile", desc:"Four-column product grid on desktop that converts to an auto-scrolling carousel on mobile.", essential:true },
-  { file:"web-grid/WebProductCard.html", name:"Product Card Grid", platform:"web", tags:["product","grid","image"], layout:"Four Column", mobile:"2×2 grid", desc:"Four-up product card grid with image, name, price and optional tag badge. Scales to 2×2 on mobile." },
+  { file:"web-grid/WebThreeColImageGridMobileStack.html", name:"Three-Col Image Grid - Mobile Stack", platform:"web", tags:["3-col","grid","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Three-column image grid. Stacks on mobile." },
+  { file:"web-grid/WebTitleThreeColMobileStackWithLink.html", name:"Title + Three-Col - Mobile Stack (With Link)", platform:"web", tags:["3-col","text","link","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Title header above three columns with links. Stacks on mobile." },
   // WEB IMAGE
-  { file:"web-image/WebImageLeftImageTextRightMobileStackWithLink.html", name:"Img Left, Img+Text Right - Mobile Stack (Link)", platform:"web", tags:["text","link","image"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Image left, image with text right. Link included. Stacks on mobile." },
-  { file:"web-image/WebImageLeftLargeRightSmallMobileStack.html", name:"Img Left Large, Right Small - Mobile Stack", platform:"web", tags:["asymmetric","image"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Larger image left, smaller right. Stacks on mobile.", essential:true },
+{ file:"web-image/WebHangingFloatingCaption.html", name:"Hanging / Floating Caption", platform:"web", tags:["editorial","text","image"], layout:"Caption", mobile:"Mobile stack", desc:"Short caption offset outside the image boundary into the negative space." },
   { file:"web-image/WebImageLeftLargeRightSmallSpaceBtwMobileStack.html", name:"Img Left Large, Right Small (Space Between) - Mobile Stack", platform:"web", tags:["asymmetric","image"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Larger image left, smaller right, with spacing between. Stacks on mobile." },
+  { file:"web-image/WebImageLeftLargeRightSmallMobileStack.html", name:"Img Left Large, Right Small - Mobile Stack", platform:"web", tags:["asymmetric","image"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Larger image left, smaller right. Stacks on mobile.", essential:true },
   { file:"web-image/WebImageLeftSmallRightLargeMobileStack.html", name:"Img Left Small, Right Large - Mobile Stack", platform:"web", tags:["asymmetric","image"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Small image left, large right. Stacks on mobile." },
-  { file:"web-image/WebTextLeftTwoColImagesRightMobileStack.html", name:"Text Left, Two-Col Images Right - Mobile Stack", platform:"web", tags:["text","2-col","image"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Text left, two-column image grid right. Stacks on mobile." },
-  { file:"web-image/WebTopDownMobileTopDownDiffSize.html", name:"Top-Down - Mobile Top-Down, Different Sizes", platform:"web", tags:["stacked","image"], layout:"Top Down", mobile:"Top-down (diff size)", desc:"Vertically stacked layout adapting to different image sizes on mobile." },
+  { file:"web-image/WebImageLeftImageTextRightMobileStackWithLink.html", name:"Img Left, Img+Text Right - Mobile Stack (Link)", platform:"web", tags:["text","link","image"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Image left, image with text right. Link included. Stacks on mobile." },
   { file:"web-image/WebSingleImageNarrowDesktopWideMobile.html", name:"Single Image - Narrow Desktop, Wide Mobile", platform:"web", tags:["centered","image"], layout:"Single Image", mobile:"Wide", desc:"Single image constrained on desktop, full-width on mobile.", essential:true },
   { file:"web-image/WebSingleVIdeoNarrowDesktopWideMobile.html", name:"Single Video - Narrow Desktop, Wide Mobile", platform:"web", tags:["video"], layout:"Single Video", mobile:"Wide", desc:"Single video constrained on desktop, full-width on mobile." },
 { file:"web-image/WebStaggeredOffsetStack.html", name:"Staggered Offset Stack", platform:"web", tags:["editorial","image"], layout:"Staggered", mobile:"Mobile stack", desc:"Vertically stacked images alternating left and right with breathing negative space." },
-{ file:"web-image/WebHangingFloatingCaption.html", name:"Hanging / Floating Caption", platform:"web", tags:["editorial","text","image"], layout:"Caption", mobile:"Mobile stack", desc:"Short caption offset outside the image boundary into the negative space." },
+  { file:"web-image/WebTextLeftTwoColImagesRightMobileStack.html", name:"Text Left, Two-Col Images Right - Mobile Stack", platform:"web", tags:["text","2-col","image"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Text left, two-column image grid right. Stacks on mobile." },
+  { file:"web-image/WebTopDownMobileTopDownDiffSize.html", name:"Top-Down - Mobile Top-Down, Different Sizes", platform:"web", tags:["stacked","image"], layout:"Top Down", mobile:"Top-down (diff size)", desc:"Vertically stacked layout adapting to different image sizes on mobile." },
   // WEB TEXT
+  { file:"web-text/AsymmetricTwoColArticleLayout.html", name:"Asymmetric Two-Col Article Layout", platform:"web", tags:["text","editorial","2-col","asymmetric","slider","image"], layout:"Editorial 2-Col", mobile:"Carousel slider", desc:"Asymmetric two-column editorial with one large featured article and stacked supporting stories; converts to a carousel on mobile.", essential:true },
+  { file:"web-text/WebChapterSectionDivider.html", name:"Chapter / Section Divider", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Full width", desc:"Full-width text-only break with a large chapter number, short label and thin rule." },
+  { file:"web-text/WebEditorialNavLeftLogoRight.html", name:"Editorial - Nav Left, Logo Right", platform:"web", tags:["text","editorial"], layout:"Editorial Nav", mobile:"--", desc:"Editorial navigation bar with logo on the right." },
+  { file:"web-text/WebEditorialCreditsStrip.html", name:"Editorial Credits Strip", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Mobile stack", desc:"Slim horizontal credits row: photographer, stylist, talent, location." },
+  { file:"web-text/WebEditorialInfoBarTwoColMobileRestack.html", name:"Editorial Info Bar - Two Col (Mobile Restack)", platform:"web", tags:["text","editorial"], layout:"Info Bar", mobile:"Mobile restack", desc:"Editorial info bar in two columns. Restacks on mobile." },
+  { file:"web-text/WebEditorialTextOpener.html", name:"Editorial Text Opener", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Full width", desc:"Large intro paragraph spanning the full width with eyebrow and body copy below.", essential:true },
+  { file:"web-text/WebPullQuoteRightAlign.html", name:"Pull Quote - Right Aligned", platform:"web", tags:["text","editorial"], layout:"Pull Quote", mobile:"--", desc:"Right-aligned editorial pull quote." },
+  { file:"web-text/snippet-section-header-tabs.html", name:"Section Header - Tabs", platform:"web", tags:["tabs"], layout:"Section Header", mobile:"--", desc:"Section header with tab navigation." },
   { file:"web-text/WebTitleLeftTextRightMobileStack.html", name:"Title Left, Text Right - Mobile Stack", platform:"web", tags:["text"], layout:"Text Split", mobile:"Mobile stack", desc:"Title left, body text right. Stacks on mobile.", essential:true },
   { file:"web-text/WebTitleRightTextLeftMobileStack.html", name:"Title Right, Text Left - Mobile Stack", platform:"web", tags:["text"], layout:"Text Split", mobile:"Mobile stack", desc:"Title right, body text left. Stacks on mobile." },
-  { file:"web-text/WebPullQuoteRightAlign.html", name:"Pull Quote - Right Aligned", platform:"web", tags:["text","editorial"], layout:"Pull Quote", mobile:"--", desc:"Right-aligned editorial pull quote." },
-  { file:"web-text/WebEditorialInfoBarTwoColMobileRestack.html", name:"Editorial Info Bar - Two Col (Mobile Restack)", platform:"web", tags:["text","editorial"], layout:"Info Bar", mobile:"Mobile restack", desc:"Editorial info bar in two columns. Restacks on mobile." },
-  { file:"web-text/WebEditorialNavLeftLogoRight.html", name:"Editorial - Nav Left, Logo Right", platform:"web", tags:["text","editorial"], layout:"Editorial Nav", mobile:"--", desc:"Editorial navigation bar with logo on the right." },
-  { file:"web-text/snippet-section-header-tabs.html", name:"Section Header - Tabs", platform:"web", tags:["tabs"], layout:"Section Header", mobile:"--", desc:"Section header with tab navigation." },
-  { file:"web-text/WebChapterSectionDivider.html", name:"Chapter / Section Divider", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Full width", desc:"Full-width text-only break with a large chapter number, short label and thin rule." },
-  { file:"web-text/WebEditorialTextOpener.html", name:"Editorial Text Opener", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Full width", desc:"Large intro paragraph spanning the full width with eyebrow and body copy below.", essential:true },
-  { file:"web-text/WebEditorialCreditsStrip.html", name:"Editorial Credits Strip", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Mobile stack", desc:"Slim horizontal credits row: photographer, stylist, talent, location." },
-  { file:"web-text/AsymmetricTwoColArticleLayout.html", name:"Asymmetric Two-Col Article Layout", platform:"web", tags:["text","editorial","2-col","asymmetric","slider","image"], layout:"Editorial 2-Col", mobile:"Carousel slider", desc:"Asymmetric two-column editorial with one large featured article and stacked supporting stories; converts to a carousel on mobile.", essential:true },
   // FULL WIDTH
-  { file:"fullwidth/FullWidthVideo.html", name:"Full Width - Video", platform:"fullwidth", tags:["video"], layout:"Full Width", mobile:"Full width", desc:"Full-width video background.", essential:true },
-  { file:"fullwidth/FullWidthVideoWithTextBelow.html", name:"Full Width - Video with Text Below", platform:"fullwidth", tags:["video","text"], layout:"Full Width", mobile:"Full width", desc:"Full-width video with a text block below." },
-  { file:"fullwidth/FullWidthVideoWithRedirectOverlay.html", name:"Full Width - Video with Redirect Overlay", platform:"fullwidth", tags:["video","overlay","link"], layout:"Full Width", mobile:"Full width", desc:"Full-width video with a clickable redirect overlay." },
-  { file:"fullwidth/FullWidthVideoTextBtmLeftWithRedirectOverlay.html", name:"Full Width - Video, Text Btm Left + Redirect Overlay", platform:"fullwidth", tags:["video","overlay","link"], layout:"Full Width", mobile:"Full width", desc:"Full-width video with text anchored bottom-left and a redirect overlay.", essential:true },
-  { file:"fullwidth/FullWidthVideoTextBtmRightWithRedirectOverlay.html", name:"Full Width - Video, Text Btm Right + Redirect Overlay", platform:"fullwidth", tags:["video","overlay","link"], layout:"Full Width", mobile:"Full width", desc:"Full-width video with text anchored bottom-right and a redirect overlay." },
+  { file:"fullwidth/FullWidthdropdown.html", name:"Full Width - Dropdown", platform:"fullwidth", tags:["interactive"], layout:"Full Width", mobile:"Full width", desc:"Full-width layout with a dropdown component." },
+  { file:"fullwidth/FullWidthHeroCentredText.html", name:"Full Width - Hero Centred Text", platform:"fullwidth", tags:["editorial","overlay","text","image"], layout:"Full Width", mobile:"Full width", desc:"100vh image with title, rule and subtitle centred — magazine cover hero.", essential:true },
   { file:"fullwidth/FullWidthImageWithTextBelow.html", name:"Full Width - Image with Text Below", platform:"fullwidth", tags:["text","image"], layout:"Full Width", mobile:"Full width", desc:"Full-width image with a text block below.", essential:true },
   { file:"fullwidth/FullWidthImageTextBtmLeftWithRedirectOverlay.html", name:"Full Width - Image, Text Btm Left + Redirect Overlay", platform:"fullwidth", tags:["overlay","link","image"], layout:"Full Width", mobile:"Full width", desc:"Full-width image with text anchored bottom-left and a redirect overlay." },
   { file:"fullwidth/FullWidthImageTextBtmRightWithRedirectOverlay.html", name:"Full Width - Image, Text Btm Right + Redirect Overlay", platform:"fullwidth", tags:["overlay","link","image"], layout:"Full Width", mobile:"Full width", desc:"Full-width image with text anchored bottom-right and a redirect overlay." },
   { file:"fullwidth/FullWidthPositionSectionLink.html", name:"Full Width - Position Section Link", platform:"fullwidth", tags:["link","image"], layout:"Full Width", mobile:"Full width", desc:"Full-width layout with a positioned section link." },
-  { file:"fullwidth/FullWidthdropdown.html", name:"Full Width - Dropdown", platform:"fullwidth", tags:["interactive"], layout:"Full Width", mobile:"Full width", desc:"Full-width layout with a dropdown component." },
-  { file:"fullwidth/FullWidthHeroCentredText.html", name:"Full Width - Hero Centred Text", platform:"fullwidth", tags:["editorial","overlay","text","image"], layout:"Full Width", mobile:"Full width", desc:"100vh image with title, rule and subtitle centred — magazine cover hero.", essential:true },
+  { file:"fullwidth/FullWidthVideo.html", name:"Full Width - Video", platform:"fullwidth", tags:["video"], layout:"Full Width", mobile:"Full width", desc:"Full-width video background.", essential:true },
+  { file:"fullwidth/FullWidthVideoWithRedirectOverlay.html", name:"Full Width - Video with Redirect Overlay", platform:"fullwidth", tags:["video","overlay","link"], layout:"Full Width", mobile:"Full width", desc:"Full-width video with a clickable redirect overlay." },
+  { file:"fullwidth/FullWidthVideoWithTextBelow.html", name:"Full Width - Video with Text Below", platform:"fullwidth", tags:["video","text"], layout:"Full Width", mobile:"Full width", desc:"Full-width video with a text block below." },
+  { file:"fullwidth/FullWidthVideoTextBtmLeftWithRedirectOverlay.html", name:"Full Width - Video, Text Btm Left + Redirect Overlay", platform:"fullwidth", tags:["video","overlay","link"], layout:"Full Width", mobile:"Full width", desc:"Full-width video with text anchored bottom-left and a redirect overlay.", essential:true },
+  { file:"fullwidth/FullWidthVideoTextBtmRightWithRedirectOverlay.html", name:"Full Width - Video, Text Btm Right + Redirect Overlay", platform:"fullwidth", tags:["video","overlay","link"], layout:"Full Width", mobile:"Full width", desc:"Full-width video with text anchored bottom-right and a redirect overlay." },
 // HOVER
-  { file:"hover/HoverImageSwap.html", name:"Hover - Image Swap", platform:"hover", tags:["hover","product","image"], layout:"Hover", mobile:"--", desc:"Three-column product grid where hovering each image crossfades to an alternate view." },
   { file:"hover/5050hover.html", name:"50/50 - Hover", platform:"hover", tags:["hover","5050","image"], layout:"50/50 Hover", mobile:"--", desc:"50/50 split with hover interaction." },
   { file:"hover/HoverGreyOutParagraph.html", name:"Hover - Grey Out Paragraph", platform:"hover", tags:["hover","text"], layout:"Hover", mobile:"--", desc:"Hovering an item greys out surrounding paragraph text." },
+  { file:"hover/HoverImageSwap.html", name:"Hover - Image Swap", platform:"hover", tags:["hover","product","image"], layout:"Hover", mobile:"--", desc:"Three-column product grid where hovering each image crossfades to an alternate view." },
+  { file:"hover/HoverSplitScreenExpand.html", name:"Hover - Split Screen Expand", platform:"hover", tags:["hover","image"], layout:"Hover", mobile:"--", desc:"Two image panels side by side — hovering one expands it while the other contracts." },
   { file:"hover/HoverTextAppearImageCentralisedDarkBackground.html", name:"Hover - Text Appear, Centralised Image Dark BG", platform:"hover", tags:["hover","text","image"], layout:"Hover", mobile:"--", desc:"Text appears on hover over a centralised image with dark background." },
   { file:"hover/HoverTextAppearImageFullScreen.html", name:"Hover - Text Appear, Full Screen Image", platform:"hover", tags:["hover","text","image"], layout:"Hover", mobile:"--", desc:"Text appears on hover over a full-screen image." },
   { file:"hover/HoverTextAppearImageVideoBtmLeftRight.html", name:"Hover - Text Appear, Video Btm Left/Right", platform:"hover", tags:["hover","video","text","image"], layout:"Hover", mobile:"--", desc:"Text appears on hover with video anchored bottom left/right." },
   { file:"hover/underlinehoverv2.html", name:"Underline Hover (v2)", platform:"hover", tags:["hover","text"], layout:"Hover", mobile:"--", desc:"Underline animation on text hover. v2." },
-  { file:"hover/HoverSplitScreenExpand.html", name:"Hover - Split Screen Expand", platform:"hover", tags:["hover","image"], layout:"Hover", mobile:"--", desc:"Two image panels side by side — hovering one expands it while the other contracts." },
   // SLIDERS
+  { file:"sliders/CarouselAutoScrollDragFree.html", name:"Carousel – Auto Scroll Drag Free", platform:"sliders", tags:["slider","product","interactive","link","image"], layout:"Auto-Scroll Carousel", mobile:"2 items visible", desc:"Horizontally auto-scrolling carousel with free-drag interaction and no visible pagination controls.", essential:true },
   { file:"sliders/CarouselAutoScrollStaticNoLink.html", name:"Carousel – Auto Scroll Static No Link", platform:"sliders", tags:["slider","image"], layout:"Carousel", mobile:"Full width", desc:"Auto-scrolling carousel, static items.", essential:true },
   { file:"sliders/CarouselAutoScrollStaticWithLink.html", name:"Carousel – Auto Scroll Static With Link", platform:"sliders", tags:["slider","link","image"], layout:"Carousel", mobile:"Full width", desc:"Auto-scrolling carousel with linked items." },
   { file:"sliders/CarouselDragFree.html", name:"Carousel – Drag Free", platform:"sliders", tags:["slider","image"], layout:"Carousel", mobile:"Full width", desc:"Carousel with free drag behaviour." },
@@ -644,45 +685,45 @@ const layouts = [
   { file:"sliders/CarouselTextBelow.html", name:"Carousel – Text Below", platform:"sliders", tags:["slider","text","image"], layout:"Carousel", mobile:"Full width", desc:"Carousel with text content below each slide." },
   { file:"sliders/CarouselWithPagination.html", name:"Carousel – With Pagination", platform:"sliders", tags:["slider","image"], layout:"Carousel", mobile:"Full width", desc:"Carousel with standard pagination.", essential:true },
   { file:"sliders/FadeSliderTextOverlay.html", name:"Fade Slider – Text Overlay", platform:"sliders", tags:["slider","banner","text","hover","interactive","link","image"], layout:"Carousel Banner", mobile:"Responsive images", desc:"Full-width fade-transition carousel with text and discovery links overlaid on editorial imagery.", essential:true },
-  { file:"sliders/CarouselAutoScrollDragFree.html", name:"Carousel – Auto Scroll Drag Free", platform:"sliders", tags:["slider","product","interactive","link","image"], layout:"Auto-Scroll Carousel", mobile:"2 items visible", desc:"Horizontally auto-scrolling carousel with free-drag interaction and no visible pagination controls.", essential:true },
   // REDIRECTS
-  { file:"redirects/WebMultiPanelSectionNav.html", name:"Multi-Panel Section Nav", platform:"redirects", tags:["tabs","link"], layout:"Section Nav", mobile:"Full width", desc:"Tab nav bar that switches between full content panels with an animated underline active state." },
   { file:"redirects/inlinetab.html", name:"Inline Tab", platform:"redirects", tags:["tabs"], layout:"Tab", mobile:"Full width", desc:"Inline tab component." },
+  { file:"redirects/WebMultiPanelSectionNav.html", name:"Multi-Panel Section Nav", platform:"redirects", tags:["tabs","link"], layout:"Section Nav", mobile:"Full width", desc:"Tab nav bar that switches between full content panels with an animated underline active state." },
   { file:"redirects/nestedtabscontent-js.html", name:"Nested Tabs Content (JS)", platform:"redirects", tags:["tabs"], layout:"Tab", mobile:"Full width", desc:"Nested tabs with JS-driven content switching." },
   { file:"redirects/redirectToNestedPageTabs-from.html", name:"Redirect to Nested Tabs - From Page", platform:"redirects", tags:["tabs","link"], layout:"Redirect", mobile:"Full width", desc:"The 'from' page of a redirect-to-nested-tab flow." },
   { file:"redirects/redirectToNestedPageTabs-to.html", name:"Redirect to Nested Tabs - To Page", platform:"redirects", tags:["tabs","link"], layout:"Redirect", mobile:"Full width", desc:"The 'to' page of a redirect-to-nested-tab flow." },
   { file:"redirects/TopImageWithSmoothScrollRedirect.html", name:"Top Image - Smooth Scroll Redirect", platform:"redirects", tags:["link","scroll","image"], layout:"Redirect", mobile:"Full width", desc:"Top image with a smooth-scroll redirect on click." },
   // SPECIAL
-  { file:"special/homepage-sale-banner.html", name:"Homepage Sale Banner", platform:"special", tags:["banner"], layout:"Banner", mobile:"Full width", desc:"Sale banner for the homepage." },
-  { file:"special/slider-promo-banner.html", name:"Slider Promo Banner", platform:"special", tags:["slider","banner","image"], layout:"Banner", mobile:"Full width", desc:"Promotional slider banner." },
-  { file:"special/plp-video-banner.html", name:"PLP Video Banner", platform:"special", tags:["video","banner"], layout:"Banner", mobile:"Full width", desc:"Video banner for PLP pages." },
+  { file:"special/AccordionFAQ.html", name:"Accordion / FAQ", platform:"special", tags:["interactive","text"], layout:"Accordion", mobile:"Full width", desc:"Expandable FAQ sections with rotating plus/cross icon — one open at a time.", essential:true },
+  { file:"special/AnnouncementBar.html", name:"Announcement Bar", platform:"special", tags:["banner","interactive"], layout:"Banner", mobile:"Full width", desc:"Slim dismissible top banner for shipping promotions or campaign messages.", essential:true },
+  { file:"special/BackToTopButton.html", name:"Back To Top Button", platform:"special", tags:["interactive","scroll","navigation"], layout:"Navigation", mobile:"Full width", desc:"Fixed bottom-right button that fades in after scrolling 300px and smooth-scrolls the page back to the top."},
+  { file:"special/CountdownTimer.html", name:"Countdown Timer", platform:"special", tags:["interactive"], layout:"Timer", mobile:"Full width", desc:"Days / hours / minutes / seconds countdown to a target date. JS-driven." },
   { file:"special/EmbedImagePLP.html", name:"Embed Image - PLP", platform:"special", tags:["embed","image"], layout:"Embed", mobile:"Full width", desc:"Image embedded within a PLP block." },
   { file:"special/EmbedVideoPLP-mp4.html", name:"Embed Video - PLP (MP4)", platform:"special", tags:["embed","video"], layout:"Embed", mobile:"Full width", desc:"MP4 video embedded within a PLP block." },
+  { file:"special/homepage-sale-banner.html", name:"Homepage Sale Banner", platform:"special", tags:["banner"], layout:"Banner", mobile:"Full width", desc:"Sale banner for the homepage." },
+  { file:"special/MarqueeTicker.html", name:"Marquee Ticker", platform:"special", tags:["scroll"], layout:"Ticker", mobile:"Full width", desc:"Infinitely looping CSS marquee strip for announcements or brand messaging.", essential:true },
   { file:"special/multivideocontrol-base.html", name:"Multi Video Control - Base", platform:"special", tags:["video"], layout:"Video Control", mobile:"Full width", desc:"Base multi-video control component." },
   { file:"special/multivideocontrol-fullscr-forward.html", name:"Multi Video Control - Full Screen Forward", platform:"special", tags:["video"], layout:"Video Control", mobile:"Full width", desc:"Multi-video control with full-screen forward behaviour." },
+  { file:"special/plp-video-banner.html", name:"PLP Video Banner", platform:"special", tags:["video","banner"], layout:"Banner", mobile:"Full width", desc:"Video banner for PLP pages." },
+  { file:"special/ProductImageHoverReveal.html", name:"Product Image - Hover for Description", platform:"special", tags:["interactive","product","overlay","hover","image"], layout:"Hover Reveal", mobile:"Full width", desc:"Product image with 3 positioned hotspot circles. Hover reveals a label and description tooltip. Tap-to-toggle on mobile." },
+  { file:"special/ProgressNavBar.html", name:"Progress Nav Bar", platform:"special", tags:["interactive","sticky","navigation"], layout:"Navigation", mobile:"Full width", desc:"Fixed section progress indicator with clickable dots. Desktop: left side. Mobile: bottom bar." },
+  { file:"special/question.html", name:"Question Component", platform:"special", tags:["interactive"], layout:"Interactive", mobile:"Full width", desc:"Interactive question component." },
+  { file:"special/quiz-multi-hybrid-base.html", name:"Quiz - Multi Hybrid Base", platform:"special", tags:["quiz","interactive"], layout:"Quiz", mobile:"Full width", desc:"Base template for a multi-answer hybrid quiz." },
+  { file:"special/quiz-single-hybrid-base.html", name:"Quiz - Single Hybrid Base", platform:"special", tags:["quiz","interactive"], layout:"Quiz", mobile:"Full width", desc:"Base template for a single-answer hybrid quiz." },
+  { file:"special/ReadMoreToggle.html", name:"Read More Toggle", platform:"special", tags:["interactive","text"], layout:"Text Toggle", mobile:"Full width", desc:"Long text collapsed to 3 lines with a Read more / Read less toggle." },
   { file:"special/removeBlackBorderFromVideo.html", name:"Remove Black Border from Video", platform:"special", tags:["video"], layout:"Video Utility", mobile:"Full width", desc:"Removes the letterbox border from a video element." },
-  { file:"sliders/ScrollVideoScrubber.html", name:"Scroll Video Scrubber", platform:"special", tags:["video","scroll"], layout:"Scroll Effect", mobile:"Full width", desc:"Video that scrubs forward/backward on scroll." },
   { file:"special/scrollvid.html", name:"Scroll Video", platform:"special", tags:["scroll","video"], layout:"Scroll Effect", mobile:"Full width", desc:"Video that plays as the user scrolls." },
+  { file:"sliders/ScrollVideoScrubber.html", name:"Scroll Video Scrubber", platform:"special", tags:["video","scroll"], layout:"Scroll Effect", mobile:"Full width", desc:"Video that scrubs forward/backward on scroll." },
   { file:"special/ScrollZoomInOutDynamic.html", name:"Scroll Zoom In/Out - Dynamic", platform:"special", tags:["scroll","video"], layout:"Scroll Effect", mobile:"Full width", desc:"Dynamic scroll-driven zoom in/out effect." },
   { file:"special/ScrollZoomInOutStatic.html", name:"Scroll Zoom In/Out - Static", platform:"special", tags:["scroll"], layout:"Scroll Effect", mobile:"Full width", desc:"Static scroll-driven zoom in/out effect." },
-  { file:"special/textleft-rightimgscroll.html", name:"Text Left - Right Image Scroll", platform:"special", tags:["scroll","text","image"], layout:"Scroll Effect", mobile:"Full width", desc:"Fixed text left with image scrolling on the right." },
+  { file:"special/slider-promo-banner.html", name:"Slider Promo Banner", platform:"special", tags:["slider","banner","image"], layout:"Banner", mobile:"Full width", desc:"Promotional slider banner." },
+  { file:"special/StickyCTABar.html", name:"Sticky CTA Bar", platform:"special", tags:["sticky","link"], layout:"Sticky", mobile:"Full width", desc:"Product name, price and Add to Bag button fixed to the bottom after scroll threshold.", essential:true },
   { file:"special/stickytext.html", name:"Sticky Text", platform:"special", tags:["scroll","text","sticky"], layout:"Sticky", mobile:"Full width", desc:"Text that sticks in place while scrolling past a section." },
+  { file:"special/SwatchSelector.html", name:"Swatch Selector", platform:"special", tags:["interactive","product","image"], layout:"Swatch", mobile:"Full width", desc:"Colour dot swatches that swap the product image and update the displayed colour name." },
+  { file:"special/tableformatting.html", name:"Table Formatting", platform:"special", tags:["text","table"], layout:"Table", mobile:"Full width", desc:"Styled table formatting template." },
   { file:"special/text-center-sticky-fade.html", name:"Text Center - Sticky Fade", platform:"special", tags:["scroll","text","sticky"], layout:"Sticky", mobile:"Full width", desc:"Centered text that fades out as it sticks during scroll." },
   { file:"special/text-center-sticky-remain.html", name:"Text Center - Sticky Remain", platform:"special", tags:["scroll","text","sticky"], layout:"Sticky", mobile:"Full width", desc:"Centered text that remains pinned during scroll." },
-  { file:"special/quiz-single-hybrid-base.html", name:"Quiz - Single Hybrid Base", platform:"special", tags:["quiz","interactive"], layout:"Quiz", mobile:"Full width", desc:"Base template for a single-answer hybrid quiz." },
-  { file:"special/quiz-multi-hybrid-base.html", name:"Quiz - Multi Hybrid Base", platform:"special", tags:["quiz","interactive"], layout:"Quiz", mobile:"Full width", desc:"Base template for a multi-answer hybrid quiz." },
-  { file:"special/question.html", name:"Question Component", platform:"special", tags:["interactive"], layout:"Interactive", mobile:"Full width", desc:"Interactive question component." },
-  { file:"special/tableformatting.html", name:"Table Formatting", platform:"special", tags:["text","table"], layout:"Table", mobile:"Full width", desc:"Styled table formatting template." },
-  { file:"special/timeline.html", name:"Timeline", platform:"special", tags:["text","timeline"], layout:"Timeline", mobile:"Full width", desc:"Vertical timeline layout." },
-  { file:"special/AnnouncementBar.html", name:"Announcement Bar", platform:"special", tags:["banner","interactive"], layout:"Banner", mobile:"Full width", desc:"Slim dismissible top banner for shipping promotions or campaign messages.", essential:true },
-  { file:"special/MarqueeTicker.html", name:"Marquee Ticker", platform:"special", tags:["scroll"], layout:"Ticker", mobile:"Full width", desc:"Infinitely looping CSS marquee strip for announcements or brand messaging.", essential:true },
-  { file:"special/CountdownTimer.html", name:"Countdown Timer", platform:"special", tags:["interactive"], layout:"Timer", mobile:"Full width", desc:"Days / hours / minutes / seconds countdown to a target date. JS-driven." },
-  { file:"special/AccordionFAQ.html", name:"Accordion / FAQ", platform:"special", tags:["interactive","text"], layout:"Accordion", mobile:"Full width", desc:"Expandable FAQ sections with rotating plus/cross icon — one open at a time.", essential:true },
-  { file:"special/ReadMoreToggle.html", name:"Read More Toggle", platform:"special", tags:["interactive","text"], layout:"Text Toggle", mobile:"Full width", desc:"Long text collapsed to 3 lines with a Read more / Read less toggle." },
-  { file:"special/StickyCTABar.html", name:"Sticky CTA Bar", platform:"special", tags:["sticky","link"], layout:"Sticky", mobile:"Full width", desc:"Product name, price and Add to Bag button fixed to the bottom after scroll threshold.", essential:true },
-  { file:"special/SwatchSelector.html", name:"Swatch Selector", platform:"special", tags:["interactive","product","image"], layout:"Swatch", mobile:"Full width", desc:"Colour dot swatches that swap the product image and update the displayed colour name." },
-  { file:"special/ProgressNavBar.html", name:"Progress Nav Bar", platform:"special", tags:["interactive","sticky","navigation"], layout:"Navigation", mobile:"Full width", desc:"Fixed section progress indicator with clickable dots. Desktop: left side. Mobile: bottom bar." },
-  { file:"special/ProductImageHoverReveal.html", name:"Product Image - Hover for Description", platform:"special", tags:["interactive","product","overlay","hover","image"], layout:"Hover Reveal", mobile:"Full width", desc:"Product image with 3 positioned hotspot circles. Hover reveals a label and description tooltip. Tap-to-toggle on mobile." }
+  { file:"special/textleft-rightimgscroll.html", name:"Text Left - Right Image Scroll", platform:"special", tags:["scroll","text","image"], layout:"Scroll Effect", mobile:"Full width", desc:"Fixed text left with image scrolling on the right." },
+  { file:"special/timeline.html", name:"Timeline", platform:"special", tags:["text","timeline"], layout:"Timeline", mobile:"Full width", desc:"Vertical timeline layout." }
 ];
 
 // Prefix all file paths with BASE so iframe src resolves correctly from this page's location
@@ -779,9 +820,11 @@ const PLATFORM_ORDER = ['web','desktop','mobile','fullwidth','hover','sliders','
 // Entry point after any filter/search change.
 // Sorts all matching items by platform order, resets to page 1, then renders the first page.
 function renderCards(items) {
-  allFilteredItems = [...items].sort((a, b) =>
-    PLATFORM_ORDER.indexOf(a.platform) - PLATFORM_ORDER.indexOf(b.platform)
-  );
+  allFilteredItems = [...items].sort((a, b) => {
+    const pDiff = PLATFORM_ORDER.indexOf(a.platform) - PLATFORM_ORDER.indexOf(b.platform);
+    if (pDiff !== 0) return pDiff;
+    return a.name.localeCompare(b.name);
+  });
   currentPage = 1;
   renderPage();
 }
@@ -865,6 +908,9 @@ function renderPage() {
       const iframe = card.querySelector('iframe');
       const prevEl = card.querySelector('.card-preview');
       iframe.addEventListener('load', () => prevEl.classList.add('loaded'));
+
+      card.addEventListener('mouseenter', () => card.classList.add('hovered'));
+      card.addEventListener('mouseleave', () => card.classList.remove('hovered'));
 
       card.querySelector('[data-action="expand"]').addEventListener('click', e => {
         e.stopPropagation(); openDrawer(item);
@@ -1393,6 +1439,18 @@ openDrawer = function(item) {
   if (tabCode.classList.contains('active')) loadCode(item.file);
   _origOpenDrawer(item);
 };
+</script>
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+<script>
+  (function(){
+    const btn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      btn.classList.toggle('visible', window.scrollY > 300);
+    }, { passive: true });
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  })();
 </script>
 <script>
   // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank)

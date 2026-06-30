@@ -81,7 +81,7 @@ One short phrase. Common values:
 
 ## Section comments in the array (for placement)
 
-Insert new entries under the matching comment block:
+Insert new entries anywhere under the matching comment block — the viewer sorts entries alphabetically by name within each section automatically:
 
 ```
 // DESKTOP

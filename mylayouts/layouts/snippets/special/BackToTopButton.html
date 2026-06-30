@@ -1,0 +1,83 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* Demo Content */
+.demo-content {
+  font-family: proxima-nova;
+  height: 200vh;
+  padding: 40px 24px;
+}
+
+/* Demo Content > P */
+.demo-content p {
+  color: #999;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+/* Back To Top */
+.back-to-top {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid #e0e0e0;
+  bottom: 32px;
+  color: #999;
+  cursor: pointer;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  right: 32px;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.2s ease, color 0.2s ease;
+  width: 40px;
+  z-index: 90;
+}
+
+/* Back To Top — Visible */
+.back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Back To Top — Hover */
+.back-to-top:hover {
+  border-color: #000;
+  color: #000;
+}
+
+/* Back To Top — SVG Icon */
+.back-to-top svg {
+  fill: none;
+  height: 14px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+  width: 14px;
+}
+</style>
+
+<div class="demo-content">
+  <p>↓ Scroll down to trigger the back to top button</p>
+</div>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function () {
+  var btn = document.getElementById('backToTop');
+  window.addEventListener('scroll', function () {
+    btn.classList.toggle('visible', window.scrollY > 300);
+  }, { passive: true });
+  btn.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
