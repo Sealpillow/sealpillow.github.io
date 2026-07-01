@@ -914,18 +914,7 @@ function renderPage() {
 
       const iframe = card.querySelector('iframe');
       const prevEl = card.querySelector('.card-preview');
-      iframe.addEventListener('load', function onFirstLoad() {
-        iframe.removeEventListener('load', onFirstLoad);
-        const src = iframe.src;
-        iframe.src = 'about:blank';
-        requestAnimationFrame(() => { iframe.src = src; });
-        iframe.addEventListener('load', function onReady() {
-          if (iframe.src !== 'about:blank') {
-            prevEl.classList.add('loaded');
-            iframe.removeEventListener('load', onReady);
-          }
-        });
-      });
+      iframe.addEventListener('load', () => prevEl.classList.add('loaded'));
 
       card.addEventListener('mouseenter', () => card.classList.add('hovered'));
       card.addEventListener('mouseleave', () => card.classList.remove('hovered'));
