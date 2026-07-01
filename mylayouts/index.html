@@ -520,7 +520,7 @@
   <div class="drawer-stage" id="drawer-stage">
     <div class="stage-inner" id="stage-inner">
       <div class="stage-loader" id="stage-loader"><div class="spinner"></div></div>
-      <iframe id="drawer-iframe" src="about:blank" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" allow="autoplay"></iframe>
+      <iframe id="drawer-iframe" src="about:blank" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
     </div>
   </div>
   <div class="code-panel" id="code-panel">
@@ -914,7 +914,18 @@ function renderPage() {
 
       const iframe = card.querySelector('iframe');
       const prevEl = card.querySelector('.card-preview');
-      iframe.addEventListener('load', () => prevEl.classList.add('loaded'));
+      iframe.addEventListener('load', function onFirstLoad() {
+        iframe.removeEventListener('load', onFirstLoad);
+        const src = iframe.src;
+        iframe.src = 'about:blank';
+        requestAnimationFrame(() => { iframe.src = src; });
+        iframe.addEventListener('load', function onReady() {
+          if (iframe.src !== 'about:blank') {
+            prevEl.classList.add('loaded');
+            iframe.removeEventListener('load', onReady);
+          }
+        });
+      });
 
       card.addEventListener('mouseenter', () => card.classList.add('hovered'));
       card.addEventListener('mouseleave', () => card.classList.remove('hovered'));
