@@ -793,7 +793,7 @@ function extraTagHTML(tags) {
 const IFRAME_W        = 1280; // desktop snippet viewport width
 const IFRAME_W_MOBILE = 375;  // mobile snippet viewport width
 const CARD_W          = 280;  // card thumbnail width (matches CSS minmax)
-const ITEMS_PER_PAGE  = 20;
+function getItemsPerPage() { return window.innerWidth <= 767 ? 10 : 20; }
 
 let currentPage       = 1;
 let allFilteredItems  = []; // holds the full sorted+filtered list across all pages
@@ -856,8 +856,9 @@ function renderPage() {
     return;
   }
 
-  const start     = (currentPage - 1) * ITEMS_PER_PAGE;
-  const end       = Math.min(start + ITEMS_PER_PAGE, total);
+  const itemsPerPage = getItemsPerPage();
+  const start     = (currentPage - 1) * itemsPerPage;
+  const end       = Math.min(start + itemsPerPage, total);
   const pageItems = allFilteredItems.slice(start, end);
 
   // Group the current page's items by platform so we can render section dividers
