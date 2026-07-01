@@ -227,50 +227,66 @@ Each snippet has a matching entry in `mylayouts/layouts/prompts.json` keyed by i
 ### Prompt format
 
 ```
-Create a [description] using HTML, CSS, and [vanilla JavaScript / no JS].
+### Goal
+One paragraph describing what the component renders and its key behaviour.
 
 ### Dependencies
-* CDN name and version (one per bullet)
+* CDN name and version — full CDN URL
 
-### Structure
-* Class names, CSS properties, HTML elements, specific values
+### Architecture
+* How the data is structured and how the component is built (JS-heavy components only)
+
+### Layout
+* Structural details — containers, columns, positioning, sizing
+
+### Styling
+* CSS properties — fonts, colours, spacing, transitions
 
 ### Behaviour
-* JS functions, event listeners, logic
+* JS interactions — event listeners, functions, logic
 
 ### Responsive
-* @media breakpoints and what changes at each
+* Breakpoint — what changes at each viewport size
+
+### Code Quality
+* Specific constraints or rules the implementation must follow
 
 ### Output Requirements
-* Return a complete HTML file
-* Separate HTML, CSS, and JavaScript into clearly commented sections
+* Return only the component implementation — do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>
+* Output in this order: dependency CSS imports, dependency JavaScript imports, HTML, CSS, JavaScript
+* Place all dependency imports at the beginning
+* Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments
 * Use semantic HTML where appropriate
-* Do not use external JavaScript libraries other than those listed in Dependencies above
-* Write clean, reusable code
-* Load all dependency CSS and JS in <head>
+* Write clean, reusable, and modular code
+* Do not use libraries other than those listed in Dependencies
 ```
 
 ### Section rules
 
 | Section | Include when |
 |---|---|
-| `### Dependencies` | Snippet uses any CDN (Bootstrap, Splide, Swiper, jQuery, etc.) |
-| `### Structure` | Always |
-| `### Behaviour` | Snippet has JavaScript |
-| `### Responsive` | Snippet has `@media` breakpoints or mobile-specific logic |
+| `### Goal` | Always — one prose paragraph, no bullets |
+| `### Dependencies` | Always — use `* No external dependencies.` if none |
+| `### Architecture` | Component uses a JS data array to drive rendering, or has multiple distinct script blocks |
+| `### Layout` | Always |
+| `### Styling` | Always |
+| `### Behaviour` | Snippet has JavaScript interaction |
+| `### Responsive` | Snippet has `@media` breakpoints or responsive JS logic |
+| `### Code Quality` | Component has specific structural constraints worth enforcing |
 | `### Output Requirements` | Always — use the exact bullets above, unchanged |
 
 ### Writing good bullets
 
-- Be specific: class names, exact CSS values, element types, function names
-- No backtick formatting around values — plain text only (e.g. `display:grid` not `` `display:grid` ``)
+- Be specific: class names, exact CSS values, element types, function names, CDN URLs
+- No backtick formatting — plain text only
 - One concern per bullet; keep bullets concise
-- For `### Dependencies`, list each CDN library on its own bullet with version (e.g. `* Bootstrap 4.6.2 CSS & JS CDN`)
+- Goal section is prose only — no bullets
+- All other sections (Dependencies, Layout, Styling, etc.) use `* ` bullets exclusively
 
 ### JSON format
 
 In the JSON file, use `\n` for newlines within the string value:
 
 ```json
-"category/FileName.html": "Create a ... using HTML, CSS, and vanilla JavaScript.\n\n### Dependencies\n* Bootstrap 4.6.2 CSS & JS CDN\n\n### Structure\n* .wrapper — display:grid; grid-template-columns:1fr 1fr\n\n### Output Requirements\n* Return a complete HTML file\n* Separate HTML, CSS, and JavaScript into clearly commented sections\n* Use semantic HTML where appropriate\n* Do not use external JavaScript libraries other than those listed in Dependencies above\n* Write clean, reusable code\n* Load all dependency CSS and JS in <head>"
+"category/FileName.html": "### Goal\nA two-column responsive layout...\n\n### Dependencies\n* Bootstrap 4.6.2 — https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css\n\n### Layout\n* Outer wrapper is a CSS grid with two equal columns.\n* ...\n\n### Styling\n* ...\n\n### Responsive\n* Below 768px: columns stack vertically.\n\n### Output Requirements\n* Return only the component implementation — do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>\n* Output in this order: dependency CSS imports, dependency JavaScript imports, HTML, CSS, JavaScript\n* Place all dependency imports at the beginning\n* Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments\n* Use semantic HTML where appropriate\n* Write clean, reusable, and modular code\n* Do not use libraries other than those listed in Dependencies"
 ```
