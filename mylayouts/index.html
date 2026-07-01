@@ -848,7 +848,8 @@ function renderPage() {
   paginationTopEl.innerHTML= '';
 
   const total      = allFilteredItems.length;
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  const itemsPerPage = getItemsPerPage();
+  const totalPages = Math.ceil(total / itemsPerPage);
   badge.textContent = `${total} layout${total!==1?'s':''}`;
 
   if (!total) {
@@ -856,7 +857,6 @@ function renderPage() {
     return;
   }
 
-  const itemsPerPage = getItemsPerPage();
   const start     = (currentPage - 1) * itemsPerPage;
   const end       = Math.min(start + itemsPerPage, total);
   const pageItems = allFilteredItems.slice(start, end);
