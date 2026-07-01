@@ -231,6 +231,7 @@
                 video.style.display   = 'block';
                 video.src             = item.dataset.video;
                 video.load();
+                video.play().catch(function () {});
             }
 
             caption.innerHTML = item.dataset.caption;
