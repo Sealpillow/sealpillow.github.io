@@ -252,13 +252,14 @@ One paragraph describing what the component renders and its key behaviour.
 * Specific constraints or rules the implementation must follow
 
 ### Output Requirements
-* Return only the component implementation — do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>
-* Output in this order: dependency CSS imports, dependency JavaScript imports, HTML, CSS, JavaScript
-* Place all dependency imports at the beginning
-* Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments
-* Use semantic HTML where appropriate
-* Write clean, reusable, and modular code
-* Do not use libraries other than those listed in Dependencies
+* Return only the component implementation.
+* Do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>.
+* Output content in the following order: dependency CSS imports (<link>), dependency JavaScript imports (<script>), HTML, CSS, JavaScript.
+* Place all dependency imports at the beginning of the output.
+* Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments.
+* Use semantic HTML where appropriate.
+* Write clean, reusable, and modular code.
+* Do not use libraries other than those listed in Dependencies.
 ```
 
 ### Section rules
@@ -288,5 +289,5 @@ One paragraph describing what the component renders and its key behaviour.
 In the JSON file, use `\n` for newlines within the string value:
 
 ```json
-"category/FileName.html": "### Goal\nA two-column responsive layout...\n\n### Dependencies\n* Bootstrap 4.6.2 — https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css\n\n### Layout\n* Outer wrapper is a CSS grid with two equal columns.\n* ...\n\n### Styling\n* ...\n\n### Responsive\n* Below 768px: columns stack vertically.\n\n### Output Requirements\n* Return only the component implementation — do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>\n* Output in this order: dependency CSS imports, dependency JavaScript imports, HTML, CSS, JavaScript\n* Place all dependency imports at the beginning\n* Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments\n* Use semantic HTML where appropriate\n* Write clean, reusable, and modular code\n* Do not use libraries other than those listed in Dependencies"
+"category/FileName.html": "### Goal\nA two-column responsive layout...\n\n### Dependencies\n* Bootstrap 4.6.2 — https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css\n\n### Layout\n* Outer wrapper is a CSS grid with two equal columns.\n* ...\n\n### Styling\n* ...\n\n### Responsive\n* Below 768px: columns stack vertically.\n\n### Output Requirements\n* Return only the component implementation.\n* Do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>.\n* Output content in the following order: dependency CSS imports (<link>), dependency JavaScript imports (<script>), HTML, CSS, JavaScript.\n* Place all dependency imports at the beginning of the output.\n* Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments.\n* Use semantic HTML where appropriate.\n* Write clean, reusable, and modular code.\n* Do not use libraries other than those listed in Dependencies."
 ```
