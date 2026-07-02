@@ -224,70 +224,20 @@ If the snippet code is unclear or could be categorised multiple ways, ask one cl
 
 Each snippet has a matching entry in `mylayouts/layouts/prompts.json` keyed by its path relative to the `snippets/` folder (e.g. `"sliders/CarouselWithPagination.html"`).
 
-### Prompt format
+### How to generate the prompt
 
-```
-### Goal
-One paragraph describing what the component renders and its key behaviour.
+Read `mylayouts/html-css-js-prompt-extraction-guide.md` and follow it to extract a prompt from the snippet code. The guide covers:
 
-### Dependencies
-* CDN name and version — full CDN URL
+- How to determine the complexity level (L1 / L2 / L3)
+- Which sections to include and what to extract for each
+- The exact Output Requirements to use (Snippet Mode)
 
-### Architecture
-* How the data is structured and how the component is built (JS-heavy components only)
-
-### Layout
-* Structural details — containers, columns, positioning, sizing
-
-### Styling
-* CSS properties — fonts, colours, spacing, transitions
-
-### Behaviour
-* JS interactions — event listeners, functions, logic
-
-### Responsive
-* Breakpoint — what changes at each viewport size
-
-### Code Quality
-* Specific constraints or rules the implementation must follow
-
-### Output Requirements
-* Return only the component implementation.
-* Do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>.
-* Output content in the following order: dependency CSS imports (<link>), dependency JavaScript imports (<script>), HTML, CSS, JavaScript.
-* Place all dependency imports at the beginning of the output.
-* Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments.
-* Use semantic HTML where appropriate.
-* Write clean, reusable, and modular code.
-* Do not use libraries other than those listed in Dependencies.
-```
-
-### Section rules
-
-| Section | Include when |
-|---|---|
-| `### Goal` | Always — one prose paragraph, no bullets |
-| `### Dependencies` | Always — use `* No external dependencies.` if none |
-| `### Architecture` | Component uses a JS data array to drive rendering, or has multiple distinct script blocks |
-| `### Layout` | Always |
-| `### Styling` | Always |
-| `### Behaviour` | Snippet has JavaScript interaction |
-| `### Responsive` | Snippet has `@media` breakpoints or responsive JS logic |
-| `### Code Quality` | Component has specific structural constraints worth enforcing |
-| `### Output Requirements` | Always — use the exact bullets above, unchanged |
-
-### Writing good bullets
-
-- Be specific: class names, exact CSS values, element types, function names, CDN URLs
-- No backtick formatting — plain text only
-- One concern per bullet; keep bullets concise
-- Goal section is prose only — no bullets
-- All other sections (Dependencies, Layout, Styling, etc.) use `* ` bullets exclusively
+The text output from that process becomes the value for the prompts.json entry.
 
 ### JSON format
 
 In the JSON file, use `\n` for newlines within the string value:
 
 ```json
-"category/FileName.html": "### Goal\nA two-column responsive layout...\n\n### Dependencies\n* Bootstrap 4.6.2 — https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css\n\n### Layout\n* Outer wrapper is a CSS grid with two equal columns.\n* ...\n\n### Styling\n* ...\n\n### Responsive\n* Below 768px: columns stack vertically.\n\n### Output Requirements\n* Return only the component implementation.\n* Do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>.\n* Output content in the following order: dependency CSS imports (<link>), dependency JavaScript imports (<script>), HTML, CSS, JavaScript.\n* Place all dependency imports at the beginning of the output.\n* Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments.\n* Use semantic HTML where appropriate.\n* Write clean, reusable, and modular code.\n* Do not use libraries other than those listed in Dependencies."
+"category/FileName.html": "### Goal\nA two-column responsive layout...\n\n### Dependencies\n* Bootstrap 4.6.2 — https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css\n\n### Layout\n* Outer wrapper is a CSS grid with two equal columns.\n\n### Styling\n* ...\n\n### Responsive\n* Below 768px: columns stack vertically.\n\n### Output Requirements\n* Return only the component implementation.\n* Do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>.\n* Output content in the following order: dependency CSS imports (<link>), dependency JavaScript imports (<script>), HTML, CSS, JavaScript.\n* Place all dependency imports at the beginning of the output.\n* Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments.\n* Use semantic HTML where appropriate.\n* Write clean, reusable, and modular code.\n* Do not use libraries other than those listed in Dependencies."
 ```

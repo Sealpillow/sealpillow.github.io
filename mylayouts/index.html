@@ -392,6 +392,137 @@
     .grid-wrap   { padding: 16px 32px 60px; }
   }
 
+  /* GUIDE BUTTON */
+  .guide-btn {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border: 1px solid var(--border); border-radius: 50%;
+    background: transparent; color: var(--text-muted);
+    font-size: 13px; font-family: var(--sans); font-weight: 500;
+    cursor: pointer; transition: border-color 0.15s, color 0.15s;
+    display: flex; align-items: center; justify-content: center; line-height: 1;
+  }
+  .guide-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* GUIDE MODAL */
+  .guide-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .guide-overlay.open { display: flex; }
+  .guide-modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; width: 100%; max-width: 720px;
+    max-height: 88vh; display: flex; flex-direction: column;
+    animation: guideIn 0.18s ease both;
+  }
+  @keyframes guideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .guide-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 16px 0; flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .guide-tabs { display: flex; gap: 2px; flex: 1; }
+  .guide-tab {
+    padding: 7px 14px; font-size: 11px; font-weight: 500; font-family: var(--sans);
+    background: transparent; border: none; border-bottom: 2px solid transparent;
+    color: var(--text-muted); cursor: pointer; transition: color 0.15s, border-color 0.15s;
+    margin-bottom: -1px;
+  }
+  .guide-tab:hover { color: var(--text-primary); }
+  .guide-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .guide-close {
+    background: none; border: none; color: var(--text-muted);
+    font-size: 18px; cursor: pointer; padding: 0 4px 8px; line-height: 1;
+    transition: color 0.15s; margin-left: auto;
+  }
+  .guide-close:hover { color: var(--text-primary); }
+  .guide-body {
+    overflow-y: auto; padding: 28px 32px; flex: 1; min-height: 0;
+  }
+  /* BUILD PROMPT FORM */
+  .build-panel { display: none; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; padding: 20px 24px; gap: 0; }
+  .build-panel.active { display: flex; }
+  .guide-body.active { display: block; }
+  .guide-body:not(.active) { display: none; }
+  .level-row { display: flex; gap: 6px; margin-bottom: 20px; align-items: center; }
+  .level-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-right: 4px; }
+  .level-pill {
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;
+    border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.12s; font-family: var(--sans);
+  }
+  .level-pill:hover { border-color: var(--border-active); color: var(--text-primary); }
+  .level-pill.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .form-section { margin-bottom: 14px; }
+  .form-section-label {
+    display: flex; align-items: baseline; gap: 8px;
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted); margin-bottom: 5px; font-family: var(--sans);
+  }
+  .form-section-hint { font-size: 10px; color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .form-section textarea {
+    width: 100%; background: #111; border: 1px solid var(--border); border-radius: 5px;
+    color: var(--text-primary); font-size: 12px; font-family: var(--mono);
+    padding: 10px 12px; resize: vertical; min-height: 72px; line-height: 1.6;
+    outline: none; transition: border-color 0.15s;
+  }
+  .form-section textarea:focus { border-color: var(--accent); }
+  .form-section textarea::placeholder { color: var(--text-muted); }
+  .build-footer {
+    flex-shrink: 0; padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+  }
+  .build-copy-btn {
+    padding: 7px 18px; font-size: 12px; font-weight: 500; font-family: var(--sans);
+    background: var(--accent); color: #0e0e0e; border: none; border-radius: 5px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .build-copy-btn:hover { background: #d9bc82; }
+  .build-copy-btn.copied { background: #4a7c59; color: #fff; }
+  .build-clear-btn {
+    padding: 7px 14px; font-size: 12px; font-family: var(--sans);
+    background: transparent; color: var(--text-muted); border: 1px solid var(--border);
+    border-radius: 5px; cursor: pointer; transition: all 0.12s;
+  }
+  .build-clear-btn:hover { color: var(--text-primary); border-color: var(--border-active); }
+  /* Scrollbar */
+  .guide-body::-webkit-scrollbar,
+  .build-panel::-webkit-scrollbar { width: 5px; }
+  .guide-body::-webkit-scrollbar-track,
+  .build-panel::-webkit-scrollbar-track { background: transparent; }
+  .guide-body::-webkit-scrollbar-thumb,
+  .build-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  .guide-body::-webkit-scrollbar-thumb:hover,
+  .build-panel::-webkit-scrollbar-thumb:hover { background: var(--border-active); }
+  .guide-content pre::-webkit-scrollbar { height: 4px; }
+  .guide-content pre::-webkit-scrollbar-track { background: transparent; }
+  .guide-content pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  .guide-content pre::-webkit-scrollbar-thumb:hover { background: var(--border-active); }
+  /* Rendered markdown styles */
+  .guide-content h1 { font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 28px 0 12px; letter-spacing: 0.04em; }
+  .guide-content h1:first-child { margin-top: 0; }
+  .guide-content h2 { font-size: 12px; font-weight: 600; color: var(--accent); margin: 24px 0 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .guide-content h3 { font-size: 12px; font-weight: 600; color: var(--text-primary); margin: 18px 0 8px; }
+  .guide-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 10px; }
+  .guide-content ul { list-style: none; padding: 0; margin: 0 0 12px; }
+  .guide-content ul li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; padding-left: 14px; position: relative; margin-bottom: 3px; }
+  .guide-content ul li::before { content: '·'; position: absolute; left: 0; color: var(--text-muted); }
+  .guide-content hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+  .guide-content strong { color: var(--text-primary); font-weight: 600; }
+  .guide-content code { font-family: var(--mono); font-size: 11px; background: #1e1e1e; color: var(--accent); padding: 1px 5px; border-radius: 3px; }
+  .guide-content pre { background: #111; border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; margin: 10px 0 14px; overflow-x: auto; }
+  .guide-content pre code { background: none; color: var(--text-secondary); padding: 0; font-size: 11px; line-height: 1.6; }
+  .guide-content table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0 16px; }
+  .guide-content th { text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .guide-content td { padding: 7px 10px; border-bottom: 1px solid #1e1e1e; color: var(--text-secondary); line-height: 1.5; vertical-align: top; }
+  .guide-content td code { font-size: 11px; }
+
   /* Back to top */
   .back-to-top {
     position: fixed;
@@ -446,7 +577,73 @@
     <input id="search" type="text" placeholder="Search layouts..." autocomplete="off">
     <button class="search-clear" id="searchClear" type="button" aria-label="Clear search">✕</button>
   </div>
+  <button class="guide-btn" id="guideBtn" title="Component creation guide">?</button>
 </header>
+
+<!-- GUIDE MODAL -->
+<div class="guide-overlay" id="guideOverlay">
+  <div class="guide-modal">
+    <div class="guide-header">
+      <div class="guide-tabs">
+        <button class="guide-tab active" data-tab="guide">Guide</button>
+        <button class="guide-tab" data-tab="build">Build Prompt</button>
+      </div>
+      <button class="guide-close" id="guideClose" aria-label="Close guide">✕</button>
+    </div>
+
+    <!-- GUIDE TAB -->
+    <div class="guide-body active" id="guideBody">
+      <div class="guide-content" id="guideContent">Loading…</div>
+    </div>
+
+    <!-- BUILD PROMPT TAB -->
+    <div class="build-panel" id="buildPanel">
+      <div class="level-row">
+        <span class="level-label">Level</span>
+        <button class="level-pill active" data-level="1">L1 — Static</button>
+        <button class="level-pill" data-level="2">L2 — Interactive</button>
+        <button class="level-pill" data-level="3">L3 — Complex</button>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-label">Goal <span class="form-section-hint">— what it renders and does (prose, 2–4 sentences)</span></div>
+        <textarea id="f-goal" rows="3" placeholder="A full-width hero section with a background image and centred text overlay. The component displays an eyebrow label, headline, and subtitle stacked vertically in the centre of the viewport."></textarea>
+      </div>
+      <div class="form-section">
+        <div class="form-section-label">Dependencies <span class="form-section-hint">— one library per line, or "No external dependencies."</span></div>
+        <textarea id="f-deps" rows="2" placeholder="Bootstrap 4.6.2 — https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"></textarea>
+      </div>
+      <div class="form-section build-l3" style="display:none">
+        <div class="form-section-label">Architecture <span class="form-section-hint">— data structure, render loop, script blocks</span></div>
+        <textarea id="f-arch" rows="3" placeholder="All tile content lives in a JS array of objects, each with title, link, and media fields.&#10;A render loop creates DOM elements for each entry and appends them to the container."></textarea>
+      </div>
+      <div class="form-section">
+        <div class="form-section-label">Layout <span class="form-section-hint">— one item per line, will become bullets</span></div>
+        <textarea id="f-layout" rows="3" placeholder="Single container spans full viewport width and 100vh.&#10;Background image fills the container using object-fit cover.&#10;Text block is absolutely positioned and centred using flexbox."></textarea>
+      </div>
+      <div class="form-section">
+        <div class="form-section-label">Styling <span class="form-section-hint">— one item per line, will become bullets</span></div>
+        <textarea id="f-styling" rows="3" placeholder="Headline: proxima-nova, font-weight 300, colour #fff, clamp(2.5rem, 7vw, 6rem).&#10;Eyebrow: 11px, uppercase, letter-spacing 0.3em, colour rgba(255,255,255,0.7)."></textarea>
+      </div>
+      <div class="form-section build-l2 build-l3">
+        <div class="form-section-label">Behaviour <span class="form-section-hint">— one item per line, will become bullets</span></div>
+        <textarea id="f-behaviour" rows="3" placeholder="On hover, an underline expands from left to right beneath the label over 0.3s ease.&#10;Clicking the anchor navigates to the href. No JS required for this section."></textarea>
+      </div>
+      <div class="form-section">
+        <div class="form-section-label">Responsive <span class="form-section-hint">— one item per line, will become bullets</span></div>
+        <textarea id="f-responsive" rows="2" placeholder="Below 768px: columns stack vertically, image above text.&#10;Above 768px: two-column layout, equal widths."></textarea>
+      </div>
+      <div class="form-section build-l3" style="display:none">
+        <div class="form-section-label">Code Quality <span class="form-section-hint">— constraints, one per line, will become bullets</span></div>
+        <textarea id="f-quality" rows="2" placeholder="All tile data must live in a JS array — no markup in the HTML body.&#10;Render loop and event listeners must be separate script blocks."></textarea>
+      </div>
+    </div>
+    <div class="build-footer" id="buildFooter" style="display:none">
+      <button class="build-clear-btn" id="buildClear">Clear</button>
+      <button class="build-copy-btn" id="buildCopy">Copy Prompt</button>
+    </div>
+  </div>
+</div>
 
 <div class="filter-bar">
   <span class="filter-label">Filter</span>
@@ -1474,6 +1671,153 @@ openDrawer = function(item) {
   _origOpenDrawer(item);
 };
 </script>
+<script>
+(function() {
+  const overlay    = document.getElementById('guideOverlay');
+  const content    = document.getElementById('guideContent');
+  const guideBody  = document.getElementById('guideBody');
+  const buildPanel = document.getElementById('buildPanel');
+  const buildFooter= document.getElementById('buildFooter');
+  const btn        = document.getElementById('guideBtn');
+  const closeBtn   = document.getElementById('guideClose');
+  const copyBtn    = document.getElementById('buildCopy');
+  const clearBtn   = document.getElementById('buildClear');
+  let rendered = false;
+  let activeTab = 'guide';
+
+  const OUTPUT_REQUIREMENTS = [
+    'Return only the component implementation.',
+    'Do not include <!DOCTYPE html>, <html>, <head>, <body>, or <title>.',
+    'Output content in the following order: dependency CSS imports (<link>), dependency JavaScript imports (<script>), HTML, CSS, JavaScript.',
+    'Place all dependency imports at the beginning of the output.',
+    'Separate the Dependencies, HTML, CSS, and JavaScript sections using clear comments.',
+    'Use semantic HTML where appropriate.',
+    'Write clean, reusable, and modular code.',
+    'Do not use libraries other than those listed in Dependencies.'
+  ].map(l => '* ' + l).join('\n');
+
+  function toBullets(text) {
+    return text.split('\n')
+      .map(l => l.trim())
+      .filter(l => l)
+      .map(l => l.startsWith('* ') ? l : '* ' + l)
+      .join('\n');
+  }
+
+  function val(id) { return (document.getElementById(id).value || '').trim(); }
+
+  function assemblePrompt() {
+    const level = document.querySelector('.level-pill.active').dataset.level;
+    const sections = [];
+
+    const goal = val('f-goal');
+    if (goal) sections.push('### Goal\n' + goal);
+
+    const deps = val('f-deps');
+    if (deps) sections.push('### Dependencies\n' + toBullets(deps));
+
+    if (level === '3') {
+      const arch = val('f-arch');
+      if (arch) sections.push('### Architecture\n' + toBullets(arch));
+    }
+
+    const layout = val('f-layout');
+    if (layout) sections.push('### Layout\n' + toBullets(layout));
+
+    const styling = val('f-styling');
+    if (styling) sections.push('### Styling\n' + toBullets(styling));
+
+    if (level === '2' || level === '3') {
+      const beh = val('f-behaviour');
+      if (beh) sections.push('### Behaviour\n' + toBullets(beh));
+    }
+
+    const resp = val('f-responsive');
+    if (resp) sections.push('### Responsive\n' + toBullets(resp));
+
+    if (level === '3') {
+      const qual = val('f-quality');
+      if (qual) sections.push('### Code Quality\n' + toBullets(qual));
+    }
+
+    sections.push('### Output Requirements\n' + OUTPUT_REQUIREMENTS);
+    return sections.join('\n\n');
+  }
+
+  // Tab switching
+  document.querySelectorAll('.guide-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      activeTab = this.dataset.tab;
+      if (activeTab === 'guide') {
+        guideBody.classList.add('active');
+        buildPanel.style.display = 'none';
+        buildFooter.style.display = 'none';
+      } else {
+        guideBody.classList.remove('active');
+        buildPanel.style.display = 'flex';
+        buildFooter.style.display = 'flex';
+      }
+    });
+  });
+
+  // Level switching
+  document.querySelectorAll('.level-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.level-pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      const level = this.dataset.level;
+      document.querySelectorAll('.build-l2').forEach(el => el.style.display = (level === '2' || level === '3') ? '' : 'none');
+      document.querySelectorAll('.build-l3').forEach(el => el.style.display = level === '3' ? '' : 'none');
+    });
+  });
+
+  // Copy prompt
+  copyBtn.addEventListener('click', function() {
+    const prompt = assemblePrompt();
+    navigator.clipboard.writeText(prompt).then(() => {
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => { copyBtn.textContent = 'Copy Prompt'; copyBtn.classList.remove('copied'); }, 2000);
+    });
+  });
+
+  // Clear form
+  clearBtn.addEventListener('click', function() {
+    ['f-goal','f-deps','f-arch','f-layout','f-styling','f-behaviour','f-responsive','f-quality']
+      .forEach(id => { document.getElementById(id).value = ''; });
+  });
+
+  function openGuide() {
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (rendered) return;
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+    script.onload = function() {
+      fetch('html-css-js-creation-guide.md')
+        .then(r => r.text())
+        .then(md => { content.innerHTML = marked.parse(md); rendered = true; })
+        .catch(() => { content.textContent = 'Could not load guide.'; });
+    };
+    document.head.appendChild(script);
+  }
+
+  function closeGuide() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', openGuide);
+  closeBtn.addEventListener('click', closeGuide);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeGuide(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeGuide();
+  });
+})();
+</script>
+
 <button class="back-to-top" id="backToTop" aria-label="Back to top">
   <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
