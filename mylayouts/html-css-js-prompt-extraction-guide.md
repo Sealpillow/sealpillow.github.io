@@ -181,6 +181,25 @@ Describe
 
 ---
 
+## Interaction Scope
+
+Capture the scope of interactive elements — not just that a link or hover exists, but what area it covers.
+
+* If an `<a>` wraps a large content area (an entire slide, card, or panel), note that the **entire area is clickable**, not just the text within it
+* If a hover animation is triggered by an ancestor element rather than the element being animated, name which ancestor triggers it
+
+Example
+
+Instead of
+
+> The discover text has an underline animation on hover.
+
+Write
+
+> Hovering anywhere on the slide link triggers an underline animation on the discover text.
+
+---
+
 # Step 3 — Analyze CSS
 
 Do not copy CSS.
@@ -197,6 +216,7 @@ Extract
 * Rows
 * Alignment
 * Positioning
+* Stacking order (z-index) — when elements overlap, note which sits on top
 
 Example
 
@@ -221,8 +241,13 @@ Extract
 * Borders
 * Border radius
 * Shadows
-* Image behaviour
+* Image behaviour — include `object-fit` and `object-position` when they determine which part of the image is visible
 * Spacing
+
+Capture functional HTML attributes on media elements — these affect loading and autoplay behavior:
+
+* Images: `loading="lazy"`
+* Video: `autoplay`, `muted`, `loop`, `playsinline`
 
 Keep exact values only when they define the design.
 
@@ -286,6 +311,8 @@ Extract
 
 Only if it affects rendering.
 
+Describe what each data object needs to support — the capability, not the field name. Example: instead of listing `desktoptextColor` and `mobiletextColor`, write "each entry can specify different text colors for desktop and mobile."
+
 Example
 
 ```text
@@ -306,6 +333,12 @@ Describe
 * Dynamic
 * Generated from arrays
 * Generated from JSON
+
+If rendering uses conditional branches based on data values, capture all branches and what triggers each.
+
+Example
+
+> If a slide entry has `type: "video"`, render a `<video>` element with desktop and mobile sources. Otherwise render an `<img>` element.
 
 ---
 
@@ -334,6 +367,16 @@ swiper.slideTo(index)
 Write
 
 > Changing one slider updates the other.
+
+---
+
+## Initialization Order
+
+For components that render HTML dynamically before initializing a library, capture the order.
+
+Example
+
+> Render all slides into the DOM first, then initialize the Swiper instances. Initializing before rendering produces an empty carousel.
 
 ---
 
@@ -493,6 +536,8 @@ Describe
 * Data model
 * Rendering
 * Major containers
+* Conditional rendering — if JS branches on a data value to produce different HTML, describe all branches and what triggers each
+* Initialization order — if HTML must be rendered before a library is initialized, state the required sequence
 
 Avoid HTML implementation details.
 
@@ -507,6 +552,8 @@ Describe
 * Columns
 * Rows
 * Positioning
+* Stacking order — which elements sit on top of which when they overlap
+* Interactive area — if an anchor wraps a large content area, note that the whole area is clickable
 
 Prefer describing the visual result.
 
@@ -518,7 +565,7 @@ Describe
 
 * Typography
 * Colours
-* Images
+* Images — include `object-position` when it determines the visible crop; include functional media attributes: `loading="lazy"` on images, `autoplay`/`muted`/`loop`/`playsinline` on video
 * Cards
 * Buttons
 * Pagination
@@ -536,6 +583,7 @@ Describe
 * Rendering
 * State
 * Synchronization
+* Hover trigger scope — specify which element is hovered to trigger the effect, especially when it is an ancestor of the animated element
 
 Do not describe JavaScript syntax.
 

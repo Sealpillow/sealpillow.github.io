@@ -396,8 +396,8 @@
   .guide-btn {
     flex-shrink: 0;
     width: 28px; height: 28px;
-    border: 1px solid var(--border); border-radius: 50%;
-    background: transparent; color: var(--text-muted);
+    border: 1px solid var(--accent); border-radius: 50%;
+    background: transparent; color: var(--accent);
     font-size: 13px; font-family: var(--sans); font-weight: 500;
     cursor: pointer; transition: border-color 0.15s, color 0.15s;
     display: flex; align-items: center; justify-content: center; line-height: 1;
@@ -465,6 +465,20 @@
     color: var(--accent); margin-bottom: 5px; font-family: var(--sans);
   }
   .form-section-hint { font-size: 10px; color: var(--accent); font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .responsive-row { display: flex; gap: 10px; }
+  .responsive-col { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .responsive-col-header { display: flex; align-items: center; justify-content: space-between; }
+  .responsive-sub-label { font-size: 10px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
+  .resp-examples { display: flex; gap: 4px; }
+  .field-examples { display: flex; gap: 4px; margin-left: auto; }
+  .output-req-note { font-size: 10px; color: var(--accent); text-align: center; padding: 4px 0 2px; font-family: var(--sans); }
+  .resp-example-btn {
+    font-size: 9px; padding: 2px 6px; border-radius: 3px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-muted); cursor: pointer; font-family: var(--sans);
+    transition: border-color 0.15s, color 0.15s; line-height: 1.6;
+  }
+  .resp-example-btn:hover { border-color: var(--accent); color: var(--accent); }
   .form-section textarea {
     width: 100%; background: #111; border: 1px solid var(--border); border-radius: 5px;
     color: var(--text-primary); font-size: 12px; font-family: var(--mono);
@@ -473,6 +487,11 @@
   }
   .form-section textarea:focus { border-color: var(--accent); }
   .form-section textarea::placeholder { color: var(--text-muted); }
+  .form-section textarea::-webkit-scrollbar { width: 4px; }
+  .form-section textarea::-webkit-scrollbar-track { background: transparent; }
+  .form-section textarea::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 2px; }
+  .form-section textarea::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  .form-section textarea { scrollbar-width: thin; scrollbar-color: var(--border-active) transparent; }
   .build-footer {
     flex-shrink: 0; padding: 14px 24px;
     border-top: 1px solid var(--border);
@@ -613,7 +632,7 @@
       </div>
 
       <div class="form-section">
-        <div class="form-section-label">Goal <span class="form-section-hint">— what it renders and does (prose, 2–4 sentences)</span></div>
+        <div class="form-section-label">Goal <span class="form-section-hint">— what it renders and does (prose, 2–4 sentences)</span><div class="field-examples"><button class="resp-example-btn" data-target="f-goal" data-level="simple">Simple</button><button class="resp-example-btn" data-target="f-goal" data-level="technical">Technical</button></div></div>
         <textarea id="f-goal" rows="3" placeholder="A full-width hero section with a background image and centred text overlay. The component displays an eyebrow label, headline, and subtitle stacked vertically in the centre of the viewport."></textarea>
       </div>
       <div class="form-section">
@@ -621,29 +640,51 @@
         <textarea id="f-deps" rows="2" placeholder="Bootstrap 4.6.2 — https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"></textarea>
       </div>
       <div class="form-section build-l3" style="display:none">
-        <div class="form-section-label">Architecture <span class="form-section-hint">— data structure, render loop, script blocks</span></div>
+        <div class="form-section-label">Architecture <span class="form-section-hint">— data structure, render loop, script blocks</span><div class="field-examples"><button class="resp-example-btn" data-target="f-arch" data-level="simple">Simple</button><button class="resp-example-btn" data-target="f-arch" data-level="technical">Technical</button></div></div>
         <textarea id="f-arch" rows="3" placeholder="All tile content lives in a JS array of objects, each with title, link, and media fields.&#10;A render loop creates DOM elements for each entry and appends them to the container."></textarea>
       </div>
       <div class="form-section">
-        <div class="form-section-label">Layout <span class="form-section-hint">— one item per line, will become bullets</span></div>
+        <div class="form-section-label">Layout <span class="form-section-hint">— one item per line, will become bullets</span><div class="field-examples"><button class="resp-example-btn" data-target="f-layout" data-level="simple">Simple</button><button class="resp-example-btn" data-target="f-layout" data-level="technical">Technical</button></div></div>
         <textarea id="f-layout" rows="3" placeholder="Single container spans full viewport width and 100vh.&#10;Background image fills the container using object-fit cover.&#10;Text block is absolutely positioned and centred using flexbox."></textarea>
       </div>
       <div class="form-section">
-        <div class="form-section-label">Styling <span class="form-section-hint">— one item per line, will become bullets</span></div>
+        <div class="form-section-label">Styling <span class="form-section-hint">— one item per line, will become bullets</span><div class="field-examples"><button class="resp-example-btn" data-target="f-styling" data-level="simple">Simple</button><button class="resp-example-btn" data-target="f-styling" data-level="technical">Technical</button></div></div>
         <textarea id="f-styling" rows="3" placeholder="Headline: proxima-nova, font-weight 300, colour #fff, clamp(2.5rem, 7vw, 6rem).&#10;Eyebrow: 11px, uppercase, letter-spacing 0.3em, colour rgba(255,255,255,0.7)."></textarea>
       </div>
-      <div class="form-section build-l2 build-l3">
-        <div class="form-section-label">Behaviour <span class="form-section-hint">— one item per line, will become bullets</span></div>
+      <div class="form-section build-l2 build-l3" style="display:none">
+        <div class="form-section-label">Behaviour <span class="form-section-hint">— one item per line, will become bullets</span><div class="field-examples"><button class="resp-example-btn" data-target="f-behaviour" data-level="simple">Simple</button><button class="resp-example-btn" data-target="f-behaviour" data-level="technical">Technical</button></div></div>
         <textarea id="f-behaviour" rows="3" placeholder="On hover, an underline expands from left to right beneath the label over 0.3s ease.&#10;Clicking the anchor navigates to the href. No JS required for this section."></textarea>
       </div>
       <div class="form-section">
-        <div class="form-section-label">Responsive <span class="form-section-hint">— one item per line, will become bullets</span></div>
-        <textarea id="f-responsive" rows="2" placeholder="Below 768px: columns stack vertically, image above text.&#10;Above 768px: two-column layout, equal widths."></textarea>
+        <div class="form-section-label">Responsive</div>
+        <div class="responsive-row">
+          <div class="responsive-col">
+            <div class="responsive-col-header">
+              <div class="responsive-sub-label">Desktop</div>
+              <div class="resp-examples">
+                <button class="resp-example-btn" data-target="f-responsive-desktop" data-level="simple">Simple</button>
+                <button class="resp-example-btn" data-target="f-responsive-desktop" data-level="technical">Technical</button>
+              </div>
+            </div>
+            <textarea id="f-responsive-desktop" rows="2" placeholder="Describe the desktop layout…"></textarea>
+          </div>
+          <div class="responsive-col">
+            <div class="responsive-col-header">
+              <div class="responsive-sub-label">Mobile</div>
+              <div class="resp-examples">
+                <button class="resp-example-btn" data-target="f-responsive-mobile" data-level="simple">Simple</button>
+                <button class="resp-example-btn" data-target="f-responsive-mobile" data-level="technical">Technical</button>
+              </div>
+            </div>
+            <textarea id="f-responsive-mobile" rows="2" placeholder="Describe the mobile layout…"></textarea>
+          </div>
+        </div>
       </div>
       <div class="form-section build-l3" style="display:none">
-        <div class="form-section-label">Code Quality <span class="form-section-hint">— constraints, one per line, will become bullets</span></div>
+        <div class="form-section-label">Code Quality <span class="form-section-hint">— constraints, one per line, will become bullets</span><div class="field-examples"><button class="resp-example-btn" data-target="f-quality" data-level="standard">Standard</button></div></div>
         <textarea id="f-quality" rows="2" placeholder="All tile data must live in a JS array — no markup in the HTML body.&#10;Render loop and event listeners must be separate script blocks."></textarea>
       </div>
+      <div class="output-req-note">Output Requirements appended automatically</div>
     </div>
     <div class="build-footer" id="buildFooter" style="display:none">
       <button class="build-clear-btn" id="buildClear">Clear</button>
@@ -920,7 +961,7 @@ const layouts = [
   { file:"special/quiz-multi-hybrid-base.html", name:"Quiz - Multi Hybrid Base", platform:"special", tags:["quiz","interactive"], layout:"Quiz", mobile:"Full width", desc:"Base template for a multi-answer hybrid quiz." },
   { file:"special/quiz-single-hybrid-base.html", name:"Quiz - Single Hybrid Base", platform:"special", tags:["quiz","interactive"], layout:"Quiz", mobile:"Full width", desc:"Base template for a single-answer hybrid quiz." },
   { file:"special/ReadMoreToggle.html", name:"Read More Toggle", platform:"special", tags:["interactive","text"], layout:"Text Toggle", mobile:"Full width", desc:"Long text collapsed to 3 lines with a Read more / Read less toggle." },
-  { file:"special/removeBlackBorderFromVideo.html", name:"Remove Black Border from Video", platform:"special", tags:["video"], layout:"Video Utility", mobile:"Full width", desc:"Removes the letterbox border from a video element." },
+  { file:"special/removeBlackBorderFromVideo.html", name:"Remove Black Border from Video", platform:"special", tags:["video"], layout:"Video Utility", mobile:"Full width", desc:"Removes the letterbox border from a video element.", essential:true },
   { file:"special/scrollvid.html", name:"Scroll Video", platform:"special", tags:["scroll","video"], layout:"Scroll Effect", mobile:"Full width", desc:"Video that plays as the user scrolls." },
   { file:"sliders/ScrollVideoScrubber.html", name:"Scroll Video Scrubber", platform:"special", tags:["video","scroll"], layout:"Scroll Effect", mobile:"Full width", desc:"Video that scrubs forward/backward on scroll." },
   { file:"special/ScrollZoomInOutDynamic.html", name:"Scroll Zoom In/Out - Dynamic", platform:"special", tags:["scroll","video"], layout:"Scroll Effect", mobile:"Full width", desc:"Dynamic scroll-driven zoom in/out effect." },
@@ -1739,8 +1780,12 @@ openDrawer = function(item) {
       if (beh) sections.push('### Behaviour\n' + toBullets(beh));
     }
 
-    const resp = val('f-responsive');
-    if (resp) sections.push('### Responsive\n' + toBullets(resp));
+    const respDesktop = val('f-responsive-desktop');
+    const respMobile = val('f-responsive-mobile');
+    const respBullets = [];
+    if (respDesktop) respDesktop.split('\n').map(l => l.trim()).filter(l => l).forEach(l => respBullets.push('* Desktop: ' + l));
+    if (respMobile) respMobile.split('\n').map(l => l.trim()).filter(l => l).forEach(l => respBullets.push('* Mobile: ' + l));
+    if (respBullets.length) sections.push('### Responsive\n' + respBullets.join('\n'));
 
     if (level === '3') {
       const qual = val('f-quality');
@@ -1792,8 +1837,115 @@ openDrawer = function(item) {
 
   // Clear form
   clearBtn.addEventListener('click', function() {
-    ['f-goal','f-deps','f-arch','f-layout','f-styling','f-behaviour','f-responsive','f-quality']
+    ['f-goal','f-deps','f-arch','f-layout','f-styling','f-behaviour','f-responsive-desktop','f-responsive-mobile','f-quality']
       .forEach(id => { document.getElementById(id).value = ''; });
+  });
+
+  // Example fill buttons — cycle through 3 examples per field per level
+  const FIELD_EXAMPLES = {
+    'f-goal': {
+      simple: [
+        'A full-width hero section with a background image and a centred headline.',
+        'A two-column editorial split with a portrait image on the left and stacked text on the right.',
+        'A product card grid showing four items per row with an image, title, price, and hover overlay.'
+      ],
+      technical: [
+        'A full-viewport hero. Background image fills via object-fit cover. Text block centred using position absolute and transform. Eyebrow, headline, and subtitle stacked vertically. No JS required.',
+        'A horizontal 50/50 editorial split, max-width 1200px. Left column: portrait image, object-fit cover. Right column: flex column, vertically centred, category label, headline, body copy, and a CTA link. Stacks vertically below 768px.',
+        'A CSS-grid product section, 4 columns desktop with 24px gap. Each tile: portrait image (aspect-ratio 3/4, object-fit cover), product name, price, hover overlay with a label. Below 768px: 2-column grid.'
+      ]
+    },
+    'f-arch': {
+      simple: [
+        'A JS array of slide objects, each with an image and a title. A loop renders each slide, then a carousel library is initialised.',
+        'Two data arrays — left slides and right product grids. Each renders independently, then two carousel instances are initialised and synced.',
+        'A single array of product objects. A render function creates a card for each entry and appends it to the grid.'
+      ],
+      technical: [
+        'slides[]: each entry has img, title, subtitle, link. A renderSlides() function appends slide HTML to the swiper wrapper. Swiper is initialised after renderSlides() completes — initialising before renders an empty carousel.',
+        'leftSlides[]: each entry has a media object (type, desktopSrc, mobileSrc), title, discoverText, and link. rightSlides[]: each entry has a layout key and a products array. Render both arrays before initialising two Swiper instances, then wire their slideChange events to keep them in sync.',
+        'products[]: each entry has img, title, price, link, and an optional badge string. If badge is present, render a badge element over the image corner. Render all cards, then initialise any scroll observers.'
+      ]
+    },
+    'f-layout': {
+      simple: [
+        'Two equal columns side by side — image on the left, text on the right.',
+        'Full-width banner with text centred horizontally and vertically.',
+        'A 4-column grid of equal-width cards.'
+      ],
+      technical: [
+        '50/50 CSS Grid, max-width 1200px centered. Left: image fills column height via object-fit cover. Right: flex column, vertically centred, 48px horizontal padding.',
+        'Full viewport width and height. Background image fills via position absolute, object-fit cover. Text block: position absolute, centred using top 50% / left 50% / transform translate(-50%, -50%).',
+        'CSS Grid, 4 equal columns, 24px gap, max-width 1440px. Each card: relative container, portrait image fills card, overlay div (position absolute inset 0) hidden until hover.'
+      ]
+    },
+    'f-styling': {
+      simple: [
+        'Clean sans-serif type, white text on a dark overlay, generous spacing.',
+        'Black and white palette, thin borders, no shadows, uppercase labels with letter-spacing.',
+        'Muted warm background, bold serif headline, soft card shadow on hover.'
+      ],
+      technical: [
+        'Headline: 48px / weight 300 / #fff. Eyebrow: 11px / uppercase / letter-spacing 0.3em / rgba(255,255,255,0.7). Overlay: rgba(0,0,0,0.4). On hover: overlay fades to 0.6 over 0.3s ease.',
+        'Background: #f5f4f0. Card: white, no border-radius, no shadow. Title: 16px / weight 500 / #111. Price: 14px / weight 400 / #666. Hover: box-shadow 0 8px 24px rgba(0,0,0,0.1) over 0.25s ease.',
+        'Accent: #c8102e. Body: Inter 14px / #333. Borders: 1px solid #e0e0e0. Image crop: object-fit cover, object-position top. On hover: image scales to 1.04 over 0.4s ease, overlay label fades in.'
+      ]
+    },
+    'f-behaviour': {
+      simple: [
+        'On hover, the image zooms in slightly and a text label fades in.',
+        'Clicking a tab button switches the visible content panel.',
+        'Clicking the accordion header toggles the panel open and closed.'
+      ],
+      technical: [
+        'On hover of the card wrapper: image scale transitions from 1 to 1.04 over 0.4s ease. Overlay label transitions from opacity 0 to 1 over 0.3s ease. CSS only — no JS needed.',
+        'Clicking a tab button: remove active class from all tab buttons, add active to the clicked one. Hide all panels, show the panel whose data-id matches the clicked button\'s data-target.',
+        'Clicking an accordion trigger toggles a CSS class on the parent item. The panel max-height transitions from 0 to its scrollHeight over 0.3s ease. Multiple panels may be open simultaneously.'
+      ]
+    },
+    'f-responsive-desktop': {
+      simple: [
+        'Two equal columns side by side.',
+        'Three equal columns with a 24px gap.',
+        'Full-width single column, image fills the top half.'
+      ],
+      technical: [
+        '50/50 split with 24px gap, image fills left column via object-fit cover, max-width 1200px centered.',
+        'CSS Grid 3 equal columns, 24px gap, max-width 1440px. Image: aspect-ratio 3/4, object-fit cover.',
+        'Full-width single column. Top: image 60vh, object-fit cover, object-position top. Bottom: flex column, 48px padding, text left-aligned.'
+      ]
+    },
+    'f-quality': {
+      standard: [
+        'All content data in a JS array — no hardcoded markup in the HTML body.\nRender functions separate from initialization and event handling.\nNo inline styles for layout — use CSS classes.'
+      ]
+    },
+    'f-responsive-mobile': {
+      simple: [
+        'Single column, image above text.',
+        'Single column, image hidden, text centred.',
+        'Two-column grid, 2 items per row.'
+      ],
+      technical: [
+        'Stack to single column below 768px. Image full width above text, 16px side padding.',
+        'Below 768px: hide image column, text column expands to full width, padding reduces to 16px.',
+        'Below 768px: 2-column grid, 12px gap. Image aspect-ratio 1/1. Title font-size reduces to 13px.'
+      ]
+    }
+  };
+  const _exCycles = {};
+  document.querySelectorAll('.resp-example-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetId = this.dataset.target;
+      const level = this.dataset.level;
+      const key = targetId + ':' + level;
+      const examples = FIELD_EXAMPLES[targetId] && FIELD_EXAMPLES[targetId][level];
+      if (!examples || !examples.length) return;
+      const idx = (_exCycles[key] || 0) % examples.length;
+      const el = document.getElementById(targetId);
+      if (el) el.value = examples[idx];
+      _exCycles[key] = idx + 1;
+    });
   });
 
   function openGuide() {

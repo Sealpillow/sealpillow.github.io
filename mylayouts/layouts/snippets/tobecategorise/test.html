@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dual-Panel Synchronized Carousel</title>
 
 <!-- ============================== DEPENDENCIES ============================== -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
@@ -49,23 +46,27 @@ img, video {
 /* ============================== LEFT PANEL: MEDIA + OVERLAY ============================== */
 .left-slide {
   position: relative;
+  display: block;
   width: 100%;
-  height: 100%;
   overflow: hidden;
+  text-decoration: none;
+  color: inherit;
 }
 
-.left-slide .media-wrapper {
-  position: absolute;
-  inset: 0;
+.left-slide img,
+.left-slide video {
   width: 100%;
-  height: 100%;
-}
-
-.left-slide .media-wrapper img,
-.left-slide .media-wrapper video {
-  width: 100%;
-  height: 100%;
+  height: 640px;
   object-fit: cover;
+  object-position: top;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .left-slide img,
+  .left-slide video {
+    height: 420px;
+  }
 }
 
 .overlay-text {
@@ -121,6 +122,8 @@ img, video {
 .left-pagination .swiper-pagination-bullet {
   width: 28px;
   height: 4px;
+  border: none;
+  outline: none;
   border-radius: 0;
   background-color: #999;
   opacity: 1;
@@ -274,8 +277,7 @@ img, video {
   }
 }
 </style>
-</head>
-<body>
+
 
 <!-- ============================== HTML STRUCTURE ============================== -->
 <div class="carousel-wrapper">
@@ -305,8 +307,8 @@ img, video {
 const leftSlides = [
   {
     type: "image",
-    desktopSrc: "https://picsum.photos/seed/pedro-editorial-1/1200/1400",
-    mobileSrc: "https://picsum.photos/seed/pedro-editorial-1m/800/1000",
+    desktopSrc: "../../media/portrait-1.jpg",
+    mobileSrc: "../../media/portrait-2.jpg",
     title: "The Weekend Edit",
     discoverText: "Discover the collection",
     textColor: "#fff",
@@ -315,8 +317,8 @@ const leftSlides = [
   },
   {
     type: "video",
-    desktopSrc: "https://cdn.coverr.co/videos/coverr-walking-in-the-city-1080p.mp4",
-    mobileSrc: "https://cdn.coverr.co/videos/coverr-walking-in-the-city-mobile.mp4",
+    desktopSrc: "../../media/portrait_video-1.mp4",
+    mobileSrc: "../../media/portrait_video-2.mp4",
     title: "Made to Move",
     discoverText: "Shop the story",
     textColor: "#fff",
@@ -325,8 +327,8 @@ const leftSlides = [
   },
   {
     type: "image",
-    desktopSrc: "https://picsum.photos/seed/pedro-editorial-3/1200/1400",
-    mobileSrc: "https://picsum.photos/seed/pedro-editorial-3m/800/1000",
+    desktopSrc: "../../media/portrait-2.jpg",
+    mobileSrc: "../../media/portrait-1.jpg",
     title: "Everyday Essentials",
     discoverText: "See what's new",
     textColor: "#000",
@@ -335,8 +337,8 @@ const leftSlides = [
   },
   {
     type: "image",
-    desktopSrc: "https://picsum.photos/seed/pedro-editorial-4/1200/1400",
-    mobileSrc: "https://picsum.photos/seed/pedro-editorial-4m/800/1000",
+    desktopSrc: "../../media/portrait-1.jpg",
+    mobileSrc: "../../media/portrait-1.jpg",
     title: "Off-Duty Hours",
     discoverText: "Explore the range",
     textColor: "#fff",
@@ -345,8 +347,8 @@ const leftSlides = [
   },
   {
     type: "image",
-    desktopSrc: "https://picsum.photos/seed/pedro-editorial-5/1200/1400",
-    mobileSrc: "https://picsum.photos/seed/pedro-editorial-5m/800/1000",
+    desktopSrc: "../../media/portrait-2.jpg",
+    mobileSrc: "../../media/portrait-2.jpg",
     title: "Statement Pieces",
     discoverText: "Discover more",
     textColor: "#000",
@@ -361,44 +363,44 @@ const rightSlides = [
   {
     layout: "1x2",
     products: [
-      { src: "https://picsum.photos/seed/prod-01/500/650", href: "/products/prod-01", analytics: { contentId: "prod_01", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-02/500/650", href: "/products/prod-02", analytics: { contentId: "prod_02", contentType: "product_tile" } }
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-01", analytics: { contentId: "prod_01", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-2.jpg", href: "/products/prod-02", analytics: { contentId: "prod_02", contentType: "product_tile" } }
     ]
   },
   {
     layout: "1x3",
     products: [
-      { src: "https://picsum.photos/seed/prod-03/500/650", href: "/products/prod-03", analytics: { contentId: "prod_03", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-04/500/650", href: "/products/prod-04", analytics: { contentId: "prod_04", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-05/500/650", href: "/products/prod-05", analytics: { contentId: "prod_05", contentType: "product_tile" } }
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-03", analytics: { contentId: "prod_03", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-2.jpg", href: "/products/prod-04", analytics: { contentId: "prod_04", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-05", analytics: { contentId: "prod_05", contentType: "product_tile" } }
     ]
   },
   {
     layout: "2x3",
     products: [
-      { src: "https://picsum.photos/seed/prod-06/500/650", href: "/products/prod-06", analytics: { contentId: "prod_06", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-07/500/650", href: "/products/prod-07", analytics: { contentId: "prod_07", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-08/500/650", href: "/products/prod-08", analytics: { contentId: "prod_08", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-09/500/650", href: "/products/prod-09", analytics: { contentId: "prod_09", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-10/500/650", href: "/products/prod-10", analytics: { contentId: "prod_10", contentType: "product_tile" } }
+      { src: "../../media/product-portrait-2.jpg", href: "/products/prod-06", analytics: { contentId: "prod_06", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-07", analytics: { contentId: "prod_07", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-2.jpg", href: "/products/prod-08", analytics: { contentId: "prod_08", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-09", analytics: { contentId: "prod_09", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-2.jpg", href: "/products/prod-10", analytics: { contentId: "prod_10", contentType: "product_tile" } }
     ]
   },
   {
     layout: "dice-layout",
     products: [
-      { src: "https://picsum.photos/seed/prod-11/500/650", href: "/products/prod-11", analytics: { contentId: "prod_11", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-12/500/650", href: "/products/prod-12", analytics: { contentId: "prod_12", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-13/500/650", href: "/products/prod-13", analytics: { contentId: "prod_13", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-14/500/650", href: "/products/prod-14", analytics: { contentId: "prod_14", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-15/500/650", href: "/products/prod-15", analytics: { contentId: "prod_15", contentType: "product_tile" } }
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-11", analytics: { contentId: "prod_11", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-2.jpg", href: "/products/prod-12", analytics: { contentId: "prod_12", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-13", analytics: { contentId: "prod_13", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-2.jpg", href: "/products/prod-14", analytics: { contentId: "prod_14", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-15", analytics: { contentId: "prod_15", contentType: "product_tile" } }
     ]
   },
   {
     layout: "3x1",
     products: [
-      { src: "https://picsum.photos/seed/prod-16/500/375", href: "/products/prod-16", analytics: { contentId: "prod_16", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-17/500/375", href: "/products/prod-17", analytics: { contentId: "prod_17", contentType: "product_tile" } },
-      { src: "https://picsum.photos/seed/prod-18/500/375", href: "/products/prod-18", analytics: { contentId: "prod_18", contentType: "product_tile" } }
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-16", analytics: { contentId: "prod_16", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-2.jpg", href: "/products/prod-17", analytics: { contentId: "prod_17", contentType: "product_tile" } },
+      { src: "../../media/product-portrait-1.jpg", href: "/products/prod-18", analytics: { contentId: "prod_18", contentType: "product_tile" } }
     ]
   }
 ];
@@ -421,19 +423,19 @@ function renderLeftSlides() {
         </video>
       `
       : `
-        <img class="d-none d-md-block" src="${slide.desktopSrc}" alt="${slide.title}">
-        <img class="d-block d-md-none" src="${slide.mobileSrc}" alt="${slide.title}">
+        <img class="d-none d-md-block" src="${slide.desktopSrc}" alt="${slide.title}" loading="lazy">
+        <img class="d-block d-md-none" src="${slide.mobileSrc}" alt="${slide.title}" loading="lazy">
       `;
 
     return `
-      <div class="swiper-slide left-slide">
-        <div class="media-wrapper">${mediaHtml}</div>
-        <div class="overlay-text" style="color: ${slide.textColor};">
-          <p class="slide-title">${slide.title}</p>
-          <a href="${slide.href}" class="discover-link ${underlineClass}" data-content-analytic='${JSON.stringify(slide.analytics)}'>
-            ${slide.discoverText}
-          </a>
-        </div>
+      <div class="swiper-slide">
+        <a href="${slide.href}" class="left-slide" data-content-analytic='${JSON.stringify(slide.analytics)}'>
+          ${mediaHtml}
+          <div class="overlay-text" style="color: ${slide.textColor};">
+            <p class="slide-title">${slide.title}</p>
+            <span class="discover-link ${underlineClass}">${slide.discoverText}</span>
+          </div>
+        </a>
       </div>
     `;
   }).join("");
@@ -504,5 +506,3 @@ rightSwiper.on("slideChange", () => {
   }
 });
 </script>
-</body>
-</html>

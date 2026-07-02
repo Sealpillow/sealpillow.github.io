@@ -118,9 +118,10 @@ Only include this section for Level 3 components.
 Describe:
 
 * How the data is structured (e.g. a JS array of objects, each with image URL, title, link)
-* What each data object contains (field names and types)
+* What each data object needs to support — describe the capability, not the field name (e.g. "each slide needs separate text colors for desktop and mobile" rather than naming the specific fields)
 * How the component is rendered (e.g. a loop that creates DOM elements, a Splide instance initialised after rendering)
 * Whether multiple independent scripts are needed and what each one does
+* If different data values should produce different HTML (e.g. a video entry renders a `<video>` element, an image entry renders an `<img>`), describe each branch
 
 If unsure: Describe the outcome you want rather than the structure. Example: "Each tile should be driven by a data array so content can be swapped without touching the HTML. The exact object shape is flexible."
 
@@ -137,6 +138,7 @@ Specify:
 * How elements are positioned (flex, grid, absolute overlay, sticky)
 * Order and stacking (what sits on top of what)
 * Spacing and padding values if they matter visually
+* Clickable area — if a card, slide, or panel should be fully clickable (not just an inner link), specify that the entire area is a link
 
 You do not need to name CSS classes — describe the result, not the implementation.
 
@@ -156,6 +158,8 @@ Specify:
 * Opacity, mix-blend-mode, filter
 * Transition or animation properties (duration, easing)
 * Hover states
+* Image crop — specify `object-position` if the image should show from a specific edge (e.g. `object-position: top` to keep the top of a portrait visible)
+* Video attributes — if the component includes video, specify which of these apply: `autoplay`, `muted`, `loop`, `playsinline`
 
 If unsure: Describe the mood or intent rather than exact values. Examples: "a muted dark overlay, roughly 50% opacity", "a subtle fade transition, nothing too fast", "clean sans-serif, no specific font required", "neutral black and white palette." The AI will pick sensible defaults — refine after seeing the first output.
 
@@ -171,6 +175,7 @@ Specify:
 * What changes (visibility, position, class, style, content)
 * Any timing (delay, duration, debounce)
 * Edge cases to handle (e.g. what happens if no link is set)
+* Hover trigger scope — if hovering a parent element triggers an animation on a child, specify this (e.g. "hovering anywhere on the slide triggers the underline on the text")
 
 If using a library (Splide, GSAP), describe the configuration options you want set.
 
@@ -180,21 +185,30 @@ If unsure: Describe the end result, not the mechanism. Example: "On hover, the i
 
 ## Responsive
 
-Describe what changes at each breakpoint. One bullet per breakpoint.
+Describe the layout separately for desktop and mobile. You can write at whatever level of detail suits you — both styles below are valid and produce good results.
 
-Specify:
+**Simple format** — describe the visual result in plain language:
 
-* The breakpoint value (e.g. below 768px, min-width 768px)
-* What is hidden, shown, or rearranged
-* What layout or sizing changes (e.g. single column instead of three, full width instead of 50%)
-* Whether a different element is shown for mobile vs desktop (e.g. portrait video below 768px)
+```
+* Desktop: Two equal columns side by side.
+* Mobile: Single column, image above text.
+```
 
-If unsure: Use the common default for your layout type and note it is flexible:
+**Technical format** — add exact values when you have them:
 
-* Multi-column grid → "Stack to single column below 768px."
-* Side-by-side split → "Stack vertically below 768px, image above text."
-* Desktop-only → "Hide entirely on mobile."
-* Full-width hero → "No layout change needed, keep full width at all sizes."
+```
+* Desktop: 50/50 split with 24px gap, image fills left column, max-width 1200px centered.
+* Mobile: Stack to single column below 768px, image full width above text, 16px side padding.
+```
+
+Both are valid. Use the simple format to get started; add exact values only when you need precise control.
+
+Common defaults if unsure:
+
+* Multi-column grid → Desktop: three equal columns. Mobile: single column stack.
+* Side-by-side split → Desktop: two equal columns. Mobile: image above text, full width.
+* Desktop-only element → Desktop: visible. Mobile: hidden.
+* Full-width hero → Desktop and mobile: full width, no layout change needed.
 
 ---
 
