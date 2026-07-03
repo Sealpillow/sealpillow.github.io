@@ -3,11 +3,10 @@
 <style>
   .hotspot-wrap {
     position: relative;
-    display: inline-block;
+    display: block;
     width: 100%;
     max-width: 720px;
     margin: 0 auto;
-    display: block;
   }
 
   .hotspot-wrap img {
@@ -75,10 +74,6 @@
   }
 
   /* Pulse ring */
-  .hotspot-dot::after {
-    animation: none;
-  }
-
   .hotspot-ring {
     position: absolute;
     inset: -6px;
@@ -94,12 +89,9 @@
     100% { transform: scale(1.6); opacity: 0; }
   }
 
-  /* Tooltip */
+  /* Tooltip base */
   .hotspot-tooltip {
     position: absolute;
-    bottom: calc(100% + 14px);
-    left: 50%;
-    transform: translateX(-50%);
     background: #fff;
     padding: 14px 16px;
     min-width: 180px;
@@ -107,57 +99,51 @@
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
     pointer-events: none;
     opacity: 0;
-    transform: translateX(-50%) translateY(6px);
-    transition: opacity 0.22s ease, transform 0.22s ease;
     white-space: normal;
+    transition: opacity 0.22s ease, transform 0.22s ease;
   }
 
-  /* Tooltip arrow */
   .hotspot-tooltip::after {
     content: '';
     position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
     border: 6px solid transparent;
-    border-top-color: #fff;
   }
 
   .hotspot:hover .hotspot-tooltip,
   .hotspot.active .hotspot-tooltip {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
   }
 
-  /* data-tip="left": tooltip to the left of the dot */
-  .hotspot[data-tip="left"] .hotspot-tooltip {
+  /* ============================================
+     DESKTOP positioning — data-tip-desktop
+     ============================================ */
+
+  /* left */
+  .hotspot[data-tip-desktop="left"] .hotspot-tooltip {
     bottom: 50%;
     left: auto;
     right: calc(100% + 14px);
     transform: translateX(0) translateY(50%) translateY(6px);
   }
-
-  .hotspot[data-tip="left"] .hotspot-tooltip::after {
+  .hotspot[data-tip-desktop="left"] .hotspot-tooltip::after {
     top: 50%;
     left: 100%;
     transform: translateY(-50%);
     border-top-color: transparent;
     border-left-color: #fff;
   }
-
-  .hotspot[data-tip="left"]:hover .hotspot-tooltip,
-  .hotspot[data-tip="left"].active .hotspot-tooltip {
+  .hotspot[data-tip-desktop="left"]:hover .hotspot-tooltip,
+  .hotspot[data-tip-desktop="left"].active .hotspot-tooltip {
     transform: translateX(0) translateY(50%);
   }
 
-  /* data-tip="right": tooltip to the right of the dot */
-  .hotspot[data-tip="right"] .hotspot-tooltip {
+  /* right */
+  .hotspot[data-tip-desktop="right"] .hotspot-tooltip {
     bottom: 50%;
     left: calc(100% + 14px);
     transform: translateX(0) translateY(50%) translateY(6px);
   }
-
-  .hotspot[data-tip="right"] .hotspot-tooltip::after {
+  .hotspot[data-tip-desktop="right"] .hotspot-tooltip::after {
     top: 50%;
     left: auto;
     right: 100%;
@@ -165,62 +151,78 @@
     border-top-color: transparent;
     border-right-color: #fff;
   }
-
-  .hotspot[data-tip="right"]:hover .hotspot-tooltip,
-  .hotspot[data-tip="right"].active .hotspot-tooltip {
+  .hotspot[data-tip-desktop="right"]:hover .hotspot-tooltip,
+  .hotspot[data-tip-desktop="right"].active .hotspot-tooltip {
     transform: translateX(0) translateY(50%);
   }
 
-  /* data-tip="above-left": tooltip above, pinned to left */
-  .hotspot[data-tip="above-left"] .hotspot-tooltip {
+  /* above (centered) */
+  .hotspot[data-tip-desktop="above"] .hotspot-tooltip {
+    bottom: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+  }
+  .hotspot[data-tip-desktop="above"] .hotspot-tooltip::after {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top-color: #fff;
+  }
+  .hotspot[data-tip-desktop="above"]:hover .hotspot-tooltip,
+  .hotspot[data-tip-desktop="above"].active .hotspot-tooltip {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* above-left */
+  .hotspot[data-tip-desktop="above-left"] .hotspot-tooltip {
+    bottom: calc(100% + 14px);
     left: 0;
     transform: translateX(0) translateY(6px);
   }
-
-  .hotspot[data-tip="above-left"] .hotspot-tooltip::after {
+  .hotspot[data-tip-desktop="above-left"] .hotspot-tooltip::after {
     left: 20px;
+    top: 100%;
     transform: none;
+    border-top-color: #fff;
   }
-
-  .hotspot[data-tip="above-left"]:hover .hotspot-tooltip,
-  .hotspot[data-tip="above-left"].active .hotspot-tooltip {
+  .hotspot[data-tip-desktop="above-left"]:hover .hotspot-tooltip,
+  .hotspot[data-tip-desktop="above-left"].active .hotspot-tooltip {
     transform: translateX(0) translateY(0);
   }
 
-  /* data-tip="above-right": tooltip above, pinned to right */
-  .hotspot[data-tip="above-right"] .hotspot-tooltip {
+  /* above-right */
+  .hotspot[data-tip-desktop="above-right"] .hotspot-tooltip {
+    bottom: calc(100% + 14px);
     left: auto;
     right: 0;
     transform: translateX(0) translateY(6px);
   }
-
-  .hotspot[data-tip="above-right"] .hotspot-tooltip::after {
+  .hotspot[data-tip-desktop="above-right"] .hotspot-tooltip::after {
     left: auto;
     right: 20px;
+    top: 100%;
     transform: none;
+    border-top-color: #fff;
   }
-
-  .hotspot[data-tip="above-right"]:hover .hotspot-tooltip,
-  .hotspot[data-tip="above-right"].active .hotspot-tooltip {
+  .hotspot[data-tip-desktop="above-right"]:hover .hotspot-tooltip,
+  .hotspot[data-tip-desktop="above-right"].active .hotspot-tooltip {
     transform: translateX(0) translateY(0);
   }
 
-  /* data-tip="below": tooltip below dot */
-  .hotspot[data-tip="below"] .hotspot-tooltip {
-    bottom: auto;
+  /* below */
+  .hotspot[data-tip-desktop="below"] .hotspot-tooltip {
     top: calc(100% + 14px);
+    left: 50%;
     transform: translateX(-50%) translateY(-6px);
   }
-
-  .hotspot[data-tip="below"] .hotspot-tooltip::after {
-    top: auto;
+  .hotspot[data-tip-desktop="below"] .hotspot-tooltip::after {
     bottom: 100%;
-    border-top-color: transparent;
+    left: 50%;
+    transform: translateX(-50%);
     border-bottom-color: #fff;
   }
-
-  .hotspot[data-tip="below"]:hover .hotspot-tooltip,
-  .hotspot[data-tip="below"].active .hotspot-tooltip {
+  .hotspot[data-tip-desktop="below"]:hover .hotspot-tooltip,
+  .hotspot[data-tip-desktop="below"].active .hotspot-tooltip {
     transform: translateX(-50%) translateY(0);
   }
 
@@ -242,24 +244,147 @@
     margin: 0;
     line-height: 1.6;
   }
+
+  /* ============================================
+     MOBILE positioning — data-tip-mobile
+     Overrides desktop rules below this breakpoint
+     ============================================ */
+  @media (max-width: 768px) {
+
+    /* reset any desktop positioning first */
+    .hotspot[data-tip-mobile] .hotspot-tooltip {
+      top: auto;
+      bottom: auto;
+      left: auto;
+      right: auto;
+    }
+
+    /* left */
+    .hotspot[data-tip-mobile="left"] .hotspot-tooltip {
+      bottom: 50%;
+      right: calc(100% + 14px);
+      transform: translateX(0) translateY(50%) translateY(6px);
+    }
+    .hotspot[data-tip-mobile="left"] .hotspot-tooltip::after {
+      top: 50%;
+      left: 100%;
+      right: auto;
+      bottom: auto;
+      transform: translateY(-50%);
+      border-top-color: transparent;
+      border-bottom-color: transparent;
+      border-left-color: #fff;
+    }
+    .hotspot[data-tip-mobile="left"]:hover .hotspot-tooltip,
+    .hotspot[data-tip-mobile="left"].active .hotspot-tooltip {
+      transform: translateX(0) translateY(50%);
+    }
+
+    /* right */
+    .hotspot[data-tip-mobile="right"] .hotspot-tooltip {
+      bottom: 50%;
+      left: calc(100% + 14px);
+      transform: translateX(0) translateY(50%) translateY(6px);
+    }
+    .hotspot[data-tip-mobile="right"] .hotspot-tooltip::after {
+      top: 50%;
+      right: 100%;
+      left: auto;
+      bottom: auto;
+      transform: translateY(-50%);
+      border-top-color: transparent;
+      border-right-color: #fff;
+    }
+    .hotspot[data-tip-mobile="right"]:hover .hotspot-tooltip,
+    .hotspot[data-tip-mobile="right"].active .hotspot-tooltip {
+      transform: translateX(0) translateY(50%);
+    }
+
+    /* above */
+    .hotspot[data-tip-mobile="above"] .hotspot-tooltip {
+      bottom: calc(100% + 14px);
+      left: 50%;
+      transform: translateX(-50%) translateY(6px);
+    }
+    .hotspot[data-tip-mobile="above"] .hotspot-tooltip::after {
+      top: 100%;
+      left: 50%;
+      bottom: auto;
+      transform: translateX(-50%);
+      border-bottom-color: transparent;
+      border-top-color: #fff;
+    }
+    .hotspot[data-tip-mobile="above"]:hover .hotspot-tooltip,
+    .hotspot[data-tip-mobile="above"].active .hotspot-tooltip {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* below */
+    .hotspot[data-tip-mobile="below"] .hotspot-tooltip {
+      top: calc(100% + 14px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+    }
+    .hotspot[data-tip-mobile="below"] .hotspot-tooltip::after {
+      bottom: 100%;
+      left: 50%;
+      top: auto;
+      transform: translateX(-50%);
+      border-top-color: transparent;
+      border-bottom-color: #fff;
+    }
+    .hotspot[data-tip-mobile="below"]:hover .hotspot-tooltip,
+    .hotspot[data-tip-mobile="below"].active .hotspot-tooltip {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* above-left */
+    .hotspot[data-tip-mobile="above-left"] .hotspot-tooltip {
+      bottom: calc(100% + 14px);
+      left: 0;
+      transform: translateX(0) translateY(6px);
+    }
+    .hotspot[data-tip-mobile="above-left"] .hotspot-tooltip::after {
+      left: 20px;
+      top: 100%;
+      bottom: auto;
+      transform: none;
+      border-bottom-color: transparent;
+      border-top-color: #fff;
+    }
+    .hotspot[data-tip-mobile="above-left"]:hover .hotspot-tooltip,
+    .hotspot[data-tip-mobile="above-left"].active .hotspot-tooltip {
+      transform: translateX(0) translateY(0);
+    }
+
+    /* above-right */
+    .hotspot[data-tip-mobile="above-right"] .hotspot-tooltip {
+      bottom: calc(100% + 14px);
+      right: 0;
+      left: auto;
+      transform: translateX(0) translateY(6px);
+    }
+    .hotspot[data-tip-mobile="above-right"] .hotspot-tooltip::after {
+      right: 20px;
+      left: auto;
+      top: 100%;
+      bottom: auto;
+      transform: none;
+      border-bottom-color: transparent;
+      border-top-color: #fff;
+    }
+    .hotspot[data-tip-mobile="above-right"]:hover .hotspot-tooltip,
+    .hotspot[data-tip-mobile="above-right"].active .hotspot-tooltip {
+      transform: translateX(0) translateY(0);
+    }
+  }
 </style>
 
 <div class="hotspot-wrap">
   <img src="../../media/product-landscape-3.jpg" alt="Product image">
 
-  <!-- Hotspot 1 -->
-  <div class="hotspot" data-tip="left" style="top: 45%; left: 35%;">
-    <div class="hotspot-dot">
-      <div class="hotspot-ring"></div>
-    </div>
-    <div class="hotspot-tooltip">
-      <p class="hotspot-label">Material</p>
-      <p class="hotspot-desc">Crafted from full-grain leather with a soft suede lining.</p>
-    </div>
-  </div>
-
-  <!-- Hotspot 2 -->
-  <div class="hotspot" data-tip="above" style="top: 54%; left: 55%;">
+  <!-- Hotspot 1: left on desktop, below on mobile (avoids clipping near left edge) -->
+  <div class="hotspot" data-tip-desktop="left" data-tip-mobile="right" style="top: 71%; left: 18%;">
     <div class="hotspot-dot">
       <div class="hotspot-ring"></div>
     </div>
@@ -269,8 +394,19 @@
     </div>
   </div>
 
-  <!-- Hotspot 3 -->
-  <div class="hotspot" data-tip="right" style="top: 68%; left: 65%;">
+  <!-- Hotspot 2: above on both -->
+  <div class="hotspot" data-tip-desktop="above" data-tip-mobile="above" style="top: 63%; left: 45%;">
+    <div class="hotspot-dot">
+      <div class="hotspot-ring"></div>
+    </div>
+    <div class="hotspot-tooltip">
+      <p class="hotspot-label">Material</p>
+      <p class="hotspot-desc">Crafted from full-grain leather with a soft suede lining.</p>
+    </div>
+  </div>
+
+  <!-- Hotspot 3: right on desktop, below on mobile (avoids clipping near right edge) -->
+  <div class="hotspot" data-tip-desktop="right" data-tip-mobile="left" style="top: 76%; left: 65%;">
     <div class="hotspot-dot">
       <div class="hotspot-ring"></div>
     </div>
