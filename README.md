@@ -20,22 +20,19 @@ Personal portfolio site for Brian Lua — IT Business Analyst and frontend devel
 │   ├── index.html          # Project grid with lightbox and filter
 │   └── editorials/         # Individual HTML project pages (~29 files)
 │       └── images/         # Local images used by editorial pages
-├── mylayouts/              # Layout snippet library
-│   ├── index.html          # Searchable snippet viewer
-│   ├── ADD_SNIPPET.md      # Guide for adding new snippets
-│   └── layouts/
-│       ├── prompts.json    # Structured AI prompts keyed by snippet filename (~160 entries)
-│       ├── media/          # Placeholder images and videos for previewing snippets
-│       └── snippets/       # HTML snippet files organised by category (~160 files)
-│           ├── desktop/        web-5050/   web-center/
-│           ├── mobile/         web-flexi/  web-grid/
-│           ├── fullwidth/      web-image/  web-text/
-│           ├── hover/          sliders/
-│           ├── redirects/      special/
-│           └── tobecategorise/ # Staging folder for uncategorised snippets
-└── stocks/                 # Personal stock tracking tool
-    ├── index.html          # Dividend tracker UI
-    └── json/               # Per-ticker dividend cycle analysis JSON files
+└── mylayouts/              # Layout snippet library
+    ├── index.html          # Searchable snippet viewer
+    ├── ADD_SNIPPET.md      # Guide for adding new snippets
+    └── layouts/
+        ├── prompts.json    # Structured AI prompts keyed by snippet filename (~160 entries)
+        ├── media/          # Placeholder images and videos for previewing snippets
+        └── snippets/       # HTML snippet files organised by category (~160 files)
+            ├── desktop/        web-5050/   web-center/
+            ├── mobile/         web-flexi/  web-grid/
+            ├── fullwidth/      web-image/  web-text/
+            ├── hover/          sliders/
+            ├── redirects/      special/
+            └── tobecategorise/ # Staging folder for uncategorised snippets
 ```
 
 ---
@@ -106,36 +103,29 @@ Searchable viewer for ~160 HTML layout snippets.
 - Card hover: iframe preview loads with shimmer, Open button appears
 - **Drawer panel** (right-side modal): larger snippet preview with three tabs:
   - **Preview** — live iframe with viewport controls (Desktop / Tablet / Mobile) that inject Bootstrap responsive shims
-  - **Code** — raw HTML split into CSS / HTML / JS tabs; parsed and cached per file; copy button per tab
+  - **Code** — raw HTML split into Deps / CSS / HTML / JS tabs; parsed and cached per file; Copy button per tab, Copy All button for the full raw file
   - **Prompt** — structured AI prompt for regenerating the snippet; copy button returns the raw prompt text
+- **Guide modal** (? button): tabbed panel with the component creation guide and a Build Prompt form that assembles a structured prompt from form fields (Level 1 / 2 / 3, Goal, Dependencies, Architecture, Layout, Styling, Behaviour, Responsive, Code Quality)
 - `layouts` array in the file: each entry has `file`, `name`, `platform`, `tags`, `layout`, `mobile`, `desc`, optional `essential`
 - iframe sandboxed with `allow-same-origin allow-scripts allow-popups allow-forms`
 
 ### `mylayouts/layouts/prompts.json` — AI Prompts
 
-Flat JSON object keyed by snippet path (e.g. `"sliders/CarouselWithPagination.html"`). Each value is a structured prompt string with named sections:
+Flat JSON object keyed by snippet path (e.g. `"sliders/CarouselWithPagination.html"`). Each value is a structured prompt string using named markdown sections:
 
 ```
-Create a [description] using HTML, CSS, and [vanilla JavaScript / no JS].
-
+### Goal
 ### Dependencies
-* CDN libraries (omitted if none)
-
-### Structure
-* CSS layout, class names, specific values
-
-### Behaviour
-* JS functions and event logic (omitted if no JS)
-
+### Architecture      (Level 3 only)
+### Layout
+### Styling
+### Behaviour         (Level 2 and 3)
 ### Responsive
-* Breakpoints and mobile behaviour (omitted if static)
-
+### Code Quality      (Level 3 only)
 ### Output Requirements
-* Return a complete HTML file
-* ...
 ```
 
-Fetched once on page load and cached. The Prompt tab only appears in the drawer if an entry exists for that snippet.
+Sections are omitted when not applicable. Output Requirements is always included verbatim. Fetched once on page load and cached. The Prompt tab only appears in the drawer if an entry exists for that snippet.
 
 See [`mylayouts/ADD_SNIPPET.md`](mylayouts/ADD_SNIPPET.md) for naming conventions, platform/tag reference, and how to add new entries.
 
@@ -172,13 +162,17 @@ See [`mylayouts/ADD_SNIPPET.md`](mylayouts/ADD_SNIPPET.md) for the full entry fo
 
 ## Adding a prompt
 
-Add an entry to `mylayouts/layouts/prompts.json` keyed by the snippet's path relative to the `snippets/` folder:
+Add an entry to `mylayouts/layouts/prompts.json` keyed by the snippet's path relative to the `snippets/` folder.
 
-```json
-"sliders/MyNewCarousel.html": "Create a [description] using HTML, CSS, and vanilla JavaScript.\n\n### Dependencies\n* Splide 4.1.4 CSS & JS CDN\n\n### Structure\n* .carousel-wrap — ...\n\n### Behaviour\n* new Splide('#id', { ... }).mount()\n\n### Output Requirements\n* Return a complete HTML file\n* Separate HTML, CSS, and JavaScript into clearly commented sections\n* Use semantic HTML where appropriate\n* Do not use external JavaScript libraries other than those listed in Dependencies above\n* Write clean, reusable code\n* Load all dependency CSS and JS in <head>"
-```
+Use the Build Prompt form in the Guide modal (? button in the snippet library) to assemble the prompt, then copy and paste the result as the JSON value. Use `\n` for newlines within the JSON string.
 
-Use `\n` for newlines within the JSON string. Sections are optional — include only `### Dependencies`, `### Behaviour`, and `### Responsive` when they apply; `### Structure` and `### Output Requirements` are always included.
+Complexity levels determine which sections to include:
+
+| Level | Sections |
+|---|---|
+| L1 — Static | Goal, Dependencies, Layout, Styling, Responsive, Output Requirements |
+| L2 — Interactive | + Behaviour |
+| L3 — Complex | + Architecture, Code Quality |
 
 Add an entry to the `layouts` array in `mylayouts/index.html`:
 

@@ -1,1333 +1,1333 @@
-<!DOCTYPE html>
-<html lang="en">
+    <!DOCTYPE html>
+    <html lang="en">
 
-<head>
+    <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- BootStrap -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- BootStrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Stylesheets -->
-<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
-<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+    <link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
 
 
-<style>
-    html, body {
-      overflow-x: hidden; 
-      color: black;
-      margin: 0;
-      padding: 0;
-      height: auto;
-  }
-  .page.parallax {
-      padding-top: 0px !important;
-  }
-
-  /* Hide folder headers (SiteGenesis leftover) */
-  .folder-header,
-  .folder_post .folder-container .container {
-      display: none !important;
-  }
-      .video-wrap {
-      position: relative;
-      display: block;
-      height: 100vh;
+    <style>
+        html, body {
+        overflow-x: hidden; 
+        color: black;
+        margin: 0;
+        padding: 0;
+        height: auto;
     }
-    video{
-        filter: grayscale(0);
+    .page.parallax {
+        padding-top: 0px !important;
     }
-    .video-wrap video {
+
+    /* Hide folder headers (SiteGenesis leftover) */
+    .folder-header,
+    .folder_post .folder-container .container {
+        display: none !important;
+    }
+        .video-wrap {
+        position: relative;
+        display: block;
+        height: 100vh;
+        }
+        video{
+            filter: grayscale(0);
+        }
+        .video-wrap video {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* Default (video panel active) */
+        .folder_post-container,
+        .page_footer{
+            display:none;     /* original display: block; */
+        }
+        .folder_post-content {
+            margin-bottom: 0px; /* original margin-bottom: 50px; */
+        }
+        .page-content {
+            height: 100vh; /* original height: 100%; */
+            overflow: hidden; /* add this */
+        }
+        /* Default — lock scroll on video panel */
+        html:not(.panel-open),
+        body:not(.panel-open) {
+            overflow: hidden;
+        }
+
+
+
+        /* When a non-video panel is active — restore originals */
+        /* Panel open — restore scroll */
+        html.panel-open,
+        body.panel-open {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        body.panel-open .folder_post-container,
+        body.panel-open .page_footer { display: block; }
+
+        body.panel-open .folder_post-content { margin-bottom: 50px; }
+
+        body.panel-open .page-content { height: 100%; }
+
+        .panel { display: none; }
+        .panel.is-active { display: block; }
+
+        .video-overlay-middle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .video-overlay-middle img {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+
+        @media (max-width: 767px) {
+            @media (max-width: 767px) {
+            .video-overlay-middle {
+                left: 6%;
+                transform: none;
+                top: unset;        /* remove vertical centering */
+                bottom: 60%;       /* position it above the left/right labels */
+            }
+        }
+            .video-overlay-middle img {
+                width: 93%;
+                height: auto;
+            }
+        }
+
+        .video-overlay-left,
+        .video-overlay-right {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fff;
+            z-index: 10;
+        }
+
+        .video-overlay-left  { left: 40px; }
+        .video-overlay-right { right: 40px; }
+
+        .video-overlay-left,
+        .video-overlay-right {
+            cursor: pointer;
+        }
+
+        .video-overlay-left .left-arrow  { display: inline; }
+        .video-overlay-left .right-arrow { display: none; } 
+        @media (max-width: 767px) {
+            .video-overlay-left,
+            .video-overlay-right {
+                top: unset;
+                transform: none;
+                left: 7%;
+                text-align: left;
+                width: 85%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .video-overlay-left  { bottom: 35%; }
+            .video-overlay-right { bottom: 30%; }
+
+            /* Hide the left-pointing arrow on mobile*/
+            .video-overlay-left .left-arrow  { display: none; }
+            .video-overlay-left .right-arrow { display: inline; }
+
+            /* Move right arrow to end on mobile */
+            .video-overlay-left .right-arrow {
+                flex-direction: row;
+            }
+
+            /* Move right arrow to end on mobile */
+            .video-overlay-right .right-arrow {
+                flex-direction: row;
+            }
+            
+        }
+        
+
+
+    .video-wrapper {
+    position: relative;
+    display: block;
+    max-width: 100%;
+    }
+    .video-media-container video {
         width: 100%;
         height: auto;
         display: block;
         object-fit: cover;
     }
 
-    /* Default (video panel active) */
-    .folder_post-container,
-    .page_footer{
-        display:none;     /* original display: block; */
-    }
-    .folder_post-content {
-        margin-bottom: 0px; /* original margin-bottom: 50px; */
-    }
-    .page-content {
-        height: 100vh; /* original height: 100%; */
-        overflow: hidden; /* add this */
-    }
-    /* Default — lock scroll on video panel */
-    html:not(.panel-open),
-    body:not(.panel-open) {
-        overflow: hidden;
+    /* Hide controls by default, show on hover */
+    .controls {
+    opacity: 0;
+    transition: opacity 0.3s ease;
     }
 
-
-
-    /* When a non-video panel is active — restore originals */
-    /* Panel open — restore scroll */
-    html.panel-open,
-    body.panel-open {
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-    body.panel-open .folder_post-container,
-    body.panel-open .page_footer { display: block; }
-
-    body.panel-open .folder_post-content { margin-bottom: 50px; }
-
-    body.panel-open .page-content { height: 100%; }
-
-    .panel { display: none; }
-    .panel.is-active { display: block; }
-
-    .video-overlay-middle {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        pointer-events: none;
+    .video-wrapper:hover .controls {
+    opacity: 1;
     }
 
-    .video-overlay-middle img {
-        height: 40px;
-        width: auto;
-        display: block;
+    .controls {
+    position: absolute;
+    bottom: 1rem;
+    width: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
     }
 
-    @media (max-width: 767px) {
-        @media (max-width: 767px) {
-        .video-overlay-middle {
-            left: 6%;
-            transform: none;
-            top: unset;        /* remove vertical centering */
-            bottom: 60%;       /* position it above the left/right labels */
-        }
-    }
-        .video-overlay-middle img {
-            width: 93%;
-            height: auto;
-        }
+    .controls button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
     }
 
-    .video-overlay-left,
-    .video-overlay-right {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #fff;
-        z-index: 10;
+    .controls button img {
+    display: block;
+    }
+    .icon-play, .icon-pause {
+    width: 12px;
+    height: 24px;
+    }
+    .icon-mute, .icon-unmute {
+    width: 12px;
+    height: 12px;
+    }
+    .controls .mute {
+    transform: translateY(-1.5px); /* tweak: -1px to -4px */
+    }
+    /* play / pause icons */
+    .icon-pause { display: none; }
+    .play.is-playing .icon-play { display: none; }
+    .play.is-playing .icon-pause { display: inline; }
+    .play.is-paused .icon-play {display: inline;}
+    .play.is-paused .icon-pause {display: none;}
+
+    .timeline {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    }
+    /* SMOOTH PROGRESS BAR */
+    .progressBar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    overflow: hidden;
     }
 
-    .video-overlay-left  { left: 40px; }
-    .video-overlay-right { right: 40px; }
-
-    .video-overlay-left,
-    .video-overlay-right {
-        cursor: pointer;
+    .progressFill {
+    height: 100%;
+    width: 100%;
+    background: white;
+    transform: scaleX(0);
+    transform-origin: left;
+    will-change: transform;
     }
 
-    .video-overlay-left .left-arrow  { display: inline; }
-    .video-overlay-left .right-arrow { display: none; } 
-    @media (max-width: 767px) {
-        .video-overlay-left,
-        .video-overlay-right {
-            top: unset;
-            transform: none;
-            left: 7%;
-            text-align: left;
-            width: 85%;
+    /* invisible seek input */
+    .seek {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    }
+        
+        .editorial-nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 20px 40px;
         }
 
-        .video-overlay-left  { bottom: 35%; }
-        .video-overlay-right { bottom: 30%; }
-
-        /* Hide the left-pointing arrow on mobile*/
-        .video-overlay-left .left-arrow  { display: none; }
-        .video-overlay-left .right-arrow { display: inline; }
-
-        /* Move right arrow to end on mobile */
-        .video-overlay-left .right-arrow {
-            flex-direction: row;
+        .editorial-nav__left,
+        .editorial-nav__right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.2s ease;
         }
 
-        /* Move right arrow to end on mobile */
-        .video-overlay-right .right-arrow {
-            flex-direction: row;
+        .editorial-nav__left.is-active,
+        .editorial-nav__right.is-active {
+            opacity: 0.4;
+            pointer-events: none;
+            cursor: default;
         }
-        
-    }
-    
 
-
-.video-wrapper {
-  position: relative;
-  display: block;
-  max-width: 100%;
-}
-.video-media-container video {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: cover;
-  }
-
-/* Hide controls by default, show on hover */
-.controls {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.video-wrapper:hover .controls {
-  opacity: 1;
-}
-
-.controls {
-  position: absolute;
-  bottom: 1rem;
-  width: 85%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-.controls button {
-  background: none;
-  border: 0;
-  cursor: pointer;
-  padding: 0;
-}
-
-.controls button img {
-  display: block;
-}
-.icon-play, .icon-pause {
-  width: 12px;
-  height: 24px;
-}
-.icon-mute, .icon-unmute {
-  width: 12px;
-  height: 12px;
-}
-.controls .mute {
-  transform: translateY(-1.5px); /* tweak: -1px to -4px */
-}
-/* play / pause icons */
-.icon-pause { display: none; }
-.play.is-playing .icon-play { display: none; }
-.play.is-playing .icon-pause { display: inline; }
-.play.is-paused .icon-play {display: inline;}
-.play.is-paused .icon-pause {display: none;}
-
-.timeline {
-  flex: 1;
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-/* SMOOTH PROGRESS BAR */
-.progressBar {
-  width: 100%;
-  height: 4px;
-  background: rgba(255,255,255,0.3);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  width: 100%;
-  background: white;
-  transform: scaleX(0);
-  transform-origin: left;
-  will-change: transform;
-}
-
-/* invisible seek input */
-.seek {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-    
-    .editorial-nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px 40px;
-    }
-
-    .editorial-nav__left,
-    .editorial-nav__right {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 11px;
-        letter-spacing: 0.1em;
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-        white-space: nowrap;
-        opacity: 1;
-        transition: opacity 0.2s ease;
-    }
-
-    .editorial-nav__left.is-active,
-    .editorial-nav__right.is-active {
-        opacity: 0.4;
-        pointer-events: none;
-        cursor: default;
-    }
-
-    .editorial-nav__left:hover,
-    .editorial-nav__right:hover {
-        /* opacity: 0.7; */
-        text-decoration: none;
-    }
-
-    .editorial-nav__center {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .editorial-nav__center img {
-        height: 30px;
-        width: auto;
-        display: block;
-    }
-
-    .editorial-nav svg {
-        pointer-events: none;
-    }
-
-    @media (max-width: 768px) {
-        .editorial-nav {
-            padding: 20px 0px;
+        .editorial-nav__left:hover,
+        .editorial-nav__right:hover {
+            /* opacity: 0.7; */
+            text-decoration: none;
         }
+
         .editorial-nav__center {
-            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
-        .editorial-nav__right.toggle-panel.display-desktop,
-        .editorial-nav__left.toggle-panel.display-desktop{
-            display: none;
+
+        .editorial-nav__center img {
+            height: 30px;
+            width: auto;
+            display: block;
         }
+
+        .editorial-nav svg {
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .editorial-nav {
+                padding: 20px 0px;
+            }
+            .editorial-nav__center {
+                margin: 0 auto;
+            }
+            .editorial-nav__right.toggle-panel.display-desktop,
+            .editorial-nav__left.toggle-panel.display-desktop{
+                display: none;
+            }
+        }
+    /** Toggle panel hover underline effect */
+    /* shared base */
+    .nav-text {
+        position: relative;
+        display: inline-block;
+        font-size: 14px;
     }
-/** Toggle panel hover underline effect */
-/* shared base */
-.nav-text {
-    position: relative;
-    display: inline-block;
-    font-size: 14px;
-}
 
-.nav-text::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    width: 0;
-    height: 1px;
-    transition: width 0.3s ease;
-}
+    .nav-text::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0;
+        height: 1px;
+        transition: width 0.3s ease;
+    }
 
-/* video overlay — white */
-.video-overlay-left .nav-text::after,
-.video-overlay-right .nav-text::after {
-    background: #fff;
-}
+    /* video overlay — white */
+    .video-overlay-left .nav-text::after,
+    .video-overlay-right .nav-text::after {
+        background: #fff;
+    }
 
-/* editorial nav — black */
-.editorial-nav .nav-text::after {
-    background: #000;
-}
+    /* editorial nav — black */
+    .editorial-nav .nav-text::after {
+        background: #000;
+    }
 
-.video-overlay-left:hover .nav-text::after,
-.video-overlay-right:hover .nav-text::after,
-.editorial-nav__left:hover .nav-text::after,
-.editorial-nav__right:hover .nav-text::after {
-    width: 100%;
-}
+    .video-overlay-left:hover .nav-text::after,
+    .video-overlay-right:hover .nav-text::after,
+    .editorial-nav__left:hover .nav-text::after,
+    .editorial-nav__right:hover .nav-text::after {
+        width: 100%;
+    }
 
-/* General image styling */
-.pair-container img {
-  width: 100%;           /* Image fills 50% of container */
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
+    /* General image styling */
+    .pair-container img {
+    width: 100%;           /* Image fills 50% of container */
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    }
 
-/* Desktop layout */
-.pair-container {
-  display: flex;
-  width: 100%;
-  margin: 0 auto;
-  gap: 15px;
-}
-
-/* Mobile layout - Stack images vertically */
-@media (max-width: 768px) {
-  .pair-container {
-    display: flex;          /* Keep flex */
-    flex-direction: column; /* Stack vertically */
+    /* Desktop layout */
+    .pair-container {
+    display: flex;
     width: 100%;
     margin: 0 auto;
-    gap: 0px;
-  }
-
-  .pair-container img {
-    width: 100%;
-    margin-bottom: 15px;
-  }
-
-  .pair-container img:last-child {
-    margin-bottom: 0;
-  }
-  .pair-container img:first-child {
-    order: 2;
-  }
-
-  .pair-container img:last-child {
-    order: 1;
-  }
-}
-
-.description-text {
-    font-family: proxima-nova;
-    font-size: 25px;
-    width: 40%;
-    margin: 0 auto;
-    text-align: left;
-}
-
-@media (max-width: 767.98px) {
-    .description-text {
-        width: 90%;
+    gap: 15px;
     }
-}
 
-    .responsive-width {
-        width: 40%;
-        margin: 100px auto;
-        display: block;
-    }
-    .responsive-width img{
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-    .responsive-width video {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
+    /* Mobile layout - Stack images vertically */
     @media (max-width: 768px) {
-        .responsive-width {
-            width: 100%;
-        }
+    .pair-container {
+        display: flex;          /* Keep flex */
+        flex-direction: column; /* Stack vertically */
+        width: 100%;
+        margin: 0 auto;
+        gap: 0px;
     }
 
-    .img-wrap {
-      position: relative;
-      display: block;
-      max-width: 100%;
+    .pair-container img {
+        width: 100%;
+        margin-bottom: 15px;
     }
 
-    .img-wrap img {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: cover;
+    .pair-container img:last-child {
+        margin-bottom: 0;
+    }
+    .pair-container img:first-child {
+        order: 2;
     }
 
-    .middle-image{
+    .pair-container img:last-child {
+        order: 1;
+    }
+    }
+
+    .description-text {
+        font-family: proxima-nova;
+        font-size: 25px;
         width: 40%;
         margin: 0 auto;
-        display: block;
-    }
-    .middle-caption {
-        width: 40%;
-        margin: 100px auto 0;
-        font-size: 14px;
         text-align: left;
     }
 
-    @media (max-width: 768px) {
-        .middle-image{
-            width: 100%;
-        }
-        .middle-caption {
+    @media (max-width: 767.98px) {
+        .description-text {
             width: 90%;
         }
     }
 
-    /* ── EDITORIAL PHOTO STACK ── */
-.editorial-photo-stack {
-  padding: 0;
-}
+        .responsive-width {
+            width: 40%;
+            margin: 100px auto;
+            display: block;
+        }
+        .responsive-width img{
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .responsive-width video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .responsive-width {
+                width: 100%;
+            }
+        }
 
-/* DESKTOP: vertical stack */
-.photo-stack-list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 40px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+        .img-wrap {
+        position: relative;
+        display: block;
+        max-width: 100%;
+        }
 
-.photo-stack-item {
-  width: 40%;
-  max-width: 380px;
-}
+        .img-wrap img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+        }
 
-.photo-stack-item img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+        .middle-image{
+            width: 40%;
+            margin: 0 auto;
+            display: block;
+        }
+        .middle-caption {
+            width: 40%;
+            margin: 100px auto 0;
+            font-size: 14px;
+            text-align: left;
+        }
 
-.photo-stack-caption {
-  font-family: proxima-nova, sans-serif;
-  font-size: 11px;
-  color: #555;
-  margin-top: 8px;
-  line-height: 1.2;
-}
+        @media (max-width: 768px) {
+            .middle-image{
+                width: 100%;
+            }
+            .middle-caption {
+                width: 90%;
+            }
+        }
 
-/* MOBILE: hide stack, show slider */
-.photo-slider {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .photo-stack-list {
-    display: none;
-  }
-
-  .photo-slider {
-    display: block;
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    margin-bottom: 100px;
-  }
-  .photo-slider-track {
-    cursor: grab;
+        /* ── EDITORIAL PHOTO STACK ── */
+    .editorial-photo-stack {
+    padding: 0;
     }
 
-    .photo-slider-track:active {
-    cursor: grabbing;
-    }
-  .photo-slider-track {
+    /* DESKTOP: vertical stack */
+    .photo-stack-list {
     display: flex;
-    transition: transform 0.5s ease;
-    will-change: transform;
-  }
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    }
 
-  .photo-slider-slide {
-    min-width: 100%;
-    padding: 0 20px;
-    box-sizing: border-box;
-  }
+    .photo-stack-item {
+    width: 40%;
+    max-width: 380px;
+    }
 
-  .photo-slider-slide img {
+    .photo-stack-item img {
     width: 100%;
     height: auto;
     display: block;
-  }
+    }
 
-  .photo-slider-caption {
+    .photo-stack-caption {
     font-family: proxima-nova, sans-serif;
     font-size: 11px;
     color: #555;
     margin-top: 8px;
-    line-height: 1.5;
-  }
-
-  /* Dot indicators */
-  .photo-slider-dots {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 16px;
+    line-height: 1.2;
     }
 
-    .photo-slider-dots button {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        border: none;
-        background: #ccc;
-        outline: none;
-        padding: 0;
-        cursor: pointer;
+    /* MOBILE: hide stack, show slider */
+    .photo-slider {
+    display: none;
     }
 
-    .photo-slider-dots button.is-active {
-        background: #111          
+    @media (max-width: 767px) {
+    .photo-stack-list {
+        display: none;
     }
-}
-</style>
-</head>
 
-<body>
+    .photo-slider {
+        display: block;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        margin-bottom: 100px;
+    }
+    .photo-slider-track {
+        cursor: grab;
+        }
 
-<!-- Panel 1: Video -->
-<div class="panel is-active" id="panel-video">
-    <div class="video-wrap js-vertical-slider" style="position: relative;">
-        <video class="d-md-block d-none" playsinline autoplay loop muted
-            style="height: 100%; object-fit: cover;" preload="auto">
-            <source src="images/design-philosophy/demi/dp-demi-a1.mp4" type="video/mp4">
-        </video>
-        <video class="d-md-none d-block" playsinline autoplay loop muted
-            style="height: 100%; object-fit: cover;" preload="none">
-            <source src="images/design-philosophy/demi/dp-demi-a1_mobile.mp4" type="video/mp4">
-        </video>
+        .photo-slider-track:active {
+        cursor: grabbing;
+        }
+    .photo-slider-track {
+        display: flex;
+        transition: transform 0.5s ease;
+        will-change: transform;
+    }
 
-        
-        <div class="video-overlay-left">
-            <img class="left-arrow toggle-panel" data-target="panel1"
-                src="images/future-in-hand/arrow_left_white.svg"
-                alt="" style="width: 5px; height: 9px; vertical-align: 1px; margin-right: 10px;">
+    .photo-slider-slide {
+        min-width: 100%;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
 
-            <span class="toggle-panel nav-text" data-target="panel1">
-                BEHIND THE CRAFT
-            </span>
+    .photo-slider-slide img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
 
-            <img class="right-arrow toggle-panel" data-target="panel1"
-                src="images/future-in-hand/arrow_right_white.svg"
-                alt="" style="width: 5px; height: 9px; vertical-align: 1px;">
-        </div>
+    .photo-slider-caption {
+        font-family: proxima-nova, sans-serif;
+        font-size: 11px;
+        color: #555;
+        margin-top: 8px;
+        line-height: 1.5;
+    }
 
-        <!-- Overlay Text Right — clicking this toggles to panel 2 -->
-        <div class="video-overlay-middle">
-            <img src="images/future-in-hand/pedro-efi-logo_white.png" alt="" >
-        </div>
-        
-        <!-- Overlay Text Right — clicking this toggles to panel 2 -->
-        <div class="video-overlay-right">
-            <span class="toggle-panel nav-text" data-target="panel2">
-                FUTURE IN HAND
-            </span>
+    /* Dot indicators */
+    .photo-slider-dots {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 16px;
+        }
 
-            <img class="right-arrow toggle-panel" data-target="panel2"
-                src="images/future-in-hand/arrow_right_white.svg"
-                alt="" style="width: 5px; height: 9px; vertical-align: 1px; margin-left: 10px;">
-        </div>
-    </div>
-</div>
+        .photo-slider-dots button {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            border: none;
+            background: #ccc;
+            outline: none;
+            padding: 0;
+            cursor: pointer;
+        }
 
+        .photo-slider-dots button.is-active {
+            background: #111          
+        }
+    }
+    </style>
+    </head>
 
-<!-- Panel 1: Your content here -->
-<div class="panel" id="panel-panel1">
-    <div class="video-wrapper js-vertical-slider">
-        <div class="video-media-container">
-            <!-- Video Background (Desktop) -->
-            <video class="video d-md-block d-none" playsinline auto autoplay loop muted
-                style="width: 100%; object-fit: cover;">
+    <body>
+
+    <!-- Panel 1: Video -->
+    <div class="panel is-active" id="panel-video">
+        <div class="video-wrap js-vertical-slider" style="position: relative;">
+            <video class="d-md-block d-none" playsinline autoplay loop muted
+                style="height: 100%; object-fit: cover;" preload="auto">
                 <source src="images/design-philosophy/demi/dp-demi-a1.mp4" type="video/mp4">
-                Your browser does not support the video tag.
             </video>
-
-            <!-- Mobile Video -->
-            <video class="video d-md-none d-block" playsinline auto autoplay loop muted
-                style="width: 100%; object-fit: cover;">
+            <video class="d-md-none d-block" playsinline autoplay loop muted
+                style="height: 100%; object-fit: cover;" preload="none">
                 <source src="images/design-philosophy/demi/dp-demi-a1_mobile.mp4" type="video/mp4">
-                Your browser does not support the video tag.
             </video>
-            <div class="controls">
-            <button class="play is-playing">
-                <img class="icon-play" src="images/media-assets/play-white.svg">
-                <img class="icon-pause" src="images/media-assets/pause-white.svg">
-            </button>
 
-            <div class="timeline">
-                <div class="progressBar">
-                <div class="progressFill"></div>
+            
+            <div class="video-overlay-left">
+                <img class="left-arrow toggle-panel" data-target="panel1"
+                    src="images/future-in-hand/arrow_left_white.svg"
+                    alt="" style="width: 5px; height: 9px; vertical-align: 1px; margin-right: 10px;">
+
+                <span class="toggle-panel nav-text" data-target="panel1">
+                    BEHIND THE CRAFT
+                </span>
+
+                <img class="right-arrow toggle-panel" data-target="panel1"
+                    src="images/future-in-hand/arrow_right_white.svg"
+                    alt="" style="width: 5px; height: 9px; vertical-align: 1px;">
+            </div>
+
+            <!-- Overlay Text Right — clicking this toggles to panel 2 -->
+            <div class="video-overlay-middle">
+                <img src="images/future-in-hand/pedro-efi-logo_white.png" alt="" >
+            </div>
+            
+            <!-- Overlay Text Right — clicking this toggles to panel 2 -->
+            <div class="video-overlay-right">
+                <span class="toggle-panel nav-text" data-target="panel2">
+                    FUTURE IN HAND
+                </span>
+
+                <img class="right-arrow toggle-panel" data-target="panel2"
+                    src="images/future-in-hand/arrow_right_white.svg"
+                    alt="" style="width: 5px; height: 9px; vertical-align: 1px; margin-left: 10px;">
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Panel 1: Your content here -->
+    <div class="panel" id="panel-panel1">
+        <div class="video-wrapper js-vertical-slider">
+            <div class="video-media-container">
+                <!-- Video Background (Desktop) -->
+                <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+                    style="width: 100%; object-fit: cover;">
+                    <source src="images/design-philosophy/demi/dp-demi-a1.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+
+                <!-- Mobile Video -->
+                <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+                    style="width: 100%; object-fit: cover;">
+                    <source src="images/design-philosophy/demi/dp-demi-a1_mobile.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="controls">
+                <button class="play is-playing">
+                    <img class="icon-play" src="images/media-assets/play-white.svg">
+                    <img class="icon-pause" src="images/media-assets/pause-white.svg">
+                </button>
+
+                <div class="timeline">
+                    <div class="progressBar">
+                    <div class="progressFill"></div>
+                    </div>
+                    <input class="seek" type="range" value="0" min="0" step="0.01">
                 </div>
-                <input class="seek" type="range" value="0" min="0" step="0.01">
-            </div>
 
-            <button class="mute">
-                <img class="icon-mute" src="images/media-assets/mute.png">
-                <img class="icon-unmute" src="images/media-assets/unmute.png" style="display:none;">
-            </button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="editorial-nav">
-        <!-- Left -->
-        <a class="editorial-nav__left toggle-panel display-desktop" data-target="panel1" href="javascript:void(0)">
-            <img src="images/future-in-hand/arrow_left_black.svg" 
-                alt="" style="width: 5px; height: 9px; pointer-events: none;">
-            <span class="nav-text">BEHIND THE CRAFT</span>
-        </a>
-
-        <!-- Center logos -->
-        <div class="editorial-nav__center">
-            <img src="images/future-in-hand/pedro-efi-logo_black.png" alt="PEDRO">
-        </div>
-
-        <!-- Right -->
-        <a class="editorial-nav__right toggle-panel display-desktop" data-target="panel2" href="javascript:void(0)">
-            <span class="nav-text">FUTURE IN HAND</span>
-            <img src="images/future-in-hand/arrow_right_black.svg" 
-                alt="" style="width: 5px; height: 9px; pointer-events: none;">
-        </a>
-    </div>
-    
-    <section class="d-block">
-        <div class="position-relative text-center" style="margin: 80px 0px 100px 0px;">
-            <!-- Desktop Description -->
-            <p class="mb-0 d-md-block d-none" style="font-family:proxima-nova; font-size:25px; width:40%; margin: 0 auto; text-align: left;">
-            A product is only as meaningful as the hands that shaped it. By shedding light on the individuals whose expertise is woven into each piece, we honour a community of makers whose lives and lineages are the true soul of this collection.
-            </p>
-
-            <!-- Mobile Description -->
-            <p class="mb-0 d-block d-md-none" style="font-family:proxima-nova; font-size:25px; width:90%; margin: 0 auto; text-align: left;">
-            A product is only as meaningful as the hands that shaped it. By shedding light on the individuals whose expertise is woven into each piece, we honour a community of makers whose lives and lineages are the true soul of this collection.
-            </p>  
-        </div>
-   </section>
-
-   <div class="pair-container d-md-flex">
-        <picture>
-            <!-- Mobile version (smaller image) -->
-            <source src="images/future-in-hand/behind-the-craft_b1.jpg" alt="Bag" media="(max-width: 768px)">
-            <!-- Web version (larger image) -->
-            <img src="images/future-in-hand/behind-the-craft_b1.jpg" alt="Bag">
-        </picture>
-        <picture>
-            <!-- Mobile version (smaller image) -->
-            <source src="images/future-in-hand/behind-the-craft_b2.jpg" alt="Bag" media="(max-width: 768px)">
-            <!-- Web version (larger image) -->
-            <img src="images/future-in-hand/behind-the-craft_b2.jpg" alt="Bag">
-        </picture>
-    </div>
-
-    <section class="d-block">
-        <div class="position-relative text-center" style="margin:100px 0;">
-            <div class="description-text">
-                <p style="font-size:20px; line-height:1.2;">
-                    <span style="font-weight:500;">Ilboudo Pauline,</span><br>
-                    <span style="font-style:italic;">Weaver</span>
-                </p>
-
-                <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
-                    Pauline believes handmade fabric carries a history that machines cannot replicate. For her, working with local cotton is an act of pride, connecting her heritage to a global audience.
-                </p>
-
-                <p style="font-size:14px; line-height:1.2; font-weight:500;">
-                    What is the most important advice you give to someone new joining?
-                </p>
-
-                <p style="font-size:14px; line-height:1.2;">
-                    I tell them to be patient and to learn step by step. It is important to do the work honestly, enjoy what you are doing, and trust the process. With time, they will improve.
-                </p>
-
-                <p style="font-size:14px; line-height:1.2; font-weight:500;">
-                    How does it feel to know that your work is being carried around the world?
-                </p>
-
-                <p style="font-size:14px; line-height:1.2;">
-                    I feel very proud that our quality is recognised globally. It gives me a sense of encouragement, knowing that something made by hand here can be valued so far beyond our local community.
-                </p>
+                <button class="mute">
+                    <img class="icon-mute" src="images/media-assets/mute.png">
+                    <img class="icon-unmute" src="images/media-assets/unmute.png" style="display:none;">
+                </button>
+                </div>
             </div>
         </div>
-    </section>
+        
+        <div class="editorial-nav">
+            <!-- Left -->
+            <a class="editorial-nav__left toggle-panel display-desktop" data-target="panel1" href="javascript:void(0)">
+                <img src="images/future-in-hand/arrow_left_black.svg" 
+                    alt="" style="width: 5px; height: 9px; pointer-events: none;">
+                <span class="nav-text">BEHIND THE CRAFT</span>
+            </a>
 
-
-    <div class="pair-container d-md-flex">
-        <picture>
-            <!-- Mobile version (smaller image) -->
-            <source src="images/future-in-hand/behind-the-craft_c1.jpg" alt="Bag" media="(max-width: 768px)">
-            <!-- Web version (larger image) -->
-            <img src="images/future-in-hand/behind-the-craft_c1.jpg" alt="Bag">
-        </picture>
-        <picture>
-            <!-- Mobile version (smaller image) -->
-            <source src="images/future-in-hand/behind-the-craft_c2.jpg" alt="Bag" media="(max-width: 768px)">
-            <!-- Web version (larger image) -->
-            <img src="images/future-in-hand/behind-the-craft_c2.jpg" alt="Bag">
-        </picture>
-    </div>
-
-    <section class="d-block">
-        <div class="position-relative text-center" style="margin:100px 0;">
-            <div class="description-text">
-                <p style="font-size:20px; line-height:1.2;">
-                    <span style="font-weight:500;">Djiga Ibrahima, </span><br>
-                    <span style="font-style:italic;">Production Director</span>
-                </p>
-
-                <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
-                    A master who finds quietude in the rhythm of the loom. Now a teacher, he maintains that patience is the first lesson any hand must learn to preserve the integrity of the craft.
-                </p>
-
-                <p style="font-size:14px; line-height:1.2; font-weight:500;">
-                    What makes Burkina Faso textiles unique compared to the rest of the world?
-                </p>
-
-                <p style="font-size:14px; line-height:1.2;">
-                    Our textiles are an expression of culture. It is knowledge we learn young and carry with us. It is not just about producing fabric, but about preserving a way of making that has meaning.
-                </p>
-
-                <p style="font-size:14px; line-height:1.2; font-weight:500;">
-                    How has the work changed now compared to the past?
-                </p>
-
-                <p style="font-size:14px; line-height:1.2;">
-                    In the past, weaving was done individually at home. Today, it is more organised with defined roles and a focus on quality. What remains the same is the foundation, the techniques are still rooted in our culture.
-                </p>
+            <!-- Center logos -->
+            <div class="editorial-nav__center">
+                <img src="images/future-in-hand/pedro-efi-logo_black.png" alt="PEDRO">
             </div>
+
+            <!-- Right -->
+            <a class="editorial-nav__right toggle-panel display-desktop" data-target="panel2" href="javascript:void(0)">
+                <span class="nav-text">FUTURE IN HAND</span>
+                <img src="images/future-in-hand/arrow_right_black.svg" 
+                    alt="" style="width: 5px; height: 9px; pointer-events: none;">
+            </a>
         </div>
+        
+        <section class="d-block">
+            <div class="position-relative text-center" style="margin: 80px 0px 100px 0px;">
+                <!-- Desktop Description -->
+                <p class="mb-0 d-md-block d-none" style="font-family:proxima-nova; font-size:25px; width:40%; margin: 0 auto; text-align: left;">
+                A product is only as meaningful as the hands that shaped it. By shedding light on the individuals whose expertise is woven into each piece, we honour a community of makers whose lives and lineages are the true soul of this collection.
+                </p>
+
+                <!-- Mobile Description -->
+                <p class="mb-0 d-block d-md-none" style="font-family:proxima-nova; font-size:25px; width:90%; margin: 0 auto; text-align: left;">
+                A product is only as meaningful as the hands that shaped it. By shedding light on the individuals whose expertise is woven into each piece, we honour a community of makers whose lives and lineages are the true soul of this collection.
+                </p>  
+            </div>
     </section>
 
     <div class="pair-container d-md-flex">
-        <picture>
-            <!-- Mobile version (smaller image) -->
-            <source src="images/future-in-hand/behind-the-craft_d1.jpg" alt="Bag" media="(max-width: 768px)">
-            <!-- Web version (larger image) -->
-            <img src="images/future-in-hand/behind-the-craft_d1.jpg" alt="Bag">
-        </picture>
-        <picture>
-            <!-- Mobile version (smaller image) -->
-            <source src="images/future-in-hand/behind-the-craft_d2.jpg" alt="Bag" media="(max-width: 768px)">
-            <!-- Web version (larger image) -->
-            <img src="images/future-in-hand/behind-the-craft_d2.jpg" alt="Bag">
-        </picture>
-    </div>
-
-    <section class="d-block">
-        <div class="position-relative text-center" style="margin:100px 0;">
-            <div class="description-text">
-                <p style="font-size:20px; line-height:1.2;">
-                    <span style="font-weight:500;">Kiendrebeogo Isseta Pélagie,</span><br>
-                    <span style="font-style:italic;">Weaver</span>
-                </p>
-
-                <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
-                    After 16 years, Pélagie’s hands move by memory. She finds purpose in the slow, steady pace of the work, which allows her to support her family and find pride in every finished piece.
-                </p>
-
-                <p style="font-size:14px; line-height:1.2; font-weight:500;">
-                    How would you describe the craft to someone who has never seen it?
-                </p>
-
-                <p style="font-size:14px; line-height:1.2;">
-                    The work requires both skill and patience. Everything is done by hand, so the process builds with experience. After many years, you become more confident and efficient in the rhythm.
-                </p>
-
-                <p style="font-size:14px; line-height:1.2; font-weight:500;">
-                    Why is it important to keep passing this knowledge down through generations?
-                </p>
-
-                <p style="font-size:14px; line-height:1.2;">
-                    This is something we learn from others and continue to build on. Sharing this knowledge creates value for us, both in our work and in our lives, allowing others to benefit from the craft as well.
-                </p>
-            </div>
+            <picture>
+                <!-- Mobile version (smaller image) -->
+                <source src="images/future-in-hand/behind-the-craft_b1.jpg" alt="Bag" media="(max-width: 768px)">
+                <!-- Web version (larger image) -->
+                <img src="images/future-in-hand/behind-the-craft_b1.jpg" alt="Bag">
+            </picture>
+            <picture>
+                <!-- Mobile version (smaller image) -->
+                <source src="images/future-in-hand/behind-the-craft_b2.jpg" alt="Bag" media="(max-width: 768px)">
+                <!-- Web version (larger image) -->
+                <img src="images/future-in-hand/behind-the-craft_b2.jpg" alt="Bag">
+            </picture>
         </div>
-    </section>
 
-   
-    <div class="responsive-width" style="margin-bottom: 50px;">
-        <picture>
-          <!-- Mobile version (smaller image) -->
-          <source src="images/future-in-hand/behind-the-craft_e1.jpg" alt="Bag" media="(max-width: 768px)">
-          <!-- Web version (larger image) -->
-          <img src="images/future-in-hand/behind-the-craft_e1.jpg" alt="Bag">
-        </picture>
-    </div>
+        <section class="d-block">
+            <div class="position-relative text-center" style="margin:100px 0;">
+                <div class="description-text">
+                    <p style="font-size:20px; line-height:1.2;">
+                        <span style="font-weight:500;">Ilboudo Pauline,</span><br>
+                        <span style="font-style:italic;">Weaver</span>
+                    </p>
 
+                    <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
+                        Pauline believes handmade fabric carries a history that machines cannot replicate. For her, working with local cotton is an act of pride, connecting her heritage to a global audience.
+                    </p>
 
-    <div class="editorial-nav" style="justify-content: center; border-top: none; border-bottom: none; padding: 100px 0px; font-weight: 500;">
-        <!-- Right -->
-        <a class="editorial-nav__right toggle-panel" data-target="panel2" href="javascript:void(0)">
-            <span class="nav-text">FUTURE IN HAND</span>
-            <img src="images/future-in-hand/arrow_right_black.svg" 
-                alt="" style="width: 5px; height: 9px; pointer-events: none;">
-        </a>
-    </div>
+                    <p style="font-size:14px; line-height:1.2; font-weight:500;">
+                        What is the most important advice you give to someone new joining?
+                    </p>
 
-    <!-- Publish Content -->
-    <div class="publish-content" style = "padding-top: 50px; padding-left: 40px;">
-      <span style="font-size: 18px;">
-          Published on 15 June 2026
-          <br><br>
-          <a href="$url('Search-Show','cgid','pwnewarrivals')$">
-            SHOP WOMEN'S NEW ARRIVALS
-          </a> &gt;
-      </span>
-    </div>
-</div>
+                    <p style="font-size:14px; line-height:1.2;">
+                        I tell them to be patient and to learn step by step. It is important to do the work honestly, enjoy what you are doing, and trust the process. With time, they will improve.
+                    </p>
 
-<!-- Panel 2: Your content here -->
-<div class="panel" id="panel-panel2">
-    <div class="video-wrapper js-vertical-slider">
-        <div class="video-media-container">
-            <!-- Video Background (Desktop) -->
-            <video class="video d-md-block d-none" playsinline auto autoplay loop muted
-                style="width: 100%; object-fit: cover;">
-                <source src="images/design-philosophy/demi/dp-demi-a1.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
+                    <p style="font-size:14px; line-height:1.2; font-weight:500;">
+                        How does it feel to know that your work is being carried around the world?
+                    </p>
 
-            <!-- Mobile Video -->
-            <video class="video d-md-none d-block" playsinline auto autoplay loop muted
-                style="width: 100%; object-fit: cover;">
-                <source src="images/design-philosophy/demi/dp-demi-a1_mobile.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-            <div class="controls">
-            <button class="play is-playing">
-                <img class="icon-play" src="images/media-assets/play-white.svg">
-                <img class="icon-pause" src="images/media-assets/pause-white.svg">
-            </button>
-
-            <div class="timeline">
-                <div class="progressBar">
-                <div class="progressFill"></div>
+                    <p style="font-size:14px; line-height:1.2;">
+                        I feel very proud that our quality is recognised globally. It gives me a sense of encouragement, knowing that something made by hand here can be valued so far beyond our local community.
+                    </p>
                 </div>
-                <input class="seek" type="range" value="0" min="0" step="0.01">
             </div>
+        </section>
 
-            <button class="mute">
-                <img class="icon-mute" src="images/media-assets/mute.png">
-                <img class="icon-unmute" src="images/media-assets/unmute.png" style="display:none;">
-            </button>
-            </div>
-        </div>
-    </div>
-    <div class="editorial-nav">
-        <!-- Left -->
-        <a class="editorial-nav__left toggle-panel display-desktop" data-target="panel1" href="javascript:void(0)">
-            <img src="images/future-in-hand/arrow_left_black.svg" 
-                alt="" style="width: 5px; height: 9px; pointer-events: none;">
-            <span class="nav-text">BEHIND THE CRAFT</span>
-        </a>
 
-        <!-- Center logos -->
-        <div class="editorial-nav__center">
-            <img src="images/future-in-hand/pedro-efi-logo_black.png" alt="PEDRO">
+        <div class="pair-container d-md-flex">
+            <picture>
+                <!-- Mobile version (smaller image) -->
+                <source src="images/future-in-hand/behind-the-craft_c1.jpg" alt="Bag" media="(max-width: 768px)">
+                <!-- Web version (larger image) -->
+                <img src="images/future-in-hand/behind-the-craft_c1.jpg" alt="Bag">
+            </picture>
+            <picture>
+                <!-- Mobile version (smaller image) -->
+                <source src="images/future-in-hand/behind-the-craft_c2.jpg" alt="Bag" media="(max-width: 768px)">
+                <!-- Web version (larger image) -->
+                <img src="images/future-in-hand/behind-the-craft_c2.jpg" alt="Bag">
+            </picture>
         </div>
 
-        <!-- Right -->
-        <a class="editorial-nav__right toggle-panel display-desktop" data-target="panel2" href="javascript:void(0)">
-            <span class="nav-text">FUTURE IN HAND</span>
-            <img src="images/future-in-hand/arrow_right_black.svg" 
-                alt="" style="width: 5px; height: 9px; pointer-events: none;">
-        </a>
+        <section class="d-block">
+            <div class="position-relative text-center" style="margin:100px 0;">
+                <div class="description-text">
+                    <p style="font-size:20px; line-height:1.2;">
+                        <span style="font-weight:500;">Djiga Ibrahima, </span><br>
+                        <span style="font-style:italic;">Production Director</span>
+                    </p>
 
-    </div>
+                    <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
+                        A master who finds quietude in the rhythm of the loom. Now a teacher, he maintains that patience is the first lesson any hand must learn to preserve the integrity of the craft.
+                    </p>
 
-    <section class="d-block">
-        <div class="position-relative text-center" style="margin: 80px 0px 100px 0px;">
-            <div class="description-text">
+                    <p style="font-size:14px; line-height:1.2; font-weight:500;">
+                        What makes Burkina Faso textiles unique compared to the rest of the world?
+                    </p>
 
-                <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
-                    For Summer 2026, PEDRO collaborates with the Ethical Fashion Initiative (EFI) on a capsule collection that brings the heritage of Burkina Faso’s artisanal weaving traditions into contemporary form.
-                </p>
+                    <p style="font-size:14px; line-height:1.2;">
+                        Our textiles are an expression of culture. It is knowledge we learn young and carry with us. It is not just about producing fabric, but about preserving a way of making that has meaning.
+                    </p>
 
-                <p class="d-md-block d-none" style="font-size:25px; line-height:1; margin-bottom: 3rem;">
-                    Sometimes, the things that matter <br>
-                    most are those that take time.
-                </p>
-                <p class="d-md-none d-block" style="font-size:25px; line-height:1; margin-bottom: 3rem;">
-                    Sometimes, the things that matter 
-                    most are those that take time.
-                </p>
+                    <p style="font-size:14px; line-height:1.2; font-weight:500;">
+                        How has the work changed now compared to the past?
+                    </p>
 
-                <p style="font-size:14px; line-height:1.2;">
-                    The collection originates from a focus on texture, proportion, and abstraction as a means of renewing traditional handicraft. At the core of the capsule is hand-loomed cotton, meticulously crafted by artisan families using techniques passed down through generations.
-                </p>
-
-                <p style="font-size:14px; line-height:1.2;">
-                    For many years, these handmade textiles remained largely within local communities, seldom seen beyond them. Today, through collaborations that create wider visibility for traditional craft, these artisans are able to bring their work to a global audience while continuing to preserve the integrity of their practice.
-
-                </p>
-
+                    <p style="font-size:14px; line-height:1.2;">
+                        In the past, weaving was done individually at home. Today, it is more organised with defined roles and a focus on quality. What remains the same is the foundation, the techniques are still rooted in our culture.
+                    </p>
+                </div>
             </div>
+        </section>
+
+        <div class="pair-container d-md-flex">
+            <picture>
+                <!-- Mobile version (smaller image) -->
+                <source src="images/future-in-hand/behind-the-craft_d1.jpg" alt="Bag" media="(max-width: 768px)">
+                <!-- Web version (larger image) -->
+                <img src="images/future-in-hand/behind-the-craft_d1.jpg" alt="Bag">
+            </picture>
+            <picture>
+                <!-- Mobile version (smaller image) -->
+                <source src="images/future-in-hand/behind-the-craft_d2.jpg" alt="Bag" media="(max-width: 768px)">
+                <!-- Web version (larger image) -->
+                <img src="images/future-in-hand/behind-the-craft_d2.jpg" alt="Bag">
+            </picture>
         </div>
-    </section>
 
+        <section class="d-block">
+            <div class="position-relative text-center" style="margin:100px 0;">
+                <div class="description-text">
+                    <p style="font-size:20px; line-height:1.2;">
+                        <span style="font-weight:500;">Kiendrebeogo Isseta Pélagie,</span><br>
+                        <span style="font-style:italic;">Weaver</span>
+                    </p>
 
-    <img src="images/future-in-hand/future-in-hand_b1.jpg" class="middle-image d-md-none" alt="Bag" style="margin-bottom: 100px; width: 80%;">
+                    <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
+                        After 16 years, Pélagie’s hands move by memory. She finds purpose in the slow, steady pace of the work, which allows her to support her family and find pride in every finished piece.
+                    </p>
 
-    <div style="margin-bottom: 100px">
-        <picture>
-            <!-- Mobile version (smaller image) -->
-            <source srcset="images/future-in-hand/future-in-hand_c2.jpg" class="middle-image" alt="Bag" media="(max-width: 768px)">
-            <!-- Web version (larger image) -->
-            <img src="images/future-in-hand/future-in-hand_b1.jpg" class="middle-image" alt="Bag">
-        </picture>
-        
-        <div class="middle-caption">
-            Behind this material language is a shared ecosystem of skill, patience, and mutual support. Produced alongside CABES, a social enterprise supporting the professionalisation of heritage craft, the collection reflects a shared commitment to equitable creation.
-        </div>
-    </div>
+                    <p style="font-size:14px; line-height:1.2; font-weight:500;">
+                        How would you describe the craft to someone who has never seen it?
+                    </p>
 
-    <div class= "d-block d-md-none" style="margin-bottom: 100px ;">
-        <!-- Mobile version (larger image) -->
-        <img src="images/future-in-hand/future-in-hand_c1.jpg" class="middle-image " alt="Bag">
-      
-        
-        <div class="middle-caption">
-            The process itself is slow and entirely manual. Because every fibre is manipulated by hand, no two surfaces are entirely identical; each finished piece carries a unique medley of complementary hues, creating dynamic compositions that shift slightly from one weave to the next.
-        </div>
-    </div>
+                    <p style="font-size:14px; line-height:1.2;">
+                        The work requires both skill and patience. Everything is done by hand, so the process builds with experience. After many years, you become more confident and efficient in the rhythm.
+                    </p>
 
-    <div class="pair-container d-none d-md-flex">
-        <!-- Web version (larger image) -->
-        <img src="images/future-in-hand/future-in-hand_c1.jpg" style= "width: 50%" alt="Bag">
+                    <p style="font-size:14px; line-height:1.2; font-weight:500;">
+                        Why is it important to keep passing this knowledge down through generations?
+                    </p>
 
-        <!-- Web version (larger image) -->
-        <img src="images/future-in-hand/future-in-hand_c2.jpg" style= "width: 50%" alt="Bag">
-    </div>
-
-    <section class="d-none d-md-block">
-        <div class="position-relative text-center" style="margin:100px 0;">
-            <div class="description-text">
-                <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
-                    The process itself is slow and entirely manual. Because every fibre is manipulated by hand, no two surfaces are entirely identical; each finished piece carries a unique medley of complementary hues, creating dynamic compositions that shift slightly from one weave to the next.
-                </p>
+                    <p style="font-size:14px; line-height:1.2;">
+                        This is something we learn from others and continue to build on. Sharing this knowledge creates value for us, both in our work and in our lives, allowing others to benefit from the craft as well.
+                    </p>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-
-    <!-- DESKTOP: vertical stack -->
-    <section class="editorial-photo-stack">
-        <ul class="photo-stack-list">
-            <li class="photo-stack-item">
-            <img src="images/future-in-hand/future-in-hand_d1.jpg" alt="Raw cotton in its primary state, gathered and prepared for the spindle.">Raw cotton in its primary state, gathered and prepared for the spindle.</p>
-            </li>
-            <li class="photo-stack-item">
-            <img src="images/future-in-hand/future-in-hand_d2.jpg" alt="Fibre is spun into spools, establishing the consistent tension required for the loom.">
-            <p class="photo-stack-caption">Fibre is spun into spools, establishing the consistent tension required for the loom.</p>
-            </li>
-            <li class="photo-stack-item">
-            <img src="images/future-in-hand/future-in-hand_d3.jpg" alt="Washed hanks of cotton are hung to dry, allowing the atmosphere to set the material.">
-            <p class="photo-stack-caption">Washed hanks of cotton are hung to dry, allowing the atmosphere to set the material.</p>
-            </li>
-            <li class="photo-stack-item">
-            <img src="images/future-in-hand/future-in-hand_d4.jpg" alt="The introduction of pigment through manual immersion, a process of gradual absorption.">
-            <p class="photo-stack-caption">The introduction of pigment through manual immersion, a process of gradual absorption.</p>
-            </li>
-            <li class="photo-stack-item">
-            <img src="images/future-in-hand/future-in-hand_d5.jpg" alt="The winding of yarn, ensuring the thread is refined and ready for weaving.">
-            <p class="photo-stack-caption">The winding of yarn, ensuring the thread is refined and ready for weaving.</p>
-            </li>
-            <li class="photo-stack-item">
-            <img src="images/future-in-hand/future-in-hand_d6.jpg" alt="Individual threads merge into a finished textile, defined by a dense and distinct grain.">
-            <p class="photo-stack-caption">Individual threads merge into a finished textile, defined by a dense and distinct grain.</p>
-            </li>
-        </ul>
-
-        <!-- MOBILE: looping slider (same images) -->
-        <div class="photo-slider" aria-label="Photo slideshow">
-            <div class="photo-slider-track">
-            <div class="photo-slider-slide">
-                <img src="images/future-in-hand/future-in-hand_d1.jpg" alt="">Raw cotton in its primary state, gathered and prepared for the spindle.</p>
-            </div>
-            <div class="photo-slider-slide">
-                <img src="images/future-in-hand/future-in-hand_d2.jpg" alt="">
-                <p class="photo-slider-caption">Fibres in spool form, establishing the consistent tension required for the loom.</p>
-            </div>
-            <div class="photo-slider-slide">
-                <img src="images/future-in-hand/future-in-hand_d3.jpg" alt="">
-                <p class="photo-slider-caption">Washed hanks of cotton are hung to dry, allowing the atmosphere to set the material.</p>
-            </div>
-            <div class="photo-slider-slide">
-                <img src="images/future-in-hand/future-in-hand_d4.jpg" alt="">
-                <p class="photo-slider-caption">The introduction of pigment through manual immersion, a process of gradual absorption.</p>
-            </div>
-            <div class="photo-slider-slide">
-                <img src="images/future-in-hand/future-in-hand_d5.jpg" alt="">
-                <p class="photo-slider-caption">The winding of yarn, ensuring the thread is refined and ready for weaving.</p>
-            </div>
-            <div class="photo-slider-slide">
-                <img src="images/future-in-hand/future-in-hand_d6.jpg" alt="">
-                <p class="photo-slider-caption">Individual threads merge into a finished textile, defined by a dense and distinct grain.</p>
-            </div>
-            </div>
-            <div class="photo-slider-dots"></div>
-        </div>
-    </section>
-
-    <section class="d-none d-md-block">
-        <div class="position-relative text-center" style="margin:100px 0;">
-            <div class="description-text">
-                <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
-                    Set against the signature Alyssa bag, these expressive textiles allow traditional knowledge to remain culturally relevant within a modern landscape. It leaves us with a singular, grounding thought: that the objects we hold closest are often those marked by the indelible imprint of human care.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <div class="img-wrap js-vertical-slider">
-        <a class="js-shop-the-collection" data-pid="PM1-66210004_DK.TAU" href="$url('Product-Show','pid','PM2-26320159-6_NVY.DE')$">
+    
+        <div class="responsive-width" style="margin-bottom: 50px;">
             <picture>
             <!-- Mobile version (smaller image) -->
-            <source srcset="images/future-in-hand/future-in-hand_e1.jpg" alt="Bag" media="(max-width: 768px)">
+            <source src="images/future-in-hand/behind-the-craft_e1.jpg" alt="Bag" media="(max-width: 768px)">
             <!-- Web version (larger image) -->
-            <img src="images/future-in-hand/future-in-hand_e1.jpg" alt="Bag">
+            <img src="images/future-in-hand/behind-the-craft_e1.jpg" alt="Bag">
             </picture>
-        </a>
+        </div>
+
+
+        <div class="editorial-nav" style="justify-content: center; border-top: none; border-bottom: none; padding: 100px 0px; font-weight: 500;">
+            <!-- Right -->
+            <a class="editorial-nav__right toggle-panel" data-target="panel2" href="javascript:void(0)">
+                <span class="nav-text">FUTURE IN HAND</span>
+                <img src="images/future-in-hand/arrow_right_black.svg" 
+                    alt="" style="width: 5px; height: 9px; pointer-events: none;">
+            </a>
+        </div>
+
+        <!-- Publish Content -->
+        <div class="publish-content" style = "padding-top: 50px; padding-left: 40px;">
+        <span style="font-size: 18px;">
+            Published on 15 June 2026
+            <br><br>
+            <a href="$url('Search-Show','cgid','pwnewarrivals')$">
+                SHOP WOMEN'S NEW ARRIVALS
+            </a> &gt;
+        </span>
+        </div>
     </div>
-    <div class="editorial-nav" style="justify-content: center; padding: 100px 0px; font-weight: 500;">
-        <!-- Left -->
-        <a class="editorial-nav__left toggle-panel" data-target="panel1" href="javascript:void(0)">
-            <img src="images/future-in-hand/arrow_left_black.svg" 
-                alt="" style="width: 5px; height: 9px; pointer-events: none;">
-            <span class="nav-text">BEHIND THE CRAFT</span>
-        </a>
+
+    <!-- Panel 2: Your content here -->
+    <div class="panel" id="panel-panel2">
+        <div class="video-wrapper js-vertical-slider">
+            <div class="video-media-container">
+                <!-- Video Background (Desktop) -->
+                <video class="video d-md-block d-none" playsinline auto autoplay loop muted
+                    style="width: 100%; object-fit: cover;">
+                    <source src="images/design-philosophy/demi/dp-demi-a1.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+
+                <!-- Mobile Video -->
+                <video class="video d-md-none d-block" playsinline auto autoplay loop muted
+                    style="width: 100%; object-fit: cover;">
+                    <source src="images/design-philosophy/demi/dp-demi-a1_mobile.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="controls">
+                <button class="play is-playing">
+                    <img class="icon-play" src="images/media-assets/play-white.svg">
+                    <img class="icon-pause" src="images/media-assets/pause-white.svg">
+                </button>
+
+                <div class="timeline">
+                    <div class="progressBar">
+                    <div class="progressFill"></div>
+                    </div>
+                    <input class="seek" type="range" value="0" min="0" step="0.01">
+                </div>
+
+                <button class="mute">
+                    <img class="icon-mute" src="images/media-assets/mute.png">
+                    <img class="icon-unmute" src="images/media-assets/unmute.png" style="display:none;">
+                </button>
+                </div>
+            </div>
+        </div>
+        <div class="editorial-nav">
+            <!-- Left -->
+            <a class="editorial-nav__left toggle-panel display-desktop" data-target="panel1" href="javascript:void(0)">
+                <img src="images/future-in-hand/arrow_left_black.svg" 
+                    alt="" style="width: 5px; height: 9px; pointer-events: none;">
+                <span class="nav-text">BEHIND THE CRAFT</span>
+            </a>
+
+            <!-- Center logos -->
+            <div class="editorial-nav__center">
+                <img src="images/future-in-hand/pedro-efi-logo_black.png" alt="PEDRO">
+            </div>
+
+            <!-- Right -->
+            <a class="editorial-nav__right toggle-panel display-desktop" data-target="panel2" href="javascript:void(0)">
+                <span class="nav-text">FUTURE IN HAND</span>
+                <img src="images/future-in-hand/arrow_right_black.svg" 
+                    alt="" style="width: 5px; height: 9px; pointer-events: none;">
+            </a>
+
+        </div>
+
+        <section class="d-block">
+            <div class="position-relative text-center" style="margin: 80px 0px 100px 0px;">
+                <div class="description-text">
+
+                    <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
+                        For Summer 2026, PEDRO collaborates with the Ethical Fashion Initiative (EFI) on a capsule collection that brings the heritage of Burkina Faso’s artisanal weaving traditions into contemporary form.
+                    </p>
+
+                    <p class="d-md-block d-none" style="font-size:25px; line-height:1; margin-bottom: 3rem;">
+                        Sometimes, the things that matter <br>
+                        most are those that take time.
+                    </p>
+                    <p class="d-md-none d-block" style="font-size:25px; line-height:1; margin-bottom: 3rem;">
+                        Sometimes, the things that matter 
+                        most are those that take time.
+                    </p>
+
+                    <p style="font-size:14px; line-height:1.2;">
+                        The collection originates from a focus on texture, proportion, and abstraction as a means of renewing traditional handicraft. At the core of the capsule is hand-loomed cotton, meticulously crafted by artisan families using techniques passed down through generations.
+                    </p>
+
+                    <p style="font-size:14px; line-height:1.2;">
+                        For many years, these handmade textiles remained largely within local communities, seldom seen beyond them. Today, through collaborations that create wider visibility for traditional craft, these artisans are able to bring their work to a global audience while continuing to preserve the integrity of their practice.
+
+                    </p>
+
+                </div>
+            </div>
+        </section>
+
+
+        <img src="images/future-in-hand/future-in-hand_b1.jpg" class="middle-image d-md-none" alt="Bag" style="margin-bottom: 100px; width: 80%;">
+
+        <div style="margin-bottom: 100px">
+            <picture>
+                <!-- Mobile version (smaller image) -->
+                <source srcset="images/future-in-hand/future-in-hand_c2.jpg" class="middle-image" alt="Bag" media="(max-width: 768px)">
+                <!-- Web version (larger image) -->
+                <img src="images/future-in-hand/future-in-hand_b1.jpg" class="middle-image" alt="Bag">
+            </picture>
+            
+            <div class="middle-caption">
+                Behind this material language is a shared ecosystem of skill, patience, and mutual support. Produced alongside CABES, a social enterprise supporting the professionalisation of heritage craft, the collection reflects a shared commitment to equitable creation.
+            </div>
+        </div>
+
+        <div class= "d-block d-md-none" style="margin-bottom: 100px ;">
+            <!-- Mobile version (larger image) -->
+            <img src="images/future-in-hand/future-in-hand_c1.jpg" class="middle-image " alt="Bag">
+        
+            
+            <div class="middle-caption">
+                The process itself is slow and entirely manual. Because every fibre is manipulated by hand, no two surfaces are entirely identical; each finished piece carries a unique medley of complementary hues, creating dynamic compositions that shift slightly from one weave to the next.
+            </div>
+        </div>
+
+        <div class="pair-container d-none d-md-flex">
+            <!-- Web version (larger image) -->
+            <img src="images/future-in-hand/future-in-hand_c1.jpg" style= "width: 50%" alt="Bag">
+
+            <!-- Web version (larger image) -->
+            <img src="images/future-in-hand/future-in-hand_c2.jpg" style= "width: 50%" alt="Bag">
+        </div>
+
+        <section class="d-none d-md-block">
+            <div class="position-relative text-center" style="margin:100px 0;">
+                <div class="description-text">
+                    <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
+                        The process itself is slow and entirely manual. Because every fibre is manipulated by hand, no two surfaces are entirely identical; each finished piece carries a unique medley of complementary hues, creating dynamic compositions that shift slightly from one weave to the next.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- DESKTOP: vertical stack -->
+        <section class="editorial-photo-stack">
+            <ul class="photo-stack-list">
+                <li class="photo-stack-item">
+                <img src="images/future-in-hand/future-in-hand_d1.jpg" alt="Raw cotton in its primary state, gathered and prepared for the spindle.">Raw cotton in its primary state, gathered and prepared for the spindle.</p>
+                </li>
+                <li class="photo-stack-item">
+                <img src="images/future-in-hand/future-in-hand_d2.jpg" alt="Fibre is spun into spools, establishing the consistent tension required for the loom.">
+                <p class="photo-stack-caption">Fibre is spun into spools, establishing the consistent tension required for the loom.</p>
+                </li>
+                <li class="photo-stack-item">
+                <img src="images/future-in-hand/future-in-hand_d3.jpg" alt="Washed hanks of cotton are hung to dry, allowing the atmosphere to set the material.">
+                <p class="photo-stack-caption">Washed hanks of cotton are hung to dry, allowing the atmosphere to set the material.</p>
+                </li>
+                <li class="photo-stack-item">
+                <img src="images/future-in-hand/future-in-hand_d4.jpg" alt="The introduction of pigment through manual immersion, a process of gradual absorption.">
+                <p class="photo-stack-caption">The introduction of pigment through manual immersion, a process of gradual absorption.</p>
+                </li>
+                <li class="photo-stack-item">
+                <img src="images/future-in-hand/future-in-hand_d5.jpg" alt="The winding of yarn, ensuring the thread is refined and ready for weaving.">
+                <p class="photo-stack-caption">The winding of yarn, ensuring the thread is refined and ready for weaving.</p>
+                </li>
+                <li class="photo-stack-item">
+                <img src="images/future-in-hand/future-in-hand_d6.jpg" alt="Individual threads merge into a finished textile, defined by a dense and distinct grain.">
+                <p class="photo-stack-caption">Individual threads merge into a finished textile, defined by a dense and distinct grain.</p>
+                </li>
+            </ul>
+
+            <!-- MOBILE: looping slider (same images) -->
+            <div class="photo-slider" aria-label="Photo slideshow">
+                <div class="photo-slider-track">
+                <div class="photo-slider-slide">
+                    <img src="images/future-in-hand/future-in-hand_d1.jpg" alt="">Raw cotton in its primary state, gathered and prepared for the spindle.</p>
+                </div>
+                <div class="photo-slider-slide">
+                    <img src="images/future-in-hand/future-in-hand_d2.jpg" alt="">
+                    <p class="photo-slider-caption">Fibres in spool form, establishing the consistent tension required for the loom.</p>
+                </div>
+                <div class="photo-slider-slide">
+                    <img src="images/future-in-hand/future-in-hand_d3.jpg" alt="">
+                    <p class="photo-slider-caption">Washed hanks of cotton are hung to dry, allowing the atmosphere to set the material.</p>
+                </div>
+                <div class="photo-slider-slide">
+                    <img src="images/future-in-hand/future-in-hand_d4.jpg" alt="">
+                    <p class="photo-slider-caption">The introduction of pigment through manual immersion, a process of gradual absorption.</p>
+                </div>
+                <div class="photo-slider-slide">
+                    <img src="images/future-in-hand/future-in-hand_d5.jpg" alt="">
+                    <p class="photo-slider-caption">The winding of yarn, ensuring the thread is refined and ready for weaving.</p>
+                </div>
+                <div class="photo-slider-slide">
+                    <img src="images/future-in-hand/future-in-hand_d6.jpg" alt="">
+                    <p class="photo-slider-caption">Individual threads merge into a finished textile, defined by a dense and distinct grain.</p>
+                </div>
+                </div>
+                <div class="photo-slider-dots"></div>
+            </div>
+        </section>
+
+        <section class="d-none d-md-block">
+            <div class="position-relative text-center" style="margin:100px 0;">
+                <div class="description-text">
+                    <p style="font-size:14px; line-height:1.2; margin-bottom: 3rem;">
+                        Set against the signature Alyssa bag, these expressive textiles allow traditional knowledge to remain culturally relevant within a modern landscape. It leaves us with a singular, grounding thought: that the objects we hold closest are often those marked by the indelible imprint of human care.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <div class="img-wrap js-vertical-slider">
+            <a class="js-shop-the-collection" data-pid="PM1-66210004_DK.TAU" href="$url('Product-Show','pid','PM2-26320159-6_NVY.DE')$">
+                <picture>
+                <!-- Mobile version (smaller image) -->
+                <source srcset="images/future-in-hand/future-in-hand_e1.jpg" alt="Bag" media="(max-width: 768px)">
+                <!-- Web version (larger image) -->
+                <img src="images/future-in-hand/future-in-hand_e1.jpg" alt="Bag">
+                </picture>
+            </a>
+        </div>
+        <div class="editorial-nav" style="justify-content: center; padding: 100px 0px; font-weight: 500;">
+            <!-- Left -->
+            <a class="editorial-nav__left toggle-panel" data-target="panel1" href="javascript:void(0)">
+                <img src="images/future-in-hand/arrow_left_black.svg" 
+                    alt="" style="width: 5px; height: 9px; pointer-events: none;">
+                <span class="nav-text">BEHIND THE CRAFT</span>
+            </a>
+
+        </div>
+
+        <!-- Publish Content -->
+        <div class="publish-content" style = "padding-top: 50px; padding-left: 40px;">
+        <span style="font-size: 18px;">
+            Published on 15 June 2026
+            <br><br>
+            <a href="$url('Search-Show','cgid','pwnewarrivals')$">
+                SHOP WOMEN'S NEW ARRIVALS
+            </a> &gt;
+        </span>
+        </div>
+
 
     </div>
 
-    <!-- Publish Content -->
-    <div class="publish-content" style = "padding-top: 50px; padding-left: 40px;">
-      <span style="font-size: 18px;">
-          Published on 15 June 2026
-          <br><br>
-          <a href="$url('Search-Show','cgid','pwnewarrivals')$">
-            SHOP WOMEN'S NEW ARRIVALS
-          </a> &gt;
-      </span>
-    </div>
 
 
-</div>
+    <script>
+    document.addEventListener('click', function(e) {
+        const trigger = e.target.closest('.toggle-panel') || e.target.closest('[data-target]');
+        if (!trigger) return;
 
+        const target = trigger.dataset.target;
+        if (!target) return;
 
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('is-active'));
+        const activePanel = document.getElementById('panel-' + target);
+        activePanel.classList.add('is-active');
 
-<script>
-document.addEventListener('click', function(e) {
-    const trigger = e.target.closest('.toggle-panel') || e.target.closest('[data-target]');
-    if (!trigger) return;
+        // Only update nav links inside the newly active panel
+        activePanel.querySelectorAll('.editorial-nav__left, .editorial-nav__right').forEach(el => {
+            el.classList.remove('is-active');
+        });
+        const activeNavLink = activePanel.querySelector(
+            `.editorial-nav__left[data-target="${target}"], .editorial-nav__right[data-target="${target}"]`
+        );
+        if (activeNavLink) activeNavLink.classList.add('is-active');
 
-    const target = trigger.dataset.target;
-    if (!target) return;
-
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('is-active'));
-    const activePanel = document.getElementById('panel-' + target);
-    activePanel.classList.add('is-active');
-
-    // Only update nav links inside the newly active panel
-    activePanel.querySelectorAll('.editorial-nav__left, .editorial-nav__right').forEach(el => {
-        el.classList.remove('is-active');
+        if (target === 'video') {
+            document.body.classList.remove('panel-open');
+            document.documentElement.classList.remove('panel-open');
+        } else {
+            document.body.classList.add('panel-open');
+            document.documentElement.classList.add('panel-open');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    const activeNavLink = activePanel.querySelector(
-        `.editorial-nav__left[data-target="${target}"], .editorial-nav__right[data-target="${target}"]`
-    );
-    if (activeNavLink) activeNavLink.classList.add('is-active');
+    </script>
 
-    if (target === 'video') {
-        document.body.classList.remove('panel-open');
-        document.documentElement.classList.remove('panel-open');
-    } else {
-        document.body.classList.add('panel-open');
-        document.documentElement.classList.add('panel-open');
+
+
+
+
+    <script>
+    function initVideoControls(scope = document) {
+
+    scope.querySelectorAll('.video-media-container').forEach(container => {
+
+        const videos = container.querySelectorAll('.video');
+        if (!videos.length) return;
+
+        // Use the visible video (desktop/mobile)
+        const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+        // Set default volume
+        video.volume = 0.2;
+
+        const playBtn = container.querySelector('.play');
+        const muteBtn = container.querySelector('.mute');
+        const seek = container.querySelector('.seek');
+        const progressFill = container.querySelector('.progressFill');
+        const iconMute = container.querySelector('.icon-mute');
+        const iconUnmute = container.querySelector('.icon-unmute');
+
+        if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
+
+        // Remove any existing event listeners by cloning the buttons
+        const newPlayBtn = playBtn.cloneNode(true);
+        const newMuteBtn = muteBtn.cloneNode(true);
+        playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+        muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+        // Update references to the new buttons
+        const freshPlayBtn = container.querySelector('.play');
+        const freshMuteBtn = container.querySelector('.mute');
+        const freshIconMute = container.querySelector('.icon-mute');
+        const freshIconUnmute = container.querySelector('.icon-unmute');
+
+        // PLAY / PAUSE
+        freshPlayBtn.addEventListener('click', () => {
+        if (video.paused) {
+            video.play();
+            freshPlayBtn.classList.add('is-playing');
+            freshPlayBtn.classList.remove('is-paused');
+        } else {
+            video.pause();
+            freshPlayBtn.classList.add('is-paused');
+            freshPlayBtn.classList.remove('is-playing');
+        }
+        });
+
+        // MUTE
+        freshMuteBtn.addEventListener('click', () => {
+        video.muted = !video.muted;
+        freshIconMute.style.display = video.muted ? 'block' : 'none';
+        freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+        });
+
+        // PROGRESS UPDATE
+        video.addEventListener('timeupdate', () => {
+        const progress = video.currentTime / video.duration;
+        progressFill.style.transform = `scaleX(${progress})`;
+        seek.value = progress * 100;
+        });
+
+        // SEEK
+        seek.addEventListener('input', () => {
+        const percent = seek.value / 100;
+        video.currentTime = percent * video.duration;
+        });
+
+    });
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-</script>
 
-
-
-
-
-<script>
-function initVideoControls(scope = document) {
-
-  scope.querySelectorAll('.video-media-container').forEach(container => {
-
-    const videos = container.querySelectorAll('.video');
-    if (!videos.length) return;
-
-    // Use the visible video (desktop/mobile)
-    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
-    // Set default volume
-    video.volume = 0.2;
-
-    const playBtn = container.querySelector('.play');
-    const muteBtn = container.querySelector('.mute');
-    const seek = container.querySelector('.seek');
-    const progressFill = container.querySelector('.progressFill');
-    const iconMute = container.querySelector('.icon-mute');
-    const iconUnmute = container.querySelector('.icon-unmute');
-
-    if (!video || !playBtn || !muteBtn || !seek || !progressFill) return;
-
-    // Remove any existing event listeners by cloning the buttons
-    const newPlayBtn = playBtn.cloneNode(true);
-    const newMuteBtn = muteBtn.cloneNode(true);
-    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
-    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
-
-    // Update references to the new buttons
-    const freshPlayBtn = container.querySelector('.play');
-    const freshMuteBtn = container.querySelector('.mute');
-    const freshIconMute = container.querySelector('.icon-mute');
-    const freshIconUnmute = container.querySelector('.icon-unmute');
-
-    // PLAY / PAUSE
-    freshPlayBtn.addEventListener('click', () => {
-      if (video.paused) {
-        video.play();
-        freshPlayBtn.classList.add('is-playing');
-        freshPlayBtn.classList.remove('is-paused');
-      } else {
-        video.pause();
-        freshPlayBtn.classList.add('is-paused');
-        freshPlayBtn.classList.remove('is-playing');
-      }
+    // INIT ON PAGE LOAD
+    document.addEventListener('DOMContentLoaded', function () {
+    initVideoControls();
     });
-
-    // MUTE
-    freshMuteBtn.addEventListener('click', () => {
-      video.muted = !video.muted;
-      freshIconMute.style.display = video.muted ? 'block' : 'none';
-      freshIconUnmute.style.display = video.muted ? 'none' : 'block';
-    });
-
-    // PROGRESS UPDATE
-    video.addEventListener('timeupdate', () => {
-      const progress = video.currentTime / video.duration;
-      progressFill.style.transform = `scaleX(${progress})`;
-      seek.value = progress * 100;
-    });
-
-    // SEEK
-    seek.addEventListener('input', () => {
-      const percent = seek.value / 100;
-      video.currentTime = percent * video.duration;
-    });
-
-  });
-}
-
-// INIT ON PAGE LOAD
-document.addEventListener('DOMContentLoaded', function () {
-  initVideoControls();
-});
-</script>
+    </script>
 
 
-<script>
-(function () {
-  var slider = document.querySelector('.photo-slider');
-  if (!slider) return;
+    <script>
+    (function () {
+    var slider = document.querySelector('.photo-slider');
+    if (!slider) return;
 
-  var track = slider.querySelector('.photo-slider-track');
-  var slides = slider.querySelectorAll('.photo-slider-slide');
-  var dotsContainer = slider.querySelector('.photo-slider-dots');
-  var total = slides.length;
-  var current = 0;
-  var autoplayTimer;
+    var track = slider.querySelector('.photo-slider-track');
+    var slides = slider.querySelectorAll('.photo-slider-slide');
+    var dotsContainer = slider.querySelector('.photo-slider-dots');
+    var total = slides.length;
+    var current = 0;
+    var autoplayTimer;
 
-  // Build dots
-    slides.forEach(function (_, i) {
-    var btn = document.createElement('button');
-    btn.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-    //btn.textContent = i + 1;   add this
-    if (i === 0) btn.classList.add('is-active');
-    btn.addEventListener('click', function () { goTo(i); resetAutoplay(); });
-    dotsContainer.appendChild(btn);
-    });
+    // Build dots
+        slides.forEach(function (_, i) {
+        var btn = document.createElement('button');
+        btn.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        //btn.textContent = i + 1;   add this
+        if (i === 0) btn.classList.add('is-active');
+        btn.addEventListener('click', function () { goTo(i); resetAutoplay(); });
+        dotsContainer.appendChild(btn);
+        });
 
-  var dots = dotsContainer.querySelectorAll('button');
+    var dots = dotsContainer.querySelectorAll('button');
 
-  function goTo(index) {
-    current = (index + total) % total;
-    track.style.transform = 'translateX(-' + current * 100 + '%)';
-    dots.forEach(function (d, i) {
-      d.classList.toggle('is-active', i === current);
-    });
-  }
-
-  function next() { goTo(current + 1); }
-
-  function resetAutoplay() {
-    clearInterval(autoplayTimer);
-    autoplayTimer = setInterval(next, 3500);
-  }
-
-  // ── DRAG (mouse + touch) ──────────────────────────────
-  var isDragging = false;
-  var startX = 0;
-  var dragOffset = 0;
-  var threshold = 40; // px needed to commit a slide change
-
-  function dragStart(e) {
-    isDragging = true;
-    startX = e.touches ? e.touches[0].clientX : e.clientX;
-    dragOffset = 0;
-    track.style.transition = 'none'; // disable snap while dragging
-    clearInterval(autoplayTimer);
-  }
-
-  function dragMove(e) {
-    if (!isDragging) return;
-    var x = e.touches ? e.touches[0].clientX : e.clientX;
-    dragOffset = x - startX;
-    var base = -(current * 100);
-    // express offset as a percentage of slider width
-    var pct = (dragOffset / slider.offsetWidth) * 100;
-    track.style.transform = 'translateX(' + (base + pct) + '%)';
-  }
-
-  function dragEnd() {
-    if (!isDragging) return;
-    isDragging = false;
-    track.style.transition = ''; // restore CSS transition
-
-    if (dragOffset < -threshold) {
-      goTo(current + 1);
-    } else if (dragOffset > threshold) {
-      goTo(current - 1);
-    } else {
-      goTo(current); // snap back
+    function goTo(index) {
+        current = (index + total) % total;
+        track.style.transform = 'translateX(-' + current * 100 + '%)';
+        dots.forEach(function (d, i) {
+        d.classList.toggle('is-active', i === current);
+        });
     }
+
+    function next() { goTo(current + 1); }
+
+    function resetAutoplay() {
+        clearInterval(autoplayTimer);
+        autoplayTimer = setInterval(next, 3500);
+    }
+
+    // ── DRAG (mouse + touch) ──────────────────────────────
+    var isDragging = false;
+    var startX = 0;
+    var dragOffset = 0;
+    var threshold = 40; // px needed to commit a slide change
+
+    function dragStart(e) {
+        isDragging = true;
+        startX = e.touches ? e.touches[0].clientX : e.clientX;
+        dragOffset = 0;
+        track.style.transition = 'none'; // disable snap while dragging
+        clearInterval(autoplayTimer);
+    }
+
+    function dragMove(e) {
+        if (!isDragging) return;
+        var x = e.touches ? e.touches[0].clientX : e.clientX;
+        dragOffset = x - startX;
+        var base = -(current * 100);
+        // express offset as a percentage of slider width
+        var pct = (dragOffset / slider.offsetWidth) * 100;
+        track.style.transform = 'translateX(' + (base + pct) + '%)';
+    }
+
+    function dragEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        track.style.transition = ''; // restore CSS transition
+
+        if (dragOffset < -threshold) {
+        goTo(current + 1);
+        } else if (dragOffset > threshold) {
+        goTo(current - 1);
+        } else {
+        goTo(current); // snap back
+        }
+        resetAutoplay();
+
+    }
+
+    // Mouse events
+    track.addEventListener('mousedown', dragStart);
+    window.addEventListener('mousemove', dragMove);
+    window.addEventListener('mouseup', dragEnd);
+
+    // Touch events
+    track.addEventListener('touchstart', dragStart, { passive: true });
+    track.addEventListener('touchmove', dragMove, { passive: true });
+    track.addEventListener('touchend', dragEnd);
+
+    // Prevent image drag interfering
+    track.querySelectorAll('img').forEach(function (img) {
+        img.addEventListener('dragstart', function (e) { e.preventDefault(); });
+    });
+
     resetAutoplay();
+    // Pause autoplay on hover
+    slider.addEventListener('mouseenter', function () { clearInterval(autoplayTimer); });
+    slider.addEventListener('mouseleave', function () { resetAutoplay(); });
+    })();
+    </script>
 
-  }
+    </body>
 
-  // Mouse events
-  track.addEventListener('mousedown', dragStart);
-  window.addEventListener('mousemove', dragMove);
-  window.addEventListener('mouseup', dragEnd);
-
-  // Touch events
-  track.addEventListener('touchstart', dragStart, { passive: true });
-  track.addEventListener('touchmove', dragMove, { passive: true });
-  track.addEventListener('touchend', dragEnd);
-
-  // Prevent image drag interfering
-  track.querySelectorAll('img').forEach(function (img) {
-    img.addEventListener('dragstart', function (e) { e.preventDefault(); });
-  });
-
-  resetAutoplay();
-  // Pause autoplay on hover
-slider.addEventListener('mouseenter', function () { clearInterval(autoplayTimer); });
-slider.addEventListener('mouseleave', function () { resetAutoplay(); });
-})();
-</script>
-
-</body>
-
-</html>
+    </html>
