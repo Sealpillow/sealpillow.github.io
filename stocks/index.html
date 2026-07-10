@@ -22,6 +22,8 @@ body{margin:0;background:radial-gradient(circle at top right,rgba(79,142,247,.14
 .btn,.picker{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid #33507f;background:linear-gradient(180deg,#1a365f,#153052);color:#fff;font-weight:600;cursor:pointer;text-decoration:none;transition:transform .12s ease,background .12s ease,border-color .12s ease,box-shadow .12s ease;box-shadow:0 8px 18px rgba(0,0,0,.16)}
 .btn:hover,.picker:hover{background:linear-gradient(180deg,#224271,#1a3962);border-color:#4f8ef7;transform:translateY(-1px)}
 .btn:active,.picker:active{transform:translateY(0)}
+.nav-link{display:inline-flex;align-items:center;font-size:12px;font-weight:400;font-family:inherit;line-height:1;color:var(--tx);padding:7px 12px;border:1px solid rgba(255,255,255,.14);border-radius:6px;text-decoration:none;background:transparent;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+.nav-link:hover{border-color:var(--bl);color:var(--bl);background:rgba(79,142,247,.08);text-decoration:none}
 .btn.btn-compact,.picker.picker-compact{padding:7px 11px;border-radius:10px;font-size:12px;box-shadow:0 6px 14px rgba(0,0,0,.14)}
 input[type=file]{display:none}
 .overlay{position:fixed;inset:0;background:rgba(7,10,18,.7);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:76px 18px 24px;z-index:80}
@@ -124,6 +126,12 @@ input[type=file]{display:none}
 /* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .chip{display:inline-flex;padding:5px 10px;border-radius:999px;border:1px solid #304260;background:#1c2740;color:#c7d2e7;font-size:12px}
+.cd-bar{display:inline-flex;align-items:center;gap:4px;font-size:12px;flex-wrap:wrap}
+.cd-sep{color:var(--mu);margin:0 2px}
+.cd-dom{color:var(--tx);font-weight:600}
+.cd-pct{font-size:11px;color:var(--mu)}
+.cd-warn{font-size:11px;padding:3px 8px}
+.cd-recent{font-size:11px;padding:3px 8px;border-color:#1e3a5f;background:#0d1f35;color:#7ab0e8}
 .chip.good{border-color:#1e5040;background:#0e2e24;color:var(--gn)}
 .chip.warn{border-color:#5a4010;background:#2e2008;color:var(--am)}
 .chip.bad{border-color:#5a2020;background:#2e1010;color:var(--rd)}
@@ -265,7 +273,7 @@ input[type=file]{display:none}
 @media(max-width:760px){
   .topbar-actions{display:grid;grid-template-columns:1fr 1fr;align-items:stretch;justify-content:stretch;width:100%;gap:10px}
   .topbar-status{grid-column:1/-1;justify-content:flex-start}
-  .topbar-actions .btn{width:100%;justify-content:center}
+  .topbar-actions .nav-link{width:100%;justify-content:center}
   .panel,.hero,.card,.series-card,.cal-card,.planner-detail{padding:14px}
   .mini-card{padding:14px}
   .mini-card-head{flex-direction:column;gap:8px}
@@ -301,7 +309,7 @@ input[type=file]{display:none}
   .check-filter-actions{flex-direction:column;align-items:stretch}
   .check-filter-link{width:100%;text-align:center}
   .topbar-actions{grid-template-columns:1fr}
-  .topbar-actions .btn{padding:7px 11px;font-size:11px}
+  .topbar-actions .nav-link{padding:6px 10px;font-size:11px}
   .topbar-actions.collapsed > :not(#loadStatus):not(#mobileActionsToggle){display:none!important}
   .topbar-actions.expanded{padding-top:2px}
   .tab{padding:7px 12px;font-size:12px}
@@ -340,6 +348,11 @@ input[type=file]{display:none}
 .table-wrap::-webkit-scrollbar-thumb:hover,.cmp-table-wrap::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4f8ef7,#2b4c75)}
 /* MINI CARDS GRID */
 .mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.mini-search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.mini-search-row input{flex:1;max-width:320px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:13px;padding:7px 12px;outline:none;font-family:inherit}
+.mini-search-row input:focus{border-color:var(--bl)}
+.mini-search-row input::placeholder{color:var(--mu)}
+.mini-search-count{font-size:12px;color:var(--mu)}
 .mini-card{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:15px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .mini-card:hover{border-color:#4f8ef7;box-shadow:0 0 0 1px #4f8ef733}
 .mini-card.selected{border-color:#4f8ef7;box-shadow:0 0 0 2px #4f8ef733}
@@ -376,6 +389,22 @@ input[type=file]{display:none}
 .setup-map-summary .card{padding:12px}
 .setup-map-keypoints{display:grid;gap:8px;margin:0 0 12px}
 .setup-map-keypoint{padding:10px 12px;border:1px solid var(--bd);border-radius:12px;background:rgba(255,255,255,.02);font-size:12px;color:#bac9e6;line-height:1.6}
+.setup-list-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px}
+.setup-list-col{border:1px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.setup-list-col-rows{overflow-y:auto;max-height:320px;scrollbar-width:thin;scrollbar-color:var(--sf2) transparent}
+.setup-list-col-head{padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.setup-list-col-head.below{color:#f87171;background:rgba(239,68,68,.07)}
+.setup-list-col-head.inside{color:#4ade80;background:rgba(34,197,94,.07)}
+.setup-list-col-head.above{color:#fbbf24;background:rgba(245,158,11,.07)}
+.setup-list-col-head .col-count{font-weight:400;opacity:.7}
+.setup-list-row{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--bd)}
+.setup-list-row:last-child{border-bottom:none}
+.setup-list-row:hover{background:var(--sf2)}
+.setup-list-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.setup-list-ticker{font-family:var(--mono);font-size:12px;font-weight:700;white-space:nowrap}
+.setup-list-name{font-size:11px;color:var(--mu);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.setup-list-gain{font-family:var(--mono);font-size:12px;font-weight:600;white-space:nowrap;margin-left:auto}
+@media(max-width:760px){.setup-list-cols{grid-template-columns:1fr}}
 .planner-action{display:inline-flex;align-items:center;justify-content:center;margin-top:10px;padding:7px 10px;border-radius:10px;border:1px solid #304260;background:#18253d;color:#dce8ff;font-size:11px;font-weight:600;cursor:pointer}
 .planner-action:hover{background:#22314d;border-color:#4f8ef7}
 .planner-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
@@ -593,12 +622,13 @@ input[type=file]{display:none}
   </div>
   <div class="topbar-actions">
     <span class="topbar-status" id="loadStatus">No stocks loaded</span>
-    <button class="btn topbar-mobile-toggle" id="mobileActionsToggle" type="button" aria-expanded="false">Actions</button>
-    <button class="btn" id="quickGuideBtn" type="button" style="font-size:11px;padding:6px 12px">Quick guide</button>
-    <button class="btn" id="manageRegistryBtn" type="button" style="font-size:11px;padding:6px 12px;display:none">Edit stock list</button>
-    <button class="btn" id="loadServerStocksBtn" type="button" style="font-size:11px;padding:6px 12px;display:none">Load existing stock data</button>
-    <button class="btn" id="runPipelineBtn" type="button" style="font-size:11px;padding:6px 12px;display:none">Update stock data</button>
-    <button class="btn" id="forgetSavedStocksBtn" type="button" style="font-size:11px;padding:6px 12px;opacity:.7">Forget saved stocks</button>
+    <button class="nav-link topbar-mobile-toggle" id="mobileActionsToggle" type="button" aria-expanded="false">Actions</button>
+    <a href="prediction-log.html" class="nav-link">Prediction Log →</a>
+    <button class="nav-link" id="quickGuideBtn" type="button">Quick guide</button>
+    <button class="nav-link" id="manageRegistryBtn" type="button" style="display:none">Edit stock list</button>
+    <button class="nav-link" id="loadServerStocksBtn" type="button" style="display:none">Load existing stock data</button>
+    <button class="nav-link" id="runPipelineBtn" type="button" style="display:none">Update stock data</button>
+    <button class="nav-link" id="forgetSavedStocksBtn" type="button" style="opacity:.6">Forget saved stocks</button>
   </div>
 </div><!-- STOCK CHIPS BAR (shown when stocks loaded) -->
 <div class="overlay" id="quickGuideOverlay" aria-hidden="true">
@@ -721,15 +751,6 @@ input[type=file]{display:none}
         <button class="btn btn-compact" id="saveRegistryBtn" type="button">Save registry</button>
       </div>
     </div>
-  </div>
-</div>
-<div id="stockBarWrap" style="display:none;padding:10px 20px 0;max-width:1400px;margin:0 auto">
-  <div class="stock-bar">
-    <div class="stock-bar-head">
-      <span class="bar-label">Loaded:</span>
-      <button class="btn" id="clearAllBtn" type="button" style="font-size:11px;padding:6px 12px;opacity:.7">Clear all</button>
-    </div>
-    <div id="stockChips" style="display:flex;flex-wrap:wrap;gap:6px;flex:1"></div>
   </div>
 </div>
 <div class="wrap">
@@ -894,7 +915,7 @@ const inferred = extractDividendCycleAnalysisSummary(source);
 
   const ticker = readString(merged.ticker || merged.symbol || merged.code);
   const stockName = readString(
-    merged.stockName || merged.stock_name || merged.name || merged.stock_name
+    merged.stockName || merged.stock_name || merged.name
   );
   const currency = readString(merged.currency || merged.currencyCode || merged.ccy);
   const currentPrice = readNumber(
@@ -1917,6 +1938,7 @@ overviewMode:"overview", // "overview" | "grouped" | "compare" | "planner"
   zoneOutcomeMode:"current",
   zoneOutcomeFilterKeys:["all"],
   setupMapFilterKeys:["all"],
+  setupMapViewMode:"map",
   rememberLoadedStocks:true,
   serverLoadedFiles:[],
   registryEntries:[],
@@ -1948,7 +1970,7 @@ overviewMode:"overview", // "overview" | "grouped" | "compare" | "planner"
 const app=document.getElementById("app");
 const BACKEND_CONFIG = {
   enabled:["http:","https:"].includes(window.location.protocol),
-  staticJsonBase:"./json",
+  staticJsonBase:"./analysis",
   healthUrl:"/api/health",
   jsonFilesUrl:"/api/json-files",
   runPipelineUrl:"/api/run-pipeline",
@@ -1967,7 +1989,18 @@ function pctRaw(v,d=1){const x=Number(v);return Number.isFinite(x)?`${x.toFixed(
 function ccy(v,c=""){return(v===null||v===undefined)?"-":`${c?c+" ":""}${n(v,4)}`}
 function dt(v){if(!v)return"-";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString("en-GB",{year:"numeric",month:"short",day:"numeric"})}
 function dtShort(v){if(!v)return"-";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString("en-GB",{month:"short",day:"numeric"})}
-function dtClusterRange(from,center,to){if(!center)return"-";if(!from||!to||from===to)return`~${dtShort(center)}`;return`${dtShort(from)} – ${dtShort(to)} (best: ${dtShort(center)})`}
+function dtClusterRange(from,center,to){if(!center)return"-";if(!from||!to||from===to)return dtShort(center);return`${dtShort(from)} – ${dtShort(to)} (best: ${dtShort(center)})`}
+function clusterDominanceTag(cd){
+  if(!cd||!cd.total)return"-";
+  const c1=cd.cluster1_count||0,c2=cd.cluster2_count||0,dom=cd.dominant,pct=cd.dominant_pct,rp=cd.recent_primary;
+  const c1cls=dom===1?"cd-dom":"",c2cls=dom===2?"cd-dom":"";
+  let h=`<span class="cd-bar"><span class="${c1cls}" title="Cluster 1 (early dip — farther from ex-div)">C1: ${c1}</span><span class="cd-sep">/</span><span class="${c2cls}" title="Cluster 2 (late dip — closer to ex-div)">C2: ${c2}</span>`;
+  if(pct!=null&&pct>=75)h+=` <span class="chip warn cd-warn" title="One cluster dominates — consider re-evaluating as RELIABLE timing">C${dom} leads ${pct}%</span>`;
+  else if(dom!=null&&pct!=null)h+=` <span class="cd-pct">(${pct}%)</span>`;
+  if(rp!=null)h+=` <span class="chip cd-recent" title="Prevailed in last 3 clean cycles">recent C${rp}</span>`;
+  h+=`</span>`;
+  return h;
+}
 function daysFrom(dateStr){if(!dateStr)return null;const d=new Date(dateStr),t=new Date();d.setHours(0,0,0,0);t.setHours(0,0,0,0);return Math.round((d-t)/86400000)}
 function toBool(v){return v===true||String(v).toLowerCase()==="true"}
 function monthName(m){return["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][(m-1)]||"-"}
@@ -2184,9 +2217,10 @@ function renderSeriesCard(s,data,m){
     <div class="series-kv" style="margin-top:12px">
       <div class="series-subhead">Forward Setup</div>
       <div>${tipLabel("Projected ex-div date","The model's estimated next ex-dividend date for this series, based on the stock's same-series interval history and forward date projection rules.")}</div><div>${dt(proj.proj_exdiv_date)}</div>
-      ${proj.est_low_date_cluster1?`<div>${tipLabel("Estimated low timing (Cluster 1)","For bimodal timing only. Range is median ± 1 SD of this timing cluster's historical weeks-before-ex-div pattern. Best estimate is the median.")}</div><div>${dtClusterRange(proj.est_low_date_cluster1_from,proj.est_low_date_cluster1,proj.est_low_date_cluster1_to)}</div>`:""}
-      ${proj.est_low_date_cluster2?`<div>${tipLabel("Estimated low timing (Cluster 2)","For bimodal timing only. Range is median ± 1 SD of this timing cluster's historical weeks-before-ex-div pattern. Best estimate is the median.")}</div><div>${dtClusterRange(proj.est_low_date_cluster2_from,proj.est_low_date_cluster2,proj.est_low_date_cluster2_to)}</div>`:""}
-      ${!proj.est_low_date_cluster1&&proj.est_low_date?`<div>${tipLabel("Estimated low timing","For reliable timing only. This date is derived from the median clean historical weeks-before-ex-div pattern for this series, projected backward from the projected ex-div date.")}</div><div>${dt(proj.est_low_date)}</div>`:""}
+      ${proj.est_low_date_cluster1?`<div>${tipLabel("Estimated low timing (Cluster 1)","Bimodal only. Cluster 1 = early dip — farther from ex-div date, more weeks before. Range shown is median ± 1 SD of that cluster's historical weeks-before-ex-div values. Range is omitted when SD exceeds 2 weeks.")}</div><div>${dtClusterRange(proj.est_low_date_cluster1_from,proj.est_low_date_cluster1,proj.est_low_date_cluster1_to)}</div>`:""}
+      ${proj.est_low_date_cluster2?`<div>${tipLabel("Estimated low timing (Cluster 2)","Bimodal only. Cluster 2 = late dip — closer to ex-div date, fewer weeks before. Range shown is median ± 1 SD of that cluster's historical weeks-before-ex-div values. Range is omitted when SD exceeds 2 weeks.")}</div><div>${dtClusterRange(proj.est_low_date_cluster2_from,proj.est_low_date_cluster2,proj.est_low_date_cluster2_to)}</div>`:""}
+      ${proj.cluster_dominance?`<div>${tipLabel("Cluster dominance","How often each cluster appeared across all historical cycles. A dominant cluster (≥75%) suggests the stock may behave like RELIABLE single-cluster timing. C1 = early dip (farther from ex-div); C2 = late dip (closer). Recent indicates which cluster prevailed in the last 3 clean cycles.")}</div><div>${clusterDominanceTag(proj.cluster_dominance)}</div>`:""}
+      ${!proj.est_low_date_cluster1&&proj.est_low_date?`<div>${tipLabel("Estimated low timing","For reliable timing only. Range is the p25–p75 watch window from historical weeks-before-ex-div values; best estimate is the median.")}</div><div>${dtClusterRange(proj.est_low_date_from,proj.est_low_date,proj.est_low_date_to)}</div>`:""}
       <div>Days away</div><div class="${(daysFrom(proj.proj_exdiv_date)||999)<=45?"warn":""}">${daysFrom(proj.proj_exdiv_date)!==null?`${daysFrom(proj.proj_exdiv_date)}d`:"-"}</div>
       <div>Current price</div><div>${ccy(data.current_price,m.currency)}</div>
       <div>${tipLabel("Anchor method","The pre-dividend reference price from the most recent prior ex-div event (the closing price just before that ex-date). Displayed for reference only — the entry zone is built from the ex-dividend adjusted level: anchor minus the dividend paid, which is where the stock actually resets after the payout.")}</div>
@@ -2204,7 +2238,7 @@ function renderSeriesCard(s,data,m){
       <div class="${Number(risk.success_rate)>=70?"good":Number(risk.success_rate)>=50?"warn":"bad"}">${pctRaw(risk.success_rate,0)}</div>
       <div>${tipLabel("Win rate (all cycles)","Same numerator, but denominator includes degen and excluded cycles — every cycle attempt. Realistic expected rate across all cycles.")}</div>
       <div class="${Number(risk.success_rate_all)>=70?"good":Number(risk.success_rate_all)>=50?"warn":"bad"}">${risk.success_rate_all!=null?pctRaw(risk.success_rate_all,0):"-"}</div>
-      <div>${tipLabel("Timing","How dependable the dip timing was in the past. Reliable means wks_cv <= 15 plus a tight spread check. Bimodal means two timing clusters split by a gap greater than 5 weeks. Unreliable means neither condition held, so price matters more than date.")}</div>
+      <div>${tipLabel("Timing","How dependable the dip timing was in the past. Reliable means wks_cv <= 15 plus a tight spread check. Bimodal means two timing clusters split by a gap greater than 5 weeks — check cluster dominance in the Forward Setup section to see if one cluster accounts for 75%+ of cycles, which may warrant treating the stock as effectively Reliable. Unreliable means neither condition held, so price matters more than date.")}</div>
       <div class="${tagClass(tim.rating)}">${esc(tim.rating_display || "-")}</div>
       <div>${tipLabel("Dip depth CV","How similar the dip sizes were across past cycles. Lower means dips were more consistent, so the entry zone is easier to trust.")}</div>
       <div class="${Number(tim.dip_depth_cv)<45?"good":Number(tim.dip_depth_cv)<70?"warn":"bad"}">${pctRaw(tim.dip_depth_cv,1)}</div>
@@ -2804,8 +2838,8 @@ function panelProgressStrip(data){
   const span=Math.max(1,dated[dated.length-1].d-dated[0].d);
   const width=Math.max(760,160+(dated.length-1)*210);
   const leftPad=20,rightPad=20,minGap=92,topLanes=[],bottomLanes=[];
-  const todayEvent=dated.find(ev=>ev.label==='TODAY');
-  const markerEvents=dated.filter(ev=>ev.label!=='TODAY');
+  const todayEvent=dated.find(ev=>ev.label==='Today');
+  const markerEvents=dated.filter(ev=>ev.label!=='Today');
   markerEvents.forEach(ev=>{
     ev.left=leftPad+((width-leftPad-rightPad)*((ev.d-dated[0].d)/span));
     ev.lane=0;
@@ -3084,7 +3118,7 @@ function panelStrategy(data){
   <div class="sr-card">
     <span class="sr-pill" style="background:var(--color-background-warning);color:var(--color-text-warning)">Bimodal</span>
     <p class="sr-title">Two distinct entry clusters detected</p>
-    <p class="sr-body">The dip occurs at two separate calendar windows across cycles — sometimes early, sometimes late. You cannot predict which cluster this cycle will follow. Set a limit order in the price zone and monitor <em>both</em> windows; do not wait for the "usual" timing.</p>
+    <p class="sr-body">The dip occurs at two separate calendar windows across cycles — sometimes early (Cluster 1, farther from ex-div), sometimes late (Cluster 2, closer to ex-div). By default you cannot predict which cluster this cycle will follow, so set a limit order in the price zone and monitor <em>both</em> windows. Check <strong>Cluster dominance</strong> in the drill view: if one cluster accounts for ≥75% of all historical cycles, the stock may behave more like Reliable timing and that dominant window deserves more weight.</p>
   </div>
 </div>
 <div class="sr-card">
@@ -3465,7 +3499,7 @@ function panelGlossary(){
     ["N_effective","Autocorrelation-adjusted sample size. If cycles are correlated with each other, n_eff will be smaller than n_clean. The live buckets are: Adequate >= 8, Moderate >= 5, Thin >= 3, and Insufficient below 3."],
     ["Dip Depth CV","Coefficient of variation of the dip sizes (low_vs_prevdp). Low CV means dips were similar in magnitude — zone is tighter."],
     ["Reliable timing","The week-count when the cycle low occurs is tightly clustered. In the live model this means wks_cv <= 15 plus a spread check of max(3, 0.3 x average weeks-before), so the dip timing can be used as a more specific date guide."],
-    ["Bimodal timing","Two timing clusters exist. In the live model this appears after failing the Reliable test, when the largest gap between sorted clean timings is greater than 5 weeks. Watch both timing windows rather than forcing one date."],
+    ["Bimodal timing","Two timing clusters exist. In the live model this appears after failing the Reliable test, when the largest gap between sorted clean timings is greater than 5 weeks. Cluster 1 = early dip (more weeks before ex-div); Cluster 2 = late dip (fewer weeks before ex-div). Watch both windows by default. If the drill view shows one cluster at ≥75% dominance across all historical cycles, favour that window and treat the timing closer to Reliable."],
     ["Unreliable timing","Timing is neither Reliable nor Bimodal, so the low timing is too scattered to give a specific date target. Use price zone first and do not rely on the calendar alone."],
     ["Calendar Window Rating","Measures how tightly the historical cycle lows cluster across the calendar year, based on the day-of-year spread between the earliest and latest clean low. Consistent means a spread of 60 days or less. Moderate means 60–120 days. Wide means more than 120 days, so calendar timing alone is not reliable."],
 ["Calendar Month Bar Colours","All bars are coloured by success rate — the % of lows in that month where the dip offered more than 3% rebound back to the PrevDP anchor: green >=70%, amber 40–69%, red <40%, grey = no lows. Modal months (where lows cluster most often) are marked with a coloured border instead of a colour override, so the success rate is always visible. In the hover tooltip, Success means the cycle cleared that rebound threshold; Not success means it did not. Sample sizes per month are often just 1–2, so treat colour as directional."],
@@ -3530,6 +3564,7 @@ function persistPlannerState(){
     zoneOutcomeMode:state.zoneOutcomeMode||"current",
     zoneOutcomeFilterKeys:Array.isArray(state.zoneOutcomeFilterKeys)?state.zoneOutcomeFilterKeys:["all"],
     setupMapFilterKeys:Array.isArray(state.setupMapFilterKeys)?state.setupMapFilterKeys:["all"],
+    setupMapViewMode:state.setupMapViewMode||"map",
     rememberLoadedStocks:state.rememberLoadedStocks!==false,
     serverLoadedFiles:state.rememberLoadedStocks===false?[]:normalizedServerLoadedFiles(),
     stocks:state.rememberLoadedStocks===false?[]:persistedStocksPayload(),
@@ -3583,6 +3618,7 @@ function hydratePlannerState(){
       }
       state.zoneOutcomeFilterKeys=Array.isArray(parsed.zoneOutcomeFilterKeys)?parsed.zoneOutcomeFilterKeys:["all"];
       state.setupMapFilterKeys=Array.isArray(parsed.setupMapFilterKeys)?parsed.setupMapFilterKeys:["all"];
+      if(["map","list"].includes(parsed.setupMapViewMode))state.setupMapViewMode=parsed.setupMapViewMode;
       state.activeKey=parsed.activeKey&&state.stocks[parsed.activeKey]?parsed.activeKey:(stockList()[0]?.key||null);
       state.view=parsed.view==="drill"&&state.activeKey?"drill":"overview";
       state.tab=Number.isFinite(Number(parsed.tab))?Number(parsed.tab):0;
@@ -4297,53 +4333,14 @@ function exportPlannerCsv(){
 
 function updateStockBar(){
   const stocks=stockList();
-  const wrap=document.getElementById("stockBarWrap");
-  const chips=document.getElementById("stockChips");
   const status=document.getElementById("loadStatus");
   if(!stocks.length){
-    wrap.style.display="none";
     status.textContent="No stocks loaded";
     status.classList.remove("is-loaded");
-    return
+    return;
   }
-  wrap.style.display="block";
   status.textContent=`${stocks.length} stock${stocks.length>1?"s":""} loaded`;
   status.classList.add("is-loaded");
-  chips.innerHTML=stocks.map(s=>`
-    <span class="stock-chip ${state.activeKey===s.key&&state.view==="drill"?"active":""}" data-key="${esc(s.key)}" title="${esc(s.label)}">
-      <span style="font-family:var(--mono);font-weight:700">${esc(s.data.meta?.ticker||s.key)}</span>
-      <span style="color:var(--mu);font-size:10px;margin-left:2px">${esc(s.data.meta?.stock_name||"")}</span>
-      <span class="chip-remove" data-remove="${esc(s.key)}" title="Remove">x</span>
-    </span>`).join("");
-  chips.querySelectorAll(".stock-chip").forEach(el=>{
-    el.addEventListener("click",e=>{
-      if(e.target.dataset.remove)return;
-      state.activeKey=el.dataset.key;
-      state.view="drill";state.tab=0;
-      renderApp();
-    });
-  });
-  chips.querySelectorAll("[data-remove]").forEach(el=>{
-    el.addEventListener("click",e=>{
-      e.stopPropagation();
-      const k=el.dataset.remove;
-      const removedLabel=state.stocks[k]?.label;
-      delete state.stocks[k];
-      delete state.planner[k];
-      if(removedLabel){
-        state.serverLoadedFiles=normalizedServerLoadedFiles().filter(name=>name!==removedLabel);
-      }
-      if(state.activeKey===k){
-        const remaining=stockList();
-        state.activeKey=remaining.length?remaining[0].key:null;
-        state.view=remaining.length?(remaining.length>1?"overview":"drill"):"overview";
-      }
-      ensurePlannerActive();
-      persistPlannerState();
-      updateStockBar();
-      renderApp();
-    });
-  });
 }
 
 async function backendHealth(){
@@ -5261,6 +5258,33 @@ function buildSetupMapItems(){
     };
   }).filter(Boolean);
 }
+function setupMapListView(items){
+  const groups=[
+    {key:"below",label:"Below Zone",cls:"below",test:i=>i.zonePosition<0},
+    {key:"inside",label:"Inside Zone",cls:"inside",test:i=>i.zonePosition>=0&&i.zonePosition<=1},
+    {key:"above",label:"Above Zone",cls:"above",test:i=>i.zonePosition>1},
+  ];
+  const cols=groups.map(g=>{
+    const rows=items.filter(g.test).sort((a,b)=>b.possibleGainPct-a.possibleGainPct);
+    const rowsHtml=rows.length
+      ? rows.map(item=>{
+          const gainColor=item.possibleGainPct>=5?"var(--hit)":item.possibleGainPct>=2?"var(--warn)":"var(--mu)";
+          return `<div class="setup-list-row" data-key="${esc(item.key)}">
+            <span class="setup-list-dot" style="background:${setupMapVerdictFill(item.finalVerdictTone)}"></span>
+            <span class="setup-list-ticker">${esc(item.ticker)}</span>
+            <span class="setup-list-name">${esc(item.stockName)}</span>
+            <span class="setup-list-gain" style="color:${gainColor}">${n(item.possibleGainPct,1)}%</span>
+          </div>`;
+        }).join("")
+      : `<div style="padding:14px;font-size:12px;color:var(--mu)">None</div>`;
+    return `<div class="setup-list-col">
+      <div class="setup-list-col-head ${g.cls}">${g.label}<span class="col-count">${rows.length}</span></div>
+      <div class="setup-list-col-rows">${rowsHtml}</div>
+    </div>`;
+  }).join("");
+  return `<div class="setup-list-cols">${cols}</div>`;
+}
+
 function panelSetupMap(){
   const allItems=buildSetupMapItems();
   const filterControl=setupMapFilterControl(allItems);
@@ -5268,7 +5292,10 @@ function panelSetupMap(){
   const items=activeKeys.includes("all")
     ? allItems
     : allItems.filter(item=>activeKeys.includes(item.key));
-  if(!items.length)return `<div class="panel"><h2>Setup Map</h2>${filterControl}<div class="empty">No stocks are selected for this chart.</div></div>`;
+  const viewMode=state.setupMapViewMode||"map";
+  const viewToggle=`<div class="tabs" style="margin:0 0 12px;display:inline-flex"><button class="tab ${viewMode==="map"?"active":""}" id="setupMapViewMap">Map</button><button class="tab ${viewMode==="list"?"active":""}" id="setupMapViewList">List</button></div>`;
+  if(!items.length)return `<div class="panel"><h2>Setup Map</h2>${viewToggle}${filterControl}<div class="empty">No stocks are selected for this chart.</div></div>`;
+  if(viewMode==="list")return `<div class="panel"><h2>Setup Map</h2>${viewToggle}${filterControl}${setupMapListView(items)}</div>`;
   const width=980,height=360;
   const margin={top:26,right:26,bottom:68,left:68};
   const plotW=width-margin.left-margin.right;
@@ -5301,7 +5328,7 @@ function panelSetupMap(){
     }));
     return `<g class="setup-map-point" data-key="${esc(item.key)}" data-meta="${tipMeta}" tabindex="0"><circle cx="${n(cx,1)}" cy="${n(cy,1)}" r="7" fill="${setupMapVerdictFill(item.finalVerdictTone)}" stroke="none"></circle><text class="setup-map-point-label" x="${n(labelPos.x,1)}" y="${n(labelPos.y,1)}" text-anchor="${labelPos.anchor}">${esc(item.ticker)}</text></g>`;
   }).join("");
-  return `<div class="panel"><h2>Setup Map</h2><p class="small muted" style="margin:0 0 12px">Each point is one loaded stock. Left means price is below the projected zone, the shaded band is inside the zone, and right means price is above it. Higher points have higher possible next-cycle gain.</p>${filterControl}<div class="setup-map-shell"><div class="setup-map-stage"><svg class="setup-map-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatter plot of price position versus possible gain"><rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" rx="12" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.05)"></rect><rect x="${n(bandX,1)}" y="${margin.top}" width="${n(bandW,1)}" height="${plotH}" fill="rgba(79,142,247,.10)"></rect>${yGrid}<line x1="${margin.left}" y1="${margin.top+plotH}" x2="${margin.left+plotW}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.12)"></line><line x1="${n(xPx(0),1)}" y1="${margin.top}" x2="${n(xPx(0),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><line x1="${n(xPx(1),1)}" y1="${margin.top}" x2="${n(xPx(1),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><text class="setup-map-band-label" x="${n(bandX+bandW/2,1)}" y="${margin.top+16}" text-anchor="middle">Projected entry zone</text>${points}<text class="setup-map-axis-label" x="${n((margin.left+xPx(0))/2,1)}" y="${height-18}" text-anchor="middle">Below zone</text><text class="setup-map-axis-label" x="${n((xPx(0)+xPx(1))/2,1)}" y="${height-18}" text-anchor="middle">Inside zone</text><text class="setup-map-axis-label" x="${n((xPx(1)+margin.left+plotW)/2,1)}" y="${height-18}" text-anchor="middle">Above zone</text><text class="setup-map-axis-label" x="16" y="${margin.top-6}">Possible gain</text></svg><div class="tooltip" id="setupMapTip"></div></div><div class="setup-map-legend"><span><i style="background:#3ed9a0"></i>Actionable now</span><span><i style="background:#f5c542"></i>Watch or small trades advised</span><span><i style="background:#a78bfa"></i>Watch only</span><span><i style="background:#7a829a"></i>On radar</span><span><i style="background:#f07070"></i>Too risky</span></div><div class="setup-map-note">All visible stocks are labelled here. Hover still gives the full detail for every stock, then click any point to drill in.</div></div></div>`
+  return `<div class="panel"><h2>Setup Map</h2>${viewToggle}<p class="small muted" style="margin:0 0 12px">Each point is one loaded stock. Left means price is below the projected zone, the shaded band is inside the zone, and right means price is above it. Higher points have higher possible next-cycle gain.</p>${filterControl}<div class="setup-map-shell"><div class="setup-map-stage"><svg class="setup-map-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatter plot of price position versus possible gain"><rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" rx="12" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.05)"></rect><rect x="${n(bandX,1)}" y="${margin.top}" width="${n(bandW,1)}" height="${plotH}" fill="rgba(79,142,247,.10)"></rect>${yGrid}<line x1="${margin.left}" y1="${margin.top+plotH}" x2="${margin.left+plotW}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.12)"></line><line x1="${n(xPx(0),1)}" y1="${margin.top}" x2="${n(xPx(0),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><line x1="${n(xPx(1),1)}" y1="${margin.top}" x2="${n(xPx(1),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><text class="setup-map-band-label" x="${n(bandX+bandW/2,1)}" y="${margin.top+16}" text-anchor="middle">Projected entry zone</text>${points}<text class="setup-map-axis-label" x="${n((margin.left+xPx(0))/2,1)}" y="${height-18}" text-anchor="middle">Below zone</text><text class="setup-map-axis-label" x="${n((xPx(0)+xPx(1))/2,1)}" y="${height-18}" text-anchor="middle">Inside zone</text><text class="setup-map-axis-label" x="${n((xPx(1)+margin.left+plotW)/2,1)}" y="${height-18}" text-anchor="middle">Above zone</text><text class="setup-map-axis-label" x="16" y="${margin.top-6}">Possible gain</text></svg><div class="tooltip" id="setupMapTip"></div></div><div class="setup-map-legend"><span><i style="background:#3ed9a0"></i>Actionable now</span><span><i style="background:#f5c542"></i>Watch or small trades advised</span><span><i style="background:#a78bfa"></i>Watch only</span><span><i style="background:#7a829a"></i>On radar</span><span><i style="background:#f07070"></i>Too risky</span></div><div class="setup-map-note">All visible stocks are labelled here. Hover still gives the full detail for every stock, then click any point to drill in.</div></div></div>`
 }
 function panelZoneOutcomeMap(){
   const mode=state.zoneOutcomeMode||"current";
@@ -5707,8 +5734,11 @@ function panelMiniCards(){
   if(!stocks.length)return"";
   return`<div class="panel">
     <h2>Portfolio Overview — Mini Cards</h2>
-    <p class="small muted" style="margin:0 0 12px">Click any card to drill into that stock.</p>
-    <div class="mini-grid">
+    <div class="mini-search-row">
+      <input type="search" id="miniCardSearch" placeholder="Search by ticker or name…" autocomplete="off" spellcheck="false">
+      <span class="mini-search-count" id="miniCardCount">${stocks.length} stock${stocks.length!==1?"s":""}</span>
+    </div>
+    <div class="mini-grid" id="miniGrid">
       ${stocks.map(s=>renderMiniCard(s)).join("")}
     </div>
   </div>`
@@ -6144,6 +6174,8 @@ function renderOverviewView(){
   }
   document.getElementById("zoneOutcomeCurrent")?.addEventListener("click",()=>{state.zoneOutcomeMode="current";persistPlannerState();renderApp()});
   document.getElementById("zoneOutcomeRecent")?.addEventListener("click",()=>{state.zoneOutcomeMode="recent";persistPlannerState();renderApp()});
+  document.getElementById("setupMapViewMap")?.addEventListener("click",()=>{state.setupMapViewMode="map";persistPlannerState();renderApp()});
+  document.getElementById("setupMapViewList")?.addEventListener("click",()=>{state.setupMapViewMode="list";persistPlannerState();renderApp()});
   const zoneFilterBtn=document.getElementById("zoneOutcomeFilterBtn");
   const zoneFilterMenu=document.getElementById("zoneOutcomeFilterMenu");
   if(zoneFilterBtn&&zoneFilterMenu){
@@ -6588,6 +6620,23 @@ document.addEventListener("click",e=>{
 hydratePlannerState();
 renderApp();
 initBackendMode();
+
+document.addEventListener("input",function(e){
+  if(e.target.id!=="miniCardSearch")return;
+  const q=e.target.value.trim().toLowerCase();
+  const cards=document.querySelectorAll("#miniGrid .mini-card");
+  let visible=0;
+  cards.forEach(card=>{
+    const key=(card.dataset.key||"").toLowerCase();
+    const name=(card.querySelector(".mini-card-name")?.textContent||"").toLowerCase();
+    const show=!q||key.includes(q)||name.includes(q);
+    card.style.display=show?"":"none";
+    if(show)visible++;
+  });
+  const countEl=document.getElementById("miniCardCount");
+  if(countEl)countEl.textContent=q?`${visible} of ${cards.length} stock${cards.length!==1?"s":""}`:
+    `${cards.length} stock${cards.length!==1?"s":""}`;
+});
 </script>
 </body>
 </html>

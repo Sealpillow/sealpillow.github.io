@@ -1,0 +1,624 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+
+<!-- Scripts -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+<style>
+
+
+
+/* Set fixed height for both sliders to match */
+.synced-keycapsule {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+/* Main keycapsule wrapper grid */
+.keycapsule-wrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 50% 50%;
+}
+
+/* Right keycapsule grid layouts */
+.rightkeycapsule-grid {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  height: 100%;
+  align-content: center;
+}
+.rightkeycapsule-grid a{
+  display: block;
+}
+/* 1 row 2 column */
+.rightkeycapsule-grid[data-layout="1x2"] {
+  grid-template-columns: 40% 40%;
+  justify-content: center;
+}
+
+/* 1 row 3 column */
+.rightkeycapsule-grid[data-layout="1x3"] {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* 2 row 1 column */
+.rightkeycapsule-grid[data-layout="2x1"] {
+  grid-template-columns: 60%;
+  grid-template-rows: 40% 40%;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .rightkeycapsule-grid[data-layout="2x1"] {
+    grid-template-columns: 80%;
+    grid-template-rows: 40% 40%;
+    gap: 1rem;
+    padding:3rem;
+    justify-content: center;
+  }
+}
+
+/* 2 row 2 column */
+.rightkeycapsule-grid[data-layout="2x2"] {
+  grid-template-columns: 35% 35%;
+  grid-template-rows: 50% 50%;
+  justify-content: center;
+}
+
+/* 3 row 1 column */
+.rightkeycapsule-grid[data-layout="3x1"] {
+  grid-template-columns: 40%;
+  grid-template-rows: 30% 30% 30%;
+  justify-content: center;
+}
+.rightkeycapsule-grid[data-layout="3x1"] img {
+  width: 100%;
+  aspect-ratio: 4 / 3;  /* force wider crop */
+  object-fit: cover;
+  object-position: bottom;
+}
+
+@media (max-width: 768px) {
+  .rightkeycapsule-grid[data-layout="3x1"] {
+    grid-template-columns: 50%;
+    grid-template-rows: 30% 30% 30%;
+    gap: 1rem;
+    padding:1rem;
+    justify-content: center;
+  }
+}
+
+
+/* 2 row 3 column (3 top 2 bottom) */
+.rightkeycapsule-grid[data-layout="2x3"] {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* virtual grid */
+    gap: 0.75rem;
+    padding: 1rem;
+}
+
+/* Top row – 3 items */
+.rightkeycapsule-grid[data-layout="2x3"] > :nth-child(-n+3) {
+    grid-column: span 2;
+}
+
+/* Bottom row – 2 centered items */
+.rightkeycapsule-grid[data-layout="2x3"] > :nth-child(4) {
+    grid-column: 2 / span 2;
+}
+
+.rightkeycapsule-grid[data-layout="2x3"] > :nth-child(5) {
+    grid-column: 4 / span 2;
+}
+
+
+/* 3 top 2 btm */
+.rightkeycapsule-grid[data-layout="3x2"] {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* virtual columns */
+    gap: 0.75rem;
+    padding: 1rem;
+}
+
+/* Top row – 2 centered items */
+.rightkeycapsule-grid[data-layout="3x2"] > :nth-child(1) {
+    grid-column: 2 / span 2;
+}
+
+.rightkeycapsule-grid[data-layout="3x2"] > :nth-child(2) {
+    grid-column: 4 / span 2;
+}
+
+/* Bottom row – 3 items */
+.rightkeycapsule-grid[data-layout="3x2"] > :nth-child(3),
+.rightkeycapsule-grid[data-layout="3x2"] > :nth-child(4),
+.rightkeycapsule-grid[data-layout="3x2"] > :nth-child(5) {
+    grid-column: span 2;
+}
+
+
+
+/* 2 top 1 mid*/
+.rightkeycapsule-grid[data-layout="3-product"] {
+  grid-template-columns: 33.33% 33.33% 33.33%;
+  grid-template-rows: 50% 50%;
+  align-items: center;
+  justify-items: center;
+}
+
+.rightkeycapsule-grid[data-layout="3-product"] .product-1 {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.rightkeycapsule-grid[data-layout="3-product"] .product-2 {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.rightkeycapsule-grid[data-layout="3-product"] .product-3 {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
+}
+
+
+
+/* 2 row 3 column (3 top 2 bottom) */
+.rightkeycapsule-grid[data-layout="special"] {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* virtual grid */
+    gap: 0.75rem;
+    padding: 1rem;
+}
+
+/* Top row – 3 items */
+
+.rightkeycapsule-grid[data-layout="special"] > :nth-child(1) {
+    grid-column: 2 / span 2;
+    grid-row: 1;
+}
+
+.rightkeycapsule-grid[data-layout="special"] > :nth-child(2) {
+    grid-column: 4 / span 2;
+    grid-row: 1;
+}
+
+/* Bottom row – 2 centered items */
+.rightkeycapsule-grid[data-layout="special"] > :nth-child(3) {
+    grid-column: 3 / span 2;
+    grid-row: 2;
+}
+
+
+
+
+/* 2 top 1 mid 2 btm */
+.rightkeycapsule-grid[data-layout="dice-layout"] {
+  grid-template-columns: 33.33% 33.33% 33.33%;
+  grid-template-rows: 33.33% 33.33% 33.33%;
+  align-items: center;
+  justify-items: center;
+  gap: 0;
+}
+
+.rightkeycapsule-grid[data-layout="dice-layout"] .product-1 {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.rightkeycapsule-grid[data-layout="dice-layout"] .product-2 {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.rightkeycapsule-grid[data-layout="dice-layout"] .product-3 {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
+}
+
+.rightkeycapsule-grid[data-layout="dice-layout"] .product-4 {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.rightkeycapsule-grid[data-layout="dice-layout"] .product-5 {
+  grid-column: 3;
+  grid-row: 3;
+}
+
+
+@media (max-width: 768px) {
+  /* Keycapsule wrapper on mobile */
+  .keycapsule-wrapper {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    height: auto;
+  }
+
+  .rightkeycapsule-splide {
+    height: auto;
+  }
+}
+
+/* Splide container styles */
+.splide {
+  width: 100%;
+  height: 100%;
+}
+
+/* Left and right keycapsule splide */
+.leftkeycapsule-splide,
+.rightkeycapsule-splide {
+  position: relative;
+  overflow: hidden;
+  height: auto;  /* Adjust this value to suit the overall design */
+  flex: 1;  /* Ensure both sliders take equal space */
+}
+
+.leftkeycapsule-splide .splide__track,
+.rightkeycapsule-splide .splide__track {
+  height: 100%;
+}
+
+
+
+/* Image styles for sliders */
+.leftkeycapsule-splide img,
+.rightkeycapsule-splide img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+
+}
+
+/* Left splide pagination */
+.leftkeycapsule-splide .splide__pagination {
+  position: absolute;
+  bottom: 20px !important;
+  right: 2.5rem;
+  left: auto !important;
+  width: auto !important;
+  display: flex;
+  gap: 5px;
+  z-index: 10;
+  justify-content: flex-end;
+}
+
+.leftkeycapsule-splide .splide__pagination__page {
+  width: 28px;
+  height: 4px;
+  margin: 0;
+  border: none;
+  outline: none;
+  border-radius: 0;
+  background-color: grey;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+/* Active bullet styles */
+.leftkeycapsule-splide .splide__pagination__page.is-active {
+  height: 6px;
+  background-color: black;
+  transform: scaleY(1);
+}
+
+/* Editorial overlay container */
+.keycapsule-text-overlay {
+  position: absolute;
+  bottom: 20px !important;
+  left: 20px;
+  z-index: 5;
+  color: black;
+}
+
+/* Bottom left capsules text */
+.bottom-left-capsules {
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.bottom-left-discover-capsules {
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.underline-black {
+  display: inline-block;
+}
+
+/* ==============================
+   UNDERLINE ANIMATION
+============================== */
+
+.bottom-left-discover-capsules {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.bottom-left-discover-capsules::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%; /* Start with no width */
+  height: 1px; /* Fixed consistent height */
+  background: #000; /* Use dynamic color classes */
+  transition: width 0.35s ease; /* Animate only the width */
+}
+
+.underline-black::after {
+  background: #000;
+}
+
+.underline-white::after {
+  background: #fff;
+}
+
+.leftkeycapsule-splide .splide__slide a:hover .bottom-left-discover-capsules::after {
+  width: 100%; /* Expand to full width on hover */
+}
+
+
+</style>
+
+<section class="synced-keycapsule">
+  <div class="keycapsule-wrapper">
+    <!-- LEFT: leftkeycapsule slider -->
+    <div class="splide leftkeycapsule-splide" aria-label="Lifestyle capsule slider">
+      <div class="splide__track">
+        <ul class="splide__list" id="left-slides"></ul>
+      </div>
+    </div>
+
+    <!-- RIGHT: Product grid slider -->
+    <div class="splide rightkeycapsule-splide" aria-label="Product capsule slider">
+      <div class="splide__track">
+        <ul class="splide__list" id="right-slides"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Left slider (Lifestyle)
+  const leftSlides = [
+    {
+      // Slide 1
+      title: "TACTILE TRANSIENCE",
+      discoverText: "Discover More",
+      desktoptextColor: "black",
+      mobiletextColor: "black",
+      link: "$url('Product-Show','pid','PW2-45060028_OLIVE')$",
+      analytics: {
+        contentId: "g_keycapsule_pw_modelimage_1",
+        contentType: "asset"
+      },
+      media: {
+        type: "image",
+        desktop: "images/homepage/2026/29jun26/g_keycapsule_pw_modelimage_1.jpg?$staticlink$",
+        mobile: "images/homepage/2026/29jun26/g_keycapsule_pw_modelimage_1_mobile.jpg?$staticlink$",
+      }
+    },
+    {
+      // Slide 2
+      title: "EARTHEN ELEMENTS",
+      discoverText: "Discover More",
+      desktoptextColor: "black",
+      mobiletextColor: "black",
+      link: "$url('Product-Show','pid','PM2-25210276_BLK.TU')$",
+      analytics: {
+        contentId: "g_keycapsule_pm_modelimage_1",
+        contentType: "asset"
+      },
+      media: {
+        type: "image",
+        desktop: "images/homepage/2026/29jun26/g_keycapsule_pm_modelimage_1.jpg?$staticlink$",
+        mobile: "images/homepage/2026/29jun26/g_keycapsule_pm_modelimage_1_mobile.jpg?$staticlink$",
+      }
+    },
+  ];
+
+  function addLeftSlide(slide) {
+    const list = document.getElementById('left-slides');
+    const newSlide = document.createElement('li');
+    newSlide.classList.add('splide__slide');
+    if (slide.media.type === "image"){
+      newSlide.innerHTML = `
+        <a href="${slide.link}" data-content-analytic='{"contentId":"${slide.analytics.contentId}", "contentType": "${slide.analytics.contentType}", "homepageBanner":true}'>
+          <!-- Image for desktop -->
+          <img class="d-md-block d-none" src="${slide.media.desktop}" loading="lazy">
+
+          <!-- Image for mobile -->
+          <img class="d-block d-md-none" src="${slide.media.mobile}" loading="lazy">
+
+          <!-- Text for desktop -->
+          <div class="d-md-block d-none keycapsule-text-overlay" style="color: ${slide.desktoptextColor};">
+            <div class="bottom-left-capsules">${slide.title}</div>
+            <div class="bottom-left-discover-capsules underline-${slide.desktoptextColor}">${slide.discoverText}</div>
+          </div>
+
+          <!-- Text for mobile -->
+          <div class="d-block d-md-none keycapsule-text-overlay" style="color: ${slide.mobiletextColor};">
+            <div class="bottom-left-capsules">${slide.title}</div>
+            <div class="bottom-left-discover-capsules underline-${slide.mobiletextColor}">${slide.discoverText}</div>
+          </div>
+        </a>
+      `;
+    }
+    else{
+      newSlide.innerHTML = `
+        <a href="${slide.link}" data-content-analytic='{"contentId":"${slide.analytics.contentId}", "contentType": "${slide.analytics.contentType}", "homepageBanner":true}'>
+          <!-- Video for desktop -->
+          <video class="d-md-block d-none" autoplay muted loop playsinline>
+            <source src="${slide.media.desktop}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+
+          <!-- Video for mobile -->
+          <video class="d-block d-md-none" autoplay muted loop playsinline>
+            <source src="${slide.media.mobile}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+
+          <!-- Text for desktop -->
+          <div class="keycapsule-text-overlay" style="color: ${slide.desktoptextColor};">
+            <div class="bottom-left-capsules">${slide.title}</div>
+            <div class="bottom-left-discover-capsules underline-${slide.desktoptextColor}">${slide.discoverText}</div>
+          </div>
+
+          <!-- Text for mobile -->
+          <div class="keycapsule-text-overlay" style="color: ${slide.mobiletextColor};">
+            <div class="bottom-left-capsules">${slide.title}</div>
+            <div class="bottom-left-discover-capsules underline-${slide.mobiletextColor}">${slide.discoverText}</div>
+          </div>
+        </a>
+      `;
+    }
+    list.appendChild(newSlide);
+  }
+
+  leftSlides.forEach(slide => addLeftSlide(slide));
+
+  // Right slider (Product Grid)
+  const rightSlides = [
+    {
+      // Slide 1
+      layout: '3x1',
+      products: [
+        {
+          img: "images/homepage/2026/29jun26/g_keycapsule_pw_productimage_2.jpg?$staticlink$",
+          link: "$url('Product-Show', 'pid', 'PW2-45060028_SAND')$",
+          analytics: {
+            contentId: "g_keycapsule_pw_productimage_1",
+            contentType: "asset"
+          },
+        },
+        {
+          img: "images/homepage/2026/29jun26/g_keycapsule_pw_productimage_3.jpg?$staticlink$",
+          link: "$url('Product-Show', 'pid', 'PW2-45060028_OLIVE')$",
+          analytics: {
+            contentId: "g_keycapsule_pw_productimage_2",
+            contentType: "asset"
+          },
+        },
+        {
+          img: "images/homepage/2026/29jun26/g_keycapsule_pw_productimage_4.jpg?$staticlink$",
+          link: "$url('Product-Show', 'pid', 'PW2-45060028_BLACK')$",
+          analytics: {
+            contentId: "g_keycapsule_pw_productimage_3",
+            contentType: "asset"
+          },
+        },
+      ],
+    },
+    {
+      // Slide 2
+      layout: '2x2',
+      products: [
+        {
+          img: "images/homepage/2026/29jun26/g_keycapsule_pm_productimage_2.jpg?$staticlink$",
+          link: "$url('Product-Show', 'pid', 'PM2-25210276_BLK.TU')$",
+          analytics: {
+            contentId: "g_keycapsule_pm_productimage_1",
+            contentType: "asset"
+          },
+        },
+        {
+          img: "images/homepage/2026/29jun26/g_keycapsule_pm_productimage_3.jpg?$staticlink$",
+          link: "$url('Product-Show', 'pid', 'PM2-26320286_BLK.TU')$",
+          analytics: {
+            contentId: "g_keycapsule_pm_productimage_2",
+            contentType: "asset"
+          },
+        },
+        {
+          img: "images/homepage/2026/29jun26/g_keycapsule_pm_productimage_4.jpg?$staticlink$",
+          link: "$url('Product-Show', 'pid', 'PM1-65110334_BLK.TU')$",
+          analytics: {
+            contentId: "g_keycapsule_pm_productimage_3",
+            contentType: "asset"
+          },
+        },
+        {
+          img: "images/homepage/2026/29jun26/g_keycapsule_pm_productimage_5.jpg?$staticlink$",
+          link: "$url('Product-Show', 'pid', 'PM1-56600021_BLACK')$",
+          analytics: {
+            contentId: "g_keycapsule_pm_productimage_4",
+            contentType: "asset"
+          },
+        },
+      ],
+    },
+  ];
+
+  function addRightSlide(slide) {
+    const list = document.getElementById('right-slides');
+    const newSlide = document.createElement('li');
+    newSlide.classList.add('splide__slide');
+    const grid = document.createElement('div');
+    grid.classList.add('rightkeycapsule-grid');
+    grid.setAttribute('data-layout', slide.layout);
+
+    slide.products.forEach((product, index) => {
+      const productDiv = document.createElement('div');
+      productDiv.classList.add(`product-${index + 1}`);
+      productDiv.innerHTML = `
+        <a href="${product.link}" data-content-analytic='{"contentId":"${product.analytics.contentId}", "contentType": "${product.analytics.contentType}", "homepageBanner":true}'>
+          <img src="${product.img}" loading="lazy">
+        </a>
+      `;
+      grid.appendChild(productDiv);
+    });
+
+    newSlide.appendChild(grid);
+    list.appendChild(newSlide);
+  }
+
+  rightSlides.forEach(slide => addRightSlide(slide));
+
+
+  // Initialize Splide sliders
+  const leftkeycapsule = new Splide('.leftkeycapsule-splide', {
+    type: 'fade',
+    rewind: true,
+    speed: 800,
+    arrows: false,
+    pagination: true,
+    autoplay: true,
+    interval: 5000,
+    pauseOnHover: false,
+    pauseOnFocus: false,
+  });
+
+  const rightkeycapsule = new Splide('.rightkeycapsule-splide', {
+    type: 'fade',
+    rewind: false,
+    speed: 800,
+    arrows: false,
+    pagination: false,
+    drag: false,
+    autoplay: true,
+    interval: 5000,
+    pauseOnHover: false,
+    pauseOnFocus: false,
+  });
+
+  // Keep both sliders moving together in both directions
+  leftkeycapsule.sync(rightkeycapsule);
+
+  leftkeycapsule.mount();
+  rightkeycapsule.mount();
+</script>

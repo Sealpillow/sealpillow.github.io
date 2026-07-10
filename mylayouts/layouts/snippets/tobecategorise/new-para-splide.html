@@ -1,0 +1,303 @@
+<link rel="preload" as="style" href="https://use.typekit.net/jwn1ofo.css" onload="this.rel='stylesheet'">
+<link rel="preload" as="image" href="../../media/landscape-1.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="../../media/landscape-2.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="../../media/portrait-1.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="../../media/portrait-2.jpg" fetchpriority="high">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ================= SPLIDE CSS ================= -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+
+<!-- ================= SPLIDE JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+
+<style>
+.page,
+.page.parallax {
+  padding-top: 0 !important;
+}
+
+.parallax-container {
+  position: relative;
+  width: 100vw;
+}
+
+/* ── Splide base ── */
+.parallax-splide .splide__track {
+  overflow: hidden;
+}
+
+.parallax-splide .splide__slide {
+  position: relative;
+}
+
+.parallax-splide .splide__slide a {
+  display: block;
+  position: relative;
+}
+
+.parallax-splide .splide__slide img,
+.parallax-splide .splide__slide video {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  height: 100%;
+  filter: grayscale(0);
+}
+
+/* ── Hide arrows ── */
+.parallax-splide .splide__arrows {
+  display: none;
+}
+
+/* ── Pagination — bar style, bottom-right ── */
+.parallax-splide .splide__pagination {
+  position: absolute;
+  bottom: 20px;
+  right: 2.5rem;
+  left: auto;
+  top: auto;
+  width: auto;
+  display: flex;
+  gap: 7px;
+  z-index: 10;
+  padding: 0;
+}
+
+.parallax-splide .splide__pagination__page {
+  width: 28px;
+  height: 4px;
+  border: none;
+  outline: none;
+  border-radius: 0;
+  background: rgba(128, 128, 128, 0.5);
+  opacity: 1;
+  transition: all 0.3s ease;
+  margin: 0;
+  padding: 0;
+  transform: none !important;
+}
+
+.parallax-splide .splide__pagination__page.is-active {
+  height: 6px;
+}
+
+/* Active bullet colour — driven by data-pagination-color on the slider root */
+.parallax-splide[data-pagination-color="white"] .splide__pagination__page.is-active {
+  background-color: #fff;
+}
+.parallax-splide[data-pagination-color="black"] .splide__pagination__page.is-active {
+  background-color: #000;
+}
+
+/* ── Overlay text ── */
+.parallax-banner-text-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 5;
+}
+
+.parallax-banner-bottom-left {
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.parallax-banner-bottom-left-discover {
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+
+.parallax-banner-bottom-left-discover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 1px;
+  transition: width 0.35s ease;
+}
+
+.underline-white::after { background: #fff; }
+.underline-black::after { background: #000; }
+
+.parallax-container .splide__slide a:hover .parallax-banner-bottom-left-discover::after {
+  width: 100%;
+}
+</style>
+
+<div class="parallax-container js-vertical-slider">
+
+  <!-- Desktop slider -->
+  <div class="splide parallax-splide d-none d-md-block" id="fade-slider-desktop">
+    <div class="splide__track">
+      <ul class="splide__list" id="fade-slides-desktop"></ul>
+    </div>
+  </div>
+
+  <!-- Mobile slider -->
+  <div class="splide parallax-splide d-block d-md-none" id="fade-slider-mobile">
+    <div class="splide__track">
+      <ul class="splide__list" id="fade-slides-mobile"></ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const desktopSlides = [
+  {
+    title: "GRANO ENGRAINED 1",
+    discoverText: "Discover More",
+    textColor: "black",
+    paginationColor: "black",
+    tabLink: { page: "material-story", tab: "grano" },
+    analytics: { contentId: "a_mainbanner_pw_productimage_2", contentType: "asset" },
+    media: { type: "video", src: "images/homepage/2026/6jul26/a_mainbanner_pw_modelvideo_1.mp4?$staticlink$" },
+    autoplaytimer: 5000
+  },
+  {
+    title: "GRANO ENGRAINED 2",
+    discoverText: "Discover More",
+    textColor: "black",
+    paginationColor: "black",
+    tabLink: { page: "material-story", tab: "grano" },
+    analytics: { contentId: "a_mainbanner_pw_productimage_2", contentType: "asset" },
+    media: { type: "video", src: "images/homepage/2026/6jul26/a_mainbanner_pw_modelvideo_1.mp4?$staticlink$" },
+    autoplaytimer: 5000
+  },
+  // Add more desktop slides here
+];
+
+const mobileSlides = [
+  {
+    title: "METRO MED 1",
+    discoverText: "Discover More",
+    textColor: "white",
+    paginationColor: "white",
+    link: "$url('Page-Show', 'cid', 'metro-med')$",
+    analytics: { contentId: "a_mainbanner_pm_modelimage_1", contentType: "asset" },
+    media: { type: "video", src: "images/homepage/2026/6jul26/a_mainbanner_pw_modelvideo_1_mobile.mp4?$staticlink$" },
+    autoplaytimer: 5000
+  },
+  {
+    title: "METRO MED 2",
+    discoverText: "Discover More",
+    textColor: "white",
+    paginationColor: "white",
+    link: "$url('Page-Show', 'cid', 'metro-med')$",
+    analytics: { contentId: "a_mainbanner_pm_modelimage_1", contentType: "asset" },
+    media: { type: "video", src: "images/homepage/2026/6jul26/a_mainbanner_pw_modelvideo_1_mobile.mp4?$staticlink$" },
+    autoplaytimer: 5000
+  },
+
+  // Add more mobile slides here
+];
+
+function buildSlideHTML(slide) {
+  const mediaHTML = slide.media.type === 'image'
+    ? `<img src="${slide.media.src}" alt="${slide.title}">`
+    : `<video autoplay muted loop playsinline><source src="${slide.media.src}" type="video/mp4"></video>`;
+
+  let href = '#';
+  let extraAttrs = '';
+  if (slide.link) {
+    href = slide.link;
+  } else if (slide.tabLink) {
+    extraAttrs = `class="js-tab-link" data-tab="${slide.tabLink.tab}" data-page="${slide.tabLink.page}"${slide.tabLink.subtab ? ` data-subtab="${slide.tabLink.subtab}"` : ''}`;
+  }
+
+  return `
+    <a href="${href}" ${extraAttrs}
+       data-content-analytic='{"contentId":"${slide.analytics.contentId}","contentType":"${slide.analytics.contentType}"}'>
+      ${mediaHTML}
+      <div class="parallax-banner-text-overlay" style="color:${slide.textColor}">
+        <div class="parallax-banner-bottom-left">${slide.title}</div>
+        <div class="parallax-banner-bottom-left-discover underline-${slide.textColor}">${slide.discoverText}</div>
+      </div>
+    </a>`;
+}
+
+function renderSlides(slides, listId) {
+  const list = document.getElementById(listId);
+  slides.forEach(slide => {
+    const li = document.createElement('li');
+    li.className = 'splide__slide';
+    li.dataset.autoplaytimer   = slide.autoplaytimer || 5000;
+    li.dataset.paginationColor = slide.paginationColor || 'white';
+    li.innerHTML = buildSlideHTML(slide);
+    list.appendChild(li);
+  });
+}
+
+function initSplide(sliderId, slides) {
+  const hasMultipleSlides = slides.length > 1;
+
+  const splide = new Splide(`#${sliderId}`, {
+    type         : 'fade',
+    rewind       : hasMultipleSlides,
+    speed        : 800,
+    arrows       : false,
+    pagination   : hasMultipleSlides,
+    autoplay     : hasMultipleSlides,
+    drag         : hasMultipleSlides,
+    interval     : slides[0] ? slides[0].autoplaytimer : 5000,
+    pauseOnHover : false,
+    pauseOnFocus : false,
+  });
+
+  const el = splide.root;
+
+  if (slides[0]) {
+    el.setAttribute(
+      'data-pagination-color',
+      slides[0].paginationColor || 'white'
+    );
+  }
+
+  splide.on('moved', function (newIndex) {
+    const slide = slides[newIndex];
+    if (!slide) return;
+
+    el.setAttribute(
+      'data-pagination-color',
+      slide.paginationColor || 'white'
+    );
+
+    splide.options = {
+        ...splide.options,
+        interval: slide.autoplaytimer || 5000,
+    };
+  });
+
+  splide.mount();
+
+  return splide;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.js-tab-link').forEach(function(link) {
+    var tab    = link.dataset.tab;
+    var subtab = link.dataset.subtab;
+    var page   = link.dataset.page;
+    if (!tab || !page) return;
+    var pathParts = window.location.pathname.split('/').filter(Boolean);
+    var countryCode = pathParts[0];
+    var hash = '#tab=' + tab;
+    if (subtab) hash += '&subtab=' + subtab;
+    link.href = '/' + countryCode + '/' + page + '.html' + hash;
+  });
+});
+
+renderSlides(desktopSlides, 'fade-slides-desktop');
+renderSlides(mobileSlides,  'fade-slides-mobile');
+
+var desktopSplide = initSplide('fade-slider-desktop', desktopSlides);
+var mobileSplide  = initSplide('fade-slider-mobile',  mobileSlides);
+</script>
