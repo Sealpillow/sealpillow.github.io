@@ -436,6 +436,15 @@ thead th.sortable{cursor:pointer}
           </ul></div>
         </div>
         <div class="hm-section">
+          <div class="hm-label">Comparing accuracy across timing types</div>
+          <p class="hm-text"><span class="chip chip-bimodal" style="font-size:10px;padding:1px 6px">Bimodal</span> date errors will always look smaller than <span class="chip chip-reliable" style="font-size:10px;padding:1px 6px">Reliable</span> ones — not because Bimodal is more accurate, but because the error is measured from whichever of the two cluster centers happened to be closer to the actual. You always get the benefit of hindsight in choosing the closer target. This is a structural advantage built into the measurement, not a signal of better timing.</p>
+          <p class="hm-text" style="margin-top:6px">Because of this, <strong>never compare Reliable vs Bimodal date errors directly</strong>. Use the per-type timing cards above the table to evaluate each type on its own terms. For Bimodal stocks, the cluster hit tally (C1 vs C2 wins) is the more meaningful signal — it shows which timing window is genuinely predictive over time, independent of how small the measured error is.</p>
+        </div>
+        <div class="hm-section">
+          <div class="hm-label">Projected Ex-Div Date</div>
+          <p class="hm-text">The model's forward estimate of the next ex-dividend date for the series, built from historical dividend intervals. Everything downstream — the estimated low date, entry zone, resolution trigger, and ex-div error — is anchored to this date. For the projection formula, see In Depth section 1.</p>
+        </div>
+        <div class="hm-section">
           <div class="hm-label">Estimated Low Date(s)</div>
           <div class="hm-text">When the model expects the stock to dip before ex-div.
           <ul>
@@ -450,7 +459,7 @@ thead th.sortable{cursor:pointer}
         </div>
         <div class="hm-section">
           <div class="hm-label">Cluster (C1 / C2)</div>
-          <p class="hm-text">Bimodal only. Records which cluster the actual dip was closest to — <strong>C1</strong> (early window, farther from ex-div) or <strong>C2</strong> (late window, closer to ex-div). Tracks which window tends to win over time.</p>
+          <p class="hm-text">Bimodal only. Records which cluster the actual low date fell closest to — <strong>C1</strong> (early window, farther from ex-div) or <strong>C2</strong> (late window, closer to ex-div). Either window can win for any given cycle. The timing cards show the running C1/C2 win tally — how often each window correctly called the dip across all resolved cycles. For historical avg dip depth per cluster, see the Cluster dominance row in the dashboard's Forward Setup section.</p>
         </div>
         <div class="hm-section">
           <div class="hm-label">Ex-Div Error</div>
@@ -502,7 +511,8 @@ est_low_date_cluster2 = proj_exdiv_date − round(late_cluster_median  × 7)</pr
           <div class="hm-dlabel">4. Date Error</div>
           <pre class="hm-code">RELIABLE: date_error_days = actual_low_date − est_low_date
 BIMODAL:  date_error_days = actual_low_date − nearest_cluster_center</pre>
-          <p class="hm-dtext">Signed: negative = actual came earlier. For BIMODAL, <em>nearest_cluster_center</em> = whichever of cluster1/cluster2 had the smaller absolute gap to the actual. This systematically reduces BIMODAL errors relative to RELIABLE — compare within the same timing type only.</p>
+          <p class="hm-dtext">Signed: negative = actual came earlier.</p>
+          <p class="hm-dtext" style="margin-top:6px"><strong>Nearest-cluster bias.</strong> For BIMODAL, <em>nearest_cluster_center</em> is always chosen in hindsight — whichever of C1/C2 had the smaller absolute gap to the actual. This guarantees BIMODAL errors are at most as large as the error to the worse cluster, and often considerably smaller. It is a structural measurement effect, not a sign that BIMODAL timing is inherently more precise. Cross-type date error comparisons are therefore meaningless — use the per-type timing cards and the C1/C2 win tally instead.</p>
         </div>
         <div class="hm-dsection">
           <div class="hm-dlabel">5. Cluster Hit (BIMODAL)</div>
@@ -786,15 +796,16 @@ function renderKPIs(rows){
     const tErrs=tRes.filter(r=>r.date_error_days!=null).map(r=>r.date_error_days);
     const tMed=medianAbs(tErrs);
     const hitPct=tRes.length?Math.round(tHits.length/tRes.length*100):null;
-    const c1=t.key==="BIMODAL"?tRes.filter(r=>r.cluster_hit===1).length:null;
-    const c2=t.key==="BIMODAL"?tRes.filter(r=>r.cluster_hit===2).length:null;
+    const c1Rows=t.key==="BIMODAL"?tRes.filter(r=>r.cluster_hit===1):[];
+    const c2Rows=t.key==="BIMODAL"?tRes.filter(r=>r.cluster_hit===2):[];
+    const c1=c1Rows.length, c2=c2Rows.length;
     return`<div class="timing-card">
       <div class="timing-card-label ${t.cls}">${t.label}</div>
       <div class="timing-stat"><span class="timing-stat-label">Predictions</span><span class="timing-stat-value">${tRows.length}</span></div>
       <div class="timing-stat"><span class="timing-stat-label">Resolved</span><span class="timing-stat-value">${tRes.length}</span></div>
       <div class="timing-stat"><span class="timing-stat-label">Zone hit rate</span><span class="timing-stat-value">${hitPct!=null?hitPct+"%":"—"}</span></div>
       <div class="timing-stat"><span class="timing-stat-label">Median date error</span><span class="timing-stat-value">${tMed!=null?tMed+"d":"—"}</span></div>
-      ${t.key==="BIMODAL"&&tRes.length?`<div class="timing-stat"><span class="timing-stat-label">Cluster 1 wins</span><span class="timing-stat-value">${c1}</span></div><div class="timing-stat"><span class="timing-stat-label">Cluster 2 wins</span><span class="timing-stat-value">${c2}</span></div>`:""}
+      ${t.key==="BIMODAL"&&tRes.length?`<div class="timing-stat"><span class="timing-stat-label">C1 wins</span><span class="timing-stat-value">${c1}</span></div><div class="timing-stat"><span class="timing-stat-label">C2 wins</span><span class="timing-stat-value">${c2}</span></div>`:""}
       ${t.note?`<div class="timing-note">${t.note}</div>`:""}
     </div>`;
   }).join("");
