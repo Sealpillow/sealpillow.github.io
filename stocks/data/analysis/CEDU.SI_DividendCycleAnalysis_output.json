@@ -1,0 +1,3302 @@
+{
+  "meta": {
+    "stock_name": "Dasin_Retail_Trust",
+    "ticker": "CEDU.SI",
+    "currency": "SGD",
+    "exchange": "SGX",
+    "today": "2026-07-11",
+    "frequency": "SEMI-ANNUAL",
+    "frequency_display": "Semi-Annual",
+    "adaptive_window_days": 152,
+    "mean_interval_days": 182.8,
+    "vol_threshold": 100000,
+    "vol_threshold_source": "default_SGX",
+    "price_growth_5yr_pct": -96.0
+  },
+  "parse_preflight": {
+    "columns_detected": [
+      "Date",
+      "Open",
+      "High",
+      "Low",
+      "Close",
+      "AdjClose",
+      "Volume",
+      "Notes"
+    ],
+    "date_format_detected": "%d %b %Y",
+    "total_rows": 504,
+    "price_rows": 495,
+    "dividend_rows": 9,
+    "zero_volume_rows": 52,
+    "zero_volume_pct": 10.5,
+    "issues_found": [
+      "2 rows share same date as dividend rows \u2014 verified safe: each pair is one price row + one dividend row on same ex-div date",
+      "Zero-volume rows exceed 5% (52/495, 10.5%) \u2014 analysis continues, but thin trading may reduce reliability"
+    ],
+    "halted": false
+  },
+  "edge_case_flags": [
+    "THIN_TRADING_HISTORY",
+    "LAPSED_DIVIDEND"
+  ],
+  "edge_case_flags_display": [
+    "Thin Trading History",
+    "Lapsed Dividend"
+  ],
+  "series_meta": [
+    {
+      "id": "S1",
+      "label": "Series 1 \u2014 Mar ex-div",
+      "sub": "Semi-Annual",
+      "color": "#3b82f6",
+      "bg": "rgba(59,130,246,0.1)",
+      "window_days": 152
+    },
+    {
+      "id": "S2",
+      "label": "Series 2 \u2014 Aug ex-div",
+      "sub": "Semi-Annual",
+      "color": "#10b981",
+      "bg": "rgba(16,185,129,0.1)",
+      "window_days": 152
+    }
+  ],
+  "cycles": [
+    {
+      "id": "S1_2018",
+      "series": "S1",
+      "exdiv_date": "2018-03-14",
+      "div_amt": 0.0415,
+      "prev_dp": 0.9,
+      "low_px": 0.8,
+      "low_date": "2017-11-10",
+      "peak_px": 0.9,
+      "peak_date": "2018-03-09",
+      "low_vs_prevdp": -11.1111,
+      "exdiv_vs_prevdp": 0.0,
+      "peak_vs_prevdp": 0.0,
+      "rebound": 12.5,
+      "wks_before": 17.7143,
+      "wks_to_peak": 17.0,
+      "div_yield": 4.6111,
+      "s1": 41.5,
+      "s1_floored": "False",
+      "s2": 0.0,
+      "degen": false,
+      "incomplete": false,
+      "outlier": "False",
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": 5.8157,
+        "stock_excess_return": 3.2752
+      },
+      "volume_avg_30d": 1384062.0,
+      "volume_entry_ratio": 1.4276,
+      "volume_trend": "INCREASING",
+      "max_drawdown_pre_exdiv": -5.6818,
+      "recovery_time_days": 124,
+      "success": "True",
+      "pattern_stability_score": null,
+      "zone_hit": null,
+      "exit_analysis": {
+        "opt_exit_px": 0.905,
+        "opt_exit_date": "2018-04-06",
+        "opt_gain_pct": 13.125,
+        "opt_wks_from_low": 21.0,
+        "opt_days_vs_exdiv": 23,
+        "opt_exit_before_exdiv": false,
+        "pre_exdiv_exit_date": "2018-03-09",
+        "pre_exdiv_exit_px": 0.9,
+        "pre_exdiv_gain_pct": 12.5,
+        "pre_exdiv_peak_days_before_exdiv": 5,
+        "exdiv_date_exit_px": 0.88,
+        "exdiv_date_exit_date": "2018-03-16",
+        "post_exdiv_exit_gain_pct": 10.0
+      }
+    },
+    {
+      "id": "S2_2018",
+      "series": "S2",
+      "exdiv_date": "2018-08-29",
+      "div_amt": 0.0359,
+      "prev_dp": 0.89,
+      "low_px": 0.865,
+      "low_date": "2018-04-27",
+      "peak_px": 0.905,
+      "peak_date": "2018-04-06",
+      "low_vs_prevdp": -2.809,
+      "exdiv_vs_prevdp": 0.0,
+      "peak_vs_prevdp": 1.6854,
+      "rebound": 2.8902,
+      "wks_before": 17.7143,
+      "wks_to_peak": -3.0,
+      "div_yield": 4.0337,
+      "s1": 143.6,
+      "s1_floored": "False",
+      "s2": 1.6854,
+      "degen": false,
+      "incomplete": false,
+      "outlier": "False",
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": -6.2571,
+        "stock_excess_return": 7.3934
+      },
+      "volume_avg_30d": 262225.0,
+      "volume_entry_ratio": 1.8806,
+      "volume_trend": "DECLINING",
+      "max_drawdown_pre_exdiv": -4.4199,
+      "recovery_time_days": 124,
+      "success": "False",
+      "pattern_stability_score": null,
+      "zone_hit": null,
+      "exit_analysis": {
+        "opt_exit_px": 0.9,
+        "opt_exit_date": "2018-08-17",
+        "opt_gain_pct": 4.0462,
+        "opt_wks_from_low": 16.0,
+        "opt_days_vs_exdiv": -12,
+        "opt_exit_before_exdiv": true,
+        "pre_exdiv_exit_date": "2018-08-17",
+        "pre_exdiv_exit_px": 0.9,
+        "pre_exdiv_gain_pct": 4.0462,
+        "pre_exdiv_peak_days_before_exdiv": 12,
+        "exdiv_date_exit_px": 0.865,
+        "exdiv_date_exit_date": "2018-08-31",
+        "post_exdiv_exit_gain_pct": 0.0
+      }
+    },
+    {
+      "id": "S1_2019",
+      "series": "S1",
+      "exdiv_date": "2019-03-14",
+      "div_amt": 0.0363,
+      "prev_dp": 0.895,
+      "low_px": 0.845,
+      "low_date": "2018-11-30",
+      "peak_px": 0.895,
+      "peak_date": "2019-03-08",
+      "low_vs_prevdp": -5.5866,
+      "exdiv_vs_prevdp": 0.0,
+      "peak_vs_prevdp": 0.0,
+      "rebound": 5.9172,
+      "wks_before": 14.8571,
+      "wks_to_peak": 14.0,
+      "div_yield": 4.0559,
+      "s1": 72.6,
+      "s1_floored": "False",
+      "s2": 0.0,
+      "degen": false,
+      "incomplete": false,
+      "outlier": "False",
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": 4.2686,
+        "stock_excess_return": -0.8004
+      },
+      "volume_avg_30d": 1140312.0,
+      "volume_entry_ratio": 0.9961,
+      "volume_trend": "INCREASING",
+      "max_drawdown_pre_exdiv": -2.3121,
+      "recovery_time_days": 104,
+      "success": "True",
+      "pattern_stability_score": null,
+      "zone_hit": null,
+      "exit_analysis": {
+        "opt_exit_px": 0.895,
+        "opt_exit_date": "2019-03-08",
+        "opt_gain_pct": 5.9172,
+        "opt_wks_from_low": 14.0,
+        "opt_days_vs_exdiv": -6,
+        "opt_exit_before_exdiv": true,
+        "pre_exdiv_exit_date": "2019-03-08",
+        "pre_exdiv_exit_px": 0.895,
+        "pre_exdiv_gain_pct": 5.9172,
+        "pre_exdiv_peak_days_before_exdiv": 6,
+        "exdiv_date_exit_px": 0.865,
+        "exdiv_date_exit_date": "2019-03-15",
+        "post_exdiv_exit_gain_pct": 2.3669
+      }
+    },
+    {
+      "id": "S2_2019",
+      "series": "S2",
+      "exdiv_date": "2019-08-21",
+      "div_amt": 0.0339,
+      "prev_dp": 0.875,
+      "low_px": 0.86,
+      "low_date": "2019-03-22",
+      "peak_px": 0.89,
+      "peak_date": "2019-06-21",
+      "low_vs_prevdp": -1.7143,
+      "exdiv_vs_prevdp": 0.0,
+      "peak_vs_prevdp": 1.7143,
+      "rebound": 1.7442,
+      "wks_before": 21.7143,
+      "wks_to_peak": 13.0,
+      "div_yield": 3.8743,
+      "s1": 226.0,
+      "s1_floored": "False",
+      "s2": 1.7143,
+      "degen": false,
+      "incomplete": false,
+      "outlier": "False",
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": -3.1677,
+        "stock_excess_return": 4.9119
+      },
+      "volume_avg_30d": 227150.0,
+      "volume_entry_ratio": 3.2459,
+      "volume_trend": "DECLINING",
+      "max_drawdown_pre_exdiv": -2.809,
+      "recovery_time_days": 152,
+      "success": "False",
+      "pattern_stability_score": null,
+      "zone_hit": null,
+      "exit_analysis": {
+        "opt_exit_px": 0.89,
+        "opt_exit_date": "2019-06-21",
+        "opt_gain_pct": 3.4884,
+        "opt_wks_from_low": 13.0,
+        "opt_days_vs_exdiv": -61,
+        "opt_exit_before_exdiv": true,
+        "pre_exdiv_exit_date": "2019-06-21",
+        "pre_exdiv_exit_px": 0.89,
+        "pre_exdiv_gain_pct": 3.4884,
+        "pre_exdiv_peak_days_before_exdiv": 61,
+        "exdiv_date_exit_px": 0.84,
+        "exdiv_date_exit_date": "2019-08-23",
+        "post_exdiv_exit_gain_pct": -2.3256
+      }
+    },
+    {
+      "id": "S1_2020",
+      "series": "S1",
+      "exdiv_date": "2020-03-13",
+      "div_amt": 0.0206,
+      "prev_dp": 0.805,
+      "low_px": 0.815,
+      "low_date": "2020-02-28",
+      "peak_px": 0.86,
+      "peak_date": "2020-01-17",
+      "low_vs_prevdp": 1.2422,
+      "exdiv_vs_prevdp": -1.8293,
+      "peak_vs_prevdp": 6.8323,
+      "rebound": -1.227,
+      "wks_before": 2.0,
+      "wks_to_peak": -6.0,
+      "div_yield": 2.559,
+      "s1": 511.8012,
+      "s1_floored": "True",
+      "s2": 6.8323,
+      "degen": false,
+      "incomplete": false,
+      "outlier": "False",
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": -15.4134,
+        "stock_excess_return": 11.2468
+      },
+      "volume_avg_30d": 1857500.0,
+      "volume_entry_ratio": 0.8088,
+      "volume_trend": "INCREASING",
+      "max_drawdown_pre_exdiv": -5.2326,
+      "recovery_time_days": 14,
+      "success": "False",
+      "pattern_stability_score": null,
+      "zone_hit": null,
+      "exit_analysis": {
+        "opt_exit_px": 0.84,
+        "opt_exit_date": "2020-06-05",
+        "opt_gain_pct": 3.0675,
+        "opt_wks_from_low": 14.0,
+        "opt_days_vs_exdiv": 84,
+        "opt_exit_before_exdiv": false,
+        "pre_exdiv_exit_date": "2020-03-06",
+        "pre_exdiv_exit_px": 0.82,
+        "pre_exdiv_gain_pct": 0.6135,
+        "pre_exdiv_peak_days_before_exdiv": 7,
+        "exdiv_date_exit_px": 0.805,
+        "exdiv_date_exit_date": "2020-03-13",
+        "post_exdiv_exit_gain_pct": -1.227
+      }
+    },
+    {
+      "id": "S2_2020",
+      "series": "S2",
+      "exdiv_date": "2020-07-03",
+      "div_amt": 0.0198,
+      "prev_dp": 0.8,
+      "low_px": 0.795,
+      "low_date": "2020-04-10",
+      "peak_px": 0.84,
+      "peak_date": "2020-06-05",
+      "low_vs_prevdp": -0.625,
+      "exdiv_vs_prevdp": -3.6145,
+      "peak_vs_prevdp": 5.0,
+      "rebound": 0.6289,
+      "wks_before": 12.0,
+      "wks_to_peak": 8.0,
+      "div_yield": 2.475,
+      "s1": 396.0,
+      "s1_floored": "False",
+      "s2": 5.0,
+      "degen": false,
+      "incomplete": false,
+      "outlier": "False",
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": -15.8793,
+        "stock_excess_return": 13.4403
+      },
+      "volume_avg_30d": 439800.0,
+      "volume_entry_ratio": 3.0751,
+      "volume_trend": "DECLINING",
+      "max_drawdown_pre_exdiv": -4.2169,
+      "recovery_time_days": 84,
+      "success": "False",
+      "pattern_stability_score": null,
+      "zone_hit": null,
+      "exit_analysis": {
+        "opt_exit_px": 0.84,
+        "opt_exit_date": "2020-06-05",
+        "opt_gain_pct": 5.6604,
+        "opt_wks_from_low": 8.0,
+        "opt_days_vs_exdiv": -28,
+        "opt_exit_before_exdiv": true,
+        "pre_exdiv_exit_date": "2020-06-05",
+        "pre_exdiv_exit_px": 0.84,
+        "pre_exdiv_gain_pct": 5.6604,
+        "pre_exdiv_peak_days_before_exdiv": 28,
+        "exdiv_date_exit_px": 0.8,
+        "exdiv_date_exit_date": "2020-07-03",
+        "post_exdiv_exit_gain_pct": 0.6289
+      }
+    },
+    {
+      "id": "S1_2021",
+      "series": "S1",
+      "exdiv_date": "2021-03-15",
+      "div_amt": 0.0196,
+      "prev_dp": 0.725,
+      "low_px": 0.725,
+      "low_date": "2021-02-26",
+      "peak_px": 0.8,
+      "peak_date": "2020-10-16",
+      "low_vs_prevdp": 0.0,
+      "exdiv_vs_prevdp": 0.0,
+      "peak_vs_prevdp": 10.3448,
+      "rebound": 0.0,
+      "wks_before": 2.4286,
+      "wks_to_peak": -19.0,
+      "div_yield": 2.7034,
+      "s1": 540.6897,
+      "s1_floored": "True",
+      "s2": 10.3448,
+      "degen": false,
+      "incomplete": false,
+      "outlier": "False",
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": 22.1949,
+        "stock_excess_return": -31.5699
+      },
+      "volume_avg_30d": 637989.0,
+      "volume_entry_ratio": 1.5122,
+      "volume_trend": "DECLINING",
+      "max_drawdown_pre_exdiv": -9.375,
+      "recovery_time_days": 17,
+      "success": "False",
+      "pattern_stability_score": 37.78,
+      "zone_hit": "True",
+      "exit_analysis": {
+        "opt_exit_px": 0.74,
+        "opt_exit_date": "2021-04-23",
+        "opt_gain_pct": 2.069,
+        "opt_wks_from_low": 8.0,
+        "opt_days_vs_exdiv": 39,
+        "opt_exit_before_exdiv": false,
+        "pre_exdiv_exit_date": "2021-03-05",
+        "pre_exdiv_exit_px": 0.73,
+        "pre_exdiv_gain_pct": 0.6897,
+        "pre_exdiv_peak_days_before_exdiv": 10,
+        "exdiv_date_exit_px": 0.725,
+        "exdiv_date_exit_date": "2021-03-19",
+        "post_exdiv_exit_gain_pct": 0.0
+      }
+    },
+    {
+      "id": "S2_2021",
+      "series": "S2",
+      "exdiv_date": "2021-08-30",
+      "div_amt": 0.0298,
+      "prev_dp": 0.46,
+      "low_px": 0.46,
+      "low_date": "2021-08-27",
+      "peak_px": 0.74,
+      "peak_date": "2021-04-23",
+      "low_vs_prevdp": 0.0,
+      "exdiv_vs_prevdp": 0.0,
+      "peak_vs_prevdp": 60.8696,
+      "rebound": 0.0,
+      "wks_before": 0.4286,
+      "wks_to_peak": -18.0,
+      "div_yield": 6.4783,
+      "s1": 1295.6522,
+      "s1_floored": "True",
+      "s2": 60.8696,
+      "degen": true,
+      "incomplete": false,
+      "outlier": false,
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": -3.1716,
+        "stock_excess_return": -33.8147
+      },
+      "volume_avg_30d": 3465578.0,
+      "volume_entry_ratio": 0.6493,
+      "volume_trend": "INCREASING",
+      "max_drawdown_pre_exdiv": -37.8378,
+      "recovery_time_days": 3,
+      "success": "False",
+      "pattern_stability_score": 0.97,
+      "zone_hit": null,
+      "exit_analysis": {
+        "opt_exit_px": 0.46,
+        "opt_exit_date": "2021-10-15",
+        "opt_gain_pct": 0.0,
+        "opt_wks_from_low": 7.0,
+        "opt_days_vs_exdiv": 46,
+        "opt_exit_before_exdiv": false,
+        "pre_exdiv_exit_date": "2021-08-27",
+        "pre_exdiv_exit_px": 0.46,
+        "pre_exdiv_gain_pct": 0.0,
+        "pre_exdiv_peak_days_before_exdiv": 3,
+        "exdiv_date_exit_px": 0.42,
+        "exdiv_date_exit_date": "2021-09-03",
+        "post_exdiv_exit_gain_pct": -8.6957
+      }
+    },
+    {
+      "id": "S1_2022",
+      "series": "S1",
+      "exdiv_date": "2022-03-15",
+      "div_amt": 0.0224,
+      "prev_dp": 0.34,
+      "low_px": 0.315,
+      "low_date": "2022-02-25",
+      "peak_px": 0.46,
+      "peak_date": "2021-10-15",
+      "low_vs_prevdp": -7.3529,
+      "exdiv_vs_prevdp": 0.0,
+      "peak_vs_prevdp": 35.2941,
+      "rebound": 7.9365,
+      "wks_before": 2.5714,
+      "wks_to_peak": -19.0,
+      "div_yield": 6.5882,
+      "s1": 89.6,
+      "s1_floored": "False",
+      "s2": 35.2941,
+      "degen": false,
+      "incomplete": false,
+      "outlier": "False",
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": 4.9378,
+        "stock_excess_return": -31.0247
+      },
+      "volume_avg_30d": 1237744.0,
+      "volume_entry_ratio": 1.1235,
+      "volume_trend": "STABLE",
+      "max_drawdown_pre_exdiv": -31.5217,
+      "recovery_time_days": 18,
+      "success": "True",
+      "pattern_stability_score": 80.53,
+      "zone_hit": "False",
+      "exit_analysis": {
+        "opt_exit_px": 0.34,
+        "opt_exit_date": "2022-03-11",
+        "opt_gain_pct": 7.9365,
+        "opt_wks_from_low": 2.0,
+        "opt_days_vs_exdiv": -4,
+        "opt_exit_before_exdiv": true,
+        "pre_exdiv_exit_date": "2022-03-11",
+        "pre_exdiv_exit_px": 0.34,
+        "pre_exdiv_gain_pct": 7.9365,
+        "pre_exdiv_peak_days_before_exdiv": 4,
+        "exdiv_date_exit_px": 0.31,
+        "exdiv_date_exit_date": "2022-03-18",
+        "post_exdiv_exit_gain_pct": -1.5873
+      }
+    }
+  ],
+  "ss_series": {
+    "S1": {
+      "window_days": 152,
+      "full": {
+        "wks_before": {
+          "avg": 7.9143,
+          "med": 2.5714,
+          "std": 6.8973,
+          "min": 2.0,
+          "max": 17.7143,
+          "vals": [
+            17.7143,
+            14.8571,
+            2.0,
+            2.4286,
+            2.5714
+          ],
+          "cv": 87.15
+        },
+        "low_vs_prevdp": {
+          "avg": -4.5617,
+          "med": -5.5866,
+          "std": 4.6093,
+          "min": -11.1111,
+          "max": 1.2422
+        },
+        "peak_vs_prevdp": {
+          "avg": 10.4942,
+          "med": 6.8323,
+          "std": 13.0286,
+          "min": 0.0,
+          "max": 35.2941
+        },
+        "s2": {
+          "avg": 10.4942,
+          "med": 6.8323,
+          "std": 13.0286,
+          "min": 0.0,
+          "max": 35.2941
+        }
+      },
+      "clean": {
+        "n_clean": 5,
+        "n_effective": 3.8,
+        "autocorr_rho": 0.1366,
+        "wks_before": {
+          "avg": 7.9143,
+          "med": 2.5714,
+          "std": 6.8973,
+          "min": 2.0,
+          "max": 17.7143,
+          "vals": [
+            17.7143,
+            14.8571,
+            2.0,
+            2.4286,
+            2.5714
+          ],
+          "cv": 87.15
+        },
+        "low_vs_prevdp": {
+          "avg": -4.5617,
+          "med": -5.5866,
+          "std": 4.6093,
+          "min": -11.1111,
+          "max": 1.2422
+        },
+        "peak_vs_prevdp": {
+          "avg": 10.4942,
+          "med": 6.8323,
+          "std": 13.0286,
+          "min": 0.0,
+          "max": 35.2941
+        },
+        "s2": {
+          "avg": 10.4942,
+          "med": 6.8323,
+          "std": 13.0286,
+          "min": 0.0,
+          "max": 35.2941
+        }
+      },
+      "timing": {
+        "vals": [
+          17.7143,
+          14.8571,
+          2.0,
+          2.4286,
+          2.5714
+        ],
+        "ids": [
+          "2018-03-14",
+          "2019-03-14",
+          "2020-03-13",
+          "2021-03-15",
+          "2022-03-15"
+        ],
+        "spread": 15.7143,
+        "cv": 87.15,
+        "dip_depth_cv": 101.04,
+        "avg": 7.9143,
+        "med": 2.5714,
+        "std": 6.8973,
+        "min": 2.0,
+        "max": 17.7143,
+        "rating": "BIMODAL",
+        "rating_display": "Bimodal",
+        "verdict": "cv=87.15% spread=15.7143wk",
+        "trade_implication": "price_zone_only",
+        "color": "yellow",
+        "price_zone_consistent": false,
+        "entry_timing_reliable": false,
+        "bimodal_clust1_med_wks": 2.5,
+        "bimodal_clust2_med_wks": 17.7143,
+        "bimodal_clust1_sd_wks": 5.427,
+        "bimodal_clust2_sd_wks": 0.0,
+        "bimodal_primary_cluster": "LATE",
+        "bimodal_cluster_recent_counts": {
+          "early": 0,
+          "late": 3
+        },
+        "bimodal_clust1_count": 4,
+        "bimodal_clust2_count": 1,
+        "bimodal_clust1_avg_dip": -2.92,
+        "bimodal_clust2_avg_dip": -11.11,
+        "epoch_recent": {
+          "ids": [
+            "2020-03-13",
+            "2021-03-15",
+            "2022-03-15"
+          ],
+          "cv": 10.41,
+          "spread": 0.5714,
+          "verdict": "approaching RELIABLE"
+        },
+        "peak_sequence": [
+          "LATE",
+          "LATE",
+          "FAST",
+          "FAST",
+          "FAST"
+        ],
+        "next_peak_mode": "FAST",
+        "cal_window": {
+          "low_months": [
+            11,
+            11,
+            2,
+            2,
+            2
+          ],
+          "modal_months": [
+            2
+          ],
+          "cal_window_label": "Feb window",
+          "cal_spread_days": 277,
+          "cal_doy_cv": 79.74,
+          "cal_window_rating": "CALENDAR_WIDE",
+          "cal_window_rating_display": "Wide spread",
+          "n": 5
+        }
+      },
+      "stability": {
+        "scores": [
+          37.78,
+          80.53
+        ],
+        "stability_trend_slope": 0.0,
+        "stability_trend_verdict": "INSUFFICIENT_DATA",
+        "stability_trend_verdict_display": "Insufficient data",
+        "stability_recent_avg": 59.16
+      },
+      "liquidity": {
+        "avg_volume_30d": 1251521.0,
+        "volume_ratio_median": 1.1235,
+        "adequacy_pct": 100.0
+      },
+      "risk": {
+        "max_drawdown_median": -5.6818,
+        "recovery_time_median": 18.0,
+        "success_rate": 60.0,
+        "success_rate_all": 60.0
+      },
+      "exit_profile": {
+        "n_complete_cycles": 5,
+        "pct_opt_before_exdiv": 40.0,
+        "pre_exdiv_peak_window_days_p25": 5.0,
+        "pre_exdiv_peak_window_days_p75": 7.0,
+        "med_days_vs_exdiv": 23.0,
+        "avg_gain_optimal": 6.423,
+        "avg_gain_pre_exdiv": 5.5314,
+        "avg_gain_post_exdiv_exit": 1.9105,
+        "pre_exdiv_win_rate": 60.0,
+        "post_exdiv_exit_win_rate": 20.0,
+        "exit_mode_verdict": "PRE_EXDIV_PREFERRED",
+        "exit_mode_verdict_display": "Pre-Exdiv Peak Exit preferred"
+      }
+    },
+    "S2": {
+      "window_days": 152,
+      "full": {
+        "wks_before": {
+          "avg": 17.1429,
+          "med": 17.7143,
+          "std": 3.9864,
+          "min": 12.0,
+          "max": 21.7143,
+          "vals": [
+            17.7143,
+            21.7143,
+            12.0
+          ],
+          "cv": 23.25
+        },
+        "low_vs_prevdp": {
+          "avg": -1.7161,
+          "med": -1.7143,
+          "std": 0.8916,
+          "min": -2.809,
+          "max": -0.625
+        },
+        "peak_vs_prevdp": {
+          "avg": 2.7999,
+          "med": 1.7143,
+          "std": 1.5558,
+          "min": 1.6854,
+          "max": 5.0
+        },
+        "s2": {
+          "avg": 2.7999,
+          "med": 1.7143,
+          "std": 1.5558,
+          "min": 1.6854,
+          "max": 5.0
+        }
+      },
+      "clean": {
+        "n_clean": 3,
+        "n_effective": 3,
+        "autocorr_rho": 0.0,
+        "wks_before": {
+          "avg": 17.1429,
+          "med": 17.7143,
+          "std": 3.9864,
+          "min": 12.0,
+          "max": 21.7143,
+          "vals": [
+            17.7143,
+            21.7143,
+            12.0
+          ],
+          "cv": 23.25
+        },
+        "low_vs_prevdp": {
+          "avg": -1.7161,
+          "med": -1.7143,
+          "std": 0.8916,
+          "min": -2.809,
+          "max": -0.625
+        },
+        "peak_vs_prevdp": {
+          "avg": 2.7999,
+          "med": 1.7143,
+          "std": 1.5558,
+          "min": 1.6854,
+          "max": 5.0
+        },
+        "s2": {
+          "avg": 2.7999,
+          "med": 1.7143,
+          "std": 1.5558,
+          "min": 1.6854,
+          "max": 5.0
+        }
+      },
+      "timing": {
+        "vals": [
+          17.7143,
+          21.7143,
+          12.0
+        ],
+        "ids": [
+          "2018-08-29",
+          "2019-08-21",
+          "2020-07-03"
+        ],
+        "spread": 9.7143,
+        "cv": 23.25,
+        "dip_depth_cv": 51.96,
+        "avg": 17.1429,
+        "med": 17.7143,
+        "std": 3.9864,
+        "min": 12.0,
+        "max": 21.7143,
+        "rating": "BIMODAL",
+        "rating_display": "Bimodal",
+        "verdict": "cv=23.25% spread=9.7143wk",
+        "trade_implication": "price_zone_only",
+        "color": "yellow",
+        "price_zone_consistent": false,
+        "entry_timing_reliable": false,
+        "bimodal_clust1_med_wks": 14.8572,
+        "bimodal_clust2_med_wks": 21.7143,
+        "bimodal_clust1_sd_wks": 2.8572,
+        "bimodal_clust2_sd_wks": 0.0,
+        "bimodal_primary_cluster": "LATE",
+        "bimodal_cluster_recent_counts": {
+          "early": 1,
+          "late": 2
+        },
+        "bimodal_clust1_count": 2,
+        "bimodal_clust2_count": 1,
+        "bimodal_clust1_avg_dip": -1.72,
+        "bimodal_clust2_avg_dip": -1.71,
+        "epoch_recent": {
+          "ids": [
+            "2018-08-29",
+            "2019-08-21",
+            "2020-07-03"
+          ],
+          "cv": 23.25,
+          "spread": 9.7143,
+          "verdict": "not approaching RELIABLE"
+        },
+        "peak_sequence": [
+          "FAST",
+          "LATE",
+          "NORMAL"
+        ],
+        "next_peak_mode": "NORMAL",
+        "cal_window": {
+          "low_months": [
+            4,
+            3,
+            4
+          ],
+          "modal_months": [
+            4
+          ],
+          "cal_window_label": "Apr window",
+          "cal_spread_days": 36,
+          "cal_doy_cv": 14.66,
+          "cal_window_rating": "CALENDAR_CONSISTENT",
+          "cal_window_rating_display": "Consistent",
+          "n": 3
+        }
+      },
+      "stability": {
+        "scores": [],
+        "stability_trend_slope": 0.0,
+        "stability_trend_verdict": "INSUFFICIENT_DATA",
+        "stability_trend_verdict_display": "Insufficient data",
+        "stability_recent_avg": 0.0
+      },
+      "liquidity": {
+        "avg_volume_30d": 309725.0,
+        "volume_ratio_median": 3.0751,
+        "adequacy_pct": 100.0
+      },
+      "risk": {
+        "max_drawdown_median": -4.2169,
+        "recovery_time_median": 124.0,
+        "success_rate": 0.0,
+        "success_rate_all": 0.0
+      },
+      "exit_profile": {
+        "n_complete_cycles": 3,
+        "pct_opt_before_exdiv": 100.0,
+        "pre_exdiv_peak_window_days_p25": 20.0,
+        "pre_exdiv_peak_window_days_p75": 44.5,
+        "med_days_vs_exdiv": -28.0,
+        "avg_gain_optimal": 4.3983,
+        "avg_gain_pre_exdiv": 4.3983,
+        "avg_gain_post_exdiv_exit": -0.5656,
+        "pre_exdiv_win_rate": 100.0,
+        "post_exdiv_exit_win_rate": 0.0,
+        "exit_mode_verdict": "INDETERMINATE",
+        "exit_mode_verdict_display": "Indeterminate"
+      }
+    }
+  },
+  "cgc_ranking": [
+    {
+      "series_id": "S1",
+      "score": 36.83,
+      "median_s2": 6.8323,
+      "median_rebound": 5.9172,
+      "win_rate": 60.0,
+      "median_low_vs_prevdp": -5.5866,
+      "n_clean": 5,
+      "rank": 1,
+      "verdict": ""
+    },
+    {
+      "series_id": "S2",
+      "score": 1.71,
+      "median_s2": 1.7143,
+      "median_rebound": 1.7442,
+      "win_rate": 0.0,
+      "median_low_vs_prevdp": -1.7143,
+      "n_clean": 3,
+      "rank": 2,
+      "verdict": ""
+    }
+  ],
+  "proj_series": {
+    "S1": {
+      "proj_exdiv_date": "2027-03-19",
+      "anchor": 0.34,
+      "anchor_source": "previous_exdiv_prev_dp",
+      "zone_bot": 0.2954,
+      "zone_top": 0.3141,
+      "zone_degradation_adjusted": false,
+      "zone_degradation_widen_pct": 0.0,
+      "est_low_px": 0.2999,
+      "est_exdiv_px": 0.3176,
+      "est_peak_px": 0.3393,
+      "est_low_date": null,
+      "est_low_date_from": null,
+      "est_low_date_to": null,
+      "est_low_date_cluster1": "2026-11-15",
+      "est_low_date_cluster1_from": "2026-11-15",
+      "est_low_date_cluster1_to": "2026-11-15",
+      "est_low_date_cluster2": "2027-03-01",
+      "est_low_date_cluster2_from": null,
+      "est_low_date_cluster2_to": null,
+      "est_low_date_cluster1_sd_wks": 0.0,
+      "est_low_date_cluster2_sd_wks": 5.43,
+      "est_low_date_note": "Bimodal - two timing clusters: early dip Nov 15 (17.7wk before) or late dip Mar 1 (2.5wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: Nov 15 \u00b7 Cluster 2: Mar 1",
+      "est_watch_window_primary_note": "Primary cluster: Late (3 of last 3 clean cycles)",
+      "est_peak_date": null,
+      "current_price_vs_zone": -93.2295,
+      "entry_status": "BELOW",
+      "entry_status_display": "Below",
+      "timing_rating": "BIMODAL",
+      "timing_rating_display": "Bimodal",
+      "cluster_dominance": {
+        "cluster1_count": 1,
+        "cluster2_count": 4,
+        "total": 5,
+        "dominant": 2,
+        "dominant_pct": 80,
+        "recent_primary": 2,
+        "cluster1_avg_dip": -11.11,
+        "cluster2_avg_dip": -2.92
+      },
+      "sample_size": "THIN",
+      "sample_size_display": "Thin",
+      "price_zone_consistent": false,
+      "entry_timing_reliable": false,
+      "stability_verdict": "INSUFFICIENT_DATA",
+      "stability_verdict_display": "Insufficient data",
+      "med_div_amt": 0.0215,
+      "div_amt_announced": false,
+      "div_amt_note": "Projected from the last 4 clean same-series payments",
+      "div_trend": "STABLE",
+      "div_trend_display": "Stable",
+      "div_amt_lo": 0.0204,
+      "div_amt_hi": 0.0226,
+      "div_yield_lo": 6.4947,
+      "div_yield_hi": 7.6506,
+      "anchor_extreme_flag": "LOW",
+      "historical_frequencies": {
+        "entry_zone_hit_rate": 50.0,
+        "exit_target_hit_rate": 100.0,
+        "avg_hold_days": 55.4,
+        "win_rate": 60.0,
+        "win_rate_all": 60.0,
+        "avg_win_pct": 8.7846,
+        "avg_loss_pct": 0.6211
+      },
+      "scenarios": {
+        "base": {
+          "description": "Filled around the middle of the projected entry zone",
+          "entry_px": 0.3047,
+          "exit_px": 0.3176,
+          "expected_hold_days": 18,
+          "historical_frequency": "mid-zone fill"
+        },
+        "downside": {
+          "description": "Filled near the top of the projected entry zone",
+          "entry_px": 0.3141,
+          "exit_px": 0.3176,
+          "expected_hold_days": 104,
+          "historical_frequency": "higher fill"
+        },
+        "upside": {
+          "description": "Filled near the bottom of the projected entry zone",
+          "entry_px": 0.2954,
+          "exit_px": 0.3176,
+          "expected_hold_days": 17,
+          "historical_frequency": "lower fill"
+        }
+      },
+      "risk_metrics": {
+        "max_expected_drawdown": -11.1111,
+        "expected_recovery_days": 55.4,
+        "liquidity_adequate": true,
+        "gap_risk": "False",
+        "success_rate_historical": 60.0,
+        "success_rate_all_historical": 60.0
+      },
+      "tail_risk": {
+        "worst_drawdown_pct": -11.1111,
+        "worst_tail_avg": -4.5617,
+        "tail_vs_zone_gap": -4.1115,
+        "tail_warning": "True",
+        "tail_level": "CAUTION",
+        "tail_level_display": "Caution"
+      },
+      "zone_fragility": {
+        "pct_cycles_outside_zone_clean": 50.0,
+        "pct_cycles_outside_zone_full": 100.0,
+        "fragility_warning": "True"
+      },
+      "macro_context": {
+        "current_regime": null,
+        "sector_etf": null,
+        "sector_performance": "IN_LINE",
+        "interest_rate_trend": "STABLE",
+        "last_update": "2026-07-11"
+      }
+    },
+    "S2": {
+      "proj_exdiv_date": "2026-09-03",
+      "anchor": 0.34,
+      "anchor_source": "previous_exdiv_prev_dp",
+      "zone_bot": 0.3109,
+      "zone_top": 0.3134,
+      "zone_degradation_adjusted": false,
+      "zone_degradation_widen_pct": 0.0,
+      "est_low_px": 0.3122,
+      "est_exdiv_px": 0.3176,
+      "est_peak_px": 0.323,
+      "est_low_date": null,
+      "est_low_date_from": null,
+      "est_low_date_to": null,
+      "est_low_date_cluster1": "2026-04-04",
+      "est_low_date_cluster1_from": "2026-04-04",
+      "est_low_date_cluster1_to": "2026-04-04",
+      "est_low_date_cluster2": "2026-05-22",
+      "est_low_date_cluster2_from": null,
+      "est_low_date_cluster2_to": null,
+      "est_low_date_cluster1_sd_wks": 0.0,
+      "est_low_date_cluster2_sd_wks": 2.86,
+      "est_low_date_note": "Bimodal - two timing clusters: early dip Apr 4 (21.7wk before) or late dip May 22 (14.9wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: Apr 4 \u00b7 Cluster 2: May 22",
+      "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
+      "est_peak_date": null,
+      "current_price_vs_zone": -93.5671,
+      "entry_status": "BELOW",
+      "entry_status_display": "Below",
+      "timing_rating": "BIMODAL",
+      "timing_rating_display": "Bimodal",
+      "cluster_dominance": {
+        "cluster1_count": 1,
+        "cluster2_count": 2,
+        "total": 3,
+        "dominant": 2,
+        "dominant_pct": 67,
+        "recent_primary": 2,
+        "cluster1_avg_dip": -1.71,
+        "cluster2_avg_dip": -1.72
+      },
+      "sample_size": "THIN",
+      "sample_size_display": "Thin",
+      "price_zone_consistent": false,
+      "entry_timing_reliable": false,
+      "stability_verdict": "INSUFFICIENT_DATA",
+      "stability_verdict_display": "Insufficient data",
+      "med_div_amt": 0.0319,
+      "div_amt_announced": false,
+      "div_amt_note": "Projected from the last 4 clean same-series payments",
+      "div_trend": "STABLE",
+      "div_trend_display": "Stable",
+      "div_amt_lo": 0.0303,
+      "div_amt_hi": 0.0335,
+      "div_yield_lo": 9.6682,
+      "div_yield_hi": 10.7752,
+      "anchor_extreme_flag": "LOW",
+      "historical_frequencies": {
+        "entry_zone_hit_rate": 0.0,
+        "exit_target_hit_rate": 33.3,
+        "avg_hold_days": 120.0,
+        "win_rate": 0.0,
+        "win_rate_all": 0.0,
+        "avg_win_pct": 0.0,
+        "avg_loss_pct": 1.7161
+      },
+      "scenarios": {
+        "base": {
+          "description": "Filled around the middle of the projected entry zone",
+          "entry_px": 0.3122,
+          "exit_px": 0.3176,
+          "expected_hold_days": 124,
+          "historical_frequency": "mid-zone fill"
+        },
+        "downside": {
+          "description": "Filled near the top of the projected entry zone",
+          "entry_px": 0.3134,
+          "exit_px": 0.3176,
+          "expected_hold_days": 138,
+          "historical_frequency": "higher fill"
+        },
+        "upside": {
+          "description": "Filled near the bottom of the projected entry zone",
+          "entry_px": 0.3109,
+          "exit_px": 0.3176,
+          "expected_hold_days": 104,
+          "historical_frequency": "lower fill"
+        }
+      },
+      "risk_metrics": {
+        "max_expected_drawdown": -2.809,
+        "expected_recovery_days": 120.0,
+        "liquidity_adequate": true,
+        "gap_risk": "False",
+        "success_rate_historical": 0.0,
+        "success_rate_all_historical": 0.0
+      },
+      "tail_risk": {
+        "worst_drawdown_pct": -2.809,
+        "worst_tail_avg": -1.7161,
+        "tail_vs_zone_gap": -0.7006,
+        "tail_warning": "False",
+        "tail_level": "LOW",
+        "tail_level_display": "Low"
+      },
+      "zone_fragility": {
+        "pct_cycles_outside_zone_clean": 100.0,
+        "pct_cycles_outside_zone_full": 100.0,
+        "fragility_warning": true
+      },
+      "macro_context": {
+        "current_regime": null,
+        "sector_etf": null,
+        "sector_performance": "IN_LINE",
+        "interest_rate_trend": "STABLE",
+        "last_update": "2026-07-11"
+      }
+    }
+  },
+  "annual_payouts": [
+    {
+      "yr": 2018,
+      "count": 2,
+      "total": 0.0774,
+      "series": [
+        "S1",
+        "S2"
+      ],
+      "partial": false,
+      "note": ""
+    },
+    {
+      "yr": 2019,
+      "count": 2,
+      "total": 0.0702,
+      "series": [
+        "S1",
+        "S2"
+      ],
+      "partial": false,
+      "note": ""
+    },
+    {
+      "yr": 2020,
+      "count": 2,
+      "total": 0.0404,
+      "series": [
+        "S1",
+        "S2"
+      ],
+      "partial": false,
+      "note": ""
+    },
+    {
+      "yr": 2021,
+      "count": 2,
+      "total": 0.0494,
+      "series": [
+        "S1",
+        "S2"
+      ],
+      "partial": false,
+      "note": ""
+    },
+    {
+      "yr": 2022,
+      "count": 1,
+      "total": 0.0224,
+      "series": [
+        "S1"
+      ],
+      "partial": true,
+      "note": ""
+    }
+  ],
+  "divs": [
+    {
+      "id": "S1_2018",
+      "series": "S1",
+      "date": "2018-03-14",
+      "amount": 0.0415,
+      "note": "Dividend"
+    },
+    {
+      "id": "S2_2018",
+      "series": "S2",
+      "date": "2018-08-29",
+      "amount": 0.0359,
+      "note": "Dividend"
+    },
+    {
+      "id": "S1_2019",
+      "series": "S1",
+      "date": "2019-03-14",
+      "amount": 0.0363,
+      "note": "Dividend"
+    },
+    {
+      "id": "S2_2019",
+      "series": "S2",
+      "date": "2019-08-21",
+      "amount": 0.0339,
+      "note": "Dividend"
+    },
+    {
+      "id": "S1_2020",
+      "series": "S1",
+      "date": "2020-03-13",
+      "amount": 0.0206,
+      "note": "Dividend"
+    },
+    {
+      "id": "S2_2020",
+      "series": "S2",
+      "date": "2020-07-03",
+      "amount": 0.0198,
+      "note": "Dividend"
+    },
+    {
+      "id": "S1_2021",
+      "series": "S1",
+      "date": "2021-03-15",
+      "amount": 0.0196,
+      "note": "Dividend"
+    },
+    {
+      "id": "S2_2021",
+      "series": "S2",
+      "date": "2021-08-30",
+      "amount": 0.0298,
+      "note": "Dividend"
+    },
+    {
+      "id": "S1_2022",
+      "series": "S1",
+      "date": "2022-03-15",
+      "amount": 0.0224,
+      "note": "Dividend"
+    }
+  ],
+  "price_data": [
+    {
+      "d": "2017-01-20",
+      "c": 0.805
+    },
+    {
+      "d": "2017-01-27",
+      "c": 0.815
+    },
+    {
+      "d": "2017-02-03",
+      "c": 0.805
+    },
+    {
+      "d": "2017-02-10",
+      "c": 0.805
+    },
+    {
+      "d": "2017-02-17",
+      "c": 0.8
+    },
+    {
+      "d": "2017-02-24",
+      "c": 0.805
+    },
+    {
+      "d": "2017-03-03",
+      "c": 0.81
+    },
+    {
+      "d": "2017-03-10",
+      "c": 0.81
+    },
+    {
+      "d": "2017-03-17",
+      "c": 0.81
+    },
+    {
+      "d": "2017-03-24",
+      "c": 0.815
+    },
+    {
+      "d": "2017-03-31",
+      "c": 0.81
+    },
+    {
+      "d": "2017-04-07",
+      "c": 0.81
+    },
+    {
+      "d": "2017-04-14",
+      "c": 0.805
+    },
+    {
+      "d": "2017-04-21",
+      "c": 0.8
+    },
+    {
+      "d": "2017-04-28",
+      "c": 0.805
+    },
+    {
+      "d": "2017-05-05",
+      "c": 0.8
+    },
+    {
+      "d": "2017-05-12",
+      "c": 0.805
+    },
+    {
+      "d": "2017-05-19",
+      "c": 0.81
+    },
+    {
+      "d": "2017-05-26",
+      "c": 0.8
+    },
+    {
+      "d": "2017-06-02",
+      "c": 0.8
+    },
+    {
+      "d": "2017-06-09",
+      "c": 0.795
+    },
+    {
+      "d": "2017-06-16",
+      "c": 0.805
+    },
+    {
+      "d": "2017-06-23",
+      "c": 0.805
+    },
+    {
+      "d": "2017-06-30",
+      "c": 0.805
+    },
+    {
+      "d": "2017-07-07",
+      "c": 0.81
+    },
+    {
+      "d": "2017-07-14",
+      "c": 0.805
+    },
+    {
+      "d": "2017-07-21",
+      "c": 0.8
+    },
+    {
+      "d": "2017-07-28",
+      "c": 0.8
+    },
+    {
+      "d": "2017-08-04",
+      "c": 0.81
+    },
+    {
+      "d": "2017-08-11",
+      "c": 0.825
+    },
+    {
+      "d": "2017-08-18",
+      "c": 0.83
+    },
+    {
+      "d": "2017-08-25",
+      "c": 0.835
+    },
+    {
+      "d": "2017-09-01",
+      "c": 0.85
+    },
+    {
+      "d": "2017-09-08",
+      "c": 0.825
+    },
+    {
+      "d": "2017-09-15",
+      "c": 0.835
+    },
+    {
+      "d": "2017-09-22",
+      "c": 0.825
+    },
+    {
+      "d": "2017-09-29",
+      "c": 0.82
+    },
+    {
+      "d": "2017-10-06",
+      "c": 0.825
+    },
+    {
+      "d": "2017-10-13",
+      "c": 0.825
+    },
+    {
+      "d": "2017-10-20",
+      "c": 0.81
+    },
+    {
+      "d": "2017-10-27",
+      "c": 0.81
+    },
+    {
+      "d": "2017-11-03",
+      "c": 0.82
+    },
+    {
+      "d": "2017-11-10",
+      "c": 0.8
+    },
+    {
+      "d": "2017-11-17",
+      "c": 0.82
+    },
+    {
+      "d": "2017-11-24",
+      "c": 0.825
+    },
+    {
+      "d": "2017-12-01",
+      "c": 0.805
+    },
+    {
+      "d": "2017-12-08",
+      "c": 0.81
+    },
+    {
+      "d": "2017-12-15",
+      "c": 0.81
+    },
+    {
+      "d": "2017-12-22",
+      "c": 0.81
+    },
+    {
+      "d": "2017-12-29",
+      "c": 0.88
+    },
+    {
+      "d": "2018-01-05",
+      "c": 0.875
+    },
+    {
+      "d": "2018-01-12",
+      "c": 0.85
+    },
+    {
+      "d": "2018-01-19",
+      "c": 0.85
+    },
+    {
+      "d": "2018-01-26",
+      "c": 0.875
+    },
+    {
+      "d": "2018-02-02",
+      "c": 0.85
+    },
+    {
+      "d": "2018-02-09",
+      "c": 0.83
+    },
+    {
+      "d": "2018-02-16",
+      "c": 0.85
+    },
+    {
+      "d": "2018-02-23",
+      "c": 0.845
+    },
+    {
+      "d": "2018-03-02",
+      "c": 0.875
+    },
+    {
+      "d": "2018-03-09",
+      "c": 0.9
+    },
+    {
+      "d": "2018-03-16",
+      "c": 0.88
+    },
+    {
+      "d": "2018-03-23",
+      "c": 0.875
+    },
+    {
+      "d": "2018-03-30",
+      "c": 0.88
+    },
+    {
+      "d": "2018-04-06",
+      "c": 0.905
+    },
+    {
+      "d": "2018-04-13",
+      "c": 0.89
+    },
+    {
+      "d": "2018-04-20",
+      "c": 0.875
+    },
+    {
+      "d": "2018-04-27",
+      "c": 0.865
+    },
+    {
+      "d": "2018-05-04",
+      "c": 0.865
+    },
+    {
+      "d": "2018-05-11",
+      "c": 0.87
+    },
+    {
+      "d": "2018-05-18",
+      "c": 0.87
+    },
+    {
+      "d": "2018-05-25",
+      "c": 0.865
+    },
+    {
+      "d": "2018-06-01",
+      "c": 0.875
+    },
+    {
+      "d": "2018-06-08",
+      "c": 0.87
+    },
+    {
+      "d": "2018-06-15",
+      "c": 0.865
+    },
+    {
+      "d": "2018-06-22",
+      "c": 0.875
+    },
+    {
+      "d": "2018-06-29",
+      "c": 0.87
+    },
+    {
+      "d": "2018-07-06",
+      "c": 0.865
+    },
+    {
+      "d": "2018-07-13",
+      "c": 0.875
+    },
+    {
+      "d": "2018-07-20",
+      "c": 0.87
+    },
+    {
+      "d": "2018-07-27",
+      "c": 0.865
+    },
+    {
+      "d": "2018-08-03",
+      "c": 0.87
+    },
+    {
+      "d": "2018-08-10",
+      "c": 0.89
+    },
+    {
+      "d": "2018-08-17",
+      "c": 0.9
+    },
+    {
+      "d": "2018-08-24",
+      "c": 0.89
+    },
+    {
+      "d": "2018-08-31",
+      "c": 0.865
+    },
+    {
+      "d": "2018-09-07",
+      "c": 0.855
+    },
+    {
+      "d": "2018-09-14",
+      "c": 0.85
+    },
+    {
+      "d": "2018-09-21",
+      "c": 0.86
+    },
+    {
+      "d": "2018-09-28",
+      "c": 0.855
+    },
+    {
+      "d": "2018-10-05",
+      "c": 0.86
+    },
+    {
+      "d": "2018-10-12",
+      "c": 0.855
+    },
+    {
+      "d": "2018-10-19",
+      "c": 0.865
+    },
+    {
+      "d": "2018-10-26",
+      "c": 0.865
+    },
+    {
+      "d": "2018-11-02",
+      "c": 0.865
+    },
+    {
+      "d": "2018-11-09",
+      "c": 0.855
+    },
+    {
+      "d": "2018-11-16",
+      "c": 0.855
+    },
+    {
+      "d": "2018-11-23",
+      "c": 0.855
+    },
+    {
+      "d": "2018-11-30",
+      "c": 0.845
+    },
+    {
+      "d": "2018-12-07",
+      "c": 0.865
+    },
+    {
+      "d": "2018-12-14",
+      "c": 0.865
+    },
+    {
+      "d": "2018-12-21",
+      "c": 0.855
+    },
+    {
+      "d": "2018-12-28",
+      "c": 0.855
+    },
+    {
+      "d": "2019-01-04",
+      "c": 0.87
+    },
+    {
+      "d": "2019-01-11",
+      "c": 0.875
+    },
+    {
+      "d": "2019-01-18",
+      "c": 0.865
+    },
+    {
+      "d": "2019-01-25",
+      "c": 0.87
+    },
+    {
+      "d": "2019-02-01",
+      "c": 0.875
+    },
+    {
+      "d": "2019-02-08",
+      "c": 0.89
+    },
+    {
+      "d": "2019-02-15",
+      "c": 0.88
+    },
+    {
+      "d": "2019-02-22",
+      "c": 0.88
+    },
+    {
+      "d": "2019-03-01",
+      "c": 0.89
+    },
+    {
+      "d": "2019-03-08",
+      "c": 0.895
+    },
+    {
+      "d": "2019-03-15",
+      "c": 0.865
+    },
+    {
+      "d": "2019-03-22",
+      "c": 0.86
+    },
+    {
+      "d": "2019-03-29",
+      "c": 0.88
+    },
+    {
+      "d": "2019-04-05",
+      "c": 0.865
+    },
+    {
+      "d": "2019-04-12",
+      "c": 0.87
+    },
+    {
+      "d": "2019-04-19",
+      "c": 0.88
+    },
+    {
+      "d": "2019-04-26",
+      "c": 0.88
+    },
+    {
+      "d": "2019-05-03",
+      "c": 0.87
+    },
+    {
+      "d": "2019-05-10",
+      "c": 0.865
+    },
+    {
+      "d": "2019-05-17",
+      "c": 0.87
+    },
+    {
+      "d": "2019-05-24",
+      "c": 0.875
+    },
+    {
+      "d": "2019-05-31",
+      "c": 0.875
+    },
+    {
+      "d": "2019-06-07",
+      "c": 0.875
+    },
+    {
+      "d": "2019-06-14",
+      "c": 0.875
+    },
+    {
+      "d": "2019-06-21",
+      "c": 0.89
+    },
+    {
+      "d": "2019-06-28",
+      "c": 0.88
+    },
+    {
+      "d": "2019-07-05",
+      "c": 0.885
+    },
+    {
+      "d": "2019-07-12",
+      "c": 0.88
+    },
+    {
+      "d": "2019-07-19",
+      "c": 0.875
+    },
+    {
+      "d": "2019-07-26",
+      "c": 0.875
+    },
+    {
+      "d": "2019-08-02",
+      "c": 0.865
+    },
+    {
+      "d": "2019-08-09",
+      "c": 0.865
+    },
+    {
+      "d": "2019-08-16",
+      "c": 0.875
+    },
+    {
+      "d": "2019-08-23",
+      "c": 0.84
+    },
+    {
+      "d": "2019-08-30",
+      "c": 0.855
+    },
+    {
+      "d": "2019-09-06",
+      "c": 0.86
+    },
+    {
+      "d": "2019-09-13",
+      "c": 0.85
+    },
+    {
+      "d": "2019-09-20",
+      "c": 0.855
+    },
+    {
+      "d": "2019-09-27",
+      "c": 0.845
+    },
+    {
+      "d": "2019-10-04",
+      "c": 0.855
+    },
+    {
+      "d": "2019-10-11",
+      "c": 0.85
+    },
+    {
+      "d": "2019-10-18",
+      "c": 0.84
+    },
+    {
+      "d": "2019-10-25",
+      "c": 0.835
+    },
+    {
+      "d": "2019-11-01",
+      "c": 0.83
+    },
+    {
+      "d": "2019-11-08",
+      "c": 0.84
+    },
+    {
+      "d": "2019-11-15",
+      "c": 0.83
+    },
+    {
+      "d": "2019-11-22",
+      "c": 0.84
+    },
+    {
+      "d": "2019-11-29",
+      "c": 0.83
+    },
+    {
+      "d": "2019-12-06",
+      "c": 0.835
+    },
+    {
+      "d": "2019-12-13",
+      "c": 0.825
+    },
+    {
+      "d": "2019-12-20",
+      "c": 0.84
+    },
+    {
+      "d": "2019-12-27",
+      "c": 0.845
+    },
+    {
+      "d": "2020-01-03",
+      "c": 0.845
+    },
+    {
+      "d": "2020-01-10",
+      "c": 0.845
+    },
+    {
+      "d": "2020-01-17",
+      "c": 0.86
+    },
+    {
+      "d": "2020-01-24",
+      "c": 0.845
+    },
+    {
+      "d": "2020-01-31",
+      "c": 0.835
+    },
+    {
+      "d": "2020-02-07",
+      "c": 0.82
+    },
+    {
+      "d": "2020-02-14",
+      "c": 0.83
+    },
+    {
+      "d": "2020-02-21",
+      "c": 0.825
+    },
+    {
+      "d": "2020-02-28",
+      "c": 0.815
+    },
+    {
+      "d": "2020-03-06",
+      "c": 0.82
+    },
+    {
+      "d": "2020-03-13",
+      "c": 0.805
+    },
+    {
+      "d": "2020-03-20",
+      "c": 0.81
+    },
+    {
+      "d": "2020-03-27",
+      "c": 0.83
+    },
+    {
+      "d": "2020-04-03",
+      "c": 0.815
+    },
+    {
+      "d": "2020-04-10",
+      "c": 0.795
+    },
+    {
+      "d": "2020-04-17",
+      "c": 0.805
+    },
+    {
+      "d": "2020-04-24",
+      "c": 0.8
+    },
+    {
+      "d": "2020-05-01",
+      "c": 0.8
+    },
+    {
+      "d": "2020-05-08",
+      "c": 0.795
+    },
+    {
+      "d": "2020-05-15",
+      "c": 0.795
+    },
+    {
+      "d": "2020-05-22",
+      "c": 0.835
+    },
+    {
+      "d": "2020-05-29",
+      "c": 0.805
+    },
+    {
+      "d": "2020-06-05",
+      "c": 0.84
+    },
+    {
+      "d": "2020-06-12",
+      "c": 0.84
+    },
+    {
+      "d": "2020-06-19",
+      "c": 0.83
+    },
+    {
+      "d": "2020-06-26",
+      "c": 0.83
+    },
+    {
+      "d": "2020-07-03",
+      "c": 0.8
+    },
+    {
+      "d": "2020-07-10",
+      "c": 0.79
+    },
+    {
+      "d": "2020-07-17",
+      "c": 0.785
+    },
+    {
+      "d": "2020-07-24",
+      "c": 0.775
+    },
+    {
+      "d": "2020-07-31",
+      "c": 0.78
+    },
+    {
+      "d": "2020-08-07",
+      "c": 0.785
+    },
+    {
+      "d": "2020-08-14",
+      "c": 0.8
+    },
+    {
+      "d": "2020-08-21",
+      "c": 0.815
+    },
+    {
+      "d": "2020-08-28",
+      "c": 0.8
+    },
+    {
+      "d": "2020-09-04",
+      "c": 0.815
+    },
+    {
+      "d": "2020-09-11",
+      "c": 0.815
+    },
+    {
+      "d": "2020-09-18",
+      "c": 0.805
+    },
+    {
+      "d": "2020-09-25",
+      "c": 0.8
+    },
+    {
+      "d": "2020-10-02",
+      "c": 0.795
+    },
+    {
+      "d": "2020-10-09",
+      "c": 0.8
+    },
+    {
+      "d": "2020-10-16",
+      "c": 0.8
+    },
+    {
+      "d": "2020-10-23",
+      "c": 0.79
+    },
+    {
+      "d": "2020-10-30",
+      "c": 0.795
+    },
+    {
+      "d": "2020-11-06",
+      "c": 0.785
+    },
+    {
+      "d": "2020-11-13",
+      "c": 0.78
+    },
+    {
+      "d": "2020-11-20",
+      "c": 0.775
+    },
+    {
+      "d": "2020-11-27",
+      "c": 0.755
+    },
+    {
+      "d": "2020-12-04",
+      "c": 0.76
+    },
+    {
+      "d": "2020-12-11",
+      "c": 0.775
+    },
+    {
+      "d": "2020-12-18",
+      "c": 0.78
+    },
+    {
+      "d": "2020-12-25",
+      "c": 0.76
+    },
+    {
+      "d": "2021-01-01",
+      "c": 0.77
+    },
+    {
+      "d": "2021-01-08",
+      "c": 0.77
+    },
+    {
+      "d": "2021-01-15",
+      "c": 0.775
+    },
+    {
+      "d": "2021-01-22",
+      "c": 0.76
+    },
+    {
+      "d": "2021-01-29",
+      "c": 0.75
+    },
+    {
+      "d": "2021-02-05",
+      "c": 0.73
+    },
+    {
+      "d": "2021-02-12",
+      "c": 0.73
+    },
+    {
+      "d": "2021-02-19",
+      "c": 0.73
+    },
+    {
+      "d": "2021-02-26",
+      "c": 0.725
+    },
+    {
+      "d": "2021-03-05",
+      "c": 0.73
+    },
+    {
+      "d": "2021-03-12",
+      "c": 0.725
+    },
+    {
+      "d": "2021-03-19",
+      "c": 0.725
+    },
+    {
+      "d": "2021-03-26",
+      "c": 0.725
+    },
+    {
+      "d": "2021-04-02",
+      "c": 0.73
+    },
+    {
+      "d": "2021-04-09",
+      "c": 0.725
+    },
+    {
+      "d": "2021-04-16",
+      "c": 0.725
+    },
+    {
+      "d": "2021-04-23",
+      "c": 0.74
+    },
+    {
+      "d": "2021-04-30",
+      "c": 0.735
+    },
+    {
+      "d": "2021-05-07",
+      "c": 0.73
+    },
+    {
+      "d": "2021-05-14",
+      "c": 0.725
+    },
+    {
+      "d": "2021-05-21",
+      "c": 0.72
+    },
+    {
+      "d": "2021-05-28",
+      "c": 0.715
+    },
+    {
+      "d": "2021-06-04",
+      "c": 0.71
+    },
+    {
+      "d": "2021-06-11",
+      "c": 0.7
+    },
+    {
+      "d": "2021-06-18",
+      "c": 0.685
+    },
+    {
+      "d": "2021-06-25",
+      "c": 0.64
+    },
+    {
+      "d": "2021-07-02",
+      "c": 0.61
+    },
+    {
+      "d": "2021-07-09",
+      "c": 0.535
+    },
+    {
+      "d": "2021-07-16",
+      "c": 0.505
+    },
+    {
+      "d": "2021-07-23",
+      "c": 0.52
+    },
+    {
+      "d": "2021-07-30",
+      "c": 0.495
+    },
+    {
+      "d": "2021-08-06",
+      "c": 0.49
+    },
+    {
+      "d": "2021-08-13",
+      "c": 0.52
+    },
+    {
+      "d": "2021-08-20",
+      "c": 0.485
+    },
+    {
+      "d": "2021-08-27",
+      "c": 0.46
+    },
+    {
+      "d": "2021-09-03",
+      "c": 0.42
+    },
+    {
+      "d": "2021-09-10",
+      "c": 0.41
+    },
+    {
+      "d": "2021-09-17",
+      "c": 0.415
+    },
+    {
+      "d": "2021-09-24",
+      "c": 0.405
+    },
+    {
+      "d": "2021-10-01",
+      "c": 0.38
+    },
+    {
+      "d": "2021-10-08",
+      "c": 0.43
+    },
+    {
+      "d": "2021-10-15",
+      "c": 0.46
+    },
+    {
+      "d": "2021-10-22",
+      "c": 0.46
+    },
+    {
+      "d": "2021-10-29",
+      "c": 0.46
+    },
+    {
+      "d": "2021-11-05",
+      "c": 0.44
+    },
+    {
+      "d": "2021-11-12",
+      "c": 0.435
+    },
+    {
+      "d": "2021-11-19",
+      "c": 0.43
+    },
+    {
+      "d": "2021-11-26",
+      "c": 0.415
+    },
+    {
+      "d": "2021-12-03",
+      "c": 0.4
+    },
+    {
+      "d": "2021-12-10",
+      "c": 0.375
+    },
+    {
+      "d": "2021-12-17",
+      "c": 0.37
+    },
+    {
+      "d": "2021-12-24",
+      "c": 0.365
+    },
+    {
+      "d": "2021-12-31",
+      "c": 0.37
+    },
+    {
+      "d": "2022-01-07",
+      "c": 0.37
+    },
+    {
+      "d": "2022-01-14",
+      "c": 0.34
+    },
+    {
+      "d": "2022-01-21",
+      "c": 0.32
+    },
+    {
+      "d": "2022-01-28",
+      "c": 0.32
+    },
+    {
+      "d": "2022-02-04",
+      "c": 0.325
+    },
+    {
+      "d": "2022-02-11",
+      "c": 0.32
+    },
+    {
+      "d": "2022-02-18",
+      "c": 0.32
+    },
+    {
+      "d": "2022-02-25",
+      "c": 0.315
+    },
+    {
+      "d": "2022-03-04",
+      "c": 0.33
+    },
+    {
+      "d": "2022-03-11",
+      "c": 0.34
+    },
+    {
+      "d": "2022-03-18",
+      "c": 0.31
+    },
+    {
+      "d": "2022-03-25",
+      "c": 0.315
+    },
+    {
+      "d": "2022-04-01",
+      "c": 0.315
+    },
+    {
+      "d": "2022-04-08",
+      "c": 0.31
+    },
+    {
+      "d": "2022-04-15",
+      "c": 0.305
+    },
+    {
+      "d": "2022-04-22",
+      "c": 0.3
+    },
+    {
+      "d": "2022-04-29",
+      "c": 0.295
+    },
+    {
+      "d": "2022-05-06",
+      "c": 0.3
+    },
+    {
+      "d": "2022-05-13",
+      "c": 0.3
+    },
+    {
+      "d": "2022-05-20",
+      "c": 0.3
+    },
+    {
+      "d": "2022-05-27",
+      "c": 0.305
+    },
+    {
+      "d": "2022-06-03",
+      "c": 0.3
+    },
+    {
+      "d": "2022-06-10",
+      "c": 0.305
+    },
+    {
+      "d": "2022-06-17",
+      "c": 0.3
+    },
+    {
+      "d": "2022-06-24",
+      "c": 0.315
+    },
+    {
+      "d": "2022-07-01",
+      "c": 0.315
+    },
+    {
+      "d": "2022-07-08",
+      "c": 0.315
+    },
+    {
+      "d": "2022-07-15",
+      "c": 0.305
+    },
+    {
+      "d": "2022-07-22",
+      "c": 0.315
+    },
+    {
+      "d": "2022-07-29",
+      "c": 0.325
+    },
+    {
+      "d": "2022-08-05",
+      "c": 0.325
+    },
+    {
+      "d": "2022-08-12",
+      "c": 0.305
+    },
+    {
+      "d": "2022-08-19",
+      "c": 0.28
+    },
+    {
+      "d": "2022-08-26",
+      "c": 0.28
+    },
+    {
+      "d": "2022-09-02",
+      "c": 0.28
+    },
+    {
+      "d": "2022-09-09",
+      "c": 0.285
+    },
+    {
+      "d": "2022-09-16",
+      "c": 0.28
+    },
+    {
+      "d": "2022-09-23",
+      "c": 0.28
+    },
+    {
+      "d": "2022-09-30",
+      "c": 0.285
+    },
+    {
+      "d": "2022-10-07",
+      "c": 0.28
+    },
+    {
+      "d": "2022-10-14",
+      "c": 0.28
+    },
+    {
+      "d": "2022-10-21",
+      "c": 0.28
+    },
+    {
+      "d": "2022-10-28",
+      "c": 0.28
+    },
+    {
+      "d": "2022-11-04",
+      "c": 0.275
+    },
+    {
+      "d": "2022-11-11",
+      "c": 0.27
+    },
+    {
+      "d": "2022-11-18",
+      "c": 0.275
+    },
+    {
+      "d": "2022-11-25",
+      "c": 0.26
+    },
+    {
+      "d": "2022-12-02",
+      "c": 0.245
+    },
+    {
+      "d": "2022-12-09",
+      "c": 0.285
+    },
+    {
+      "d": "2022-12-16",
+      "c": 0.275
+    },
+    {
+      "d": "2022-12-23",
+      "c": 0.275
+    },
+    {
+      "d": "2022-12-30",
+      "c": 0.285
+    },
+    {
+      "d": "2023-01-06",
+      "c": 0.27
+    },
+    {
+      "d": "2023-01-13",
+      "c": 0.26
+    },
+    {
+      "d": "2023-01-20",
+      "c": 0.23
+    },
+    {
+      "d": "2023-01-27",
+      "c": 0.205
+    },
+    {
+      "d": "2023-02-03",
+      "c": 0.205
+    },
+    {
+      "d": "2023-02-10",
+      "c": 0.205
+    },
+    {
+      "d": "2023-02-17",
+      "c": 0.205
+    },
+    {
+      "d": "2023-02-24",
+      "c": 0.2
+    },
+    {
+      "d": "2023-03-03",
+      "c": 0.194
+    },
+    {
+      "d": "2023-03-10",
+      "c": 0.192
+    },
+    {
+      "d": "2023-03-17",
+      "c": 0.187
+    },
+    {
+      "d": "2023-03-24",
+      "c": 0.183
+    },
+    {
+      "d": "2023-03-31",
+      "c": 0.175
+    },
+    {
+      "d": "2023-04-07",
+      "c": 0.166
+    },
+    {
+      "d": "2023-04-14",
+      "c": 0.153
+    },
+    {
+      "d": "2023-04-21",
+      "c": 0.144
+    },
+    {
+      "d": "2023-04-28",
+      "c": 0.121
+    },
+    {
+      "d": "2023-05-05",
+      "c": 0.118
+    },
+    {
+      "d": "2023-05-12",
+      "c": 0.128
+    },
+    {
+      "d": "2023-05-19",
+      "c": 0.119
+    },
+    {
+      "d": "2023-05-26",
+      "c": 0.121
+    },
+    {
+      "d": "2023-06-02",
+      "c": 0.133
+    },
+    {
+      "d": "2023-06-09",
+      "c": 0.123
+    },
+    {
+      "d": "2023-06-16",
+      "c": 0.118
+    },
+    {
+      "d": "2023-06-23",
+      "c": 0.116
+    },
+    {
+      "d": "2023-06-30",
+      "c": 0.125
+    },
+    {
+      "d": "2023-07-07",
+      "c": 0.122
+    },
+    {
+      "d": "2023-07-14",
+      "c": 0.093
+    },
+    {
+      "d": "2023-07-21",
+      "c": 0.089
+    },
+    {
+      "d": "2023-07-28",
+      "c": 0.092
+    },
+    {
+      "d": "2023-08-04",
+      "c": 0.092
+    },
+    {
+      "d": "2023-08-11",
+      "c": 0.094
+    },
+    {
+      "d": "2023-08-18",
+      "c": 0.087
+    },
+    {
+      "d": "2023-08-25",
+      "c": 0.086
+    },
+    {
+      "d": "2023-09-01",
+      "c": 0.079
+    },
+    {
+      "d": "2023-09-08",
+      "c": 0.07
+    },
+    {
+      "d": "2023-09-15",
+      "c": 0.072
+    },
+    {
+      "d": "2023-09-22",
+      "c": 0.069
+    },
+    {
+      "d": "2023-09-29",
+      "c": 0.068
+    },
+    {
+      "d": "2023-10-06",
+      "c": 0.057
+    },
+    {
+      "d": "2023-10-13",
+      "c": 0.05
+    },
+    {
+      "d": "2023-10-20",
+      "c": 0.05
+    },
+    {
+      "d": "2023-10-27",
+      "c": 0.056
+    },
+    {
+      "d": "2023-11-03",
+      "c": 0.052
+    },
+    {
+      "d": "2023-11-10",
+      "c": 0.055
+    },
+    {
+      "d": "2023-11-17",
+      "c": 0.06
+    },
+    {
+      "d": "2023-11-24",
+      "c": 0.059
+    },
+    {
+      "d": "2023-12-01",
+      "c": 0.049
+    },
+    {
+      "d": "2023-12-08",
+      "c": 0.053
+    },
+    {
+      "d": "2023-12-15",
+      "c": 0.053
+    },
+    {
+      "d": "2023-12-22",
+      "c": 0.049
+    },
+    {
+      "d": "2023-12-29",
+      "c": 0.055
+    },
+    {
+      "d": "2024-01-05",
+      "c": 0.05
+    },
+    {
+      "d": "2024-01-12",
+      "c": 0.05
+    },
+    {
+      "d": "2024-01-19",
+      "c": 0.05
+    },
+    {
+      "d": "2024-01-26",
+      "c": 0.05
+    },
+    {
+      "d": "2024-02-02",
+      "c": 0.05
+    },
+    {
+      "d": "2024-02-09",
+      "c": 0.05
+    },
+    {
+      "d": "2024-02-16",
+      "c": 0.05
+    },
+    {
+      "d": "2024-02-23",
+      "c": 0.028
+    },
+    {
+      "d": "2024-03-01",
+      "c": 0.024
+    },
+    {
+      "d": "2024-03-08",
+      "c": 0.025
+    },
+    {
+      "d": "2024-03-15",
+      "c": 0.025
+    },
+    {
+      "d": "2024-03-22",
+      "c": 0.026
+    },
+    {
+      "d": "2024-03-29",
+      "c": 0.028
+    },
+    {
+      "d": "2024-04-05",
+      "c": 0.026
+    },
+    {
+      "d": "2024-04-12",
+      "c": 0.024
+    },
+    {
+      "d": "2024-04-19",
+      "c": 0.023
+    },
+    {
+      "d": "2024-04-26",
+      "c": 0.024
+    },
+    {
+      "d": "2024-05-03",
+      "c": 0.025
+    },
+    {
+      "d": "2024-05-10",
+      "c": 0.026
+    },
+    {
+      "d": "2024-05-17",
+      "c": 0.026
+    },
+    {
+      "d": "2024-05-24",
+      "c": 0.026
+    },
+    {
+      "d": "2024-05-31",
+      "c": 0.026
+    },
+    {
+      "d": "2024-06-07",
+      "c": 0.025
+    },
+    {
+      "d": "2024-06-14",
+      "c": 0.024
+    },
+    {
+      "d": "2024-06-21",
+      "c": 0.023
+    },
+    {
+      "d": "2024-06-28",
+      "c": 0.024
+    },
+    {
+      "d": "2024-07-05",
+      "c": 0.024
+    },
+    {
+      "d": "2024-07-12",
+      "c": 0.022
+    },
+    {
+      "d": "2024-07-19",
+      "c": 0.021
+    },
+    {
+      "d": "2024-07-26",
+      "c": 0.022
+    },
+    {
+      "d": "2024-08-02",
+      "c": 0.025
+    },
+    {
+      "d": "2024-08-09",
+      "c": 0.022
+    },
+    {
+      "d": "2024-08-16",
+      "c": 0.021
+    },
+    {
+      "d": "2024-08-23",
+      "c": 0.028
+    },
+    {
+      "d": "2024-08-30",
+      "c": 0.039
+    },
+    {
+      "d": "2024-09-06",
+      "c": 0.039
+    },
+    {
+      "d": "2024-09-13",
+      "c": 0.038
+    },
+    {
+      "d": "2024-09-20",
+      "c": 0.038
+    },
+    {
+      "d": "2024-09-27",
+      "c": 0.039
+    },
+    {
+      "d": "2024-10-04",
+      "c": 0.039
+    },
+    {
+      "d": "2024-10-11",
+      "c": 0.034
+    },
+    {
+      "d": "2024-10-18",
+      "c": 0.036
+    },
+    {
+      "d": "2024-10-25",
+      "c": 0.035
+    },
+    {
+      "d": "2024-11-01",
+      "c": 0.034
+    },
+    {
+      "d": "2024-11-08",
+      "c": 0.037
+    },
+    {
+      "d": "2024-11-15",
+      "c": 0.037
+    },
+    {
+      "d": "2024-11-22",
+      "c": 0.033
+    },
+    {
+      "d": "2024-11-29",
+      "c": 0.033
+    },
+    {
+      "d": "2024-12-06",
+      "c": 0.032
+    },
+    {
+      "d": "2024-12-13",
+      "c": 0.03
+    },
+    {
+      "d": "2024-12-20",
+      "c": 0.03
+    },
+    {
+      "d": "2024-12-27",
+      "c": 0.029
+    },
+    {
+      "d": "2025-01-03",
+      "c": 0.033
+    },
+    {
+      "d": "2025-01-10",
+      "c": 0.024
+    },
+    {
+      "d": "2025-01-17",
+      "c": 0.026
+    },
+    {
+      "d": "2025-01-24",
+      "c": 0.022
+    },
+    {
+      "d": "2025-01-31",
+      "c": 0.022
+    },
+    {
+      "d": "2025-02-07",
+      "c": 0.025
+    },
+    {
+      "d": "2025-02-14",
+      "c": 0.022
+    },
+    {
+      "d": "2025-02-21",
+      "c": 0.022
+    },
+    {
+      "d": "2025-02-28",
+      "c": 0.02
+    },
+    {
+      "d": "2025-03-07",
+      "c": 0.02
+    },
+    {
+      "d": "2025-03-14",
+      "c": 0.019
+    },
+    {
+      "d": "2025-03-21",
+      "c": 0.021
+    },
+    {
+      "d": "2025-03-28",
+      "c": 0.02
+    },
+    {
+      "d": "2025-04-04",
+      "c": 0.02
+    },
+    {
+      "d": "2025-04-11",
+      "c": 0.019
+    },
+    {
+      "d": "2025-04-18",
+      "c": 0.02
+    },
+    {
+      "d": "2025-04-25",
+      "c": 0.021
+    },
+    {
+      "d": "2025-05-02",
+      "c": 0.019
+    },
+    {
+      "d": "2025-05-09",
+      "c": 0.024
+    },
+    {
+      "d": "2025-05-16",
+      "c": 0.02
+    },
+    {
+      "d": "2025-05-23",
+      "c": 0.023
+    },
+    {
+      "d": "2025-05-30",
+      "c": 0.025
+    },
+    {
+      "d": "2025-06-06",
+      "c": 0.027
+    },
+    {
+      "d": "2025-06-13",
+      "c": 0.022
+    },
+    {
+      "d": "2025-06-20",
+      "c": 0.023
+    },
+    {
+      "d": "2025-06-27",
+      "c": 0.02
+    },
+    {
+      "d": "2025-07-04",
+      "c": 0.022
+    },
+    {
+      "d": "2025-07-11",
+      "c": 0.022
+    },
+    {
+      "d": "2025-07-18",
+      "c": 0.02
+    },
+    {
+      "d": "2025-07-25",
+      "c": 0.02
+    },
+    {
+      "d": "2025-08-01",
+      "c": 0.02
+    },
+    {
+      "d": "2025-08-08",
+      "c": 0.02
+    },
+    {
+      "d": "2025-08-15",
+      "c": 0.02
+    },
+    {
+      "d": "2025-08-22",
+      "c": 0.02
+    },
+    {
+      "d": "2025-08-29",
+      "c": 0.02
+    },
+    {
+      "d": "2025-09-05",
+      "c": 0.02
+    },
+    {
+      "d": "2025-09-12",
+      "c": 0.02
+    },
+    {
+      "d": "2025-09-19",
+      "c": 0.02
+    },
+    {
+      "d": "2025-09-26",
+      "c": 0.02
+    },
+    {
+      "d": "2025-10-03",
+      "c": 0.02
+    },
+    {
+      "d": "2025-10-10",
+      "c": 0.02
+    },
+    {
+      "d": "2025-10-17",
+      "c": 0.02
+    },
+    {
+      "d": "2025-10-24",
+      "c": 0.02
+    },
+    {
+      "d": "2025-10-31",
+      "c": 0.02
+    },
+    {
+      "d": "2025-11-07",
+      "c": 0.02
+    },
+    {
+      "d": "2025-11-14",
+      "c": 0.02
+    },
+    {
+      "d": "2025-11-21",
+      "c": 0.02
+    },
+    {
+      "d": "2025-11-28",
+      "c": 0.02
+    },
+    {
+      "d": "2025-12-05",
+      "c": 0.02
+    },
+    {
+      "d": "2025-12-12",
+      "c": 0.02
+    },
+    {
+      "d": "2025-12-19",
+      "c": 0.02
+    },
+    {
+      "d": "2025-12-26",
+      "c": 0.02
+    },
+    {
+      "d": "2026-01-02",
+      "c": 0.02
+    },
+    {
+      "d": "2026-01-09",
+      "c": 0.02
+    },
+    {
+      "d": "2026-01-16",
+      "c": 0.02
+    },
+    {
+      "d": "2026-01-23",
+      "c": 0.02
+    },
+    {
+      "d": "2026-01-30",
+      "c": 0.02
+    },
+    {
+      "d": "2026-02-06",
+      "c": 0.02
+    },
+    {
+      "d": "2026-02-13",
+      "c": 0.02
+    },
+    {
+      "d": "2026-02-20",
+      "c": 0.02
+    },
+    {
+      "d": "2026-02-27",
+      "c": 0.02
+    },
+    {
+      "d": "2026-03-06",
+      "c": 0.02
+    },
+    {
+      "d": "2026-03-13",
+      "c": 0.02
+    },
+    {
+      "d": "2026-03-20",
+      "c": 0.02
+    },
+    {
+      "d": "2026-03-27",
+      "c": 0.02
+    },
+    {
+      "d": "2026-04-03",
+      "c": 0.02
+    },
+    {
+      "d": "2026-04-10",
+      "c": 0.02
+    },
+    {
+      "d": "2026-04-17",
+      "c": 0.02
+    },
+    {
+      "d": "2026-04-24",
+      "c": 0.02
+    },
+    {
+      "d": "2026-05-01",
+      "c": 0.02
+    },
+    {
+      "d": "2026-05-08",
+      "c": 0.02
+    },
+    {
+      "d": "2026-05-15",
+      "c": 0.02
+    },
+    {
+      "d": "2026-05-22",
+      "c": 0.02
+    },
+    {
+      "d": "2026-05-29",
+      "c": 0.02
+    },
+    {
+      "d": "2026-06-05",
+      "c": 0.02
+    },
+    {
+      "d": "2026-06-12",
+      "c": 0.02
+    },
+    {
+      "d": "2026-06-19",
+      "c": 0.02
+    },
+    {
+      "d": "2026-06-26",
+      "c": 0.02
+    },
+    {
+      "d": "2026-07-03",
+      "c": 0.02
+    },
+    {
+      "d": "2026-07-10",
+      "c": 0.02
+    }
+  ],
+  "current_price": 0.02,
+  "anchor_price": 0.31,
+  "anchor_date": "2022-03-15",
+  "data_window_start": "2017-01-20",
+  "data_window_end": "2026-07-10",
+  "years_covered": 9.47,
+  "series_adequacy": {
+    "S1": {
+      "n_clean": 5,
+      "n_effective": 3.8,
+      "sample_size": "THIN",
+      "can_project": true
+    },
+    "S2": {
+      "n_clean": 3,
+      "n_effective": 3,
+      "sample_size": "THIN",
+      "can_project": true
+    }
+  },
+  "anomalies_excluded": []
+}

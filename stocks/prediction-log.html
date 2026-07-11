@@ -855,7 +855,7 @@ async function loadData(){
   const tbody=document.getElementById("tableBody");
   try{
     // 1. Discover tickers from manifest
-    const mRes=await fetch("./analysis/manifest.json");
+    const mRes=await fetch("./data/analysis/manifest.json");
     if(!mRes.ok) throw new Error(`manifest.json: HTTP ${mRes.status}`);
     const manifest=await mRes.json();
     const files=manifest.files||[];
@@ -874,12 +874,12 @@ async function loadData(){
     // 2. Fetch stock names + per-stock CSVs in parallel
     const [nameResults,results]=await Promise.all([
       Promise.allSettled(
-        tickers.map(t=>fetch(`./analysis/${t}_DividendCycleAnalysis_output.json`)
+        tickers.map(t=>fetch(`./data/analysis/${t}_DividendCycleAnalysis_output.json`)
           .then(r=>r.ok?r.json():Promise.reject())
           .then(d=>({ticker:t,name:d?.meta?.stock_name||""})))
       ),
       Promise.allSettled(
-        tickers.map(t=>fetch(`./predictlog/${t}_prediction_log.csv`)
+        tickers.map(t=>fetch(`./data/predictlog/${t}_prediction_log.csv`)
           .then(r=>r.ok?r.text():Promise.reject(new Error(`HTTP ${r.status}`)))
           .then(parseCSV))
       )

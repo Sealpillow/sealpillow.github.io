@@ -9,7 +9,13 @@
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(circle at top right,rgba(79,142,247,.14),transparent 24%),var(--bg);color:var(--tx);font-family:var(--sans);font-size:14px;line-height:1.6}
 /* TOPBAR */
-.topbar{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 20px;background:linear-gradient(180deg,rgba(16,20,32,.97),rgba(16,20,32,.92));backdrop-filter:blur(14px);border-bottom:1px solid rgba(79,142,247,.18);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.topbar{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 20px 14px;background:linear-gradient(180deg,rgba(16,20,32,.97),rgba(16,20,32,.92));backdrop-filter:blur(14px);border-bottom:1px solid rgba(79,142,247,.18);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+/* PROGRESS BAR */
+#loadProgressWrap{position:absolute;bottom:0;left:0;width:100%;height:3px;overflow:hidden;opacity:0;transition:opacity .2s}
+#loadProgressWrap.active{opacity:1}
+#loadProgressBar{height:100%;width:0%;background:linear-gradient(90deg,#4f8ef7,#7bb3ff);border-radius:0 2px 2px 0;transition:width .25s ease}
+#loadProgressBar.indeterminate{width:40%!important;animation:progressSweep 1.4s ease-in-out infinite}
+@keyframes progressSweep{0%{transform:translateX(-110%)}60%{transform:translateX(220%)}100%{transform:translateX(220%)}}
 .topbar-brand{display:flex;align-items:center;gap:0;min-width:0}
 .topbar-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
 .topbar-title{font-size:16px;font-weight:700;letter-spacing:.01em;color:#f2f6ff;white-space:nowrap}
@@ -393,6 +399,13 @@ input[type=file]{display:none}
 .setup-list-col{border:1px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
 .setup-list-col-rows{overflow-y:auto;max-height:320px;scrollbar-width:thin;scrollbar-color:var(--sf2) transparent}
 .setup-list-col-head{padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.setup-list-col-subhead{display:flex;align-items:center;gap:10px;padding:5px 14px;font-size:10px;color:var(--mu);font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--bd);background:var(--sf)}
+.setup-list-col-subhead .sh-name{flex:1;min-width:0}
+.setup-list-col-subhead .sh-num{width:48px;text-align:right;white-space:nowrap}
+.setup-list-col-subhead .sh-sort{cursor:pointer;user-select:none}
+.setup-list-col-subhead .sh-sort:hover{color:var(--tx)}
+.setup-list-col-subhead .sh-sort .sort-arrow{display:inline-block;margin-left:4px;opacity:.4;font-size:9px}
+.setup-list-col-subhead .sh-sort.sorted .sort-arrow{opacity:1;color:var(--bl)}
 .setup-list-col-head.below{color:#f87171;background:rgba(239,68,68,.07)}
 .setup-list-col-head.inside{color:#4ade80;background:rgba(34,197,94,.07)}
 .setup-list-col-head.above{color:#fbbf24;background:rgba(245,158,11,.07)}
@@ -630,6 +643,7 @@ input[type=file]{display:none}
     <button class="nav-link" id="runPipelineBtn" type="button" style="display:none">Update stock data</button>
     <button class="nav-link" id="forgetSavedStocksBtn" type="button" style="opacity:.6">Forget saved stocks</button>
   </div>
+  <div id="loadProgressWrap"><div id="loadProgressBar"></div></div>
 </div><!-- STOCK CHIPS BAR (shown when stocks loaded) -->
 <div class="overlay" id="quickGuideOverlay" aria-hidden="true">
   <div class="panel modal-card modal-card-compact">
@@ -649,12 +663,12 @@ input[type=file]{display:none}
       <div class="start-step">
         <div class="start-step-num">2</div>
         <h3>Update stock data</h3>
-        <p>Refresh the latest analysis outputs.</p>
+        <p>Fetches latest price data and company descriptions from Yahoo Finance, then regenerates analysis outputs. A progress bar tracks file loading on completion.</p>
       </div>
       <div class="start-step">
         <div class="start-step-num">3</div>
         <h3>Load existing stock data</h3>
-        <p>Open the generated stock data in the dashboard.</p>
+        <p>Loads generated analysis outputs into the dashboard. A progress bar tracks each file as it loads.</p>
       </div>
     </div>
   </div>
@@ -1939,6 +1953,7 @@ overviewMode:"overview", // "overview" | "grouped" | "compare" | "planner"
   zoneOutcomeFilterKeys:["all"],
   setupMapFilterKeys:["all"],
   setupMapViewMode:"map",
+  setupListSort:{below:{field:"gain",dir:"desc"},inside:{field:"gain",dir:"desc"},above:{field:"gain",dir:"desc"}},
   rememberLoadedStocks:true,
   serverLoadedFiles:[],
   registryEntries:[],
@@ -1947,6 +1962,7 @@ overviewMode:"overview", // "overview" | "grouped" | "compare" | "planner"
   registryMultiSelectEnabled:false,
   registrySelectedMasterTickers:[],
   registryMasterPage:1,
+  stockDescriptions:{},
   planner:{},
   plannerActiveKey:null,
   cmpSortKey:"none",
@@ -1970,12 +1986,14 @@ overviewMode:"overview", // "overview" | "grouped" | "compare" | "planner"
 const app=document.getElementById("app");
 const BACKEND_CONFIG = {
   enabled:["http:","https:"].includes(window.location.protocol),
-  staticJsonBase:"./analysis",
+  staticJsonBase:"./data/analysis",
   healthUrl:"/api/health",
   jsonFilesUrl:"/api/json-files",
   runPipelineUrl:"/api/run-pipeline",
   stockRegistryUrl:"/api/stock-registry",
   masterStocksUrl:"/api/master-stocks",
+  stockDescriptionsUrl:"/api/stock-descriptions",
+  stockDescriptionsStaticUrl:"./data/stock_descriptions.json",
 };
 let backendHealthPromise=null;
 let backendAvailable=false;
@@ -2230,6 +2248,7 @@ function renderSeriesCard(s,data,m){
       ${!proj.est_low_date_cluster1&&proj.est_low_date?`<div>${tipLabel("Estimated low timing","For reliable timing only. Range is the p25–p75 watch window from historical weeks-before-ex-div values; best estimate is the median.")}</div><div>${dtClusterRange(proj.est_low_date_from,proj.est_low_date,proj.est_low_date_to)}</div>`:""}
       <div>Days away</div><div class="${(daysFrom(proj.proj_exdiv_date)||999)<=45?"warn":""}">${daysFrom(proj.proj_exdiv_date)!==null?`${daysFrom(proj.proj_exdiv_date)}d`:"-"}</div>
       <div>Current price</div><div>${ccy(data.current_price,m.currency)}</div>
+      <div>${tipLabel("5yr price growth","Total price return over the past 5 years (weekly close ~5 years ago vs today). Excludes dividends — capital change only. Use as a background check: consistent growth suggests a healthy business; sustained decline may mean dividends are masking capital erosion.")}</div><div class="${growthCls(m.price_growth_5yr_pct)}">${growthFmt(m.price_growth_5yr_pct)}</div>
       <div>${tipLabel("Anchor method","The pre-dividend reference price from the most recent prior ex-div event (the closing price just before that ex-date). Displayed for reference only — the entry zone is built from the ex-dividend adjusted level: anchor minus the dividend paid, which is where the stock actually resets after the payout.")}</div>
       <div><div>${esc(anchorSourceLabel)}</div><div class="small muted">Anchor ref (pre-div) ${ccy(proj.anchor,m.currency)}</div></div>
 
@@ -2843,10 +2862,19 @@ function panelProgressStrip(data){
   const dated=events.map(ev=>({ ...ev, d:new Date(ev.date) })).filter(ev=>!Number.isNaN(ev.d.getTime())).sort((a,b)=>a.d-b.d);
   if(!dated.length)return `<div class="empty">No upcoming timeline data found.</div>`;
   const span=Math.max(1,dated[dated.length-1].d-dated[0].d);
-  const width=Math.max(760,160+(dated.length-1)*210);
-  const leftPad=20,rightPad=20,minGap=92,topLanes=[],bottomLanes=[];
   const todayEvent=dated.find(ev=>ev.label==='Today');
   const markerEvents=dated.filter(ev=>ev.label!=='Today');
+  // rightPad=100 gives labels at the far-right edge room to render;
+  // base width grows with event count; also expand so tightly-spaced events get ≥80px apart
+  const leftPad=20,rightPad=100,minGap=60,topLanes=[],bottomLanes=[];
+  let width=Math.max(900,200+(dated.length-1)*220);
+  if(markerEvents.length>1){
+    const minDateGap=Math.min(...markerEvents.slice(1).map((ev,i)=>ev.d-markerEvents[i].d).filter(g=>g>0));
+    if(minDateGap>0){
+      const neededWidth=Math.ceil(80*span/minDateGap)+leftPad+rightPad;
+      width=Math.min(Math.max(width,neededWidth),3200);
+    }
+  }
   markerEvents.forEach(ev=>{
     ev.left=leftPad+((width-leftPad-rightPad)*((ev.d-dated[0].d)/span));
     ev.lane=0;
@@ -2868,7 +2896,7 @@ function panelProgressStrip(data){
     if(clusterSize>1){
       const center=(clusterSize-1)/2;
       for(let i=clusterStart;i<=clusterEnd;i++){
-        markerEvents[i].nudge=(i-clusterStart-center)*18;
+        markerEvents[i].nudge=(i-clusterStart-center)*26;
       }
     }else{
       markerEvents[clusterStart].nudge=0;
@@ -3535,6 +3563,7 @@ function panelGlossary(){
     ["Stability Trend","Direction of pattern stability scores across recent cycles. Improving appears when slope > 5 and recent average score > 70. Degrading appears when slope < -5 and recent average score < 60. Otherwise the trend is Stable."],
     ["Exit Mode","Historical summary of which bounded exit path looked stronger. Pre-Exdiv Peak Exit preferred means average pre-exdiv gain is at least 95% of average ex-div-date gain when ex-div-date gain is positive. Ex-Div Date Exit preferred means average optimal gain is more than 105% of average ex-div-date gain and fewer than 40% of optimal exits happened before ex-div."],
     ["S2 (peak return)","Peak price vs PrevDP expressed as a percentage. Measures the upside captured above the dividend entry price, not just vs the dip."],
+    ["5yr price growth","Total price return over the past 5 years, from the weekly close closest to 5 years ago to the current price. Excludes dividends — capital change only. Green = ≥ 15% (growing), amber = 0–15% (flat to modest), red = negative (declining). Use as a background check: consistent growth suggests a healthy business; a sustained decline may mean dividends are masking capital erosion. Shown in the Forward Setup section, mini-card, and Setup Map list view. Null when fewer than 5 years of price history are available."],
   ];
   return`<div class="grid g3">
     ${terms.map(([t,d])=>`<div class="card">
@@ -3572,6 +3601,7 @@ function persistPlannerState(){
     zoneOutcomeFilterKeys:Array.isArray(state.zoneOutcomeFilterKeys)?state.zoneOutcomeFilterKeys:["all"],
     setupMapFilterKeys:Array.isArray(state.setupMapFilterKeys)?state.setupMapFilterKeys:["all"],
     setupMapViewMode:state.setupMapViewMode||"map",
+    setupListSort:state.setupListSort||{below:{field:"gain",dir:"desc"},inside:{field:"gain",dir:"desc"},above:{field:"gain",dir:"desc"}},
     rememberLoadedStocks:state.rememberLoadedStocks!==false,
     serverLoadedFiles:state.rememberLoadedStocks===false?[]:normalizedServerLoadedFiles(),
     stocks:state.rememberLoadedStocks===false?[]:persistedStocksPayload(),
@@ -3626,6 +3656,19 @@ function hydratePlannerState(){
       state.zoneOutcomeFilterKeys=Array.isArray(parsed.zoneOutcomeFilterKeys)?parsed.zoneOutcomeFilterKeys:["all"];
       state.setupMapFilterKeys=Array.isArray(parsed.setupMapFilterKeys)?parsed.setupMapFilterKeys:["all"];
       if(["map","list"].includes(parsed.setupMapViewMode))state.setupMapViewMode=parsed.setupMapViewMode;
+      if(parsed.setupListSort&&typeof parsed.setupListSort==="object"){
+        const zones=["below","inside","above"];
+        const restored={};
+        zones.forEach(z=>{
+          const v=parsed.setupListSort[z];
+          if(v&&["ticker","name","growth5yr","gain"].includes(v.field)&&["asc","desc"].includes(v.dir)){
+            restored[z]=v;
+          }else{
+            restored[z]={field:"gain",dir:"desc"};
+          }
+        });
+        state.setupListSort=restored;
+      }
       state.activeKey=parsed.activeKey&&state.stocks[parsed.activeKey]?parsed.activeKey:(stockList()[0]?.key||null);
       state.view=parsed.view==="drill"&&state.activeKey?"drill":"overview";
       state.tab=Number.isFinite(Number(parsed.tab))?Number(parsed.tab):0;
@@ -4395,19 +4438,26 @@ async function backendJsonPayload(filename){
 async function staticAutoLoad(){
   const status=document.getElementById("loadStatus");
   try{
-    const res=await fetch(`${BACKEND_CONFIG.staticJsonBase}/manifest.json`,{cache:"no-store"});
+    const [res]=await Promise.all([
+      fetch(`${BACKEND_CONFIG.staticJsonBase}/manifest.json`,{cache:"no-store"}),
+      BACKEND_CONFIG.stockDescriptionsStaticUrl?fetchStockDescriptions():Promise.resolve(),
+    ]);
     if(!res.ok){if(status)status.textContent="No stock data found";return;}
     const payload=await res.json();
     const files=(Array.isArray(payload?.files)?payload.files:[]).filter(f=>f&&f!=="manifest.json");
     if(!files.length){if(status)status.textContent="No stock data found";return;}
     let loaded=0;
+    showProgress(0,files.length);
     for(const filename of files){
-      if(status)status.textContent=`Loading ${filename}…`;
+      if(status)status.textContent=`Loading ${loaded+1} / ${files.length}…`;
       try{const data=await backendJsonPayload(filename);addStock(data,filename);loaded++;}catch(_){}
+      showProgress(loaded,files.length);
     }
+    hideProgress();
     if(status)status.textContent=`Loaded ${loaded} stock${loaded===1?"":"s"}`;
     renderApp();
   }catch(err){
+    hideProgress();
     if(status)status.textContent=`Load failed: ${err.message}`;
   }
 }
@@ -4420,18 +4470,46 @@ function registryAnalysisFilenames(entries){
     .map(ticker=>`${ticker}_DividendCycleAnalysis_output.json`)));
 }
 
+function showProgress(current,total){
+  const wrap=document.getElementById("loadProgressWrap");
+  const bar=document.getElementById("loadProgressBar");
+  if(!wrap||!bar)return;
+  bar.classList.remove("indeterminate");
+  bar.style.width=(total>0?Math.round((current/total)*100):0)+"%";
+  wrap.classList.add("active");
+}
+function showIndeterminateProgress(){
+  const wrap=document.getElementById("loadProgressWrap");
+  const bar=document.getElementById("loadProgressBar");
+  if(!wrap||!bar)return;
+  bar.classList.add("indeterminate");
+  wrap.classList.add("active");
+}
+function hideProgress(){
+  const wrap=document.getElementById("loadProgressWrap");
+  const bar=document.getElementById("loadProgressBar");
+  if(!wrap||!bar)return;
+  wrap.classList.remove("active");
+  setTimeout(()=>{bar.classList.remove("indeterminate");bar.style.width="0%";},250);
+}
+
 async function loadStocksFromServer(filenames,options={}){
   const names=Array.from(new Set((Array.isArray(filenames)?filenames:[]).filter(Boolean)));
   if(!names.length)return 0;
   const status=document.getElementById("loadStatus");
   const {persistFiles=true,replaceServerFiles=false}=options;
   let loaded=0;
+  showProgress(0,names.length);
   for(const filename of names){
-    status.textContent=`Loading ${filename} from server...`;
-    const data=await backendJsonPayload(filename);
-    addStock(data,filename);
-    loaded+=1;
+    status.textContent=`Loading ${loaded+1} / ${names.length}…`;
+    try{
+      const data=await backendJsonPayload(filename);
+      addStock(data,filename);
+      loaded+=1;
+    }catch(_){}
+    showProgress(loaded,names.length);
   }
+  hideProgress();
   if(persistFiles){
     const nextFiles=replaceServerFiles?names:[...normalizedServerLoadedFiles(),...names];
     state.serverLoadedFiles=Array.from(new Set(nextFiles));
@@ -4444,9 +4522,7 @@ async function loadStocksFromServer(filenames,options={}){
 async function loadRegistryServerStocks(){
   const [files,entries]=await Promise.all([
     backendJsonFiles(),
-    Array.isArray(state.registryEntries) && state.registryEntries.length
-      ? Promise.resolve(state.registryEntries)
-      : fetchRegistryEntries(),
+    fetchRegistryEntries(),
   ]);
   if(!files.length){
     document.getElementById("loadStatus").textContent="No existing server stock data found";
@@ -4474,10 +4550,12 @@ async function runPipelineFromDashboard(){
   status.textContent="Updating stock data...";
   const btn=document.getElementById("runPipelineBtn");
   if(btn)btn.disabled=true;
+  showIndeterminateProgress();
   try{
     const res=await fetch(BACKEND_CONFIG.runPipelineUrl,{method:"POST"});
     const payload=await res.json().catch(()=>({ok:false,error:"Pipeline response could not be read"}));
     if(!res.ok||payload?.ok===false){
+      hideProgress();
       throw new Error(payload?.stderr||payload?.error||payload?.stdout||"Stock data update failed");
     }
     status.textContent="Stock data updated. Reloading server JSONs...";
@@ -4493,7 +4571,7 @@ async function initBackendMode(){
   syncBackendButtons();
   if(backendAvailable){
     try{
-      await fetchMasterStocks();
+      await Promise.all([fetchMasterStocks(),fetchStockDescriptions()]);
     }catch(_){}
   }
   renderApp();
@@ -4503,6 +4581,7 @@ async function initBackendMode(){
   if(!shouldRestore)return;
   try{
     await loadStocksFromServer(normalizedServerLoadedFiles(),{persistFiles:true,replaceServerFiles:true});
+    renderApp();
   }catch(err){
     document.getElementById("loadStatus").textContent=`Restore failed: ${err.message}`;
   }
@@ -4849,6 +4928,20 @@ async function fetchRegistryEntries(){
   return state.registryEntries;
 }
 
+async function fetchStockDescriptions(){
+  const url=BACKEND_CONFIG.stockDescriptionsStaticUrl||BACKEND_CONFIG.stockDescriptionsUrl;
+  try{
+    const res=await fetch(url,{cache:"no-store"});
+    const payload=await res.json().catch(()=>null);
+    if(!payload||typeof payload!=="object"||Array.isArray(payload))return;
+    if(payload.ok===true&&payload.descriptions&&typeof payload.descriptions==="object"){
+      state.stockDescriptions=payload.descriptions;
+    }else if(payload.ok===undefined){
+      state.stockDescriptions=payload;
+    }
+  }catch(_){}
+}
+
 async function fetchMasterStocks(){
   const res=await fetch(BACKEND_CONFIG.masterStocksUrl,{cache:"no-store"});
   const payload=await res.json().catch(()=>({ok:false,error:"Master stock response could not be read"}));
@@ -5050,6 +5143,9 @@ function setupMapVerdictFill(tone){
   const fills={good:"#3ed9a0",warn:"#f5c542",bad:"#f07070",pu:"#a78bfa",muted:"#7a829a"};
   return fills[tone]||fills.muted;
 }
+function growthCls(v){return v==null?"":v>=15?"good":v>=0?"warn":"bad"}
+function growthFmt(v){if(v==null)return"-";return(v>=0?"+":"")+v.toFixed(1)+"%"}
+function growthColor(v){return v==null?"var(--mu)":v>=15?"var(--hit)":v>=0?"var(--warn)":"var(--miss)"}
 function projectionWindowStart(proj){
   const dates=["est_low_date_cluster1","est_low_date_cluster2","est_low_date"]
     .map(key=>proj?.[key])
@@ -5262,17 +5358,40 @@ function buildSetupMapItems(){
       currentPrice:current,
       entryZoneLow:low,
       entryZoneHigh:high,
+      growth5yr:s.data?.meta?.price_growth_5yr_pct??null,
     };
   }).filter(Boolean);
 }
 function setupMapListView(items){
+  const sortMap=state.setupListSort||{};
+  const defaultSrt={field:"gain",dir:"desc"};
   const groups=[
     {key:"below",label:"Below Zone",cls:"below",test:i=>i.zonePosition<0},
     {key:"inside",label:"Inside Zone",cls:"inside",test:i=>i.zonePosition>=0&&i.zonePosition<=1},
     {key:"above",label:"Above Zone",cls:"above",test:i=>i.zonePosition>1},
   ];
   const cols=groups.map(g=>{
-    const rows=items.filter(g.test).sort((a,b)=>b.possibleGainPct-a.possibleGainPct);
+    const srt=sortMap[g.key]||defaultSrt;
+    function sortedRows(rows){
+      return [...rows].sort((a,b)=>{
+        let av,bv;
+        if(srt.field==="ticker"){av=a.ticker;bv=b.ticker;}
+        else if(srt.field==="name"){av=a.stockName;bv=b.stockName;}
+        else if(srt.field==="growth5yr"){av=a.growth5yr;bv=b.growth5yr;}
+        else{av=a.possibleGainPct;bv=b.possibleGainPct;}
+        if(av==null&&bv==null)return 0;
+        if(av==null)return 1;
+        if(bv==null)return -1;
+        if(typeof av==="string")return srt.dir==="asc"?av.localeCompare(bv):bv.localeCompare(av);
+        return srt.dir==="asc"?av-bv:bv-av;
+      });
+    }
+    function shCell(field,label,cls,style){
+      const active=srt.field===field;
+      const arrow=active?(srt.dir==="asc"?"↑":"↓"):"↕";
+      return `<span class="sh-sort${active?" sorted":""}${cls?" "+cls:""}" data-sort-field="${field}" data-sort-zone="${g.key}"${style?` style="${style}"`:""}>${label}<span class="sort-arrow">${arrow}</span></span>`;
+    }
+    const rows=sortedRows(items.filter(g.test));
     const rowsHtml=rows.length
       ? rows.map(item=>{
           const gainColor=item.possibleGainPct>=5?"var(--hit)":item.possibleGainPct>=2?"var(--warn)":"var(--mu)";
@@ -5280,12 +5399,20 @@ function setupMapListView(items){
             <span class="setup-list-dot" style="background:${setupMapVerdictFill(item.finalVerdictTone)}"></span>
             <span class="setup-list-ticker">${esc(item.ticker)}</span>
             <span class="setup-list-name">${esc(item.stockName)}</span>
+            <span style="font-size:10px;font-family:var(--mono);color:${growthColor(item.growth5yr)};white-space:nowrap">${growthFmt(item.growth5yr)}</span>
             <span class="setup-list-gain" style="color:${gainColor}">${n(item.possibleGainPct,1)}%</span>
           </div>`;
         }).join("")
       : `<div style="padding:14px;font-size:12px;color:var(--mu)">None</div>`;
     return `<div class="setup-list-col">
       <div class="setup-list-col-head ${g.cls}">${g.label}<span class="col-count">${rows.length}</span></div>
+      <div class="setup-list-col-subhead">
+        <span style="width:8px;flex-shrink:0"></span>
+        ${shCell("ticker","Ticker","","min-width:52px")}
+        ${shCell("name","Name","sh-name")}
+        ${shCell("growth5yr","5yr","sh-num")}
+        ${shCell("gain","Gain","sh-num")}
+      </div>
       <div class="setup-list-col-rows">${rowsHtml}</div>
     </div>`;
   }).join("");
@@ -5935,6 +6062,7 @@ function renderMiniCard(s){
       <div class="mini-stat"><span class="ms-label">CGC #1: </span>${cgcTop?esc(cgcTop.series_id):"-"}</div>
       <div class="mini-stat"><span class="ms-label">Cycles: </span>${(data.cycles||[]).length}</div>
       <div class="mini-stat"><span class="ms-label">Div trend: </span>${divTrend?`<span class="${divTrend==="RISING"?"good":divTrend==="FALLING"||divTrend==="DECLINING"?"bad":""}">${esc(divTrendDisplay||divTrend)}</span>`:"-"}</div>
+      <div class="mini-stat"><span class="ms-label">5yr growth: </span><span class="${growthCls(m.price_growth_5yr_pct)}">${growthFmt(m.price_growth_5yr_pct)}</span></div>
     </div>
     ${executionSummary?`<div class="small muted" style="margin-top:10px;line-height:1.55">${esc(executionSummary)}</div>`:""}
     <button class="planner-action" type="button" data-planner-toggle="${esc(s.key)}">${plannerHas(s.key)?"Remove from Planner":"Add to Planner"}</button>
@@ -5959,6 +6087,7 @@ function renderDrillView(stockEntry){
   const assetTypeChip=assetTypeChipForTicker(m.ticker||stockEntry.key);
   const sectorLabel=sectorLabelForTicker(m.ticker||stockEntry.key);
   
+  const desc=(state.stockDescriptions||{})[m.ticker||""]||"";
   const heroHTML=`<section class="hero" style="margin-bottom:18px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <div>
@@ -5974,6 +6103,7 @@ function renderDrillView(stockEntry){
       ${daysTo!==null?`<span class="chip ${daysTo<=30?"warn":""}">${daysTo}d to ex-div</span>`:""}
       <span class="chip">${(data.series_meta||[]).length} series · ${(data.cycles||[]).length} cycles</span>
     </div>
+    ${desc?`<p style="font-size:13px;color:var(--mu);line-height:1.65;margin:10px 0 0;padding:10px 12px;background:var(--sf);border-radius:8px;border:1px solid var(--bd)">${esc(desc)}</p>`:""}
       <div class="section-note" style="margin-top:12px">All outputs are rule-based from uploaded Dividend Cycle Analysis data. No LLM inference is used.</div>
     <div style="margin-top:14px">
       <div class="hero-grid hero-top">
@@ -6065,6 +6195,9 @@ function renderOverviewView(){
   <div class="foot">Dividend Cycle Analysis dashboard · No LLM required · Click any stock to drill in</div>`;
 
   app.querySelectorAll(".mini-card[data-key]").forEach(el=>{
+    el.addEventListener("click",()=>setOverviewDrillTarget(el.dataset.key));
+  });
+  app.querySelectorAll(".setup-list-row[data-key]").forEach(el=>{
     el.addEventListener("click",()=>setOverviewDrillTarget(el.dataset.key));
   });
   const setupMapTip=document.getElementById("setupMapTip");
@@ -6183,6 +6316,17 @@ function renderOverviewView(){
   document.getElementById("zoneOutcomeRecent")?.addEventListener("click",()=>{state.zoneOutcomeMode="recent";persistPlannerState();renderApp()});
   document.getElementById("setupMapViewMap")?.addEventListener("click",()=>{state.setupMapViewMode="map";persistPlannerState();renderApp()});
   document.getElementById("setupMapViewList")?.addEventListener("click",()=>{state.setupMapViewMode="list";persistPlannerState();renderApp()});
+  app.querySelectorAll(".setup-list-col-subhead .sh-sort[data-sort-field]").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const f=el.dataset.sortField;
+      const zone=el.dataset.sortZone;
+      if(!zone)return;
+      const map=state.setupListSort||{};
+      const cur=map[zone]||{field:"gain",dir:"desc"};
+      state.setupListSort={...map,[zone]:{field:f,dir:cur.field===f&&cur.dir==="desc"?"asc":"desc"}};
+      renderApp();
+    });
+  });
   const zoneFilterBtn=document.getElementById("zoneOutcomeFilterBtn");
   const zoneFilterMenu=document.getElementById("zoneOutcomeFilterMenu");
   if(zoneFilterBtn&&zoneFilterMenu){
@@ -6448,6 +6592,7 @@ function addStock(data,label){
 document.getElementById("loadServerStocksBtn")?.addEventListener("click",async()=>{
   try{
     await loadRegistryServerStocks();
+    renderApp();
   }catch(err){
     document.getElementById("loadStatus").textContent=`Existing stock data load failed: ${err.message}`;
   }
