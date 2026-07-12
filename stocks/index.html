@@ -352,6 +352,29 @@ input[type=file]{display:none}
 .table-wrap::-webkit-scrollbar-track,.cmp-table-wrap::-webkit-scrollbar-track{background:#131724}
 .table-wrap::-webkit-scrollbar-thumb,.cmp-table-wrap::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#35537e,#22344f);border:2px solid #131724;border-radius:999px}
 .table-wrap::-webkit-scrollbar-thumb:hover,.cmp-table-wrap::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4f8ef7,#2b4c75)}
+/* REVIEW TABLE */
+#reviewTable tbody tr:hover{background:var(--sf)}
+#reviewTable tbody tr{border-bottom:1px solid var(--bd)}
+.rev-th:hover{color:var(--bl)!important}
+.rev-th-active{color:var(--bl)!important}
+.rev-list{scrollbar-width:thin;scrollbar-color:#3f6090 transparent}
+.rev-list::-webkit-scrollbar{width:6px}
+.rev-list::-webkit-scrollbar-track{background:transparent}
+.rev-list::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#35537e,#22344f);border-radius:999px}
+.rev-list::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4f8ef7,#2b4c75)}
+/* REVIEW HELP MODAL */
+.rev-help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.rev-help-modal{background:var(--bg);border:1px solid var(--bd);border-radius:12px;max-width:580px;width:100%;max-height:82vh;overflow-y:auto;padding:24px 28px 28px;position:relative;box-shadow:0 12px 48px rgba(0,0,0,.55);scrollbar-width:thin;scrollbar-color:#3f6090 transparent}
+.rev-help-modal::-webkit-scrollbar{width:5px}
+.rev-help-modal::-webkit-scrollbar-thumb{background:#35537e;border-radius:999px}
+.rev-help-modal h4{font-size:13px;font-weight:700;margin:20px 0 5px;color:var(--tx);letter-spacing:.01em}
+.rev-help-modal h4:first-of-type{margin-top:0}
+.rev-help-modal p,.rev-help-modal li{font-size:12px;line-height:1.75;color:var(--mu);margin:0}
+.rev-help-modal ul{margin:4px 0 0;padding-left:16px}
+.rev-help-modal ul li{margin-bottom:3px}
+.rev-help-modal .rev-help-rule{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:9px 12px;font-size:11.5px;line-height:1.7;color:var(--mu);margin-top:8px}
+.rev-help-modal .rev-help-rule strong{color:var(--tx)}
+.rev-help-divider{border:none;border-top:1px solid var(--bd);margin:18px 0 0}
 /* MINI CARDS GRID */
 .mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .mini-search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
@@ -3608,6 +3631,10 @@ function persistPlannerState(){
     activeKey:state.activeKey||null,
     view:state.view||"overview",
     tab:Number.isFinite(state.tab)?state.tab:0,
+    reviewSort:state.reviewSort||{col:"potential",dir:"desc"},
+    reviewFilterEntry:state.reviewFilterEntry||"all",
+    reviewFilterShow:state.reviewFilterShow||"all",
+    reviewOverrides:state.reviewOverrides&&typeof state.reviewOverrides==="object"?state.reviewOverrides:{},
   };
   try{
     localStorage.setItem(PLANNER_STORAGE_KEY,JSON.stringify(payload));
@@ -3647,7 +3674,7 @@ function hydratePlannerState(){
       });
       state.planner=parsed.planner&&typeof parsed.planner==="object"?parsed.planner:{};
       state.plannerActiveKey=parsed.plannerActiveKey||null;
-      if(["overview","grouped","compare","planner"].includes(parsed.overviewMode)){
+      if(["overview","grouped","compare","planner","review"].includes(parsed.overviewMode)){
         state.overviewMode=parsed.overviewMode;
       }
       if(["current","recent"].includes(parsed.zoneOutcomeMode)){
@@ -3668,6 +3695,17 @@ function hydratePlannerState(){
           }
         });
         state.setupListSort=restored;
+      }
+      if(parsed.reviewSort&&typeof parsed.reviewSort==="object"&&
+         typeof parsed.reviewSort.col==="string"&&["asc","desc"].includes(parsed.reviewSort.dir)){
+        state.reviewSort=parsed.reviewSort;
+      }
+      if(["all","potential","nonpotential"].includes(parsed.reviewFilterEntry))state.reviewFilterEntry=parsed.reviewFilterEntry;
+      if(["all","potential","nonpotential"].includes(parsed.reviewFilterShow))state.reviewFilterShow=parsed.reviewFilterShow;
+      if(parsed.reviewOverrides&&typeof parsed.reviewOverrides==="object"&&!Array.isArray(parsed.reviewOverrides)){
+        const validOverrides={};
+        Object.entries(parsed.reviewOverrides).forEach(([k,v])=>{if(v==="keep"||v==="remove")validOverrides[k]=v;});
+        state.reviewOverrides=validOverrides;
       }
       state.activeKey=parsed.activeKey&&state.stocks[parsed.activeKey]?parsed.activeKey:(stockList()[0]?.key||null);
       state.view=parsed.view==="drill"&&state.activeKey?"drill":"overview";
@@ -5786,7 +5824,255 @@ function panelGroupedStocks(){
     "upcoming"
   )
 }
-/* ?? COMPARISON PANEL ??????????????????????????????????????????????????? 
+/* ?? REVIEW REMOVE HELPERS ???????????????????????????????????????????? */
+function revConfirmRemove(btn){
+  const key=btn.dataset.key;
+  btn.outerHTML=`<div class="rev-remove-confirm" style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
+    <span style="font-size:10px;color:var(--mu);white-space:nowrap">Remove from watchlist?</span>
+    <button data-key="${esc(key)}" onclick="event.stopPropagation();revConfirmYes(this)" style="font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid #6b3a3a;background:var(--bg);color:#c47a7a;cursor:pointer;white-space:nowrap">Yes, remove</button>
+    <button onclick="event.stopPropagation();revCancelRemove()" style="font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid var(--bd);background:var(--bg);color:var(--mu);cursor:pointer;white-space:nowrap">Cancel</button>
+  </div>`;
+}
+async function revConfirmYes(btn){
+  const key=btn.dataset.key;
+  const ticker=state.stocks[key]?.data?.meta?.ticker||key;
+  btn.disabled=true;btn.textContent="Removing…";
+  try{
+    const regResp=await fetch(BACKEND_CONFIG.stockRegistryUrl);
+    const regData=await regResp.json();
+    if(!regData.ok)throw new Error(regData.error||"Failed to load registry");
+    const updated=regData.entries.filter(e=>e.ticker!==ticker);
+    const saveResp=await fetch(BACKEND_CONFIG.stockRegistryUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({entries:updated})});
+    const saveData=await saveResp.json();
+    if(!saveData.ok)throw new Error(saveData.error||"Failed to save registry");
+    delete state.stocks[key];
+    if(state.reviewOverrides)delete state.reviewOverrides[key];
+    persistPlannerState();renderApp();
+  }catch(err){
+    btn.disabled=false;btn.textContent="Yes, remove";
+    const wrap=btn.closest(".rev-remove-confirm");
+    if(wrap){const existing=wrap.querySelector(".rev-err");
+      if(existing)existing.textContent=err.message;
+      else wrap.insertAdjacentHTML("beforeend",`<span class="rev-err" style="font-size:10px;color:#e05a5a;white-space:normal;max-width:140px;word-break:break-word">${esc(err.message)}</span>`);
+    }
+  }
+}
+function revCancelRemove(){renderApp();}
+
+/* ?? REVIEW PANEL ??????????????????????????????????????????????????? */
+function panelReview(){
+  const allStocks=stockList();
+  if(!allStocks.length)return`<div class="panel"><h2>Review</h2><div class="empty">No stocks loaded. Use "Load existing stock data" or "Update stock data" to begin.</div></div>`;
+
+  const cfg=mergeConfig(CONFIG,{});
+  const overrides=state.reviewOverrides||{};
+
+  // Build row data
+  const rows=allStocks.map(s=>{
+    const data=s.data;
+    const cgcTop=Array.isArray(data.cgc_ranking)?data.cgc_ranking[0]:null;
+    const bestSid=cgcTop?.series_id||upcomingSeries(data)?.id;
+    const proj=bestSid?data.proj_series?.[bestSid]:null;
+    const hf=proj?.historical_frequencies||{};
+    const ssSeries=bestSid?data.ss_series?.[bestSid]:null;
+    const calWin=ssSeries?.timing?.cal_window||{};
+    const normalized=normalizeStock(data,cfg);
+    const eligResult=isPotentialStock(normalized,cfg);
+    const eligible=eligResult.eligible;
+    const potScore=eligible?scorePotentialStock(normalized,cfg).potentialScore:null;
+    return{
+      key:s.key,
+      ticker:data.meta?.ticker||s.key,
+      stockName:data.meta?.stock_name||"",
+      eligible,
+      potScore,
+      potReasons:eligResult.reasons||[],
+      entryStatus:proj?.entry_status,
+      entryStatusDisplay:proj?.entry_status_display,
+      winRate:hf.win_rate,
+      winRateAll:hf.win_rate_all,
+      zoneHit:hf.entry_zone_hit_rate,
+      avgGain:hf.avg_win_pct,
+      calRating:calWin.cal_window_rating,
+      calDisplay:calWin.cal_window_rating_display,
+      stability:proj?.stability_verdict,
+      growth5yr:data.meta?.price_growth_5yr_pct,
+      frequency:data.meta?.frequency,
+      frequencyDisplay:data.meta?.frequency_display,
+    };
+  });
+
+  // Auto-assign: Keep = passes potential AND zone hit is not exactly 0%; Remove = fails either
+  const autoAssign=r=>{
+    if(!r.eligible) return"remove";
+    if(r.zoneHit===0) return"remove";
+    return"keep";
+  };
+  const getAssign=r=>overrides[r.key]||autoAssign(r);
+
+  // Generate reason sentence
+  const getReason=r=>{
+    const assigned=getAssign(r);
+    const wasAuto=autoAssign(r);
+    const overrideSuffix=overrides[r.key]&&overrides[r.key]!==wasAuto?" (manually moved)":"";
+    if(assigned==="keep"){
+      const parts=[];
+      if(r.potScore!=null) parts.push(r.potScore>=75?`High potential score (${n(r.potScore,0)})`:`Score ${n(r.potScore,0)}`);
+      if(r.winRate!=null) parts.push(`${pctRaw(r.winRate,0)} win rate`);
+      if(r.zoneHit!=null&&r.zoneHit>0) parts.push(`${pctRaw(r.zoneHit,0)} zone hit`);
+      if(r.calRating==="CALENDAR_CONSISTENT") parts.push("consistent calendar");
+      else if(r.calRating==="CALENDAR_MODERATE") parts.push("moderate calendar spread");
+      if(r.growth5yr!=null&&r.growth5yr>=20) parts.push(`${n(r.growth5yr,0)}% 5yr growth`);
+      return(parts.join(" · ")||"Passes the structural potential screen.")+overrideSuffix;
+    }else{
+      if(r.zoneHit===0&&!r.eligible){
+        const extra=r.potReasons[0]?` Also: ${r.potReasons[0].toLowerCase()}.`:"";
+        return`Zone hit rate is 0% — entry zone has never been reached in practice.${extra}${overrideSuffix}`;
+      }
+      if(r.zoneHit===0) return`Zone hit rate is 0% — entry zone has never been reached in practice.${overrideSuffix}`;
+      if(!r.eligible&&r.potReasons.length){
+        const first=r.potReasons[0].toLowerCase();
+        const more=r.potReasons.length>1?` (+${r.potReasons.length-1} more reason${r.potReasons.length>2?"s":""})`:""
+        return`Does not pass the structural screen — ${first}.${more}${overrideSuffix}`;
+      }
+      return`Does not meet the structural potential threshold.${overrideSuffix}`;
+    }
+  };
+
+  const keepList=rows.filter(r=>getAssign(r)==="keep").sort((a,b)=>(b.potScore??-999)-(a.potScore??-999));
+  const removeList=rows.filter(r=>getAssign(r)==="remove").sort((a,b)=>(b.potScore??-999)-(a.potScore??-999));
+
+  const renderCard=r=>{
+    const assigned=getAssign(r);
+    const reason=getReason(r);
+    const chips=[];
+    if(r.potScore!=null) chips.push(`<span class="chip ${r.potScore>=75?"good":r.potScore>=60?"warn":""}">Score ${n(r.potScore,0)}</span>`);
+    else chips.push(`<span class="chip muted">No score</span>`);
+    if(r.winRate!=null) chips.push(`<span class="chip ${r.winRate>=70?"good":r.winRate>=50?"warn":"bad"}">WR ${pctRaw(r.winRate,0)}</span>`);
+    if(r.zoneHit!=null) chips.push(`<span class="chip ${r.zoneHit>=60?"good":r.zoneHit>=30?"warn":"bad"}">Zone ${pctRaw(r.zoneHit,0)}</span>`);
+    if(r.frequencyDisplay) chips.push(`<span class="chip ${{QUARTERLY:"good",MONTHLY:"good",SEMI_ANNUAL:""}[r.frequency]||"muted"}">${esc(r.frequencyDisplay)}</span>`);
+    const moveTo=assigned==="keep"?"remove":"keep";
+    const moveLabel=assigned==="keep"?"Move to Remove →":"← Move to Keep";
+    const canRemove=assigned==="remove"&&!BACKEND_CONFIG.staticJsonBase;
+    const removeBtn=canRemove?`<button class="rev-watchlist-btn" data-key="${esc(r.key)}" onclick="event.stopPropagation();revConfirmRemove(this)" style="font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid #6b3a3a;background:var(--bg);color:#c47a7a;cursor:pointer;white-space:nowrap">Remove from watchlist</button>`:"";
+    return`<div class="rev-card" data-key="${esc(r.key)}" style="border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:background .12s" onmouseenter="this.style.background='var(--sf)'" onmouseleave="this.style.background=''">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="min-width:0;flex:1">
+          <div style="font-family:var(--mono);font-weight:700;font-size:13px">${esc(r.ticker)} <span style="font-weight:400;font-size:11px;color:var(--mu)">${esc(r.stockName)}</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin:5px 0">${chips.join("")}</div>
+          <div style="font-size:11px;color:var(--mu);line-height:1.5">${esc(reason)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+          <button class="rev-move-btn" data-key="${esc(r.key)}" data-target="${moveTo}" style="font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--mu);cursor:pointer;white-space:nowrap">${moveLabel}</button>
+          ${removeBtn}
+        </div>
+      </div>
+    </div>`;
+  };
+
+  const overrideCount=Object.keys(overrides).length;
+  const resetBtn=overrideCount?`<button id="reviewResetOverrides" style="font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--mu);cursor:pointer">Reset ${overrideCount} manual override${overrideCount!==1?"s":""}</button>`:"";
+
+  const keepHtml=keepList.length?keepList.map(renderCard).join(""):`<div class="empty" style="font-size:12px;padding:14px">No stocks assigned here.</div>`;
+  const removeHtml=removeList.length?removeList.map(renderCard).join(""):`<div class="empty" style="font-size:12px;padding:14px">No stocks assigned here.</div>`;
+
+  const helpModal=`<div id="reviewHelpModal" class="rev-help-overlay" style="display:none">
+    <div class="rev-help-modal">
+      <button id="reviewHelpClose" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--mu);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px" title="Close">&times;</button>
+      <div style="font-size:16px;font-weight:700;margin-bottom:14px">How Scores &amp; Metrics Work</div>
+
+      <h4>Potential Score <span style="font-weight:400;font-size:11px;color:var(--mu)">(0&ndash;100)</span></h4>
+      <p>A composite quality score that combines eight weighted factors measured from the stock's historical dividend cycles. A higher score means the setup has historically been more reliable and consistent.</p>
+      <ul>
+        <li><strong>Win Rate</strong> &mdash; how often price rose from the entry zone before ex-dividend</li>
+        <li><strong>Clean Cycles</strong> &mdash; number of usable historical setups (degenerate cycles excluded)</li>
+        <li><strong>Years of Data</strong> &mdash; longer track record = higher confidence</li>
+        <li><strong>Dividend Frequency</strong> &mdash; quarterly or monthly cycles provide more data points</li>
+        <li><strong>Timing Reliability</strong> &mdash; how consistently the seasonal window falls in the same period</li>
+        <li><strong>Tail Risk</strong> &mdash; penalty for stocks with a history of extreme drawdowns near ex-div</li>
+        <li><strong>Dividend Trend</strong> &mdash; whether dividends have been growing, flat, or declining</li>
+        <li><strong>Zone Width</strong> &mdash; tighter entry zones are rewarded; very wide zones are less precise</li>
+      </ul>
+      <div class="rev-help-rule">
+        <span class="chip good">Score 75+</span>&nbsp;High confidence &nbsp;&nbsp;
+        <span class="chip warn">Score 60+</span>&nbsp;Moderate &nbsp;&nbsp;
+        <span class="chip muted">No score</span>&nbsp;Didn't pass minimum criteria (e.g. &lt;3 cycles or WR &lt;50%)
+      </div>
+
+      <hr class="rev-help-divider">
+
+      <h4>Win Rate (WR)</h4>
+      <p>The percentage of clean historical cycles where price rose from the entry zone before the ex-dividend date. Only non-degenerate cycles are counted so outlier setups don't skew the rate.</p>
+      <div class="rev-help-rule">
+        <span class="chip good">70%+</span>&nbsp;Strong &nbsp;&nbsp;
+        <span class="chip warn">50–69%</span>&nbsp;Moderate &nbsp;&nbsp;
+        <span class="chip bad">&lt;50%</span>&nbsp;Below threshold (not eligible)
+      </div>
+
+      <hr class="rev-help-divider">
+
+      <h4>Zone Hit Rate</h4>
+      <p>The percentage of historical cycles where price actually fell <em>into</em> the projected entry zone at some point before ex-dividend. A 0% zone hit means the entry zone exists on paper but price has never reached it in practice &mdash; so there is rarely a chance to buy at the target price even if the pattern looks strong.</p>
+      <div class="rev-help-rule">
+        <span class="chip good">60%+</span>&nbsp;Frequently reachable &nbsp;&nbsp;
+        <span class="chip warn">30–59%</span>&nbsp;Occasionally reachable &nbsp;&nbsp;
+        <span class="chip bad">0–29%</span>&nbsp;Rarely or never reached &nbsp;&nbsp;
+        <span class="chip bad">0%</span>&nbsp;Auto-removed
+      </div>
+
+      <hr class="rev-help-divider">
+
+      <h4>Calendar</h4>
+      <p>How consistently the stock's seasonal entry window falls in the same months each year. A tight calendar is more predictable; a wide or inconsistent one is harder to time.</p>
+      <ul>
+        <li><strong>Consistent</strong> &mdash; entry window falls in a narrow seasonal band every year</li>
+        <li><strong>Moderate</strong> &mdash; some spread across the year, but still has a seasonal lean</li>
+        <li><strong>Wide</strong> &mdash; entry window shifts significantly year to year; harder to anticipate</li>
+      </ul>
+
+      <hr class="rev-help-divider">
+
+      <h4>Frequency</h4>
+      <p>How often the company pays dividends. More frequent dividends mean more historical cycles to analyze, which makes the potential score more statistically reliable.</p>
+      <ul>
+        <li><strong style="color:var(--gn)">Quarterly / Monthly</strong> &mdash; 4&ndash;12 cycles per year; most data</li>
+        <li><strong>Semi-Annual</strong> &mdash; 2 cycles per year</li>
+        <li><strong style="color:var(--mu)">Annual / Irregular</strong> &mdash; 1 or fewer predictable cycles per year; fewer data points</li>
+      </ul>
+
+      <hr class="rev-help-divider">
+
+      <h4>Auto-Assignment Logic</h4>
+      <div class="rev-help-rule">
+        <strong>To Keep</strong> &mdash; passes the potential screen (score exists) AND zone hit rate &gt; 0%<br>
+        <strong>To Remove</strong> &mdash; fails the potential screen OR zone hit rate is exactly 0%<br>
+        <span style="display:block;margin-top:6px">You can override any assignment using the button on each card. Overrides are saved and shown as <em>(manually moved)</em>.</span>
+      </div>
+    </div>
+  </div>`;
+
+  return`<div class="panel">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <h2 style="margin:0">Review &mdash; Keep or Remove?</h2>
+      <button id="reviewHelpBtn" style="font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid var(--bd);background:var(--sf);color:var(--mu);cursor:pointer;white-space:nowrap;flex-shrink:0">About these metrics</button>
+    </div>
+    <p class="small muted" style="margin:0 0 8px">Auto-assigned by potential score and zone hit rate. Click any stock to drill in. Use the button on each card to override the assignment. Finalise removals via "Edit stock list".</p>
+    ${resetBtn?`<div style="margin-bottom:12px">${resetBtn}</div>`:`<div style="margin-bottom:12px"></div>`}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;align-items:start">
+      <div>
+        <h3 style="font-size:13px;font-weight:700;margin:0 0 10px;color:var(--gn)">To Keep <span style="font-weight:400;font-size:11px;color:var(--mu)">${keepList.length} stock${keepList.length!==1?"s":""}</span></h3>
+        <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${keepHtml}</div>
+      </div>
+      <div>
+        <h3 style="font-size:13px;font-weight:700;margin:0 0 10px;color:var(--rd)">To Remove <span style="font-weight:400;font-size:11px;color:var(--mu)">${removeList.length} stock${removeList.length!==1?"s":""}</span></h3>
+        <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${removeHtml}</div>
+      </div>
+    </div>
+    ${helpModal}
+  </div>`;
+}
+
+/* ?? COMPARISON PANEL ???????????????????????????????????????????????????
  */
 function panelComparison(){
   let stocks=stockList();
@@ -6164,13 +6450,14 @@ function bindStateSelect(id,stateKey,afterChange){
 function renderOverviewView(){
   const stocks=stockList();
   document.title="Dividend Cycle Dashboard";
-  const mode=state.overviewMode||"overview"; // "overview" | "grouped" | "compare" | "planner"
+  const mode=state.overviewMode||"overview"; // "overview" | "grouped" | "compare" | "planner" | "review"
 
   const modeToggle=`
     <div style="display:flex;gap:6px">
       <button class="tab ${mode==="overview"?"active":""}" id="ovModeOverview">Overview</button>
       <button class="tab ${mode==="grouped"?"active":""}" id="ovModeGrouped">Potential &amp; Upcoming</button>
       <button class="tab ${mode==="planner"?"active":""}" id="ovModePlanner">Trade Planner</button>
+      <button class="tab ${mode==="review"?"active":""}" id="ovModeReview">Review</button>
       <button class="tab ${mode==="compare"?"active":""}" id="ovModeCompare">Comparison</button>
     </div>`;
 
@@ -6181,6 +6468,8 @@ function renderOverviewView(){
     body=panelTradePlanner();
   }else if(mode==="compare"){
     body=panelZoneOutcomeMap()+panelComparison();
+  }else if(mode==="review"){
+    body=panelReview();
   }else{
     body=panelSetupMap()+panelMiniCards();
   }
@@ -6386,6 +6675,38 @@ function renderOverviewView(){
   document.getElementById("ovModeGrouped")?.addEventListener("click",()=>{state.overviewMode="grouped";persistPlannerState();renderApp()});
   document.getElementById("ovModePlanner")?.addEventListener("click",()=>{state.overviewMode="planner";persistPlannerState();renderApp()});
   document.getElementById("ovModeCompare")?.addEventListener("click",()=>{state.overviewMode="compare";persistPlannerState();renderApp()});
+  document.getElementById("ovModeReview")?.addEventListener("click",()=>{state.overviewMode="review";persistPlannerState();renderApp()});
+  app.querySelectorAll(".rev-move-btn[data-key]").forEach(btn=>{
+    btn.addEventListener("click",e=>{
+      e.stopPropagation();
+      const key=btn.dataset.key;
+      const target=btn.dataset.target;
+      if(!state.reviewOverrides)state.reviewOverrides={};
+      state.reviewOverrides[key]=target;
+      persistPlannerState();renderApp();
+    });
+  });
+  app.querySelectorAll(".rev-card[data-key]").forEach(card=>{
+    card.addEventListener("click",e=>{
+      if(e.target.closest(".rev-move-btn"))return;
+      setOverviewDrillTarget(card.dataset.key);
+    });
+  });
+  document.getElementById("reviewResetOverrides")?.addEventListener("click",()=>{
+    state.reviewOverrides={};
+    persistPlannerState();renderApp();
+  });
+  document.getElementById("reviewHelpBtn")?.addEventListener("click",()=>{
+    const m=document.getElementById("reviewHelpModal");
+    if(m)m.style.display="flex";
+  });
+  document.getElementById("reviewHelpClose")?.addEventListener("click",()=>{
+    const m=document.getElementById("reviewHelpModal");
+    if(m)m.style.display="none";
+  });
+  document.getElementById("reviewHelpModal")?.addEventListener("click",e=>{
+    if(e.target===e.currentTarget)e.currentTarget.style.display="none";
+  });
   document.getElementById("plannerExportCsv")?.addEventListener("click",e=>{
     e.preventDefault();
     exportPlannerCsv();
