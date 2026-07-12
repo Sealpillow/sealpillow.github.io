@@ -3704,7 +3704,7 @@ function hydratePlannerState(){
       if(["all","potential","nonpotential"].includes(parsed.reviewFilterShow))state.reviewFilterShow=parsed.reviewFilterShow;
       if(parsed.reviewOverrides&&typeof parsed.reviewOverrides==="object"&&!Array.isArray(parsed.reviewOverrides)){
         const validOverrides={};
-        Object.entries(parsed.reviewOverrides).forEach(([k,v])=>{if(v==="keep"||v==="remove")validOverrides[k]=v;});
+        Object.entries(parsed.reviewOverrides).forEach(([k,v])=>{if(v==="keep"||v==="watch"||v==="remove")validOverrides[k]=v;});
         state.reviewOverrides=validOverrides;
       }
       state.activeKey=parsed.activeKey&&state.stocks[parsed.activeKey]?parsed.activeKey:(stockList()[0]?.key||null);
@@ -5902,11 +5902,19 @@ function panelReview(){
     };
   });
 
-  // Auto-assign: Keep = passes potential AND zone hit is not exactly 0%; Remove = fails either
+  // Auto-assign with edge-case handling
   const autoAssign=r=>{
-    if(!r.eligible) return"remove";
-    if(r.zoneHit===0) return"remove";
-    return"keep";
+    // Clean keep: eligible, zone reachable (>15%), pattern not degrading
+    if(r.eligible&&r.zoneHit>15&&r.stability!=="DEGRADING") return"keep";
+    // Eligible with zone hit but degrading pattern or barely reachable entry (<=15%)
+    if(r.eligible&&r.zoneHit>0) return"watch";
+    // Zone = 0 but eligible and rising stock (steady 5yr growth above the zone)
+    if(r.eligible&&r.zoneHit===0&&r.growth5yr!=null&&r.growth5yr>=15) return"watch";
+    // Fails screen but strong zone hit + win rate (good hits, structural gaps)
+    if(!r.eligible&&r.zoneHit!=null&&r.zoneHit>=50&&r.winRate!=null&&r.winRate>=60) return"watch";
+    // Fails screen but strong business fundamentals with some zone activity
+    if(!r.eligible&&r.growth5yr!=null&&r.growth5yr>=25&&r.zoneHit>0) return"watch";
+    return"remove";
   };
   const getAssign=r=>overrides[r.key]||autoAssign(r);
 
@@ -5924,6 +5932,18 @@ function panelReview(){
       else if(r.calRating==="CALENDAR_MODERATE") parts.push("moderate calendar spread");
       if(r.growth5yr!=null&&r.growth5yr>=20) parts.push(`${n(r.growth5yr,0)}% 5yr growth`);
       return(parts.join(" · ")||"Passes the structural potential screen.")+overrideSuffix;
+    }else if(assigned==="watch"){
+      if(r.eligible&&r.zoneHit>0&&r.stability==="DEGRADING")
+        return`Pattern consistency is trending down in recent cycles — timing or dip depth is shifting from historical norms. Valid setup but trade with caution.${overrideSuffix}`;
+      if(r.eligible&&r.zoneHit>0&&r.zoneHit<=15)
+        return`Entry zone is rarely reached (${pctRaw(r.zoneHit,0)} zone hit) — a valid setup exists but practical entry opportunities are very uncommon.${overrideSuffix}`;
+      if(r.eligible&&r.zoneHit===0&&r.growth5yr!=null)
+        return`Zone never reached — ${n(r.growth5yr,0)}% 5yr growth suggests the stock is steadily rising above the entry zone. Consider monitoring for a pullback or holding for price appreciation.${overrideSuffix}`;
+      if(!r.eligible&&r.zoneHit!=null&&r.zoneHit>=50&&r.winRate!=null&&r.winRate>=60)
+        return`Doesn't pass the structural screen but price enters the zone ${pctRaw(r.zoneHit,0)} of the time with a ${pctRaw(r.winRate,0)} win rate — worth monitoring as more cycle data accumulates.${overrideSuffix}`;
+      if(!r.eligible&&r.growth5yr!=null&&r.growth5yr>=25)
+        return`Doesn't pass the structural screen but ${n(r.growth5yr,0)}% 5yr growth indicates a healthy business. Monitor for a cycle pattern to develop.${overrideSuffix}`;
+      return`Edge case — doesn't fit cleanly into Keep or Remove. Review manually.${overrideSuffix}`;
     }else{
       if(r.zoneHit===0&&!r.eligible){
         const extra=r.potReasons[0]?` Also: ${r.potReasons[0].toLowerCase()}.`:"";
@@ -5940,6 +5960,7 @@ function panelReview(){
   };
 
   const keepList=rows.filter(r=>getAssign(r)==="keep").sort((a,b)=>(b.potScore??-999)-(a.potScore??-999));
+  const watchList=rows.filter(r=>getAssign(r)==="watch").sort((a,b)=>(b.potScore??-999)-(a.potScore??-999));
   const removeList=rows.filter(r=>getAssign(r)==="remove").sort((a,b)=>(b.potScore??-999)-(a.potScore??-999));
 
   const renderCard=r=>{
@@ -5950,9 +5971,15 @@ function panelReview(){
     else chips.push(`<span class="chip muted">No score</span>`);
     if(r.winRate!=null) chips.push(`<span class="chip ${r.winRate>=70?"good":r.winRate>=50?"warn":"bad"}">WR ${pctRaw(r.winRate,0)}</span>`);
     if(r.zoneHit!=null) chips.push(`<span class="chip ${r.zoneHit>=60?"good":r.zoneHit>=30?"warn":"bad"}">Zone ${pctRaw(r.zoneHit,0)}</span>`);
+    if(r.stability==="DEGRADING") chips.push(`<span class="chip bad">Degrading</span>`);
+    else if(r.stability==="IMPROVING") chips.push(`<span class="chip good">Improving</span>`);
     if(r.frequencyDisplay) chips.push(`<span class="chip ${{QUARTERLY:"good",MONTHLY:"good",SEMI_ANNUAL:""}[r.frequency]||"muted"}">${esc(r.frequencyDisplay)}</span>`);
-    const moveTo=assigned==="keep"?"remove":"keep";
-    const moveLabel=assigned==="keep"?"Move to Remove →":"← Move to Keep";
+    const ms="font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--mu);cursor:pointer;white-space:nowrap";
+    const moveButtons=assigned==="keep"
+      ?`<button class="rev-move-btn" data-key="${esc(r.key)}" data-target="watch" style="${ms}">→ Watch</button><button class="rev-move-btn" data-key="${esc(r.key)}" data-target="remove" style="${ms}">→ Remove</button>`
+      :assigned==="watch"
+      ?`<button class="rev-move-btn" data-key="${esc(r.key)}" data-target="keep" style="${ms}">← Keep</button><button class="rev-move-btn" data-key="${esc(r.key)}" data-target="remove" style="${ms}">→ Remove</button>`
+      :`<button class="rev-move-btn" data-key="${esc(r.key)}" data-target="keep" style="${ms}">← Keep</button><button class="rev-move-btn" data-key="${esc(r.key)}" data-target="watch" style="${ms}">← Watch</button>`;
     const canRemove=assigned==="remove"&&!BACKEND_CONFIG.staticJsonBase;
     const removeBtn=canRemove?`<button class="rev-watchlist-btn" data-key="${esc(r.key)}" onclick="event.stopPropagation();revConfirmRemove(this)" style="font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid #6b3a3a;background:var(--bg);color:#c47a7a;cursor:pointer;white-space:nowrap">Remove from watchlist</button>`:"";
     return`<div class="rev-card" data-key="${esc(r.key)}" style="border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:background .12s" onmouseenter="this.style.background='var(--sf)'" onmouseleave="this.style.background=''">
@@ -5963,7 +5990,7 @@ function panelReview(){
           <div style="font-size:11px;color:var(--mu);line-height:1.5">${esc(reason)}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-          <button class="rev-move-btn" data-key="${esc(r.key)}" data-target="${moveTo}" style="font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--mu);cursor:pointer;white-space:nowrap">${moveLabel}</button>
+          ${moveButtons}
           ${removeBtn}
         </div>
       </div>
@@ -5974,6 +6001,7 @@ function panelReview(){
   const resetBtn=overrideCount?`<button id="reviewResetOverrides" style="font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--mu);cursor:pointer">Reset ${overrideCount} manual override${overrideCount!==1?"s":""}</button>`:"";
 
   const keepHtml=keepList.length?keepList.map(renderCard).join(""):`<div class="empty" style="font-size:12px;padding:14px">No stocks assigned here.</div>`;
+  const watchHtml=watchList.length?watchList.map(renderCard).join(""):`<div class="empty" style="font-size:12px;padding:14px">No stocks assigned here.</div>`;
   const removeHtml=removeList.length?removeList.map(renderCard).join(""):`<div class="empty" style="font-size:12px;padding:14px">No stocks assigned here.</div>`;
 
   const helpModal=`<div id="reviewHelpModal" class="rev-help-overlay" style="display:none">
@@ -6016,9 +6044,19 @@ function panelReview(){
       <div class="rev-help-rule">
         <span class="chip good">60%+</span>&nbsp;Frequently reachable &nbsp;&nbsp;
         <span class="chip warn">30–59%</span>&nbsp;Occasionally reachable &nbsp;&nbsp;
-        <span class="chip bad">0–29%</span>&nbsp;Rarely or never reached &nbsp;&nbsp;
-        <span class="chip bad">0%</span>&nbsp;Auto-removed
+        <span class="chip bad">1–15%</span>&nbsp;Rarely reachable &rarr; Worth Watching &nbsp;&nbsp;
+        <span class="chip bad">0%</span>&nbsp;Rising stock &rarr; Worth Watching; otherwise To Remove
       </div>
+
+      <hr class="rev-help-divider">
+
+      <h4>Pattern Stability</h4>
+      <p>Measures whether the dividend cycle behaviour is becoming more or less consistent over time. Each cycle gets a consistency score based on how closely its timing, dip depth, and rebound match the stock's historical median. The trend of those scores over time produces the verdict.</p>
+      <ul>
+        <li><strong style="color:var(--gn)">Improving</strong> &mdash; recent cycles are more consistent; pattern is strengthening</li>
+        <li><strong>Stable</strong> &mdash; cycles conform to historical norms; no significant drift</li>
+        <li><strong style="color:var(--rd)">Degrading</strong> &mdash; recent cycles show shifting timing or dip depth; the predictable pattern is weakening. Eligible stocks with a degrading verdict go to <em>Worth Watching</em> rather than To Keep</li>
+      </ul>
 
       <hr class="rev-help-divider">
 
@@ -6044,9 +6082,15 @@ function panelReview(){
 
       <h4>Auto-Assignment Logic</h4>
       <div class="rev-help-rule">
-        <strong>To Keep</strong> &mdash; passes the potential screen (score exists) AND zone hit rate &gt; 0%<br>
-        <strong>To Remove</strong> &mdash; fails the potential screen OR zone hit rate is exactly 0%<br>
-        <span style="display:block;margin-top:6px">You can override any assignment using the button on each card. Overrides are saved and shown as <em>(manually moved)</em>.</span>
+        <strong>To Keep</strong> &mdash; eligible + zone hit &gt; 15% + pattern not Degrading<br>
+        <strong style="color:#c9a227">Worth Watching</strong> &mdash; any of:<br>
+        <span style="padding-left:12px;display:block">· Eligible but Degrading pattern (timing or depth drifting from norms)</span>
+        <span style="padding-left:12px;display:block">· Eligible but zone hit &le; 15% (entry rarely reachable in practice)</span>
+        <span style="padding-left:12px;display:block">· Eligible but zone hit = 0% with 5yr growth &ge; 15% (rising above the zone)</span>
+        <span style="padding-left:12px;display:block">· Not eligible but zone hit &ge; 50% and win rate &ge; 60% (strong hits, structural gaps)</span>
+        <span style="padding-left:12px;display:block">· Not eligible but 5yr growth &ge; 25% with some zone activity (healthy business)</span>
+        <strong>To Remove</strong> &mdash; everything else<br>
+        <span style="display:block;margin-top:6px">Use the buttons on each card to override. Overrides are saved and shown as <em>(manually moved)</em>.</span>
       </div>
     </div>
   </div>`;
@@ -6056,12 +6100,16 @@ function panelReview(){
       <h2 style="margin:0">Review &mdash; Keep or Remove?</h2>
       <button id="reviewHelpBtn" style="font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid var(--bd);background:var(--sf);color:var(--mu);cursor:pointer;white-space:nowrap;flex-shrink:0">About these metrics</button>
     </div>
-    <p class="small muted" style="margin:0 0 8px">Auto-assigned by potential score and zone hit rate. Click any stock to drill in. Use the button on each card to override the assignment. Finalise removals via "Edit stock list".</p>
+    <p class="small muted" style="margin:0 0 8px">Auto-assigned by potential score, zone hit rate, pattern stability, and 5yr price growth. Click any stock to drill in. Use the buttons on each card to override. Finalise removals via "Edit stock list".</p>
     ${resetBtn?`<div style="margin-bottom:12px">${resetBtn}</div>`:`<div style="margin-bottom:12px"></div>`}
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;align-items:start">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;align-items:start">
       <div>
         <h3 style="font-size:13px;font-weight:700;margin:0 0 10px;color:var(--gn)">To Keep <span style="font-weight:400;font-size:11px;color:var(--mu)">${keepList.length} stock${keepList.length!==1?"s":""}</span></h3>
         <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${keepHtml}</div>
+      </div>
+      <div>
+        <h3 style="font-size:13px;font-weight:700;margin:0 0 10px;color:#c9a227">Worth Watching <span style="font-weight:400;font-size:11px;color:var(--mu)">${watchList.length} stock${watchList.length!==1?"s":""}</span></h3>
+        <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${watchHtml}</div>
       </div>
       <div>
         <h3 style="font-size:13px;font-weight:700;margin:0 0 10px;color:var(--rd)">To Remove <span style="font-weight:400;font-size:11px;color:var(--mu)">${removeList.length} stock${removeList.length!==1?"s":""}</span></h3>
