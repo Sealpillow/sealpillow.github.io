@@ -131,7 +131,7 @@ input[type=file]{display:none}
 .small.mono{font-family:var(--mono)}
 /* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.chip{display:inline-flex;padding:5px 10px;border-radius:999px;border:1px solid #304260;background:#1c2740;color:#c7d2e7;font-size:12px}
+.chip{display:inline-flex;padding:2px 8px;border-radius:4px;border:1px solid #304260;background:#1c2740;color:#c7d2e7;font-size:11px}
 .cd-bar{display:inline-flex;align-items:center;gap:4px;font-size:12px;flex-wrap:wrap}
 .cd-sep{color:var(--mu);margin:0 2px}
 .cd-dom{color:var(--tx);font-weight:600}
@@ -375,6 +375,7 @@ input[type=file]{display:none}
 .rev-help-modal .rev-help-rule{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:9px 12px;font-size:11.5px;line-height:1.7;color:var(--mu);margin-top:8px}
 .rev-help-modal .rev-help-rule strong{color:var(--tx)}
 .rev-help-divider{border:none;border-top:1px solid var(--bd);margin:18px 0 0}
+@media(max-width:640px){.rev-list{max-height:none}.rev-col+.rev-col{border-top:2px solid var(--bd);margin-top:16px;padding-top:16px}}
 /* MINI CARDS GRID */
 .mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .mini-search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
@@ -451,7 +452,7 @@ input[type=file]{display:none}
 .planner-card-title{font-size:16px;font-weight:700;font-family:var(--mono)}
 .planner-card-sub{font-size:11px;color:var(--mu);margin-top:2px}
 .planner-status-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.planner-status-row .chip{font-size:10px;padding:5px 9px}
+.planner-status-row .chip{font-size:10px}
 .planner-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:0 0 14px}
 .planner-summary-card{padding:12px;border:1px solid rgba(79,142,247,.14);border-radius:12px;background:rgba(79,142,247,.05)}
 .planner-summary-card .value{font-size:18px;font-weight:700;font-family:var(--mono);margin-top:4px}
@@ -1979,6 +1980,8 @@ overviewMode:"overview", // "overview" | "grouped" | "compare" | "planner"
   setupListSort:{below:{field:"gain",dir:"desc"},inside:{field:"gain",dir:"desc"},above:{field:"gain",dir:"desc"}},
   rememberLoadedStocks:true,
   serverLoadedFiles:[],
+  reviewSort:{keep:"score",watch:"zoneHit",remove:"score"},
+  reviewSearch:"",
   registryEntries:[],
   registryEditingIndex:null,
   masterStocks:[],
@@ -5904,15 +5907,29 @@ function panelReview(){
 
   // Auto-assign with edge-case handling
   const autoAssign=r=>{
-    // Clean keep: eligible, zone reachable (>15%), pattern not degrading
+    // KEEP — eligible, zone well-reachable (>15%), pattern not degrading
     if(r.eligible&&r.zoneHit>15&&r.stability!=="DEGRADING") return"keep";
-    // Eligible with zone hit but degrading pattern or barely reachable entry (<=15%)
-    if(r.eligible&&r.zoneHit>0) return"watch";
-    // Zone = 0 but eligible and rising stock (steady 5yr growth above the zone)
-    if(r.eligible&&r.zoneHit===0&&r.growth5yr!=null&&r.growth5yr>=15) return"watch";
-    // Fails screen but strong zone hit + win rate (good hits, structural gaps)
-    if(!r.eligible&&r.zoneHit!=null&&r.zoneHit>=50&&r.winRate!=null&&r.winRate>=60) return"watch";
-    // Fails screen but strong business fundamentals with some zone activity
+    // WATCH-A — eligible, good execution (>15%), but degrading pattern
+    if(r.eligible&&r.zoneHit>15&&r.stability==="DEGRADING") return"watch";
+    // WATCH-B — eligible, zone barely reachable (1-15%), quality justifies monitoring
+    //   Gate: score ≥65, improving stability, or strong avg gain (≥6%)
+    //   Growth is NOT a gate here — zone has been reached, so this is a quality question
+    if(r.eligible&&r.zoneHit>0&&r.zoneHit<=15&&
+       (r.potScore>=65||r.stability==="IMPROVING"||(r.avgGain!=null&&r.avgGain>=6)))
+      return"watch";
+    // WATCH-C — eligible, zone never reached, quality or momentum signal present
+    //   Gate: high score (≥70), improving pattern, growth ≥15% + score ≥65, or currently inside
+    //   Growth at 15% (~2.85%/yr) is above Singapore CPI (~2-3%/yr) — real momentum, not inflation drift
+    //   Growth gate requires score ≥65: growth alone in a dividend strategy is thin justification —
+    //   a rising stock with weak dividend fundamentals is better bought outright; the zone model adds no value
+    if(r.eligible&&r.zoneHit===0&&
+       (r.potScore>=70||r.stability==="IMPROVING"||
+        (r.growth5yr!=null&&r.growth5yr>=15&&r.potScore!=null&&r.potScore>=65)||
+        r.entryStatus==="INSIDE"))
+      return"watch";
+    // WATCH-D — fails screen but strong execution (zone hit ≥50% + win rate ≥65%)
+    if(!r.eligible&&r.zoneHit!=null&&r.zoneHit>=50&&r.winRate!=null&&r.winRate>=65) return"watch";
+    // WATCH-E — fails screen but strong business fundamentals with some zone activity
     if(!r.eligible&&r.growth5yr!=null&&r.growth5yr>=25&&r.zoneHit>0) return"watch";
     return"remove";
   };
@@ -5933,14 +5950,31 @@ function panelReview(){
       if(r.growth5yr!=null&&r.growth5yr>=20) parts.push(`${n(r.growth5yr,0)}% 5yr growth`);
       return(parts.join(" · ")||"Passes the structural potential screen.")+overrideSuffix;
     }else if(assigned==="watch"){
+      // WATCH-A: well-accessible zone but pattern deteriorating
+      if(r.eligible&&r.zoneHit>15&&r.stability==="DEGRADING")
+        return`Zone is well-accessible (${pctRaw(r.zoneHit,0)} hit rate) but pattern stability has been declining — timing or dip depth is shifting in recent cycles. Valid setup; trade with caution.${overrideSuffix}`;
+      // remaining zoneHit>0 + DEGRADING is now zoneHit 1–15% range
       if(r.eligible&&r.zoneHit>0&&r.stability==="DEGRADING")
         return`Pattern consistency is trending down in recent cycles — timing or dip depth is shifting from historical norms. Valid setup but trade with caution.${overrideSuffix}`;
+      // WATCH-B: barely reachable zone (1–15%)
       if(r.eligible&&r.zoneHit>0&&r.zoneHit<=15)
         return`Entry zone is rarely reached (${pctRaw(r.zoneHit,0)} zone hit) — a valid setup exists but practical entry opportunities are very uncommon.${overrideSuffix}`;
+      // WATCH-C: zone never reached — improving pattern signal
+      if(r.eligible&&r.zoneHit===0&&r.stability==="IMPROVING")
+        return`Entry zone has not yet been triggered, but the cycle pattern is strengthening (improving stability). Could become actionable if price pulls back.${overrideSuffix}`;
+      // WATCH-C: zone never reached — high potential score signal
+      if(r.eligible&&r.zoneHit===0&&r.potScore!=null&&r.potScore>=70)
+        return`Entry zone has never been reached in practice, but a strong potential score (${n(r.potScore,0)})${r.winRate!=null?` and ${pctRaw(r.winRate,0)} win rate`:""} justify monitoring. Watch for a broad pullback to create an entry.${overrideSuffix}`;
+      // WATCH-C: zone never reached — steady climber (growth + quality floor)
       if(r.eligible&&r.zoneHit===0&&r.growth5yr!=null)
-        return`Zone never reached — ${n(r.growth5yr,0)}% 5yr growth suggests the stock is steadily rising above the entry zone. Consider monitoring for a pullback or holding for price appreciation.${overrideSuffix}`;
-      if(!r.eligible&&r.zoneHit!=null&&r.zoneHit>=50&&r.winRate!=null&&r.winRate>=60)
+        return`${n(r.growth5yr,0)}% 5yr price growth${r.potScore!=null?` with a decent potential score (${n(r.potScore,0)})`:""} suggests a quality stock whose entry zone has been left behind by a rising price. Monitor for a broad pullback to bring price back into range.${overrideSuffix}`;
+      // WATCH-C fallback: zone=0 but currently inside (first-time entry window)
+      if(r.eligible&&r.zoneHit===0)
+        return`Entry zone has never been reached historically, but current price is inside the zone — a potential entry window is open now.${overrideSuffix}`;
+      // WATCH-D: fails screen but strong execution metrics
+      if(!r.eligible&&r.zoneHit!=null&&r.zoneHit>=50&&r.winRate!=null&&r.winRate>=65)
         return`Doesn't pass the structural screen but price enters the zone ${pctRaw(r.zoneHit,0)} of the time with a ${pctRaw(r.winRate,0)} win rate — worth monitoring as more cycle data accumulates.${overrideSuffix}`;
+      // WATCH-E: fails screen but strong business fundamentals
       if(!r.eligible&&r.growth5yr!=null&&r.growth5yr>=25)
         return`Doesn't pass the structural screen but ${n(r.growth5yr,0)}% 5yr growth indicates a healthy business. Monitor for a cycle pattern to develop.${overrideSuffix}`;
       return`Edge case — doesn't fit cleanly into Keep or Remove. Review manually.${overrideSuffix}`;
@@ -5959,9 +5993,26 @@ function panelReview(){
     }
   };
 
-  const keepList=rows.filter(r=>getAssign(r)==="keep").sort((a,b)=>(b.potScore??-999)-(a.potScore??-999));
-  const watchList=rows.filter(r=>getAssign(r)==="watch").sort((a,b)=>(b.potScore??-999)-(a.potScore??-999));
-  const removeList=rows.filter(r=>getAssign(r)==="remove").sort((a,b)=>(b.potScore??-999)-(a.potScore??-999));
+  const sortFn=key=>{
+    if(key==="zoneHit")return(a,b)=>(b.zoneHit??-1)-(a.zoneHit??-1);
+    if(key==="winRate")return(a,b)=>(b.winRate??-1)-(a.winRate??-1);
+    if(key==="alpha")  return(a,b)=>(a.stockName||a.ticker).localeCompare(b.stockName||b.ticker);
+    return(a,b)=>(b.potScore??-999)-(a.potScore??-999);
+  };
+  const sortBar=(col,current)=>["score","zoneHit","winRate","alpha"].map(s=>{
+    const active=current===s;
+    const label=s==="score"?"Score":s==="zoneHit"?"Zone":s==="winRate"?"WR":"A→Z";
+    return`<button class="rev-sort-btn" data-col="${col}" data-sort="${s}" style="font-size:10px;padding:2px 7px;border:1px solid var(--bd);border-radius:3px;background:${active?"var(--ac)":"transparent"};color:${active?"#fff":"var(--mu)"};cursor:pointer;line-height:1.4">${label}</button>`;
+  }).join("");
+  const revSort=state.reviewSort||{};
+  const revQ=(state.reviewSearch||"").toLowerCase().trim();
+  const matchSearch=r=>!revQ||(r.ticker||"").toLowerCase().includes(revQ)||(r.stockName||"").toLowerCase().includes(revQ);
+  const keepTotal=rows.filter(r=>getAssign(r)==="keep").length;
+  const watchTotal=rows.filter(r=>getAssign(r)==="watch").length;
+  const removeTotal=rows.filter(r=>getAssign(r)==="remove").length;
+  const keepList=rows.filter(r=>getAssign(r)==="keep"&&matchSearch(r)).sort(sortFn(revSort.keep||"score"));
+  const watchList=rows.filter(r=>getAssign(r)==="watch"&&matchSearch(r)).sort(sortFn(revSort.watch||"zoneHit"));
+  const removeList=rows.filter(r=>getAssign(r)==="remove"&&matchSearch(r)).sort(sortFn(revSort.remove||"score"));
 
   const renderCard=r=>{
     const assigned=getAssign(r);
@@ -6044,9 +6095,11 @@ function panelReview(){
       <div class="rev-help-rule">
         <span class="chip good">60%+</span>&nbsp;Frequently reachable &nbsp;&nbsp;
         <span class="chip warn">30–59%</span>&nbsp;Occasionally reachable &nbsp;&nbsp;
-        <span class="chip bad">1–15%</span>&nbsp;Rarely reachable &rarr; Worth Watching &nbsp;&nbsp;
-        <span class="chip bad">0%</span>&nbsp;Rising stock &rarr; Worth Watching; otherwise To Remove
+        <span class="chip bad">1–15%</span>&nbsp;Rarely reachable &rarr; Worth Watching <em>only if</em> quality signal present (score &ge;65, Improving, or avg gain &ge;6%) &nbsp;&nbsp;
+        <span class="chip bad">0%</span>&nbsp;Worth Watching if score &ge;70, Improving, growth &ge;15% with score &ge;65, or currently Inside; otherwise To Remove
       </div>
+      <p style="margin-top:8px">The 15% boundary is the practical execution floor: below this, the entry zone is visited in roughly 1-in-7 cycles or fewer &mdash; so even a strong win rate has limited trading value because entries are too rare to act on systematically.</p>
+      <p style="margin-top:8px"><strong>Steady climbers:</strong> When a stock trends upward consistently, its current price sits above the historical entry zone &mdash; the pre-dividend dip still occurs but is no longer deep enough to reach a zone calibrated on older, lower prices. A 0% zone hit combined with 15%&plus; 5yr price growth is more likely a sign of strength (rising price left the zone behind) than a broken pattern. These stocks go to Worth Watching rather than Remove. The 15% floor is intentional: over 5 years, 15% total price appreciation equals ~2.85% per year &mdash; meaningfully above Singapore&rsquo;s average CPI of ~2&ndash;3%, confirming real upward momentum rather than inflation drift. A growth gate without a quality floor would catch rising stocks regardless of their dividend fundamentals; the score &ge;65 requirement ensures you are monitoring a stock with <em>both</em> upward price momentum <em>and</em> a decent dividend cycle &mdash; a candidate worth waiting for a pullback on.</p>
 
       <hr class="rev-help-divider">
 
@@ -6084,11 +6137,12 @@ function panelReview(){
       <div class="rev-help-rule">
         <strong>To Keep</strong> &mdash; eligible + zone hit &gt; 15% + pattern not Degrading<br>
         <strong style="color:#c9a227">Worth Watching</strong> &mdash; any of:<br>
-        <span style="padding-left:12px;display:block">· Eligible but Degrading pattern (timing or depth drifting from norms)</span>
-        <span style="padding-left:12px;display:block">· Eligible but zone hit &le; 15% (entry rarely reachable in practice)</span>
-        <span style="padding-left:12px;display:block">· Eligible but zone hit = 0% with 5yr growth &ge; 15% (rising above the zone)</span>
-        <span style="padding-left:12px;display:block">· Not eligible but zone hit &ge; 50% and win rate &ge; 60% (strong hits, structural gaps)</span>
-        <span style="padding-left:12px;display:block">· Not eligible but 5yr growth &ge; 25% with some zone activity (healthy business)</span>
+        <span style="padding-left:12px;display:block">· Eligible + zone hit &gt; 15% + Degrading (good entry access, weakening pattern)</span>
+        <span style="padding-left:12px;display:block">· Eligible + zone hit 1&ndash;15% + quality signal (score &ge;65, Improving, or avg gain &ge;6%)</span>
+        <span style="padding-left:12px;display:block">· Eligible + zone hit 0% + strong signal (score &ge;70, Improving, growth &ge;15% with score &ge;65, or currently Inside)</span>
+        <span style="padding-left:12px;display:block">· Not eligible + zone hit &ge; 50% + win rate &ge; 65% (strong execution, structural gap)</span>
+        <span style="padding-left:12px;display:block">· Not eligible + 5yr growth &ge; 25% with some zone activity (healthy business, monitor)</span>
+        <span style="display:block;margin-top:4px;margin-bottom:4px;font-style:italic;color:var(--mu)">Quality floors (score &ge;65 / &ge;70) are set above the eligibility pass mark because a monitoring slot has a cost &mdash; a weak setup that never provides entry is noise, not a genuine candidate.</span>
         <strong>To Remove</strong> &mdash; everything else<br>
         <span style="display:block;margin-top:6px">Use the buttons on each card to override. Overrides are saved and shown as <em>(manually moved)</em>.</span>
       </div>
@@ -6101,18 +6155,25 @@ function panelReview(){
       <button id="reviewHelpBtn" style="font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid var(--bd);background:var(--sf);color:var(--mu);cursor:pointer;white-space:nowrap;flex-shrink:0">About these metrics</button>
     </div>
     <p class="small muted" style="margin:0 0 8px">Auto-assigned by potential score, zone hit rate, pattern stability, and 5yr price growth. Click any stock to drill in. Use the buttons on each card to override. Finalise removals via "Edit stock list".</p>
-    ${resetBtn?`<div style="margin-bottom:12px">${resetBtn}</div>`:`<div style="margin-bottom:12px"></div>`}
+    ${resetBtn?`<div style="margin-bottom:8px">${resetBtn}</div>`:`<div style="margin-bottom:8px"></div>`}
+    <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <input id="revSearch" type="text" placeholder="Filter by ticker or name…" value="${(state.reviewSearch||'').replace(/"/g,'&quot;')}" style="padding:4px 10px;border:1px solid var(--bd);border-radius:4px;background:var(--sf);color:var(--tx);font-size:12px;width:220px">
+      ${revQ?`<span style="font-size:11px;color:var(--mu)">${keepList.length+watchList.length+removeList.length} of ${keepTotal+watchTotal+removeTotal} shown</span>`:""}
+    </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;align-items:start">
-      <div>
-        <h3 style="font-size:13px;font-weight:700;margin:0 0 10px;color:var(--gn)">To Keep <span style="font-weight:400;font-size:11px;color:var(--mu)">${keepList.length} stock${keepList.length!==1?"s":""}</span></h3>
+      <div class="rev-col">
+        <h3 style="font-size:13px;font-weight:700;margin:0 0 6px;color:var(--gn)">To Keep <span style="font-weight:400;font-size:11px;color:var(--mu)">${revQ&&keepList.length!==keepTotal?`${keepList.length} / ${keepTotal}`:keepList.length} stock${keepList.length!==1?"s":""}</span></h3>
+        <div style="display:flex;gap:4px;margin-bottom:8px">${sortBar("keep",revSort.keep||"score")}</div>
         <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${keepHtml}</div>
       </div>
-      <div>
-        <h3 style="font-size:13px;font-weight:700;margin:0 0 10px;color:#c9a227">Worth Watching <span style="font-weight:400;font-size:11px;color:var(--mu)">${watchList.length} stock${watchList.length!==1?"s":""}</span></h3>
+      <div class="rev-col">
+        <h3 style="font-size:13px;font-weight:700;margin:0 0 6px;color:#c9a227">Worth Watching <span style="font-weight:400;font-size:11px;color:var(--mu)">${revQ&&watchList.length!==watchTotal?`${watchList.length} / ${watchTotal}`:watchList.length} stock${watchList.length!==1?"s":""}</span></h3>
+        <div style="display:flex;gap:4px;margin-bottom:8px">${sortBar("watch",revSort.watch||"zoneHit")}</div>
         <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${watchHtml}</div>
       </div>
-      <div>
-        <h3 style="font-size:13px;font-weight:700;margin:0 0 10px;color:var(--rd)">To Remove <span style="font-weight:400;font-size:11px;color:var(--mu)">${removeList.length} stock${removeList.length!==1?"s":""}</span></h3>
+      <div class="rev-col">
+        <h3 style="font-size:13px;font-weight:700;margin:0 0 6px;color:var(--rd)">To Remove <span style="font-weight:400;font-size:11px;color:var(--mu)">${revQ&&removeList.length!==removeTotal?`${removeList.length} / ${removeTotal}`:removeList.length} stock${removeList.length!==1?"s":""}</span></h3>
+        <div style="display:flex;gap:4px;margin-bottom:8px">${sortBar("remove",revSort.remove||"score")}</div>
         <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${removeHtml}</div>
       </div>
     </div>
@@ -6734,6 +6795,23 @@ function renderOverviewView(){
       persistPlannerState();renderApp();
     });
   });
+  app.querySelectorAll(".rev-sort-btn[data-col]").forEach(btn=>{
+    btn.addEventListener("click",e=>{
+      e.stopPropagation();
+      if(!state.reviewSort)state.reviewSort={};
+      state.reviewSort[btn.dataset.col]=btn.dataset.sort;
+      persistPlannerState();renderApp();
+    });
+  });
+  const revSearchEl=document.getElementById("revSearch");
+  if(revSearchEl){
+    revSearchEl.addEventListener("input",e=>{
+      state.reviewSearch=e.target.value;
+      renderApp();
+      const el=document.getElementById("revSearch");
+      if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}
+    });
+  }
   app.querySelectorAll(".rev-card[data-key]").forEach(card=>{
     card.addEventListener("click",e=>{
       if(e.target.closest(".rev-move-btn"))return;
