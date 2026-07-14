@@ -375,6 +375,11 @@ input[type=file]{display:none}
 .rev-help-modal .rev-help-rule{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:9px 12px;font-size:11.5px;line-height:1.7;color:var(--mu);margin-top:8px}
 .rev-help-modal .rev-help-rule strong{color:var(--tx)}
 .rev-help-divider{border:none;border-top:1px solid var(--bd);margin:18px 0 0}
+.rev-help-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--bd);padding-bottom:10px}
+.rev-help-tab{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;white-space:nowrap}
+.rev-help-tab.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.rev-help-panel{display:none}
+.rev-help-panel.active{display:block}
 @media(max-width:640px){.rev-list{max-height:none}.rev-col+.rev-col{border-top:2px solid var(--bd);margin-top:16px;padding-top:16px}}
 /* MINI CARDS GRID */
 .mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
@@ -2711,7 +2716,7 @@ function renderCalCard(s,data){
         <div class="small muted">Modal: ${modal.length?modal.map(monthName).join(", "):"-"}</div>
       </div>
       <div class="card">
-        <div class="label">${tipLabel("Observed Range","Actual earliest-to-latest span of clean low dates behind the calendar summary.")}</div>
+        <div class="label">${tipLabel("Observed Range","Smallest circular window covering all clean low dates. Computed as 365 minus the largest gap between consecutive day-of-year values, so Dec/Jan windows are not inflated.")}</div>
         <div class="value" style="font-size:17px">${esc(exactRange)}</div>
         <div class="small muted">${n(cal.cal_spread_days,0)}d spread · ${n(cal.n,0)} clean cycles</div>
       </div>
@@ -3562,7 +3567,7 @@ function panelGlossary(){
     ["Reliable timing","The week-count when the cycle low occurs is tightly clustered. In the live model this means wks_cv <= 15 plus a spread check of max(3, 0.3 x average weeks-before), so the dip timing can be used as a more specific date guide."],
     ["Bimodal timing","Two timing clusters exist. In the live model this appears after failing the Reliable test, when the largest gap between sorted clean timings is greater than 5 weeks. Cluster 1 = early dip (more weeks before ex-div); Cluster 2 = late dip (fewer weeks before ex-div). Watch both windows by default. If the drill view shows one cluster at ≥75% dominance across all historical cycles, favour that window and treat the timing closer to Reliable. The avg dip shown next to each cluster count indicates which window historically produced deeper dips — a secondary signal when counts alone are inconclusive."],
     ["Unreliable timing","Timing is neither Reliable nor Bimodal, so the low timing is too scattered to give a specific date target. Use price zone first and do not rely on the calendar alone."],
-    ["Calendar Window Rating","Measures how tightly the historical cycle lows cluster across the calendar year, based on the day-of-year spread between the earliest and latest clean low. Consistent means a spread of 60 days or less. Moderate means 60–120 days. Wide means more than 120 days, so calendar timing alone is not reliable."],
+    ["Calendar Window Rating","Measures how tightly the historical cycle lows cluster across the calendar year. The spread is the smallest circular window that covers all clean low dates (so a Dec/Jan stock is not penalised). Consistent means a spread of 60 days or less. Moderate means 61–120 days. Wide means more than 120 days, so calendar timing alone is not reliable."],
 ["Calendar Month Bar Colours","All bars are coloured by success rate — the % of lows in that month where the dip offered more than 3% rebound back to the PrevDP anchor: green >=70%, amber 40–69%, red <40%, grey = no lows. Modal months (where lows cluster most often) are marked with a coloured border instead of a colour override, so the success rate is always visible. In the hover tooltip, Success means the cycle cleared that rebound threshold; Not success means it did not. Sample sizes per month are often just 1–2, so treat colour as directional."],
     ["Pattern Stability Score","0–100 score per cycle measuring how consistent that cycle's behaviour was vs the historical norm. Scored only for cycles with enough history."],
     ["Zone Hit","Whether the price entered the entry zone during that cycle using the same walk-forward zone construction logic. Low zone-hit rate means the zone was easy to miss in practice, not just that it was mathematically too tight."],
@@ -6059,92 +6064,153 @@ function panelReview(){
     <div class="rev-help-modal">
       <button id="reviewHelpClose" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--mu);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px" title="Close">&times;</button>
       <div style="font-size:16px;font-weight:700;margin-bottom:14px">How Scores &amp; Metrics Work</div>
-
-      <h4>Potential Score <span style="font-weight:400;font-size:11px;color:var(--mu)">(0&ndash;100)</span></h4>
-      <p>A composite quality score that combines eight weighted factors measured from the stock's historical dividend cycles. A higher score means the setup has historically been more reliable and consistent.</p>
-      <ul>
-        <li><strong>Win Rate</strong> &mdash; how often price rose from the entry zone before ex-dividend</li>
-        <li><strong>Clean Cycles</strong> &mdash; number of usable historical setups (degenerate cycles excluded)</li>
-        <li><strong>Years of Data</strong> &mdash; longer track record = higher confidence</li>
-        <li><strong>Dividend Frequency</strong> &mdash; quarterly or monthly cycles provide more data points</li>
-        <li><strong>Timing Reliability</strong> &mdash; how consistently the seasonal window falls in the same period</li>
-        <li><strong>Tail Risk</strong> &mdash; penalty for stocks with a history of extreme drawdowns near ex-div</li>
-        <li><strong>Dividend Trend</strong> &mdash; whether dividends have been growing, flat, or declining</li>
-        <li><strong>Zone Width</strong> &mdash; tighter entry zones are rewarded; very wide zones are less precise</li>
-      </ul>
-      <div class="rev-help-rule">
-        <span class="chip good">Score 75+</span>&nbsp;High confidence &nbsp;&nbsp;
-        <span class="chip warn">Score 60+</span>&nbsp;Moderate &nbsp;&nbsp;
-        <span class="chip muted">No score</span>&nbsp;Didn't pass minimum criteria (e.g. &lt;3 cycles or WR &lt;50%)
+      <div class="rev-help-tabs">
+        <button class="rev-help-tab active" data-tab="score">Score</button>
+        <button class="rev-help-tab" data-tab="winrate">Win Rate</button>
+        <button class="rev-help-tab" data-tab="zonehit">Zone Hit</button>
+        <button class="rev-help-tab" data-tab="stability">Stability</button>
+        <button class="rev-help-tab" data-tab="calendar">Calendar</button>
+        <button class="rev-help-tab" data-tab="logic">Logic</button>
       </div>
 
-      <hr class="rev-help-divider">
-
-      <h4>Win Rate (WR)</h4>
-      <p>The percentage of clean historical cycles where price rose from the entry zone before the ex-dividend date. Only non-degenerate cycles are counted so outlier setups don't skew the rate.</p>
-      <div class="rev-help-rule">
-        <span class="chip good">70%+</span>&nbsp;Strong &nbsp;&nbsp;
-        <span class="chip warn">50–69%</span>&nbsp;Moderate &nbsp;&nbsp;
-        <span class="chip bad">&lt;50%</span>&nbsp;Below threshold (not eligible)
+      <div class="rev-help-panel active" data-tab="score">
+        <h4>Potential Score <span style="font-weight:400;font-size:11px;color:var(--mu)">(0&ndash;100)</span></h4>
+        <p>A composite quality score that combines eight weighted factors measured from the stock's historical dividend cycles. A higher score means the setup has historically been more reliable and consistent.</p>
+        <ul>
+          <li><strong>Win Rate</strong> &mdash; how often the cycle low was at least 3% below the ex-div closing price (the rebound hurdle)</li>
+          <li><strong>Clean Cycles</strong> &mdash; number of usable historical setups (degenerate cycles excluded)</li>
+          <li><strong>Years of Data</strong> &mdash; longer track record = higher confidence</li>
+          <li><strong>Dividend Frequency</strong> &mdash; quarterly or monthly cycles provide more data points</li>
+          <li><strong>Timing Reliability</strong> &mdash; how consistently the seasonal window falls in the same period</li>
+          <li><strong>Tail Risk</strong> &mdash; penalty for stocks with a history of extreme drawdowns near ex-div</li>
+          <li><strong>Dividend Trend</strong> &mdash; whether dividends have been growing, flat, or declining</li>
+          <li><strong>Zone Width</strong> &mdash; tighter entry zones are rewarded; very wide zones are less precise</li>
+        </ul>
+        <div class="rev-help-rule">
+          <span class="chip good">Score 75+</span>&nbsp;High confidence &nbsp;&nbsp;
+          <span class="chip warn">Score 60+</span>&nbsp;Moderate &nbsp;&nbsp;
+          <span class="chip muted">No score</span>&nbsp;Didn't pass minimum criteria (e.g. &lt;3 cycles or WR &lt;50%)
+        </div>
+        <p style="margin-top:10px"><strong>Eligibility:</strong> A stock is <em>eligible</em> when it passes all minimum criteria: &ge;3 clean cycles, win rate &ge;50%, &ge;2 years of data, and a dividend frequency of Quarterly, Semi-Annual, or Monthly (Annual and Irregular are excluded by default). Tail risk SEVERE also blocks eligibility. Stocks failing any gate have no potential score and cannot be assigned To Keep, though they may still appear in Worth Watching if their zone hit rate or growth signal is strong enough.</p>
+        <p style="margin-top:8px"><strong>Data depth matters as much as win rate:</strong> A stock with 90% WR across 3 cycles scores lower than one with 70% WR across 15 cycles, because a small sample can simply be lucky. The Clean Cycles and Years of Data factors penalise thin histories so that confidence reflects how much evidence is actually behind the number.</p>
+        <hr class="rev-help-divider">
+        <h4>How it&rsquo;s calculated</h4>
+        <p>The score is a <strong>weighted average</strong> of 8 sub-scores. Each factor is independently normalised to 0&ndash;100, then combined using these weights:</p>
+        <div class="rev-help-rule" style="font-family:monospace;font-size:11px;line-height:2">Win Rate          &nbsp;28%&nbsp; &mdash; foundation of the signal<br>Clean Cycles      &nbsp;18%&nbsp; &mdash; data volume; more cycles = tighter zone<br>Timing            &nbsp;14%&nbsp; &mdash; RELIABLE=100, BIMODAL=72, UNRELIABLE=20<br>Years of Data     &nbsp;10%&nbsp; &mdash; track record length<br>Tail Risk         &nbsp;10%&nbsp; &mdash; inverted; LOW=100, MODERATE=82, CAUTION=60, HIGH=30, SEVERE=0<br>Frequency         &nbsp;10%&nbsp; &mdash; Quarterly=100, Semi-Annual=95, Monthly=82, Annual=60&dagger;, Irregular=20&dagger;<br>Dividend Trend    &nbsp; 5%&nbsp; &mdash; Rising=100, Stable=80, Declining=30<br>Zone Width        &nbsp; 5%&nbsp; &mdash; &le;3%&rarr;100 / &le;5%&rarr;88 / &le;8%&rarr;68 / &le;12%&rarr;45 / &gt;12%&rarr;20<br><span style="color:var(--mu)">&dagger; Annual and Irregular stocks are excluded from eligibility by the default frequency gate &mdash; these sub-score values do not appear in practice for eligible stocks.</span></div>
+        <p style="margin-top:8px">Continuous factors are normalised on fixed ranges:</p>
+        <div class="rev-help-rule" style="font-family:monospace;font-size:11px;line-height:2">Win Rate:      35% &rarr; sub-score 0 &nbsp;&nbsp;|&nbsp;&nbsp; 80% &rarr; sub-score 100<br>Clean Cycles:   2  &rarr; sub-score 0 &nbsp;&nbsp;|&nbsp;&nbsp; 10  &rarr; sub-score 100<br>Years of Data:  1y &rarr; sub-score 0 &nbsp;&nbsp;|&nbsp;&nbsp;  8y &rarr; sub-score 100</div>
+        <p style="margin-top:8px">Because each factor is capped at 100, a perfect win rate can&rsquo;t compensate for a thin history &mdash; every factor must be reasonably strong to push the total into the 75+ range.</p>
       </div>
 
-      <hr class="rev-help-divider">
-
-      <h4>Zone Hit Rate</h4>
-      <p>The percentage of historical cycles where price actually fell <em>into</em> the projected entry zone at some point before ex-dividend. A 0% zone hit means the entry zone exists on paper but price has never reached it in practice &mdash; so there is rarely a chance to buy at the target price even if the pattern looks strong.</p>
-      <div class="rev-help-rule">
-        <span class="chip good">60%+</span>&nbsp;Frequently reachable &nbsp;&nbsp;
-        <span class="chip warn">30–59%</span>&nbsp;Occasionally reachable &nbsp;&nbsp;
-        <span class="chip bad">1–15%</span>&nbsp;Rarely reachable &rarr; Worth Watching <em>only if</em> quality signal present (score &ge;65, Improving, or avg gain &ge;6%) &nbsp;&nbsp;
-        <span class="chip bad">0%</span>&nbsp;Worth Watching if score &ge;70, Improving, growth &ge;15% with score &ge;65, or currently Inside; otherwise To Remove
+      <div class="rev-help-panel" data-tab="winrate">
+        <h4>Win Rate (WR)</h4>
+        <p>The percentage of clean historical cycles where the cycle had a meaningful dip and recovery &mdash; specifically, where the closing price just before ex-dividend was at least 3% above the cycle low. Only non-degenerate cycles are counted so outlier setups don&rsquo;t skew the rate.</p>
+        <div class="rev-help-rule">
+          <span class="chip good">70%+</span>&nbsp;Strong &nbsp;&nbsp;
+          <span class="chip warn">50&ndash;69%</span>&nbsp;Moderate &nbsp;&nbsp;
+          <span class="chip bad">&lt;50%</span>&nbsp;Below threshold (not eligible)
+        </div>
+        <p style="margin-top:10px"><strong>How a cycle is counted as a win:</strong> The cycle low must be at least 3% below the closing price just before ex-dividend. This is the <em>3% rebound hurdle</em> &mdash; formula: <code>(prev_dp &minus; low_px) / low_px &times; 100 &gt; 3.0</code>. It confirms a genuine dip-and-recovery occurred, and that buying near the cycle low would have yielded a return of at least 3% before the ex-dividend date. Cycles where price barely moved score as losses. <strong>Zone Hit Rate</strong> separately tracks whether price fell <em>into</em> the projected entry zone &mdash; that is a different question from whether the cycle's rebound was large enough to meet the 3% hurdle.</p>
+        <p style="margin-top:8px"><strong>What a &ldquo;clean cycle&rdquo; is:</strong> A cycle is excluded (marked degenerate) when it shows extreme outlier behaviour &mdash; for example, a drawdown so severe it dwarfs every other cycle, or an anomalous dividend payout that distorts the pattern. Degenerate cycles are still visible in the drill-down view but are excluded from win rate and score calculations so that one crisis event doesn&rsquo;t permanently distort the signal.</p>
+        <p style="margin-top:8px"><strong>Hard gate:</strong> A win rate below 50% makes a stock ineligible regardless of all other factors. A setup that historically loses more than it wins is not a buy signal at any score level.</p>
       </div>
-      <p style="margin-top:8px">The 15% boundary is the practical execution floor: below this, the entry zone is visited in roughly 1-in-7 cycles or fewer &mdash; so even a strong win rate has limited trading value because entries are too rare to act on systematically.</p>
-      <p style="margin-top:8px"><strong>Steady climbers:</strong> When a stock trends upward consistently, its current price sits above the historical entry zone &mdash; the pre-dividend dip still occurs but is no longer deep enough to reach a zone calibrated on older, lower prices. A 0% zone hit combined with 15%&plus; 5yr price growth is more likely a sign of strength (rising price left the zone behind) than a broken pattern. These stocks go to Worth Watching rather than Remove. The 15% floor is intentional: over 5 years, 15% total price appreciation equals ~2.85% per year &mdash; meaningfully above Singapore&rsquo;s average CPI of ~2&ndash;3%, confirming real upward momentum rather than inflation drift. A growth gate without a quality floor would catch rising stocks regardless of their dividend fundamentals; the score &ge;65 requirement ensures you are monitoring a stock with <em>both</em> upward price momentum <em>and</em> a decent dividend cycle &mdash; a candidate worth waiting for a pullback on.</p>
 
-      <hr class="rev-help-divider">
+      <div class="rev-help-panel" data-tab="zonehit">
+        <h4>Zone Hit Rate</h4>
+        <p>The percentage of historical cycles where price actually fell <em>into</em> the projected entry zone at some point before ex-dividend. A 0% zone hit means the entry zone exists on paper but price has never reached it in practice &mdash; so there is rarely a chance to buy at the target price even if the pattern looks strong.</p>
+        <div class="rev-help-rule">
+          <span class="chip good">60%+</span>&nbsp;Frequently reachable &nbsp;&nbsp;
+          <span class="chip warn">30&ndash;59%</span>&nbsp;Occasionally reachable &nbsp;&nbsp;
+          <span class="chip bad">1&ndash;15%</span>&nbsp;Rarely reachable &rarr; Worth Watching <em>only if</em> quality signal present (score &ge;65, Improving, or avg gain &ge;6%) &nbsp;&nbsp;
+          <span class="chip bad">0%</span>&nbsp;Worth Watching if score &ge;70, Improving, growth &ge;15% with score &ge;65, or currently Inside; otherwise To Remove
+        </div>
+        <p style="margin-top:8px">The 15% boundary is the practical execution floor: below this, the entry zone is visited in roughly 1-in-7 cycles or fewer &mdash; so even a strong win rate has limited trading value because entries are too rare to act on systematically.</p>
+        <p style="margin-top:8px"><strong>Steady climbers:</strong> When a stock trends upward consistently, its current price sits above the historical entry zone &mdash; the pre-dividend dip still occurs but is no longer deep enough to reach a zone calibrated on older, lower prices. A 0% zone hit combined with 15%&plus; 5yr price growth is more likely a sign of strength (rising price left the zone behind) than a broken pattern. These stocks go to Worth Watching rather than Remove. The 15% floor is intentional: over 5 years, 15% total price appreciation equals ~2.85% per year &mdash; meaningfully above Singapore&rsquo;s average CPI of ~2&ndash;3%, confirming real upward momentum rather than inflation drift. A growth gate without a quality floor would catch rising stocks regardless of their dividend fundamentals; the score &ge;65 requirement ensures you are monitoring a stock with <em>both</em> upward price momentum <em>and</em> a decent dividend cycle &mdash; a candidate worth waiting for a pullback on.</p>
+        <hr class="rev-help-divider">
+        <h4>How it&rsquo;s calculated</h4>
+        <p>The rate is computed as a <strong>walk-forward replay</strong>, not a hindsight calculation. The script iterates through all clean cycles in chronological order and, for each cycle, rebuilds the entry zone using <em>only the cycles that came before it</em> &mdash; exactly the information available at that point in real time.</p>
+        <p style="margin-top:8px">The first 3 clean cycles are always skipped because at least 3 preceding data points are needed to form a meaningful zone. From cycle 4 onward:</p>
+        <ul>
+          <li>Collect the dip depths from the last 5 preceding clean cycles</li>
+          <li>Winsorise at the 5th/95th percentile to blunt one-off crashes</li>
+          <li>Take percentile bounds scaled to sample size: 10/90 for &ge;8 cycles, 20/80 for &ge;5, 30/70 for &ge;3</li>
+          <li>Anchor the zone from the ex-dividend adjusted price of the most recent prior ex-div event</li>
+          <li>Test: did the actual cycle low land inside the zone?</li>
+        </ul>
+        <div class="rev-help-rule" style="font-family:monospace;font-size:11px;line-height:2">Cycle 1 &rarr; skip (not enough history)<br>Cycle 2 &rarr; skip<br>Cycle 3 &rarr; skip<br>Cycle 4 &rarr; zone from cycles 1&ndash;3 &rarr; did low hit? &#10003;/&#10007;<br>Cycle 5 &rarr; zone from cycles 1&ndash;4 &rarr; did low hit? &#10003;/&#10007;<br>Cycle 6 &rarr; zone from cycles 2&ndash;5 &rarr; did low hit? &#10003;/&#10007;<br><span style="color:var(--mu)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(capped at last 5 once enough history exists)</span></div>
+        <p style="margin-top:8px"><strong>Zone Hit Rate = hits &divide; total tested cycles</strong></p>
+        <p style="margin-top:8px">This answers the practical question: <em>if you had been running this system in real time, how often would you have actually gotten a valid entry?</em> A mathematically neat zone that history never touched is not actionable.</p>
+      </div>
 
-      <h4>Pattern Stability</h4>
-      <p>Measures whether the dividend cycle behaviour is becoming more or less consistent over time. Each cycle gets a consistency score based on how closely its timing, dip depth, and rebound match the stock's historical median. The trend of those scores over time produces the verdict.</p>
-      <ul>
-        <li><strong style="color:var(--gn)">Improving</strong> &mdash; recent cycles are more consistent; pattern is strengthening</li>
-        <li><strong>Stable</strong> &mdash; cycles conform to historical norms; no significant drift</li>
-        <li><strong style="color:var(--rd)">Degrading</strong> &mdash; recent cycles show shifting timing or dip depth; the predictable pattern is weakening. Eligible stocks with a degrading verdict go to <em>Worth Watching</em> rather than To Keep</li>
-      </ul>
+      <div class="rev-help-panel" data-tab="stability">
+        <h4>Pattern Stability</h4>
+        <p>Measures whether the dividend cycle behaviour is becoming more or less consistent over time. Each cycle gets a consistency score based on how closely its timing, dip depth, and rebound match the stock's historical median. The trend of those scores over time produces the verdict.</p>
+        <ul>
+          <li><strong style="color:var(--gn)">Improving</strong> &mdash; recent cycles are more consistent; pattern is strengthening</li>
+          <li><strong>Stable</strong> &mdash; cycles conform to historical norms; no significant drift</li>
+          <li><strong style="color:var(--rd)">Degrading</strong> &mdash; recent cycles show shifting timing or dip depth; the predictable pattern is weakening. Eligible stocks with a degrading verdict go to <em>Worth Watching</em> rather than To Keep</li>
+        </ul>
+        <p style="margin-top:10px"><strong>How the consistency score works:</strong> Each cycle is scored on three dimensions &mdash; how closely its timing matches the historical median window, how close its dip depth is to the median dip, and how closely its recovery matches the median rebound. A cycle that dips in the expected month, to roughly the expected depth, and recovers by the expected amount scores well. One that dips three months early, overshoots dramatically, and barely recovers scores poorly.</p>
+        <p style="margin-top:8px"><strong>The verdict comes from the trend</strong>, not any single cycle. Improving means recent cycles are conforming more closely than older ones &mdash; the pattern is sharpening. Degrading means recent cycles are drifting away from historical norms.</p>
+        <p style="margin-top:8px"><strong>Why Degrading goes to Watch, not Remove:</strong> A degrading pattern doesn&rsquo;t mean the stock is broken. It means the predictable behaviour is weakening. The stock stays monitored so you can see if it stabilises or the zone recalibrates after a few more cycles. It&rsquo;s a caution flag, not a disqualification.</p>
+        <hr class="rev-help-divider">
+        <h4>How it&rsquo;s calculated</h4>
+        <p><strong>Step 1 &mdash; per-cycle consistency score (0&ndash;100):</strong> every cycle from position 4 onward receives a score on three proximity dimensions, using medians derived from clean cycles as the reference. Both clean and non-clean cycles are scored (non-clean scores appear in the drill-down table), but only <em>clean</em> cycle scores feed the verdict regression in Step 2.</p>
+        <p style="margin-top:4px">Each proximity dimension is 1.0 when the cycle matched the clean-series median exactly and 0.0 when it deviated by the full size of the median:</p>
+        <div class="rev-help-rule" style="font-family:monospace;font-size:11px;line-height:2">Timing proximity    &nbsp;(40%)&nbsp; &mdash; weeks before ex-div vs series median<br>Dip depth proximity &nbsp;(40%)&nbsp; &mdash; % dip vs series median dip<br>Rebound proximity   &nbsp;(20%)&nbsp; &mdash; recovery magnitude vs series median<br><br>Score = (timing&times;0.4 + dip&times;0.4 + rebound&times;0.2) &times; 100<br><span style="color:var(--mu)">First 3 cycles always skipped (too few preceding cycles to form a median)</span></div>
+        <p style="margin-top:8px"><strong>Step 2 &mdash; verdict from the score sequence:</strong> a linear regression is run over the sequence of per-cycle scores. The verdict requires <em>both</em> conditions to be met simultaneously:</p>
+        <div class="rev-help-rule" style="line-height:2">
+          <strong style="color:var(--rd)">Degrading</strong> &nbsp;&mdash;&nbsp; regression slope &lt; &minus;5 <em>AND</em> recent 3-cycle avg &lt; 60<br>
+          <strong style="color:var(--gn)">Improving</strong> &nbsp;&mdash;&nbsp; regression slope &gt; +5 <em>AND</em> recent 3-cycle avg &gt; 70<br>
+          <strong>Stable</strong> &nbsp;&mdash;&nbsp; everything else
+        </div>
+        <p style="margin-top:8px">Requiring both a slope threshold and a recent-average threshold prevents one unusual cycle from flipping the verdict. A falling slope with a still-strong recent average is not yet Degrading; a rising slope with a still-weak recent average is not yet Improving.</p>
+      </div>
 
-      <hr class="rev-help-divider">
+      <div class="rev-help-panel" data-tab="calendar">
+        <h4>Calendar</h4>
+        <p>How consistently the stock's seasonal entry window falls in the same months each year. A tight calendar is more predictable; a wide or inconsistent one is harder to time.</p>
+        <ul>
+          <li><strong>Consistent</strong> &mdash; entry window falls in a narrow seasonal band every year</li>
+          <li><strong>Moderate</strong> &mdash; some spread across the year, but still has a seasonal lean</li>
+          <li><strong>Wide</strong> &mdash; entry window shifts significantly year to year; harder to anticipate</li>
+        </ul>
+        <p style="margin-top:10px"><strong>What the entry window is:</strong> The calendar months when price historically dips before ex-dividend. Consistent means the same 1&ndash;2 month window repeats each year &mdash; you can plan in advance when to watch. Wide means the dip might arrive in January one year and July the next &mdash; the pattern exists, but you can&rsquo;t block out a specific watching period.</p>
+        <hr class="rev-help-divider">
+        <h4>How it&rsquo;s calculated</h4>
+        <p>The rating is based on the <strong>day-of-year spread</strong> across all historical cycle lows. Each cycle low is mapped to its calendar day of year (1&ndash;365), then the <em>smallest circular window</em> covering all the lows is measured. The calendar is treated like a clock face &mdash; December 31 and January 1 are neighbours, not opposites. Without this, a stock with a tight Dec/Jan window would be severely misrated:</p>
+        <div class="rev-help-rule" style="font-family:monospace;font-size:11px;line-height:2">Dec 28 &rarr; day 362 &nbsp;&nbsp; Jan 5 &rarr; day 5<br>Simple max&minus;min: 362 &minus; 5 = <strong>357 days &rarr; Wide</strong> &nbsp;(wrong)<br>Circular window: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>&nbsp;~8 days &rarr; Consistent</strong> &nbsp;(correct)</div>
+        <p style="margin-top:8px">For the typical case where all lows fall within the same half of the year, both methods give the same result. Example:</p>
+        <div class="rev-help-rule" style="font-family:monospace;font-size:11px;line-height:2">Cycle 1 low: 15 Mar &rarr; day 74<br>Cycle 2 low: &nbsp;5 Apr &rarr; day 95<br>Cycle 3 low: 22 Mar &rarr; day 81<br>Cycle 4 low: 30 Mar &rarr; day 89<br><br>Spread: 21 days &rarr; <strong>Consistent</strong></div>
+        <div class="rev-help-rule" style="line-height:2;margin-top:8px">Spread &le;&nbsp; 60 days &nbsp;(&asymp; 2 months) &rarr; <strong>Consistent</strong><br>Spread &le; 120 days &nbsp;(&asymp; 4 months) &rarr; <strong>Moderate</strong><br>Spread &gt; 120 days &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&rarr; <strong>Wide</strong></div>
+        <p style="margin-top:8px">The modal window label (e.g. &ldquo;Sep/Oct window&rdquo;) is derived separately &mdash; it is the shortest set of months that covers at least 60% of historical cycle lows, giving you a practical watching period even for Moderate-rated stocks.</p>
+        <hr class="rev-help-divider">
+        <h4>Frequency</h4>
+        <p>How often the company pays dividends. More frequent dividends mean more historical cycles to analyze, which makes the potential score more statistically reliable.</p>
+        <ul>
+          <li><strong style="color:var(--gn)">Quarterly / Monthly</strong> &mdash; 4&ndash;12 cycles per year; most data</li>
+          <li><strong>Semi-Annual</strong> &mdash; 2 cycles per year</li>
+          <li><strong style="color:var(--mu)">Annual / Irregular</strong> &mdash; 1 or fewer predictable cycles per year; fewer data points</li>
+        </ul>
+        <p style="margin-top:10px"><strong>Why it matters for reliability:</strong> More dividends per year means more clean cycles over the same number of years. A quarterly payer accumulates roughly 40 cycles in 10 years; an annual payer accumulates only 10. Percentile bounds and winsorisation are more stable with 40 data points &mdash; the zone is tighter and less influenced by any single unusual year. By default, only Quarterly, Semi-Annual, and Monthly payers are eligible &mdash; Annual and Irregular frequencies are excluded from the eligibility gate because the thin cycle history makes the zone statistically unreliable.</p>
+        <p style="margin-top:8px"><strong>Why Monthly scores below Quarterly in the potential score:</strong> Monthly payers distribute their annual dividend yield across 12 payments instead of 4, so each individual dividend is smaller. A smaller dividend per event means a shallower pre-ex-div dip &mdash; the price barely moves before each payment, making individual cycles harder to enter and exit for a meaningful return. Monthly payers still score above Semi-Annual because they generate more data points, but the reduced trade amplitude per cycle is penalised relative to Quarterly, where each payment is large enough to produce a clear, actionable dip.</p>
+      </div>
 
-      <h4>Calendar</h4>
-      <p>How consistently the stock's seasonal entry window falls in the same months each year. A tight calendar is more predictable; a wide or inconsistent one is harder to time.</p>
-      <ul>
-        <li><strong>Consistent</strong> &mdash; entry window falls in a narrow seasonal band every year</li>
-        <li><strong>Moderate</strong> &mdash; some spread across the year, but still has a seasonal lean</li>
-        <li><strong>Wide</strong> &mdash; entry window shifts significantly year to year; harder to anticipate</li>
-      </ul>
-
-      <hr class="rev-help-divider">
-
-      <h4>Frequency</h4>
-      <p>How often the company pays dividends. More frequent dividends mean more historical cycles to analyze, which makes the potential score more statistically reliable.</p>
-      <ul>
-        <li><strong style="color:var(--gn)">Quarterly / Monthly</strong> &mdash; 4&ndash;12 cycles per year; most data</li>
-        <li><strong>Semi-Annual</strong> &mdash; 2 cycles per year</li>
-        <li><strong style="color:var(--mu)">Annual / Irregular</strong> &mdash; 1 or fewer predictable cycles per year; fewer data points</li>
-      </ul>
-
-      <hr class="rev-help-divider">
-
-      <h4>Auto-Assignment Logic</h4>
-      <div class="rev-help-rule">
-        <strong>To Keep</strong> &mdash; eligible + zone hit &gt; 15% + pattern not Degrading<br>
-        <strong style="color:#c9a227">Worth Watching</strong> &mdash; any of:<br>
-        <span style="padding-left:12px;display:block">· Eligible + zone hit &gt; 15% + Degrading (good entry access, weakening pattern)</span>
-        <span style="padding-left:12px;display:block">· Eligible + zone hit 1&ndash;15% + quality signal (score &ge;65, Improving, or avg gain &ge;6%)</span>
-        <span style="padding-left:12px;display:block">· Eligible + zone hit 0% + strong signal (score &ge;70, Improving, growth &ge;15% with score &ge;65, or currently Inside)</span>
-        <span style="padding-left:12px;display:block">· Not eligible + zone hit &ge; 50% + win rate &ge; 65% (strong execution, structural gap)</span>
-        <span style="padding-left:12px;display:block">· Not eligible + 5yr growth &ge; 25% with some zone activity (healthy business, monitor)</span>
-        <span style="display:block;margin-top:4px;margin-bottom:4px;font-style:italic;color:var(--mu)">Quality floors (score &ge;65 / &ge;70) are set above the eligibility pass mark because a monitoring slot has a cost &mdash; a weak setup that never provides entry is noise, not a genuine candidate.</span>
-        <strong>To Remove</strong> &mdash; everything else<br>
-        <span style="display:block;margin-top:6px">Use the buttons on each card to override. Overrides are saved and shown as <em>(manually moved)</em>.</span>
+      <div class="rev-help-panel" data-tab="logic">
+        <h4>Auto-Assignment Logic</h4>
+        <p style="margin-bottom:8px"><strong>Eligible</strong> means the stock passed all minimum criteria: &ge;3 clean cycles, win rate &ge;50%, &ge;2 years of data, dividend frequency is Quarterly/Semi-Annual/Monthly (Annual and Irregular excluded by default), and tail risk is not SEVERE. Failing any gate removes the potential score. An ineligible stock can still appear in Worth Watching if its zone hit rate or growth signal is strong enough, but it cannot be assigned To Keep.</p>
+        <div class="rev-help-rule">
+          <strong>To Keep</strong> &mdash; eligible + zone hit &gt; 15% + pattern not Degrading<br>
+          <strong style="color:#c9a227">Worth Watching</strong> &mdash; any of:<br>
+          <span style="padding-left:12px;display:block">· Eligible + zone hit &gt; 15% + Degrading (good entry access, weakening pattern)</span>
+          <span style="padding-left:12px;display:block">· Eligible + zone hit 1&ndash;15% + quality signal (score &ge;65, Improving, or avg gain &ge;6%)</span>
+          <span style="padding-left:12px;display:block">· Eligible + zone hit 0% + strong signal (score &ge;70, Improving, growth &ge;15% with score &ge;65, or currently Inside)</span>
+          <span style="padding-left:12px;display:block">· Not eligible + zone hit &ge; 50% + win rate &ge; 65% (strong execution, structural gap)</span>
+          <span style="padding-left:12px;display:block">· Not eligible + 5yr growth &ge; 25% with some zone activity (healthy business, monitor)</span>
+          <span style="display:block;margin-top:4px;margin-bottom:4px;font-style:italic;color:var(--mu)">Quality floors (score &ge;65 / &ge;70) are set above the eligibility pass mark because a monitoring slot has a cost &mdash; a weak setup that never provides entry is noise, not a genuine candidate.</span>
+          <strong>To Remove</strong> &mdash; everything else<br>
+          <span style="display:block;margin-top:6px">Use the buttons on each card to override. Overrides are saved and shown as <em>(manually moved)</em>.</span>
+        </div>
       </div>
     </div>
   </div>`;
@@ -6832,6 +6898,14 @@ function renderOverviewView(){
   });
   document.getElementById("reviewHelpModal")?.addEventListener("click",e=>{
     if(e.target===e.currentTarget)e.currentTarget.style.display="none";
+  });
+  document.querySelectorAll("#reviewHelpModal .rev-help-tab").forEach(tab=>{
+    tab.addEventListener("click",()=>{
+      document.querySelectorAll("#reviewHelpModal .rev-help-tab").forEach(t=>t.classList.remove("active"));
+      document.querySelectorAll("#reviewHelpModal .rev-help-panel").forEach(p=>p.classList.remove("active"));
+      tab.classList.add("active");
+      document.querySelector(`#reviewHelpModal .rev-help-panel[data-tab="${tab.dataset.tab}"]`).classList.add("active");
+    });
   });
   document.getElementById("plannerExportCsv")?.addEventListener("click",e=>{
     e.preventDefault();
