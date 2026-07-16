@@ -11,11 +11,16 @@ body{margin:0;background:radial-gradient(circle at top right,rgba(79,142,247,.14
 /* TOPBAR */
 .topbar{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 20px 14px;background:linear-gradient(180deg,rgba(16,20,32,.97),rgba(16,20,32,.92));backdrop-filter:blur(14px);border-bottom:1px solid rgba(79,142,247,.18);box-shadow:0 10px 30px rgba(0,0,0,.18)}
 /* PROGRESS BAR */
-#loadProgressWrap{position:absolute;bottom:0;left:0;width:100%;height:3px;overflow:hidden;opacity:0;transition:opacity .2s}
+#loadProgressWrap{position:absolute;bottom:0;left:0;width:100%;height:4px;overflow:hidden;opacity:0;transition:opacity .2s}
 #loadProgressWrap.active{opacity:1}
 #loadProgressBar{height:100%;width:0%;background:linear-gradient(90deg,#4f8ef7,#7bb3ff);border-radius:0 2px 2px 0;transition:width .25s ease}
 #loadProgressBar.indeterminate{width:40%!important;animation:progressSweep 1.4s ease-in-out infinite}
 @keyframes progressSweep{0%{transform:translateX(-110%)}60%{transform:translateX(220%)}100%{transform:translateX(220%)}}
+#loadProgressPill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--fg);box-shadow:0 2px 12px rgba(0,0,0,.18);display:none;align-items:center;gap:8px;z-index:9999;white-space:nowrap}
+#loadProgressPill.active{display:flex}
+#loadProgressPillBar{width:80px;height:6px;background:var(--sf);border-radius:3px;overflow:hidden;flex-shrink:0}
+#loadProgressPillFill{height:100%;width:0%;background:linear-gradient(90deg,#4f8ef7,#7bb3ff);border-radius:3px;transition:width .25s ease}
+@media(min-width:641px){#loadProgressWrap{height:4px}#loadProgressPill{display:none!important}}
 .topbar-brand{display:flex;align-items:center;gap:0;min-width:0}
 .topbar-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
 .topbar-title{font-size:16px;font-weight:700;letter-spacing:.01em;color:#f2f6ff;white-space:nowrap}
@@ -66,6 +71,12 @@ input[type=file]{display:none}
 .modal-card::-webkit-scrollbar-thumb:hover,.registry-master-menu::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4f8ef7,#2b4c75)}
 .registry-actions{grid-column:1/-1;display:flex;align-items:center;justify-content:flex-start;gap:12px;flex-wrap:wrap}
 .registry-toggle-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.reg-pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;border:none;cursor:default;white-space:nowrap}
+.reg-pill-active{background:rgba(72,199,142,.18);color:#48c78e;border:1px solid rgba(72,199,142,.35);cursor:pointer}
+.reg-pill-active:hover{background:rgba(72,199,142,.3)}
+.reg-pill-monitor{background:rgba(155,184,234,.12);color:var(--mu);border:1px solid rgba(155,184,234,.2);cursor:pointer}
+.reg-pill-monitor:hover{background:rgba(155,184,234,.22)}
+.reg-pill-index{background:rgba(255,193,70,.12);color:#ffc146;border:1px solid rgba(255,193,70,.25)}
 .registry-check{display:inline-flex;align-items:center;gap:8px;height:auto;padding:0;color:var(--tx);font-size:12px;white-space:nowrap}
 .registry-inline-note{grid-column:1/-1;margin:-2px 0 4px;color:var(--mu);font-size:11px;line-height:1.5}
 .registry-helper-note{grid-column:1/-1;margin:-4px 0 2px;color:var(--mu);font-size:11px;line-height:1.5}
@@ -74,6 +85,16 @@ input[type=file]{display:none}
 .registry-selection-note{grid-column:1/-1;color:#9bb8ea;font-size:11px;line-height:1.5}
 .registry-row-actions{display:flex;justify-content:flex-start;gap:8px}
 .registry-note{margin-top:12px;color:var(--mu);font-size:12px}
+.registry-summary{font-size:11px;color:var(--mu);margin-top:3px}
+.registry-tabs-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.registry-tabs{display:flex;gap:4px;flex-shrink:0}
+.registry-tab{padding:5px 14px;border-radius:8px;border:1px solid var(--bd);background:transparent;color:var(--mu);font-size:12px;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,color .15s}
+.registry-tab:hover{background:rgba(255,255,255,.06)}
+.registry-tab.is-active{background:rgba(79,142,247,.15);border-color:rgba(79,142,247,.4);color:#9bb8ea}
+#registryTableSearch{flex:1;min-width:120px;padding:6px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:12px}
+#registryTableSearch:focus{outline:none;border-color:#4f8ef7;box-shadow:0 0 0 3px rgba(79,142,247,.14)}
+.table-wrap.registry-table{max-height:380px;overflow:auto}
+#saveRegistryBtn.has-changes{background:#c8962a;color:#000}
 .registry-form #saveRegistryEntryBtn{white-space:nowrap;min-width:104px}
 @media(max-width:980px){.registry-form{grid-template-columns:1fr 1fr}.registry-form .btn{width:100%}}
 @media(max-width:760px){
@@ -140,6 +161,7 @@ input[type=file]{display:none}
 .cd-recent{font-size:11px;padding:3px 8px;border-color:#1e3a5f;background:#0d1f35;color:#7ab0e8}
 .chip.good{border-color:#1e5040;background:#0e2e24;color:var(--gn)}
 .chip.warn{border-color:#5a4010;background:#2e2008;color:var(--am)}
+.date-wide{font-size:10px;color:var(--am);margin-left:3px;font-style:italic}
 .chip.bad{border-color:#5a2020;background:#2e1010;color:var(--rd)}
 .chip.asset-type{border-color:#35507c;background:rgba(79,142,247,.10);color:#c9dcff}
 .mini-card-meta{margin-top:2px}
@@ -147,6 +169,14 @@ input[type=file]{display:none}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
 .tab{padding:8px 14px;border:1px solid var(--bd);border-radius:999px;background:var(--sf);color:var(--mu);cursor:pointer;font-size:13px}
 .tab.active{color:#fff;background:#1a2b48;border-color:#3f6090}
+.tab:hover:not(.active){background:rgba(255,255,255,.07);color:var(--tx)}
+.view-seg{display:inline-flex;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:3px;gap:2px}
+.view-seg-btn{padding:4px 14px;border:none;border-radius:6px;background:transparent;color:var(--mu);font-size:12px;cursor:pointer;transition:background .15s,color .15s}
+.view-seg-btn.active{background:#1a2b48;color:#fff;border:1px solid #3f6090}
+.view-seg-btn:hover:not(.active){background:rgba(255,255,255,.07);color:var(--tx)}
+.cfm-search{width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--sf2);color:var(--tx);font-size:12px;margin-bottom:6px}
+.cfm-search:focus{outline:none;border-color:#4f8ef7;box-shadow:0 0 0 3px rgba(79,142,247,.14)}
+.check-filter-item.cfm-hidden{display:none}
 /* HELP */
 .help{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-left:5px;border:1px solid #516b97;border-radius:50%;font-size:9px;color:#aac3ea;cursor:help;vertical-align:middle}
 /* SERIES CARDS */
@@ -348,7 +378,7 @@ input[type=file]{display:none}
 .cmp-table-wrap th.cmp-stock-head{min-width:140px}
 .table-wrap,.cmp-table-wrap{scrollbar-width:thin;scrollbar-color:#3f6090 #131724;cursor:grab;touch-action:pan-x}
 .table-wrap.dragging,.cmp-table-wrap.dragging{cursor:grabbing;user-select:none}
-.table-wrap::-webkit-scrollbar,.cmp-table-wrap::-webkit-scrollbar{height:12px;width:12px}
+.table-wrap::-webkit-scrollbar,.cmp-table-wrap::-webkit-scrollbar{height:6px;width:6px}
 .table-wrap::-webkit-scrollbar-track,.cmp-table-wrap::-webkit-scrollbar-track{background:#131724}
 .table-wrap::-webkit-scrollbar-thumb,.cmp-table-wrap::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#35537e,#22344f);border:2px solid #131724;border-radius:999px}
 .table-wrap::-webkit-scrollbar-thumb:hover,.cmp-table-wrap::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4f8ef7,#2b4c75)}
@@ -362,10 +392,19 @@ input[type=file]{display:none}
 .rev-list::-webkit-scrollbar-track{background:transparent}
 .rev-list::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#35537e,#22344f);border-radius:999px}
 .rev-list::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4f8ef7,#2b4c75)}
+.rev-sort-btn{font-size:10px;padding:2px 7px;border:1px solid var(--bd);border-radius:3px;background:transparent;color:var(--mu);cursor:pointer;line-height:1.4;transition:background .12s,color .12s}
+.rev-sort-btn:hover{background:rgba(255,255,255,.07);color:var(--tx)}
+.rev-sort-btn.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.rev-move-btn{font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--mu);cursor:pointer;white-space:nowrap;transition:background .12s,color .12s}
+.rev-move-btn:hover{background:var(--sf);color:var(--tx);border-color:#4f8ef7}
+.rev-card:hover{background:var(--sf)}
+#revSearch{width:220px;max-width:100%}
+#cmpSearch{width:100%;box-sizing:border-box;padding:6px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--sf2);color:var(--tx);font-size:12px;margin-bottom:12px}
+#cmpSearch:focus{outline:none;border-color:#4f8ef7;box-shadow:0 0 0 3px rgba(79,142,247,.14)}
 /* REVIEW HELP MODAL */
 .rev-help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
 .rev-help-modal{background:var(--bg);border:1px solid var(--bd);border-radius:12px;max-width:580px;width:100%;max-height:82vh;overflow-y:auto;padding:24px 28px 28px;position:relative;box-shadow:0 12px 48px rgba(0,0,0,.55);scrollbar-width:thin;scrollbar-color:#3f6090 transparent}
-.rev-help-modal::-webkit-scrollbar{width:5px}
+.rev-help-modal::-webkit-scrollbar{width:6px}
 .rev-help-modal::-webkit-scrollbar-thumb{background:#35537e;border-radius:999px}
 .rev-help-modal h4{font-size:13px;font-weight:700;margin:20px 0 5px;color:var(--tx);letter-spacing:.01em}
 .rev-help-modal h4:first-of-type{margin-top:0}
@@ -380,7 +419,7 @@ input[type=file]{display:none}
 .rev-help-tab.active{background:var(--ac);color:#fff;border-color:var(--ac)}
 .rev-help-panel{display:none}
 .rev-help-panel.active{display:block}
-@media(max-width:640px){.rev-list{max-height:none}.rev-col+.rev-col{border-top:2px solid var(--bd);margin-top:16px;padding-top:16px}}
+@media(max-width:640px){.rev-list{max-height:none}.rev-col+.rev-col{border-top:2px solid var(--bd);margin-top:16px;padding-top:16px}.setup-list-cols{grid-template-columns:1fr}.view-seg{display:flex;width:100%}.view-seg-btn{flex:1;text-align:center}}
 /* MINI CARDS GRID */
 .mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .mini-search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
@@ -427,6 +466,10 @@ input[type=file]{display:none}
 .setup-list-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px}
 .setup-list-col{border:1px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
 .setup-list-col-rows{overflow-y:auto;max-height:320px;scrollbar-width:thin;scrollbar-color:var(--sf2) transparent}
+.setup-list-col-rows::-webkit-scrollbar{width:6px}
+.setup-list-col-rows::-webkit-scrollbar-track{background:transparent}
+.setup-list-col-rows::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#35537e,#22344f);border-radius:999px}
+.setup-list-col-rows::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4f8ef7,#2b4c75)}
 .setup-list-col-head{padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
 .setup-list-col-subhead{display:flex;align-items:center;gap:10px;padding:5px 14px;font-size:10px;color:var(--mu);font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--bd);background:var(--sf)}
 .setup-list-col-subhead .sh-name{flex:1;min-width:0}
@@ -559,7 +602,11 @@ input[type=file]{display:none}
 .check-filter{position:relative;display:inline-flex;align-items:center}
 .check-filter-btn{padding:8px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:13px;cursor:pointer;min-width:220px;text-align:left}
 .check-filter-btn:hover,.check-filter-btn:focus{outline:none;border-color:#4f8ef7}
-.check-filter-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:260px;max-height:280px;overflow:auto;padding:10px;border:1px solid var(--bd);border-radius:12px;background:var(--sf);box-shadow:0 12px 28px rgba(0,0,0,.35);z-index:40}
+.check-filter-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:260px;max-height:280px;overflow-y:auto;overflow-x:hidden;padding:10px;border:1px solid var(--bd);border-radius:12px;background:var(--sf);box-shadow:0 12px 28px rgba(0,0,0,.35);z-index:40;scrollbar-width:thin;scrollbar-color:#3f6090 transparent}
+.check-filter-menu::-webkit-scrollbar{width:6px}
+.check-filter-menu::-webkit-scrollbar-track{background:transparent}
+.check-filter-menu::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#35537e,#22344f);border-radius:999px}
+.check-filter-menu::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4f8ef7,#2b4c75)}
 .check-filter-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
 .check-filter-link{padding:4px 8px;border-radius:999px;border:1px solid #304260;background:#18253d;color:#dce8ff;font-size:11px;cursor:pointer}
 .check-filter-link:hover{background:#22314d;border-color:#4f8ef7}
@@ -674,6 +721,7 @@ input[type=file]{display:none}
   </div>
   <div id="loadProgressWrap"><div id="loadProgressBar"></div></div>
 </div><!-- STOCK CHIPS BAR (shown when stocks loaded) -->
+<div id="loadProgressPill"><div id="loadProgressPillBar"><div id="loadProgressPillFill"></div></div><span id="loadProgressPillText">Loading…</span></div>
 <div class="overlay" id="quickGuideOverlay" aria-hidden="true">
   <div class="panel modal-card modal-card-compact">
     <div class="registry-head">
@@ -708,6 +756,7 @@ input[type=file]{display:none}
       <div class="registry-head-copy">
         <h2>Edit Stock List</h2>
         <p>Add or update tracked stocks here, then save the registry before running <strong>Update stock data</strong>.</p>
+        <div id="registrySummaryBadge" class="registry-summary"></div>
       </div>
       <button class="btn btn-compact" id="closeRegistryBtn" type="button">Close</button>
     </div>
@@ -721,7 +770,7 @@ input[type=file]{display:none}
       <label class="registry-field">
         <span>Stock type filter</span>
         <select id="registryMasterFilter">
-          <option value="all">Enabled only</option>
+          <option value="all">All enabled stocks</option>
           <option value="dividend">Dividend names</option>
           <option value="etf">ETFs</option>
           <option value="benchmark">Benchmarks</option>
@@ -734,14 +783,8 @@ input[type=file]{display:none}
           <option value="all">All sectors</option>
         </select>
       </label>
-      <div class="registry-picker-tools">
-        <label class="registry-check">
-          <input id="registryMultiSelect" type="checkbox">
-          <span>Enable multi-select</span>
-        </label>
-      </div>
       <div class="registry-helper-note">Stock type, sector, and role are used here to help you search and filter the master list. Sector is shown in selected views so you can keep context while scanning stocks.</div>
-      <div class="registry-selection-note" id="registrySelectionNote">Multi-select is off. Click one master stock to load it into the form.</div>
+      <div class="registry-selection-note" id="registrySelectionNote">Click one or more stocks to select them, then use Add selected.</div>
       <div class="registry-master-menu" id="masterStockMenu"></div>
       <label class="registry-field">
         <span>Stock name</span>
@@ -770,6 +813,14 @@ input[type=file]{display:none}
       </div>
       <div class="registry-inline-note"><strong>Include in analysis</strong> should stay checked for normal tracked stocks so they are included when you update stock data. Use <strong>Use as market index</strong> only for the benchmark row, such as <strong>^STI</strong>. It provides market context for the analysis and should normally be the only index entry.</div>
     </div>
+    <div class="registry-tabs-row">
+      <div class="registry-tabs">
+        <button class="registry-tab is-active" type="button" data-reg-tab="active">Active</button>
+        <button class="registry-tab" type="button" data-reg-tab="monitor">Monitor</button>
+        <button class="registry-tab" type="button" data-reg-tab="index">Index</button>
+      </div>
+      <input id="registryTableSearch" type="text" autocomplete="off" placeholder="Filter by name or ticker…">
+    </div>
     <div class="table-wrap registry-table">
       <table>
         <thead>
@@ -779,11 +830,12 @@ input[type=file]{display:none}
             <th>Sector</th>
             <th>In Analysis</th>
             <th>Market Index</th>
+            <th>Dashboard</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody id="registryTableBody">
-          <tr><td colspan="6" class="muted">Registry not loaded yet.</td></tr>
+          <tr><td colspan="7" class="muted">Registry not loaded yet.</td></tr>
         </tbody>
       </table>
     </div>
@@ -2021,6 +2073,7 @@ const BACKEND_CONFIG = {
   healthUrl:"/api/health",
   jsonFilesUrl:"/api/json-files",
   runPipelineUrl:"/api/run-pipeline",
+  runPipelineStreamUrl:"/api/run-pipeline-stream",
   stockRegistryUrl:"/api/stock-registry",
   masterStocksUrl:"/api/master-stocks",
   stockDescriptionsUrl:"/api/stock-descriptions",
@@ -2038,7 +2091,7 @@ function pctRaw(v,d=1){const x=Number(v);return Number.isFinite(x)?`${x.toFixed(
 function ccy(v,c=""){return(v===null||v===undefined)?"-":`${c?c+" ":""}${n(v,4)}`}
 function dt(v){if(!v)return"-";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString("en-GB",{year:"numeric",month:"short",day:"numeric"})}
 function dtShort(v){if(!v)return"-";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString("en-GB",{month:"short",day:"numeric"})}
-function dtClusterRange(from,center,to){if(!center)return"-";if(!from||!to||from===to)return dtShort(center);return`${dtShort(from)} – ${dtShort(to)} (best: ${dtShort(center)})`}
+function dtClusterRange(from,center,to,sdWks){if(!center)return"-";if(!from||!to||from===to){if(sdWks!=null&&sdWks>0){return`${dtShort(center)} <span class="date-wide" title="Timing spread too wide to show a date range (SD: ${sdWks.toFixed(1)}wk) — date shown is the best estimate.">±${sdWks.toFixed(1)}wk</span>`;}return dtShort(center);}return`${dtShort(from)} – ${dtShort(to)}<br><span class="date-best">best: ${dtShort(center)}</span>`}
 function clusterDominanceTag(cd){
   if(!cd||!cd.total)return"-";
   const c1=cd.cluster1_count||0,c2=cd.cluster2_count||0,dom=cd.dominant,pct=cd.dominant_pct,rp=cd.recent_primary;
@@ -2272,15 +2325,15 @@ function renderSeriesCard(s,data,m){
     <div class="series-kv" style="margin-top:12px">
       <div class="series-subhead">Forward Setup</div>
       <div>${tipLabel("Projected ex-div date","The model's estimated next ex-dividend date for this series, based on the stock's same-series interval history and forward date projection rules.")}</div><div>${dt(proj.proj_exdiv_date)}</div>
-      ${proj.est_low_date_cluster1?`<div>${tipLabel("Estimated low timing (Cluster 1)","Bimodal only. Cluster 1 = early dip — farther from ex-div date, more weeks before. Range shown is median ± 1 SD of that cluster's historical weeks-before-ex-div values. Range is omitted when SD exceeds 2 weeks.")}</div><div>${dtClusterRange(proj.est_low_date_cluster1_from,proj.est_low_date_cluster1,proj.est_low_date_cluster1_to)}</div>`:""}
-      ${proj.est_low_date_cluster2?`<div>${tipLabel("Estimated low timing (Cluster 2)","Bimodal only. Cluster 2 = late dip — closer to ex-div date, fewer weeks before. Range shown is median ± 1 SD of that cluster's historical weeks-before-ex-div values. Range is omitted when SD exceeds 2 weeks.")}</div><div>${dtClusterRange(proj.est_low_date_cluster2_from,proj.est_low_date_cluster2,proj.est_low_date_cluster2_to)}</div>`:""}
+      ${proj.est_low_date_cluster1?`<div>${tipLabel("Estimated low timing (Cluster 1)","Bimodal only. Cluster 1 = early dip — farther from ex-div date, more weeks before. Range = median ± 1 SD (population SD) of recent cluster timings. When SD ≤ 2 wks: date range shown. When SD > 2 wks: range replaced by ±Nwk badge (timing too spread to pin down). Single-point cluster: bare date only.")}</div><div>${dtClusterRange(proj.est_low_date_cluster1_from,proj.est_low_date_cluster1,proj.est_low_date_cluster1_to,proj.est_low_date_cluster1_sd_wks)}</div>`:""}
+      ${proj.est_low_date_cluster2?`<div>${tipLabel("Estimated low timing (Cluster 2)","Bimodal only. Cluster 2 = late dip — closer to ex-div date, fewer weeks before. Range = median ± 1 SD (population SD) of recent cluster timings. When SD ≤ 2 wks: date range shown. When SD > 2 wks: range replaced by ±Nwk badge (timing too spread to pin down). Single-point cluster: bare date only.")}</div><div>${dtClusterRange(proj.est_low_date_cluster2_from,proj.est_low_date_cluster2,proj.est_low_date_cluster2_to,proj.est_low_date_cluster2_sd_wks)}</div>`:""}
       ${proj.cluster_dominance?`<div>${tipLabel("Cluster dominance","How often each cluster appeared across all historical cycles, with each cluster's average historical dip depth (% from anchor price). A dominant cluster (≥75%) suggests the stock may behave like RELIABLE single-cluster timing. C1 = early dip (farther from ex-div); C2 = late dip (closer). Recent indicates which cluster prevailed in the last 3 clean cycles.")}</div><div>${clusterDominanceTag(proj.cluster_dominance)}</div>`:""}
       ${proj.cluster_track_record&&clusterTrackRecordTag(proj.cluster_track_record)?`<div>${tipLabel("Cluster track record","C1/C2 win counts from out-of-sample predictions logged before outcomes were known. Unlike historical dominance, this reflects how often each window correctly called the actual dip in live forward testing — a growing empirical check that accumulates as cycles resolve.")}</div><div>${clusterTrackRecordTag(proj.cluster_track_record)}</div>`:""}
       ${!proj.est_low_date_cluster1&&proj.est_low_date?`<div>${tipLabel("Estimated low timing","For reliable timing only. Range is the p25–p75 watch window from historical weeks-before-ex-div values; best estimate is the median.")}</div><div>${dtClusterRange(proj.est_low_date_from,proj.est_low_date,proj.est_low_date_to)}</div>`:""}
       <div>Days away</div><div class="${(daysFrom(proj.proj_exdiv_date)||999)<=45?"warn":""}">${daysFrom(proj.proj_exdiv_date)!==null?`${daysFrom(proj.proj_exdiv_date)}d`:"-"}</div>
       <div>Current price</div><div>${ccy(data.current_price,m.currency)}</div>
       <div>${tipLabel("5yr price growth","Total price return over the past 5 years (weekly close ~5 years ago vs today). Excludes dividends — capital change only. Use as a background check: consistent growth suggests a healthy business; sustained decline may mean dividends are masking capital erosion.")}</div><div class="${growthCls(m.price_growth_5yr_pct)}">${growthFmt(m.price_growth_5yr_pct)}</div>
-      <div>${tipLabel("Anchor method","The pre-dividend reference price from the most recent prior ex-div event (the closing price just before that ex-date). Displayed for reference only — the entry zone is built from the ex-dividend adjusted level: anchor minus the dividend paid, which is where the stock actually resets after the payout.")}</div>
+      <div>${tipLabel("Anchor method","The pre-dividend reference price used to anchor the forward zone. Normally taken from the most recent prior ex-div event (the closing price just before that ex-date). Falls back to the current live price if no prior ex-div cycle with a prev_dp is available. Displayed for reference only — the entry zone is built from the ex-dividend adjusted level: anchor minus the dividend paid, which is where the stock actually resets after the payout.")}</div>
       <div><div>${esc(anchorSourceLabel)}</div><div class="small muted">Anchor ref (pre-div) ${ccy(proj.anchor,m.currency)}</div></div>
 
       <div>${tipLabel("Entry zone","The projected buy range. Built from the ex-dividend adjusted anchor (anchor price minus the dividend paid), which is where the stock theoretically resets on ex-div date. Dip percentiles from clean historical cycles are applied to that adjusted level.")}</div>
@@ -3396,9 +3449,11 @@ function panelPriceHTML(){
     <div class="date-range-row">
       <label>From <input type="date" id="priceFrom"></label>
       <label>To <input type="date" id="priceTo"></label>
+      <button class="preset-btn" id="pricePreset6M">6M</button>
       <button class="preset-btn" id="pricePreset1Y">1Y</button>
       <button class="preset-btn" id="pricePreset2Y">2Y</button>
       <button class="preset-btn" id="pricePreset3Y">3Y</button>
+      <button class="preset-btn" id="pricePreset5Y">5Y</button>
       <button class="preset-btn" id="pricePresetAll">All</button>
     </div>
     <div class="spark-wrap">
@@ -3412,7 +3467,7 @@ function panelPriceHTML(){
       <span><i style="background:#00e5ff"></i>Cycle low</span>
       <span><i style="background:#ff6b35"></i>Cycle peak</span>
     </div>
-    <div class="section-note">Hover markers to inspect date and value. Zone band shows entry zone bot for each series, calculated from the ex-dividend adjusted anchor (anchor minus dividend paid).</div>
+    <div class="section-note">Hover markers to inspect date and value. Scroll to zoom, drag to pan. Zone band shows entry zone bot for each series, calculated from the ex-dividend adjusted anchor (anchor minus dividend paid).</div>
   </div>`
 }
 
@@ -3538,21 +3593,88 @@ function renderPriceChart(data){
   if(toEl)toEl.oninput=()=>renderPriceChart(_priceChartData);
 
   // preset buttons — set From to N years back from the last data date, keep To at max
-  const _setPreset=(years)=>{
-    const endVal=allDates[allDates.length-1]||"";
-    if(!endVal)return;
-    if(toEl)toEl.value=endVal;
-    if(fromEl){const d=new Date(endVal);d.setFullYear(d.getFullYear()-years);fromEl.value=d.toISOString().split("T")[0]}
-    renderPriceChart(_priceChartData);
-  };
-  const _presetMap={pricePreset1Y:1,pricePreset2Y:2,pricePreset3Y:3};
-  Object.entries(_presetMap).forEach(([id,y])=>{const b=document.getElementById(id);if(b)b.onclick=()=>_setPreset(y)});
+  const _presetMap={pricePreset6M:{m:6},pricePreset1Y:{y:1},pricePreset2Y:{y:2},pricePreset3Y:{y:3},pricePreset5Y:{y:5}};
+  Object.entries(_presetMap).forEach(([id,cfg])=>{
+    const b=document.getElementById(id);
+    if(!b)return;
+    b.onclick=()=>{
+      const endVal=allDates[allDates.length-1]||"";
+      if(!endVal)return;
+      if(toEl)toEl.value=endVal;
+      if(fromEl){const d=new Date(endVal);cfg.y?d.setFullYear(d.getFullYear()-cfg.y):d.setMonth(d.getMonth()-cfg.m);fromEl.value=d.toISOString().split("T")[0];}
+      renderPriceChart(_priceChartData);
+    };
+  });
   const _allBtn=document.getElementById("pricePresetAll");
   if(_allBtn)_allBtn.onclick=()=>{
     if(fromEl)fromEl.value=allDates[0]||"";
     if(toEl)toEl.value=allDates[allDates.length-1]||"";
     renderPriceChart(_priceChartData);
   };
+  // Zoom/pan — attach once per SVG element instance
+  if(!svg.dataset.zoomPanInit){
+    svg.dataset.zoomPanInit="1";
+    const allMs=allDates.map(d=>new Date(d).getTime()).filter(Number.isFinite).sort((a,b)=>a-b);
+    const msMin=allMs[0],msMax=allMs[allMs.length-1];
+    const MIN_SPAN=28*864e5;
+    const msToStr=ms=>new Date(ms).toISOString().slice(0,10);
+    const getRange=()=>{
+      const f=fromEl?.value?new Date(fromEl.value).getTime():msMin;
+      const t=toEl?.value?new Date(toEl.value).getTime():msMax;
+      return{f,t,span:t-f};
+    };
+    const applyRange=(f,t)=>{
+      const sp=t-f;
+      if(sp<MIN_SPAN){const mid=(f+t)/2;f=mid-MIN_SPAN/2;t=mid+MIN_SPAN/2;}
+      if(f<msMin){t+=msMin-f;f=msMin;}
+      if(t>msMax){f-=t-msMax;t=msMax;}
+      if(fromEl)fromEl.value=msToStr(Math.max(msMin,f));
+      if(toEl)toEl.value=msToStr(Math.min(msMax,t));
+      renderPriceChart(_priceChartData);
+    };
+    const svgFrac=cx=>{
+      const r=svg.getBoundingClientRect();
+      const lx=pad/w*r.width,rx=(w-pad)/w*r.width;
+      return Math.max(0,Math.min(1,(cx-r.left-lx)/(rx-lx)));
+    };
+    svg.addEventListener("wheel",e=>{
+      e.preventDefault();
+      const frac=svgFrac(e.clientX);
+      const{f,t,span}=getRange();
+      const pivot=f+frac*span;
+      const nSpan=Math.max(MIN_SPAN,Math.min(msMax-msMin,span*(e.deltaY>0?1.3:1/1.3)));
+      applyRange(pivot-frac*nSpan,pivot+(1-frac)*nSpan);
+    },{passive:false});
+    let drag=null,rafId=null,pendingX=null;
+    svg.addEventListener("mousedown",e=>{
+      if(e.button!==0)return;
+      e.preventDefault();
+      const{f,t,span}=getRange();
+      const r=svg.getBoundingClientRect();
+      const plotPx=(w-pad*2)/w*r.width;
+      drag={x:e.clientX,f,t,msPx:span/Math.max(1,plotPx)};
+      svg.dataset.dragging="1";
+      svg.style.cursor="grabbing";
+    });
+    window.addEventListener("mousemove",e=>{
+      if(!drag)return;
+      pendingX=e.clientX;
+      if(rafId)return;
+      rafId=requestAnimationFrame(()=>{
+        rafId=null;
+        if(!drag||pendingX==null)return;
+        const shift=(drag.x-pendingX)*drag.msPx;
+        applyRange(drag.f+shift,drag.t+shift);
+      });
+    });
+    window.addEventListener("mouseup",()=>{
+      if(!drag)return;
+      drag=null;rafId=null;pendingX=null;
+      const el=document.getElementById("priceSvg");
+      if(el){delete el.dataset.dragging;el.style.cursor="grab";}
+    });
+  }
+  if(!svg.dataset.dragging)svg.style.cursor="grab";
 }
 
 /* -- TAB 7: GLOSSARY ----------------------------------------------------- */
@@ -3583,9 +3705,9 @@ function panelGlossary(){
 ["Current Verdict","Action-oriented summary of what to do now. It is separate from Potential Score. The live logic checks price vs zone first, then timing and tail risk, then whether the next cycle is near. Treat the verdict as a guideline, not a hard block: you may still act with your own judgment, sizing, and caution."],
 ["Actionable Now","Current price is inside the entry zone, or only slightly below it within about 0.5% of zone bottom, while tail risk is not High or Severe and timing is not Unreliable. The slight-below path is intentionally stricter: it only stays fully actionable when tail risk is Low or Moderate. A Caution tail profile can still remain actionable inside the zone, but not once price has already slipped slightly below it."],
 ["Small Trades Advised","Current price is inside the zone, or only slightly below it, but either tail risk is High or timing is Unreliable. Slight-below cases with a Caution tail profile also land here by design, because the setup may already be starting to overshoot the projected floor. The setup is live, but exposure should be lighter than normal."],
-["Watch Closely","Current price is above the zone but within about 3% of zone_top, and the next cycle is still within the near-term monitoring window, so it may become actionable soon."],
-["Wait","Used when price is too far above the zone, or materially below the zone and likely past the expected entry area."],
-["Watch Only","The next cycle is within the near-term monitoring window, but price is not yet in place for action."],
+["Watch Closely","Current price is above the zone but within about 3% of zone_top, and the next ex-div is within 90 days, so the setup may become actionable soon."],
+["Wait","Price is above the zone and either too far away (>3% from zone_top) or the next ex-div is more than 90 days out. Also used when price is materially below the zone and likely past the expected entry area."],
+["Watch Only","The next ex-div is within 90 days but price is not yet in position — not inside the zone, not near the top, not slightly below."],
 ["On Radar","Fallback status for structurally interesting stocks that are not yet close enough to action."],
     ["Too Risky","Triggered when tail risk is Severe. The broader pattern may still exist, but downside is too harsh for a live setup."],
     ["Trade Planner","Planning view for the nearest next cycle only. It turns the projected setup into milestone timelines for watch, dip, exit, and ex-div. Official ex-div date, official dividend amount, and planned entry price can be overridden without changing the historical ratings."],
@@ -3611,6 +3733,7 @@ function stockKey(data,filename){
 }
 
 function stockList(){return Object.values(state.stocks)}
+function activeStockList(){return stockList().filter(s=>s.data?.meta?.active!==false)}
 function persistedStocksPayload(){
   return stockList().map(entry=>({
     key:entry.key,
@@ -4519,24 +4642,40 @@ function registryAnalysisFilenames(entries){
 function showProgress(current,total){
   const wrap=document.getElementById("loadProgressWrap");
   const bar=document.getElementById("loadProgressBar");
+  const pill=document.getElementById("loadProgressPill");
+  const pillFill=document.getElementById("loadProgressPillFill");
+  const pillText=document.getElementById("loadProgressPillText");
   if(!wrap||!bar)return;
+  const pct=total>0?Math.round((current/total)*100):0;
   bar.classList.remove("indeterminate");
-  bar.style.width=(total>0?Math.round((current/total)*100):0)+"%";
+  bar.style.width=pct+"%";
   wrap.classList.add("active");
+  if(pill&&pillFill&&pillText){
+    pillFill.style.width=pct+"%";
+    pillText.textContent=total>0?`${current} / ${total} stocks (${pct}%)`:"Loading…";
+    pill.classList.add("active");
+  }
 }
 function showIndeterminateProgress(){
   const wrap=document.getElementById("loadProgressWrap");
   const bar=document.getElementById("loadProgressBar");
+  const pill=document.getElementById("loadProgressPill");
+  const pillText=document.getElementById("loadProgressPillText");
   if(!wrap||!bar)return;
   bar.classList.add("indeterminate");
   wrap.classList.add("active");
+  if(pill&&pillText){pillText.textContent="Loading…";pill.classList.add("active");}
 }
 function hideProgress(){
   const wrap=document.getElementById("loadProgressWrap");
   const bar=document.getElementById("loadProgressBar");
+  const pill=document.getElementById("loadProgressPill");
   if(!wrap||!bar)return;
   wrap.classList.remove("active");
-  setTimeout(()=>{bar.classList.remove("indeterminate");bar.style.width="0%";},250);
+  if(pill)pill.classList.remove("active");
+  setTimeout(()=>{bar.classList.remove("indeterminate");bar.style.width="0%";
+    const f=document.getElementById("loadProgressPillFill");if(f)f.style.width="0%";
+  },250);
 }
 
 async function loadStocksFromServer(filenames,options={}){
@@ -4598,16 +4737,36 @@ async function runPipelineFromDashboard(){
   if(btn)btn.disabled=true;
   showIndeterminateProgress();
   try{
-    const res=await fetch(BACKEND_CONFIG.runPipelineUrl,{method:"POST"});
-    const payload=await res.json().catch(()=>({ok:false,error:"Pipeline response could not be read"}));
-    if(!res.ok||payload?.ok===false){
-      hideProgress();
-      throw new Error(payload?.stderr||payload?.error||payload?.stdout||"Stock data update failed");
+    const res=await fetch(BACKEND_CONFIG.runPipelineStreamUrl,{method:"POST"});
+    if(!res.ok)throw new Error("Pipeline request failed (HTTP "+res.status+")");
+    const reader=res.body.getReader();
+    const dec=new TextDecoder();
+    let buf="",pipelineOk=true,pipelineError=null;
+    outer:while(true){
+      const{done,value}=await reader.read();
+      if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split("\n");
+      buf=lines.pop();
+      for(const line of lines){
+        if(!line.startsWith("data: "))continue;
+        let d;try{d=JSON.parse(line.slice(6))}catch{continue}
+        if(d.line){
+          const m=d.line.match(/\[(\d+)\/(\d+)\]/);
+          if(m)showProgress(parseInt(m[1]),parseInt(m[2]));
+          else if(/STEP 1\/2/i.test(d.line))status.textContent="Step 1/2: Refreshing price data…";
+          else if(/STEP 2\/2/i.test(d.line))status.textContent="Step 2/2: Running analysis…";
+        }
+        if(d.done){pipelineOk=d.ok;if(!d.ok)pipelineError="Pipeline exited with code "+d.returncode;}
+        if(d.error){pipelineOk=false;pipelineError=d.error;}
+      }
     }
+    if(!pipelineOk)throw new Error(pipelineError||"Stock data update failed");
     status.textContent="Stock data updated. Reloading server JSONs...";
     await loadRegistryServerStocks();
   }finally{
     if(btn)btn.disabled=false;
+    hideProgress();
   }
 }
 
@@ -4623,6 +4782,20 @@ async function initBackendMode(){
   renderApp();
   if(BACKEND_CONFIG.staticJsonBase){staticAutoLoad();return;}
   if(!backendAvailable)return;
+  try{
+    const entries=await fetchRegistryEntries();
+    const validFilenames=new Set(registryAnalysisFilenames(entries));
+    let purged=0;
+    for(const key of Object.keys(state.stocks||{})){
+      if(!validFilenames.has(state.stocks[key]?.label)){delete state.stocks[key];purged++;}
+    }
+    if(purged>0){
+      if(Array.isArray(state.serverLoadedFiles))
+        state.serverLoadedFiles=state.serverLoadedFiles.filter(f=>validFilenames.has(f));
+      persistPlannerState();
+      renderApp();
+    }
+  }catch(_){}
   const shouldRestore=state.rememberLoadedStocks!==false && !stockList().length && normalizedServerLoadedFiles().length;
   if(!shouldRestore)return;
   try{
@@ -4654,7 +4827,7 @@ function normalizedRegistrySelectedTickers(values){
 }
 
 function registryMultiSelectEnabled(){
-  return !!state.registryMultiSelectEnabled;
+  return true;
 }
 
 function buildRegistryEntryFromMaster(entry){
@@ -4689,27 +4862,24 @@ function visibleMasterStockTickers(query=""){
 
 function registrySelectedSummary(){
   const count=normalizedRegistrySelectedTickers(state.registrySelectedMasterTickers).length;
-  if(!registryMultiSelectEnabled()){
-    return "Multi-select is off. Click one master stock to load it into the form.";
-  }
   if(!count){
-    return "Multi-select is on. Tick one or more visible master stocks, then use Add selected.";
+    return "Click one or more stocks to select them, then use Add selected.";
   }
-  return `${count} master stock${count===1?"":"s"} selected. Use Add selected to add them into the registry draft together.`;
+  return `${count} stock${count===1?"":"s"} selected. Click Add selected to add them all.`;
 }
 
 function updateRegistryMultiSelectUI(){
-  const enabled=registryMultiSelectEnabled();
   const selectedCount=normalizedRegistrySelectedTickers(state.registrySelectedMasterTickers).length;
-  const toggle=document.getElementById("registryMultiSelect");
   const note=document.getElementById("registrySelectionNote");
   const saveBtn=document.getElementById("saveRegistryEntryBtn");
-  if(toggle) toggle.checked=enabled;
   if(note) note.textContent=registrySelectedSummary();
   if(saveBtn){
-    saveBtn.textContent=(enabled && state.registryEditingIndex===null && selectedCount)
-      ? `Add selected (${selectedCount})`
-      : (state.registryEditingIndex===null||state.registryEditingIndex===undefined ? "Add stock" : "Update stock");
+    const editing=state.registryEditingIndex!==null&&state.registryEditingIndex!==undefined;
+    saveBtn.textContent=editing
+      ?"Update stock"
+      :selectedCount
+        ?`Add selected (${selectedCount})`
+        :"Add stock";
   }
 }
 
@@ -4730,6 +4900,7 @@ function resetRegistryForm(){
   state.registryEditingIndex=null;
   state.registrySelectedMasterTickers=[];
   state.registryMasterPage=1;
+  state.registryMultiSelectEnabled=true;
   updateRegistryMultiSelectUI();
   renderMasterStockOptions(document.getElementById("registryMasterStock")?.value||"");
 }
@@ -4865,13 +5036,12 @@ function renderMasterStockOptions(query=""){
   const currentPage=state.registryMasterPage;
   const entries=filteredMasterStocks(query,currentPage);
   const selectedSet=new Set(normalizedRegistrySelectedTickers(state.registrySelectedMasterTickers));
-  const multi=registryMultiSelectEnabled();
   const rangeStart=fullMatches.length?((currentPage-1)*40)+1:0;
   const rangeEnd=Math.min(currentPage*40,fullMatches.length);
   const countLabel=fullMatches.length
     ? `Showing ${rangeStart}-${rangeEnd} of ${fullMatches.length} matches`
     : "0 matches";
-  const head=`<div class="registry-master-head"><div class="registry-master-count">${esc(countLabel)}${multi?' · Multi-select ready':''}</div>${multi?`<div class="check-filter-actions"><button type="button" class="check-filter-link" data-master-action="all">Select all filtered</button><button type="button" class="check-filter-link" data-master-action="none">None</button></div>`:""}</div>`;
+  const head=`<div class="registry-master-head"><div class="registry-master-count">${esc(countLabel)}</div><div class="check-filter-actions"><button type="button" class="check-filter-link" data-master-action="all">Select all filtered</button><button type="button" class="check-filter-link" data-master-action="none">None</button></div></div>`;
   const footer=fullMatches.length>40
     ? `<div class="registry-master-footer"><div class="registry-master-page">Page ${currentPage} of ${totalPages}</div><div class="registry-master-pager"><button type="button" class="check-filter-link" data-master-page="prev" ${currentPage<=1?'disabled':''}>Prev</button><button type="button" class="check-filter-link" data-master-page="next" ${currentPage>=totalPages?'disabled':''}>Next</button></div></div>`
     : "";
@@ -4880,7 +5050,7 @@ function renderMasterStockOptions(query=""){
   }else{
     list.innerHTML=`${head}${entries.map(entry=>`
       <button class="registry-master-option${selectedSet.has(String(entry.ticker||"").toUpperCase())?" is-selected":""}" type="button" data-master-stock="${esc(entry.ticker||"")}">
-        ${multi?`<input type="checkbox" tabindex="-1" aria-hidden="true" ${selectedSet.has(String(entry.ticker||"").toUpperCase())?"checked":""}>`:""}
+        <input type="checkbox" tabindex="-1" aria-hidden="true" ${selectedSet.has(String(entry.ticker||"").toUpperCase())?"checked":""}>
         <span class="registry-master-option-copy">
           <span>${esc(masterStockLabel(entry))}</span>
           <small>${esc(masterStockMetaLine(entry))}</small>
@@ -4910,33 +5080,84 @@ function applyMasterStockToForm(entry,options={}){
 function renderRegistryTable(){
   const body=document.getElementById("registryTableBody");
   if(!body)return;
-  const entries=Array.isArray(state.registryEntries)?state.registryEntries:[];
+  const allEntries=Array.isArray(state.registryEntries)?state.registryEntries:[];
+
+  // Counts for badge + tab labels
+  const ac=allEntries.filter(e=>!e.is_index&&e.active!==false).length;
+  const mo=allEntries.filter(e=>e.active===false).length;
+  const ix=allEntries.filter(e=>e.is_index).length;
+
+  const badge=document.getElementById("registrySummaryBadge");
+  if(badge) badge.textContent=allEntries.length?`${ac} Active · ${ix} Index · ${mo} Monitor`:"";
+
+  // Update tab labels with live counts
+  const tabCounts={active:ac,monitor:mo,index:ix};
+  const tabLabels={active:"Active",monitor:"Monitor",index:"Index"};
+  document.querySelectorAll("[data-reg-tab]").forEach(btn=>{
+    const t=btn.dataset.regTab;
+    btn.textContent=`${tabLabels[t]} (${tabCounts[t]??0})`;
+  });
+
+  // Filter by active tab
+  const tab=state.registryActiveTab||"active";
+  let tabEntries;
+  if(tab==="active") tabEntries=allEntries.filter(e=>!e.is_index&&e.active!==false);
+  else if(tab==="monitor") tabEntries=allEntries.filter(e=>e.active===false);
+  else tabEntries=allEntries.filter(e=>e.is_index);
+
+  // Apply search within tab
+  const q=(document.getElementById("registryTableSearch")?.value||"").trim().toLowerCase();
+  const entries=q?tabEntries.filter(e=>(String(e.stock_name||"")+' '+String(e.ticker||'')).toLowerCase().includes(q)):tabEntries;
+
   if(!entries.length){
-    body.innerHTML='<tr><td colspan="6" class="muted">No registry entries loaded.</td></tr>';
+    body.innerHTML=q
+      ?'<tr><td colspan="7" class="muted">No entries match the filter.</td></tr>'
+      :`<tr><td colspan="7" class="muted">No ${tab} entries.</td></tr>`;
     return;
   }
-  body.innerHTML=entries.map((entry,index)=>`
-    <tr>
+
+  body.innerHTML=entries.map(entry=>{
+    const i=allEntries.indexOf(entry);
+    const isIdx=!!entry.is_index;
+    const isActive=entry.active!==false&&!isIdx;
+    const pill=isIdx
+      ?`<span class="reg-pill reg-pill-index">Index</span>`
+      :isActive
+        ?`<button class="reg-pill reg-pill-active" type="button" data-registry-toggle="${i}" title="Click to hide from dashboard">Active</button>`
+        :`<button class="reg-pill reg-pill-monitor" type="button" data-registry-toggle="${i}" title="Click to show in dashboard">Monitor</button>`;
+    return `<tr>
       <td>${esc(entry.stock_name||"")}</td>
       <td><span class="mono">${esc(entry.ticker||"")}</span></td>
       <td>${esc(sectorLabelForTicker(entry.ticker)||"-")}</td>
       <td>${entry.run_analysis===false?"No":"Yes"}</td>
       <td>${entry.is_index?"Yes":"No"}</td>
-      <td>
-        <div class="registry-row-actions">
-          <button class="btn btn-compact" type="button" data-registry-edit="${index}">Edit</button>
-          <button class="btn btn-compact" type="button" data-registry-delete="${index}" style="opacity:.8">Remove</button>
-        </div>
-      </td>
-    </tr>
-  `).join("");
+      <td>${pill}</td>
+      <td><div class="registry-row-actions">
+        <button class="btn btn-compact" type="button" data-registry-edit="${i}">Edit</button>
+        <button class="btn btn-compact" type="button" data-registry-delete="${i}" style="opacity:.8">Remove</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+
+function setRegistryTab(tab){
+  state.registryActiveTab=tab;
+  document.querySelectorAll("[data-reg-tab]").forEach(btn=>{
+    btn.classList.toggle("is-active",btn.dataset.regTab===tab);
+  });
+  renderRegistryTable();
 }
 
 function openRegistryOverlay(){
   const overlay=document.getElementById("registryOverlay");
   if(!overlay)return;
+  state.registryMultiSelectEnabled=true;
+  state.registryActiveTab=state.registryActiveTab||"active";
   overlay.classList.add("open");
   overlay.setAttribute("aria-hidden","false");
+  document.querySelectorAll("[data-reg-tab]").forEach(btn=>{
+    btn.classList.toggle("is-active",btn.dataset.regTab===state.registryActiveTab);
+  });
   updateRegistryMultiSelectUI();
 }
 
@@ -5037,12 +5258,18 @@ function addSelectedMasterStocksToRegistry(){
     state.registryEntries.push(buildRegistryEntryFromMaster(master));
     added+=1;
   });
+  markRegistryChanged();
   renderRegistryTable();
   const messages=[];
   if(added) messages.push(`added ${added}`);
   if(skipped) messages.push(`skipped ${skipped} duplicate${skipped===1?"":"s"}`);
   registryStatus(messages.length ? `Bulk add complete: ${messages.join(", ")}.` : "No new stocks were added.");
   resetRegistryForm();
+}
+
+function markRegistryChanged(){
+  const btn=document.getElementById("saveRegistryBtn");
+  if(btn){btn.classList.add("has-changes");btn.textContent="● Save registry";}
 }
 
 async function saveRegistryEntries(){
@@ -5056,6 +5283,8 @@ async function saveRegistryEntries(){
     throw new Error(payload?.error||"Unable to save stock registry");
   }
   registryStatus(`Registry saved with ${payload.count} entr${payload.count===1?"y":"ies"}.`);
+  const btn=document.getElementById("saveRegistryBtn");
+  if(btn){btn.classList.remove("has-changes");btn.textContent="Save registry";}
 }
 
 function upsertRegistryEntry(){
@@ -5087,6 +5316,7 @@ function upsertRegistryEntry(){
     state.registryEntries[state.registryEditingIndex]=entry;
     registryStatus(`Updated ${entry.ticker} in the registry draft.`);
   }
+  markRegistryChanged();
   renderRegistryTable();
   resetRegistryForm();
 }
@@ -5111,17 +5341,33 @@ function editRegistryEntry(index){
 function removeRegistryEntry(index){
   const entry=(state.registryEntries||[])[index];
   if(!entry)return;
+  if(!confirm(`Remove "${entry.stock_name}" from the registry?`))return;
   state.registryEntries.splice(index,1);
+  markRegistryChanged();
   renderRegistryTable();
   if(state.registryEditingIndex===index)resetRegistryForm();
   registryStatus(`Removed ${entry.ticker} from the registry draft.`);
+}
+
+async function toggleRegistryActive(index){
+  const entry=(state.registryEntries||[])[index];
+  if(!entry||entry.is_index)return;
+  const nowActive=entry.active!==false;
+  if(nowActive){entry.active=false;}else{delete entry.active;}
+  renderRegistryTable();
+  try{
+    await saveRegistryEntries();
+    registryStatus(`${entry.ticker} is now ${entry.active===false?"monitoring only (hidden from dashboard)":"active (shown in dashboard)"}.`);
+  }catch(err){
+    registryStatus(`Save failed: ${err.message}`);
+  }
 }
 
 /* ?? GROUPED STOCK PANELS ?????????????????????????????????????????????? */
 function groupedStockData(){
   const api=window.DividendGroupedStocks;
   if(!api||typeof api.buildGroupedStockView!=="function")return null;
-  try{return api.buildGroupedStockView(stockList().map(s=>s.data))}
+  try{return api.buildGroupedStockView(activeStockList().map(s=>s.data))}
   catch(err){console.warn("Grouped stock view failed",err);return null}
 }
 
@@ -5227,7 +5473,7 @@ function cycleFlagFalse(value){
   return value===false||value==="False"||value==="FALSE";
 }
 function buildCurrentZoneOutcomeItems(){
-  return stockList().map(s=>{
+  return activeStockList().map(s=>{
     const up=upcomingSeries(s.data);
     if(!up?.proj)return null;
     const start=projectionWindowStart(up.proj);
@@ -5279,7 +5525,7 @@ function buildCurrentZoneOutcomeItems(){
   }).filter(Boolean);
 }
 function buildRecentZoneOutcomeItems(){
-  return stockList().flatMap(s=>{
+  return activeStockList().flatMap(s=>{
     const up=upcomingSeries(s.data);
     if(!up?.proj||!up?.id)return [];
     const estExDivPx=readNumber(up.proj.est_exdiv_px);
@@ -5339,7 +5585,7 @@ function buildZoneOutcomeItems(mode="current"){
   return mode==="recent" ? buildRecentZoneOutcomeItems() : buildCurrentZoneOutcomeItems();
 }
 function zoneOutcomeFilterControl(items){
-  const options=stockList().map(s=>({
+  const options=activeStockList().map(s=>({
     value:s.key,
     label:`${s.data?.meta?.ticker||s.key}${s.data?.meta?.stock_name?` · ${s.data.meta.stock_name}`:""}`
   }));
@@ -5359,7 +5605,7 @@ function zoneOutcomeFilterControl(items){
   return `<div class="stock-selector" style="margin:0 0 12px"><span class="small muted">Show</span><div class="check-filter"><button type="button" class="check-filter-btn" id="zoneOutcomeFilterBtn">${esc(selectedLabels||"Choose stocks")}</button><div class="check-filter-menu" id="zoneOutcomeFilterMenu" style="display:none"><div class="check-filter-actions"><button type="button" class="check-filter-link" data-zonefilter-action="all">All</button><button type="button" class="check-filter-link" data-zonefilter-action="none">None</button></div><label class="check-filter-item"><input type="checkbox" data-zonefilter-all ${allSelected?"checked":""}> All stocks</label>${options.map(opt=>`<label class="check-filter-item"><input type="checkbox" data-zonefilter-item="${esc(opt.value)}" ${allSelected||state.zoneOutcomeFilterKeys.includes(opt.value)?"checked":""}> ${esc(opt.label)}</label>`).join("")}</div></div><button type="button" class="btn" id="zoneOutcomeFilterApply" style="font-size:11px;padding:6px 12px">Apply</button></div>`;
 }
 function setupMapFilterControl(items){
-  const options=stockList().map(s=>({
+  const options=activeStockList().map(s=>({
     value:s.key,
     label:`${s.data?.meta?.ticker||s.key}${s.data?.meta?.stock_name?` · ${s.data.meta.stock_name}`:""}`
   }));
@@ -5376,10 +5622,10 @@ function setupMapFilterControl(items){
       : selectedKeys.length===1
         ? options.find(opt=>opt.value===selectedKeys[0])?.label.split(" · ")[0] || "1 stock"
         : `${selectedKeys.length} stocks`;
-  return `<div class="stock-selector" style="margin:0 0 12px"><span class="small muted">Show</span><div class="check-filter"><button type="button" class="check-filter-btn" id="setupMapFilterBtn">${esc(selectedLabels||"Choose stocks")}</button><div class="check-filter-menu" id="setupMapFilterMenu" style="display:none"><div class="check-filter-actions"><button type="button" class="check-filter-link" data-setupfilter-action="all">All</button><button type="button" class="check-filter-link" data-setupfilter-action="none">None</button></div><label class="check-filter-item"><input type="checkbox" data-setupfilter-all ${allSelected?"checked":""}> All stocks</label>${options.map(opt=>`<label class="check-filter-item"><input type="checkbox" data-setupfilter-item="${esc(opt.value)}" ${allSelected||state.setupMapFilterKeys.includes(opt.value)?"checked":""}> ${esc(opt.label)}</label>`).join("")}</div></div><button type="button" class="btn" id="setupMapFilterApply" style="font-size:11px;padding:6px 12px">Apply</button></div>`;
+  return `<div class="stock-selector" style="margin:0 0 12px"><span class="small muted">Show</span><div class="check-filter"><button type="button" class="check-filter-btn" id="setupMapFilterBtn">${esc(selectedLabels||"Choose stocks")}</button><div class="check-filter-menu" id="setupMapFilterMenu" style="display:none"><input class="cfm-search" type="text" placeholder="Filter stocks…" autocomplete="off"><div class="check-filter-actions"><button type="button" class="check-filter-link" data-setupfilter-action="all">All</button><button type="button" class="check-filter-link" data-setupfilter-action="none">None</button></div><label class="check-filter-item"><input type="checkbox" data-setupfilter-all ${allSelected?"checked":""}> All stocks</label>${options.map(opt=>`<label class="check-filter-item"><input type="checkbox" data-setupfilter-item="${esc(opt.value)}" ${allSelected||state.setupMapFilterKeys.includes(opt.value)?"checked":""}> ${esc(opt.label)}</label>`).join("")}</div></div><button type="button" class="btn" id="setupMapFilterApply" style="font-size:11px;padding:6px 12px">Apply</button></div>`;
 }
 function buildSetupMapItems(){
-  return stockList().map(s=>{
+  return activeStockList().map(s=>{
     const metrics=normalizeStock(s.data,{});
     const low=readNumber(metrics.entryZoneLow);
     const high=readNumber(metrics.entryZoneHigh);
@@ -5473,7 +5719,7 @@ function panelSetupMap(){
     ? allItems
     : allItems.filter(item=>activeKeys.includes(item.key));
   const viewMode=state.setupMapViewMode||"map";
-  const viewToggle=`<div class="tabs" style="margin:0 0 12px;display:inline-flex"><button class="tab ${viewMode==="map"?"active":""}" id="setupMapViewMap">Map</button><button class="tab ${viewMode==="list"?"active":""}" id="setupMapViewList">List</button></div>`;
+  const viewToggle=`<div class="view-seg" style="margin:0 0 12px"><button class="view-seg-btn${viewMode==="map"?" active":""}" id="setupMapViewMap">Map</button><button class="view-seg-btn${viewMode==="list"?" active":""}" id="setupMapViewList">List</button></div>`;
   if(!items.length)return `<div class="panel"><h2>Setup Map</h2>${viewToggle}${filterControl}<div class="empty">No stocks are selected for this chart.</div></div>`;
   if(viewMode==="list")return `<div class="panel"><h2>Setup Map</h2>${viewToggle}${filterControl}${setupMapListView(items)}</div>`;
   const width=980,height=360;
@@ -5814,7 +6060,8 @@ function panelGroupedSection(title,subtitle,items,type){
   const controls=renderGroupedControls(type);
   if(!filtered||!filtered.length)return `<div class="panel"><h2>${title}</h2><p class="small muted" style="margin:0 0 12px">${subtitle}</p>${controls}<p class="small muted" style="margin:0">No stocks currently match these filters.</p></div>`;
   const sorted=sortGroupedItems(filtered,type);
-  return `<div class="panel"><h2>${title}</h2><p class="small muted" style="margin:0 0 12px">${subtitle}</p>${controls}<div class="mini-grid">${sorted.map(item=>renderGroupedStockCard(item,type)).join("")}</div></div>`
+  const countLine=filtered.length<items.length?`<p class="small muted" style="margin:0 0 10px">Showing ${filtered.length} of ${items.length}</p>`:"";
+  return `<div class="panel"><h2>${title}</h2><p class="small muted" style="margin:0 0 12px">${subtitle}</p>${controls}${countLine}<div class="mini-grid">${sorted.map(item=>renderGroupedStockCard(item,type)).join("")}</div></div>`
 }
 
 function panelGroupedStocks(){
@@ -5853,8 +6100,11 @@ async function revConfirmYes(btn){
     const saveResp=await fetch(BACKEND_CONFIG.stockRegistryUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({entries:updated})});
     const saveData=await saveResp.json();
     if(!saveData.ok)throw new Error(saveData.error||"Failed to save registry");
+    const removedLabel=state.stocks[key]?.label;
     delete state.stocks[key];
     if(state.reviewOverrides)delete state.reviewOverrides[key];
+    if(removedLabel&&Array.isArray(state.serverLoadedFiles))
+      state.serverLoadedFiles=state.serverLoadedFiles.filter(f=>f!==removedLabel);
     persistPlannerState();renderApp();
   }catch(err){
     btn.disabled=false;btn.textContent="Yes, remove";
@@ -5869,7 +6119,7 @@ function revCancelRemove(){renderApp();}
 
 /* ?? REVIEW PANEL ??????????????????????????????????????????????????? */
 function panelReview(){
-  const allStocks=stockList();
+  const allStocks=activeStockList();
   if(!allStocks.length)return`<div class="panel"><h2>Review</h2><div class="empty">No stocks loaded. Use "Load existing stock data" or "Update stock data" to begin.</div></div>`;
 
   const cfg=mergeConfig(CONFIG,{});
@@ -6007,7 +6257,7 @@ function panelReview(){
   const sortBar=(col,current)=>["score","zoneHit","winRate","alpha"].map(s=>{
     const active=current===s;
     const label=s==="score"?"Score":s==="zoneHit"?"Zone":s==="winRate"?"WR":"A→Z";
-    return`<button class="rev-sort-btn" data-col="${col}" data-sort="${s}" style="font-size:10px;padding:2px 7px;border:1px solid var(--bd);border-radius:3px;background:${active?"var(--ac)":"transparent"};color:${active?"#fff":"var(--mu)"};cursor:pointer;line-height:1.4">${label}</button>`;
+    return`<button class="rev-sort-btn${active?" active":""}" data-col="${col}" data-sort="${s}">${label}</button>`;
   }).join("");
   const revSort=state.reviewSort||{};
   const revQ=(state.reviewSearch||"").toLowerCase().trim();
@@ -6030,15 +6280,14 @@ function panelReview(){
     if(r.stability==="DEGRADING") chips.push(`<span class="chip bad">Degrading</span>`);
     else if(r.stability==="IMPROVING") chips.push(`<span class="chip good">Improving</span>`);
     if(r.frequencyDisplay) chips.push(`<span class="chip ${{QUARTERLY:"good",MONTHLY:"good",SEMI_ANNUAL:""}[r.frequency]||"muted"}">${esc(r.frequencyDisplay)}</span>`);
-    const ms="font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--mu);cursor:pointer;white-space:nowrap";
     const moveButtons=assigned==="keep"
-      ?`<button class="rev-move-btn" data-key="${esc(r.key)}" data-target="watch" style="${ms}">→ Watch</button><button class="rev-move-btn" data-key="${esc(r.key)}" data-target="remove" style="${ms}">→ Remove</button>`
+      ?`<button class="rev-move-btn" data-key="${esc(r.key)}" data-target="watch">→ Watch</button><button class="rev-move-btn" data-key="${esc(r.key)}" data-target="remove">→ Remove</button>`
       :assigned==="watch"
-      ?`<button class="rev-move-btn" data-key="${esc(r.key)}" data-target="keep" style="${ms}">← Keep</button><button class="rev-move-btn" data-key="${esc(r.key)}" data-target="remove" style="${ms}">→ Remove</button>`
-      :`<button class="rev-move-btn" data-key="${esc(r.key)}" data-target="keep" style="${ms}">← Keep</button><button class="rev-move-btn" data-key="${esc(r.key)}" data-target="watch" style="${ms}">← Watch</button>`;
+      ?`<button class="rev-move-btn" data-key="${esc(r.key)}" data-target="keep">← Keep</button><button class="rev-move-btn" data-key="${esc(r.key)}" data-target="remove">→ Remove</button>`
+      :`<button class="rev-move-btn" data-key="${esc(r.key)}" data-target="keep">← Keep</button><button class="rev-move-btn" data-key="${esc(r.key)}" data-target="watch">← Watch</button>`;
     const canRemove=assigned==="remove"&&!BACKEND_CONFIG.staticJsonBase;
     const removeBtn=canRemove?`<button class="rev-watchlist-btn" data-key="${esc(r.key)}" onclick="event.stopPropagation();revConfirmRemove(this)" style="font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid #6b3a3a;background:var(--bg);color:#c47a7a;cursor:pointer;white-space:nowrap">Remove from watchlist</button>`:"";
-    return`<div class="rev-card" data-key="${esc(r.key)}" style="border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:background .12s" onmouseenter="this.style.background='var(--sf)'" onmouseleave="this.style.background=''">
+    return`<div class="rev-card" data-key="${esc(r.key)}" style="border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:background .12s">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <div style="min-width:0;flex:1">
           <div style="font-family:var(--mono);font-weight:700;font-size:13px">${esc(r.ticker)} <span style="font-weight:400;font-size:11px;color:var(--mu)">${esc(r.stockName)}</span></div>
@@ -6223,23 +6472,23 @@ function panelReview(){
     <p class="small muted" style="margin:0 0 8px">Auto-assigned by potential score, zone hit rate, pattern stability, and 5yr price growth. Click any stock to drill in. Use the buttons on each card to override. Finalise removals via "Edit stock list".</p>
     ${resetBtn?`<div style="margin-bottom:8px">${resetBtn}</div>`:`<div style="margin-bottom:8px"></div>`}
     <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <input id="revSearch" type="text" placeholder="Filter by ticker or name…" value="${(state.reviewSearch||'').replace(/"/g,'&quot;')}" style="padding:4px 10px;border:1px solid var(--bd);border-radius:4px;background:var(--sf);color:var(--tx);font-size:12px;width:220px">
+      <input id="revSearch" type="text" placeholder="Filter by ticker or name…" value="${(state.reviewSearch||'').replace(/"/g,'&quot;')}" style="padding:4px 10px;border:1px solid var(--bd);border-radius:4px;background:var(--sf);color:var(--tx);font-size:12px">
       ${revQ?`<span style="font-size:11px;color:var(--mu)">${keepList.length+watchList.length+removeList.length} of ${keepTotal+watchTotal+removeTotal} shown</span>`:""}
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;align-items:start">
       <div class="rev-col">
         <h3 style="font-size:13px;font-weight:700;margin:0 0 6px;color:var(--gn)">To Keep <span style="font-weight:400;font-size:11px;color:var(--mu)">${revQ&&keepList.length!==keepTotal?`${keepList.length} / ${keepTotal}`:keepList.length} stock${keepList.length!==1?"s":""}</span></h3>
-        <div style="display:flex;gap:4px;margin-bottom:8px">${sortBar("keep",revSort.keep||"score")}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${sortBar("keep",revSort.keep||"score")}</div>
         <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${keepHtml}</div>
       </div>
       <div class="rev-col">
         <h3 style="font-size:13px;font-weight:700;margin:0 0 6px;color:#c9a227">Worth Watching <span style="font-weight:400;font-size:11px;color:var(--mu)">${revQ&&watchList.length!==watchTotal?`${watchList.length} / ${watchTotal}`:watchList.length} stock${watchList.length!==1?"s":""}</span></h3>
-        <div style="display:flex;gap:4px;margin-bottom:8px">${sortBar("watch",revSort.watch||"zoneHit")}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${sortBar("watch",revSort.watch||"zoneHit")}</div>
         <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${watchHtml}</div>
       </div>
       <div class="rev-col">
         <h3 style="font-size:13px;font-weight:700;margin:0 0 6px;color:var(--rd)">To Remove <span style="font-weight:400;font-size:11px;color:var(--mu)">${revQ&&removeList.length!==removeTotal?`${removeList.length} / ${removeTotal}`:removeList.length} stock${removeList.length!==1?"s":""}</span></h3>
-        <div style="display:flex;gap:4px;margin-bottom:8px">${sortBar("remove",revSort.remove||"score")}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${sortBar("remove",revSort.remove||"score")}</div>
         <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${removeHtml}</div>
       </div>
     </div>
@@ -6250,8 +6499,8 @@ function panelReview(){
 /* ?? COMPARISON PANEL ???????????????????????????????????????????????????
  */
 function panelComparison(){
-  let stocks=stockList();
-  if(!stocks.length)return"";
+  let stocks=activeStockList();
+  if(!stocks.length)return`<div class="panel"><div class="empty" style="padding:32px 0">No stocks match the current filters.</div></div>`;
 
   // sector + entry status filters
   const allSectors=[...new Set(stocks.map(s=>sectorLabelForTicker(s.data.meta?.ticker||s.key)).filter(Boolean))].sort();
@@ -6305,23 +6554,23 @@ function panelComparison(){
     });
   }
 
-  const colHeaders=stocks.map(s=>`<th class="cmp-stock-head" data-key="${esc(s.key)}" style="cursor:pointer;user-select:none" title="Open ${esc(s.data.meta?.ticker||s.key)}"><div style="font-family:var(--mono);font-weight:700;font-size:12px;color:var(--tx)">${esc(s.data.meta?.ticker||s.key)}</div><div style="font-size:10px;color:var(--mu);font-weight:400;text-transform:none;letter-spacing:0">${esc(s.data.meta?.stock_name||"")}</div></th>`).join("");
+  const colHeaders=stocks.map((s,i)=>`<th class="cmp-stock-head" data-key="${esc(s.key)}" data-col-index="${i+1}" style="cursor:pointer;user-select:none" title="Open ${esc(s.data.meta?.ticker||s.key)}"><div style="font-family:var(--mono);font-weight:700;font-size:12px;color:var(--tx)">${esc(s.data.meta?.ticker||s.key)}</div><div style="font-size:10px;color:var(--mu);font-weight:400;text-transform:none;letter-spacing:0">${esc(s.data.meta?.stock_name||"")}</div></th>`).join("");
   const tableRows=rowGroups.map(group=>{
     const sectionRow=`<tr class="cmp-section-row"><td colspan="${stocks.length+1}">${esc(group.label)}</td></tr>`;
-    const metricRows=group.rows.map(r=>`<tr><td class="metric-label no-drag">${tipLabel(r.label,r.tip||"")}</td>${stocks.map(s=>`<td>${r.raw?r.fn(s):esc(r.fn(s))}</td>`).join("")}</tr>`).join("");
+    const metricRows=group.rows.map(r=>`<tr><td class="metric-label no-drag">${tipLabel(r.label,r.tip||"")}</td>${stocks.map((s,i)=>`<td data-col-index="${i+1}">${r.raw?r.fn(s):esc(r.fn(s))}</td>`).join("")}</tr>`).join("");
     return sectionRow+metricRows;
   }).join("");
   const metricColHeaders=`<th class="metric-label no-drag">Metric</th>`;
   const sectorOptions=`<option value="all">All sectors</option>${allSectors.map(sec=>`<option value="${esc(sec)}" ${state.cmpFilterSector===sec?"selected":""}>${esc(sec)}</option>`).join("")}`;
   const entryStatusOptions=`<option value="all">All</option><option value="INSIDE" ${state.cmpFilterEntryStatus==="INSIDE"?"selected":""}>Inside zone</option><option value="BELOW" ${state.cmpFilterEntryStatus==="BELOW"?"selected":""}>Below zone</option><option value="ABOVE" ${state.cmpFilterEntryStatus==="ABOVE"?"selected":""}>Above zone</option>`;
-  const sortUI=`<div class="stock-selector" style="margin-bottom:12px"><span class="small muted">Sort by</span><select id="cmpSortKey">${sortOptions.map(opt=>`<option value="${opt.key}" ${state.cmpSortKey===opt.key?"selected":""}>${opt.label}</option>`).join("")}</select><select id="cmpSortDir" ${state.cmpSortKey==='none'?'disabled':''}><option value="asc" ${state.cmpSortDir==='asc'?'selected':''}>Ascending</option><option value="desc" ${state.cmpSortDir==='desc'?'selected':''}>Descending</option></select><span class="small muted" style="margin-left:12px">Sector</span><select id="cmpFilterSector">${sectorOptions}</select><span class="small muted" style="margin-left:8px">Entry status</span><select id="cmpFilterEntryStatus">${entryStatusOptions}</select></div>`;
+  const sortUI=`<div class="stock-selector" style="margin-bottom:8px"><span class="small muted">Sort by</span><select id="cmpSortKey">${sortOptions.map(opt=>`<option value="${opt.key}" ${state.cmpSortKey===opt.key?"selected":""}>${opt.label}</option>`).join("")}</select><select id="cmpSortDir" ${state.cmpSortKey==='none'?'disabled':''}><option value="asc" ${state.cmpSortDir==='asc'?'selected':''}>Ascending</option><option value="desc" ${state.cmpSortDir==='desc'?'selected':''}>Descending</option></select><span class="small muted" style="margin-left:10px">Sector</span><select id="cmpFilterSector">${sectorOptions}</select><span class="small muted" style="margin-left:10px">Entry status</span><select id="cmpFilterEntryStatus">${entryStatusOptions}</select></div><input id="cmpSearch" type="text" placeholder="Search by ticker or name…" autocomplete="off" value="${(state.cmpSearch||'').replace(/"/g,'&quot;')}">`;
 
   return`<div class="panel"><h2>Comparison &mdash; All Loaded Stocks</h2><p class="small muted" style="margin:0 0 12px">Rows show next projected ex-div series. Use the sort controls for ordering. Drag to scroll horizontally from the stock columns area. Click any stock header or stock chip to drill in.</p>${sortUI}<div class="cmp-table-wrap drag-scroll"><table><thead><tr>${metricColHeaders}${colHeaders}</tr></thead><tbody>${tableRows}</tbody></table></div></div>`
 }
 
 /* ?? MINI CARDS GRID ??????????????????????????????????????????????????? */
 function panelMiniCards(){
-  const stocks=stockList().slice().sort((a,b)=>{
+  const stocks=activeStockList().slice().sort((a,b)=>{
     const aTicker=(a?.data?.meta?.ticker||a?.key||"").toUpperCase();
     const bTicker=(b?.data?.meta?.ticker||b?.key||"").toUpperCase();
     return aTicker.localeCompare(bTicker);
@@ -6377,8 +6626,8 @@ function panelTradePlanner(){
     <p class="small muted" style="margin:0 0 12px">This planner only uses the nearest next cycle for each stock. Stocks are sorted by the earliest buy-watch timing, then by ticker. Milestones are estimated until official inputs are added. Official dates and dividend amounts update the planning schedule, while historical ratings stay unchanged. Current Verdict is a broader action guide, not a hard block, so you may still act with your own judgment and caution.</p>
     <div class="planner-summary-grid">
       <div class="planner-summary-card"><div class="label">Planned stocks</div><div class="value">${plannerItems.length}</div><div class="small muted">Nearest next-cycle setups currently tracked.</div></div>
-      <div class="planner-summary-card"><div class="label">Next watch date</div><div class="value" style="font-size:16px">${nextWatchDate?dt(nextWatchDate):"-"}</div><div class="small muted">${nextWatchDate&&daysFrom(nextWatchDate)!=null?`${daysFrom(nextWatchDate)}d from today`:"Waiting for usable watch timing."}</div></div>
-      <div class="planner-summary-card"><div class="label">Next effective ex-div</div><div class="value" style="font-size:16px">${nextExDivDate?dt(nextExDivDate):"-"}</div><div class="small muted">${nextExDivDate&&daysFrom(nextExDivDate)!=null?`${daysFrom(nextExDivDate)}d away`:"No active ex-div date available."}</div></div>
+      <div class="planner-summary-card"><div class="label">Next watch date</div><div class="value">${nextWatchDate?dt(nextWatchDate):"-"}</div><div class="small muted">${nextWatchDate&&daysFrom(nextWatchDate)!=null?`${daysFrom(nextWatchDate)}d from today`:"Waiting for usable watch timing."}</div></div>
+      <div class="planner-summary-card"><div class="label">Next effective ex-div</div><div class="value">${nextExDivDate?dt(nextExDivDate):"-"}</div><div class="small muted">${nextExDivDate&&daysFrom(nextExDivDate)!=null?`${daysFrom(nextExDivDate)}d away`:"No active ex-div date available."}</div></div>
       <div class="planner-summary-card"><div class="label">Overrides active</div><div class="value">${overrideCount}</div><div class="small muted">${overrideCount?`${overrideCount} planner item${overrideCount>1?"s have":" has"} updated inputs.`:"No overrides applied yet."}</div></div>
     </div>
     ${renderPlannerBoardTimeline(plannerItems)}
@@ -6623,12 +6872,12 @@ function bindStateSelect(id,stateKey,afterChange){
 }
 
 function renderOverviewView(){
-  const stocks=stockList();
+  const stocks=activeStockList();
   document.title="Dividend Cycle Dashboard";
   const mode=state.overviewMode||"overview"; // "overview" | "grouped" | "compare" | "planner" | "review"
 
   const modeToggle=`
-    <div style="display:flex;gap:6px">
+    <div class="tabs" style="margin-bottom:0">
       <button class="tab ${mode==="overview"?"active":""}" id="ovModeOverview">Overview</button>
       <button class="tab ${mode==="grouped"?"active":""}" id="ovModeGrouped">Potential &amp; Upcoming</button>
       <button class="tab ${mode==="planner"?"active":""}" id="ovModePlanner">Trade Planner</button>
@@ -6701,6 +6950,14 @@ function renderOverviewView(){
       setupFilterMenu.style.display=setupFilterMenu.style.display==="none"?"block":"none";
     });
     setupFilterMenu.addEventListener("click",e=>e.stopPropagation());
+    setupFilterMenu.addEventListener("input",e=>{
+      const inp=e.target.closest(".cfm-search");
+      if(!inp)return;
+      const q=inp.value.trim().toLowerCase();
+      setupFilterMenu.querySelectorAll(".check-filter-item").forEach(el=>{
+        el.classList.toggle("cfm-hidden",!(!q||el.textContent.toLowerCase().includes(q)));
+      });
+    });
     const syncSetupFilterChecks=(mode)=>{
       const allBox=setupFilterMenu.querySelector("[data-setupfilter-all]");
       const itemBoxes=Array.from(setupFilterMenu.querySelectorAll("[data-setupfilter-item]"));
@@ -6978,6 +7235,16 @@ function renderOverviewView(){
   bindStateSelect("cmpSortDir","cmpSortDir");
   bindStateSelect("cmpFilterSector","cmpFilterSector");
   bindStateSelect("cmpFilterEntryStatus","cmpFilterEntryStatus");
+  document.getElementById("cmpSearch")?.addEventListener("input",e=>{
+    state.cmpSearch=e.target.value;
+    const q=e.target.value.trim().toLowerCase();
+    document.querySelectorAll(".cmp-stock-head[data-col-index]").forEach(th=>{
+      const show=!q||th.textContent.toLowerCase().includes(q);
+      const idx=th.dataset.colIndex;
+      th.style.display=show?"":"none";
+      document.querySelectorAll(`[data-col-index="${idx}"]`).forEach(el=>el.style.display=show?"":"none");
+    });
+  });
   bindStateSelect("groupedPotentialSort","groupedPotentialSort");
   bindStateSelect("groupedPotentialFilterFrequency","groupedPotentialFilterFrequency");
   bindStateSelect("groupedPotentialFilterTiming","groupedPotentialFilterTiming");
@@ -7204,10 +7471,6 @@ document.getElementById("masterStockMenu")?.addEventListener("click",e=>{
   }
   const action=e.target.closest("[data-master-action]")?.dataset.masterAction;
   if(action){
-    if(!registryMultiSelectEnabled()){
-      registryStatus("Turn on multi-select first.");
-      return;
-    }
     const input=document.getElementById("registryMasterStock");
     if(action==="all"){
       const visible=visibleMasterStockTickers(input?.value||"");
@@ -7238,20 +7501,15 @@ document.getElementById("registrySectorFilter")?.addEventListener("change",()=>{
   state.registryMasterPage=1;
   renderMasterStockOptions(input?.value||"");
 });
-document.getElementById("registryMultiSelect")?.addEventListener("change",e=>{
-  state.registryMultiSelectEnabled=!!e.target.checked;
-  state.registrySelectedMasterTickers=[];
-  const input=document.getElementById("registryMasterStock");
-  if(state.registryMultiSelectEnabled && state.registryEditingIndex!==null && state.registryEditingIndex!==undefined){
-    resetRegistryForm();
-  }else{
-    if(state.registryMultiSelectEnabled && input){
-      input.value="";
-    }
-    updateRegistryMultiSelectUI();
+document.getElementById("registryTableSearch")?.addEventListener("input",()=>renderRegistryTable());
+document.querySelector(".registry-tabs")?.addEventListener("click",e=>{
+  const tab=e.target.closest("[data-reg-tab]")?.dataset.regTab;
+  if(tab)setRegistryTab(tab);
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&document.getElementById("registryOverlay")?.classList.contains("open")){
+    closeRegistryOverlay();
   }
-  state.registryMasterPage=1;
-  renderMasterStockOptions(input?.value||"");
 });
 document.getElementById("forgetSavedStocksBtn")?.addEventListener("click",()=>{
   state.rememberLoadedStocks=false;
@@ -7276,6 +7534,11 @@ document.addEventListener("click",e=>{
   const deleteIndex=e.target.closest("[data-registry-delete]")?.dataset.registryDelete;
   if(deleteIndex!==undefined){
     removeRegistryEntry(Number(deleteIndex));
+    return;
+  }
+  const toggleIndex=e.target.closest("[data-registry-toggle]")?.dataset.registryToggle;
+  if(toggleIndex!==undefined){
+    toggleRegistryActive(Number(toggleIndex));
     return;
   }
   if(id==="clearAllBtn"){

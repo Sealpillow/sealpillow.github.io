@@ -505,7 +505,7 @@ est_low_date_to   = proj_exdiv_date − round(p25_wks × 7)   ← later bound</p
           <p class="hm-dtext">Clean <code>wks_before</code> values are split at the largest gap. Lower values → Cluster 2 (late dip, fewer weeks before ex-div); higher values → Cluster 1 (early dip, more weeks before).</p>
           <pre class="hm-code">est_low_date_cluster1 = proj_exdiv_date − round(early_cluster_median × 7)
 est_low_date_cluster2 = proj_exdiv_date − round(late_cluster_median  × 7)</pre>
-          <p class="hm-dtext">Ranges = median ± 1 SD (population SD). Range is omitted when SD &gt; 2 weeks.</p>
+          <p class="hm-dtext">Ranges = median ± 1 SD (population SD). When SD &gt; 2 weeks, the range is replaced by a ±Nwk badge — the date shown is still the best estimate, but the timing spread is too wide to show a meaningful window. Single-point clusters (only one cycle in that cluster, SD = 0) show just the date with no badge.</p>
         </div>
         <div class="hm-dsection">
           <div class="hm-dlabel">4. Date Error</div>
@@ -595,11 +595,10 @@ function dtFull(s){
 }
 function dtClusterRange(from,center,to,sdWks){
   if(!center)return"—";
-  if(!from||!to){
-    const sdStr=sdWks!=null?`±${sdWks.toFixed(1)}wk`:"±wide";
-    return`${dtShort(center)} <span class="date-wide" title="Range suppressed — cluster SD exceeds 2 weeks">${sdStr}</span>`;
+  if(!from||!to||from===to){
+    if(sdWks!=null&&sdWks>0){return`${dtShort(center)} <span class="date-wide" title="Timing spread too wide to show a date range (SD: ${sdWks.toFixed(1)}wk) — date shown is the best estimate.">±${sdWks.toFixed(1)}wk</span>`;}
+    return dtShort(center);
   }
-  if(from===to)return dtShort(center);
   return`${dtShort(from)} – ${dtShort(to)}<br><span class="date-best">best: ${dtShort(center)}</span>`;
 }
 function pctFmt(v,decimals=1){
