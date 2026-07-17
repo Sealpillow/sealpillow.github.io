@@ -7,7 +7,7 @@
 <style>
 :root{--bg:#0c0f1a;--sf:#131724;--sf2:#1a1f30;--bd:#252a3d;--bl:#4f8ef7;--gn:#3ed9a0;--am:#f5c542;--rd:#f07070;--pu:#a78bfa;--cy:#22d3ee;--tx:#d4daf0;--mu:#7a829a;--mono:'IBM Plex Mono',Consolas,monospace;--sans:'Segoe UI',Arial,sans-serif;--color-background-info:rgba(79,142,247,.14);--color-text-info:#bcd6ff;--color-background-success:rgba(62,217,160,.14);--color-text-success:#8ef0c4;--color-background-warning:rgba(245,197,66,.14);--color-text-warning:#f6df92;--color-background-danger:rgba(240,112,112,.14);--color-text-danger:#f3b0b0;--color-background-secondary:rgba(167,139,250,.14);--color-text-secondary:#d3c1ff}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at top right,rgba(79,142,247,.14),transparent 24%),var(--bg);color:var(--tx);font-family:var(--sans);font-size:14px;line-height:1.6}
+body{margin:0;background:radial-gradient(circle at top right,rgba(79,142,247,.14),transparent 24%),var(--bg);background-attachment:fixed;color:var(--tx);font-family:var(--sans);font-size:14px;line-height:1.6}
 /* TOPBAR */
 .topbar{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 20px 14px;background:linear-gradient(180deg,rgba(16,20,32,.97),rgba(16,20,32,.92));backdrop-filter:blur(14px);border-bottom:1px solid rgba(79,142,247,.18);box-shadow:0 10px 30px rgba(0,0,0,.18)}
 /* PROGRESS BAR */
@@ -416,7 +416,7 @@ input[type=file]{display:none}
 .rev-help-divider{border:none;border-top:1px solid var(--bd);margin:18px 0 0}
 .rev-help-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--bd);padding-bottom:10px}
 .rev-help-tab{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;white-space:nowrap}
-.rev-help-tab.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.rev-help-tab.active{background:var(--bl);color:#fff;border-color:var(--bl)}
 .rev-help-panel{display:none}
 .rev-help-panel.active{display:block}
 @media(max-width:640px){.rev-list{max-height:none}.rev-col+.rev-col{border-top:2px solid var(--bd);margin-top:16px;padding-top:16px}.setup-list-cols{grid-template-columns:1fr}.view-seg{display:flex;width:100%}.view-seg-btn{flex:1;text-align:center}}
@@ -2295,6 +2295,7 @@ function renderSeriesCard(s,data,m){
   // risk flags
   const hasTailWarn=toBool(proj.tail_risk?.tail_warning);
   const hasFragWarn=toBool(proj.zone_fragility?.fragility_warning);
+  const fragSeverity=fragilitySeverity(proj.historical_frequencies?.entry_zone_hit_rate);
   const anchorSourceLabel = proj.anchor_source === "previous_exdiv_prev_dp"
     ? "Most Recent Ex-Div Anchor"
     : proj.anchor_source === "special_exdiv_prev_dp"
@@ -2344,7 +2345,7 @@ function renderSeriesCard(s,data,m){
 
     <div class="series-kv" style="margin-top:10px">
       <div class="series-subhead">Historical Edge</div>
-<div>${tipLabel("Win rate (clean)","Percent of clean cycles (excluding degen/macro/outlier) where the dip offered more than 3% rebound. Best-case rate — only tradeable setups in the denominator.")}</div>
+<div>${tipLabel("Win rate (clean)","Percent of clean cycles (excluding degen/macro/outlier) where the dip offered more than 3% rebound SOMEWHERE in the cycle window — not whether the projected zone specifically was touched. See Zone Hit Rate below for that.")}</div>
       <div class="${Number(risk.success_rate)>=70?"good":Number(risk.success_rate)>=50?"warn":"bad"}">${pctRaw(risk.success_rate,0)}</div>
       <div>${tipLabel("Win rate (all cycles)","Same numerator, but denominator includes degen and excluded cycles — every cycle attempt. Realistic expected rate across all cycles.")}</div>
       <div class="${Number(risk.success_rate_all)>=70?"good":Number(risk.success_rate_all)>=50?"warn":"bad"}">${risk.success_rate_all!=null?pctRaw(risk.success_rate_all,0):"-"}</div>
@@ -2355,8 +2356,10 @@ function renderSeriesCard(s,data,m){
       <div>Clean / n_eff</div><div>${n(clean.n_clean,0)} / ${n(clean.n_effective,2)}</div>
       <div>Median dip</div><div class="bad">${pct(clean.low_vs_prevdp?.med,2)}</div>
       <div>Median peak</div><div class="good">${pct(clean.peak_vs_prevdp?.med,2)}</div>
-<div>${tipLabel("Entry zone hit rate","Percent of clean cycles where price actually traded into the projected entry zone. Low values mean the zone was easy to miss in practice, either because price stayed too shallow or fell straight through it.")}</div>
-      <div>${pctRaw(proj.historical_frequencies?.entry_zone_hit_rate,0)}</div>
+<div class="series-subhead" style="margin-top:2px">Zone Hit Rate <span class="small muted" style="text-transform:none;letter-spacing:0;font-weight:400">— a different, harder question: not "did a dip happen" but "did THIS zone get touched"</span></div>
+      <div>${tipLabel("Entry zone hit rate","Percent of clean cycles where price actually traded into the projected entry zone. This is stricter than Win Rate above — a stock can have a high win rate (a good dip happened) but a low zone hit rate (that dip didn't land in the specific projected band).")}</div>
+      <div class="${Number(proj.historical_frequencies?.entry_zone_hit_rate)>=50?"good":Number(proj.historical_frequencies?.entry_zone_hit_rate)>=25?"warn":"bad"}">${pctRaw(proj.historical_frequencies?.entry_zone_hit_rate,0)}</div>
+      ${proj.zone_fragility?.median_miss_pct!=null?`<div>${tipLabel("Typical miss distance","When the zone was missed, how far off (median, as % of the anchor price) the actual low typically was. Small values mean misses are usually near misses, not wild ones.")}</div><div>${proj.zone_fragility.median_miss_pct===0?"—":`±${n(proj.zone_fragility.median_miss_pct,1)}%`}</div>`:""}
       <div>Avg hold days</div><div>${n(proj.historical_frequencies?.avg_hold_days,0)}d</div>
       <div>Avg win / loss</div><div><span class="good">${pct(proj.historical_frequencies?.avg_win_pct,1)}</span> / <span class="bad">${pct(-(proj.historical_frequencies?.avg_loss_pct||0),1)}</span></div>
     </div>
@@ -2383,7 +2386,9 @@ function renderSeriesCard(s,data,m){
 
     <!-- RISK FLAGS -->
 ${hasTailWarn?`<div class="err-banner">Tail risk: worst drawdown ${n(proj.tail_risk?.worst_drawdown_pct,1)}% · tail stress avg ${n(proj.tail_risk?.worst_tail_avg,1)}%</div>`:""}
-    ${hasFragWarn?`<div class="warn-banner">Zone fragility: ${n(proj.zone_fragility?.pct_cycles_outside_zone_clean,0)}% of clean cycles missed the zone</div>`:""}
+    ${fragSeverity
+      ?(fragSeverity.tone==="bad"?`<div class="warn-banner">Zone fragility: ${n(proj.zone_fragility?.pct_cycles_outside_zone_clean,0)}% of clean cycles missed the zone — ${esc(fragSeverity.label)} ${esc(fragSeverity.detail)}</div>`:"")
+      :(hasFragWarn?`<div class="warn-banner">Zone fragility: ${n(proj.zone_fragility?.pct_cycles_outside_zone_clean,0)}% of clean cycles missed the zone (load more stocks to compare relative standing)</div>`:"")}
 
     <!-- TIMING NOTE -->
     ${proj.est_low_date_note?`<div class="section-note" style="margin-top:10px">${esc(proj.est_low_date_note)}</div>`:""}
@@ -2428,12 +2433,13 @@ function panelProjections(data){
           <th>Avg Hold</th>
           <th>Yield Lo–Hi</th>
           <th>${tipLabel("Tail Risk","How much bad historical cycles fell below the expected zone. Higher levels mean downside has historically gone much deeper than the zone suggested.")}</th>
-          <th>${tipLabel("Frag Warning","Warning that more than 30% of clean cycles never entered the zone at all. This means the zone may be too fragile or too easy to miss.")}</th>
+          <th>${tipLabel("Zone Fragility","How often the projected zone was missed, shown relative to every other loaded stock's own zone-hit rate (not a fixed threshold, which trips on nearly everything in this universe and stops being useful as a filter).")}</th>
         </tr></thead>
         <tbody>
         ${rows.map(([id,p])=>{
           const days=daysFrom(p.proj_exdiv_date);
           const isReferenceOnly=primaryUpcomingId && id!==primaryUpcomingId;
+          const fragSev=fragilitySeverity(p.historical_frequencies?.entry_zone_hit_rate);
           return`<tr>
             <td><strong>${esc(id)}</strong>${isReferenceOnly?`<div class="small muted">Reference only</div>`:""}</td>
             <td>${dt(p.proj_exdiv_date)}</td>
@@ -2446,11 +2452,11 @@ function panelProjections(data){
             <td class="${tagClass(p.entry_status)}">${esc(p.entry_status_display || "-")}</td>
             <td class="${tagClass(p.timing_rating)}">${esc(p.timing_rating_display || "-")}</td>
             <td class="${Number(p.historical_frequencies?.win_rate)>=70?"good":Number(p.historical_frequencies?.win_rate)>=50?"warn":"bad"}">${pctRaw(p.historical_frequencies?.win_rate,0)}${p.historical_frequencies?.win_rate_all!=null?`<span class="muted" style="font-size:10px"> / ${pctRaw(p.historical_frequencies.win_rate_all,0)}</span>`:""}</td>
-            <td>${pctRaw(p.historical_frequencies?.entry_zone_hit_rate,0)}</td>
+            <td class="${Number(p.historical_frequencies?.entry_zone_hit_rate)>=50?"good":Number(p.historical_frequencies?.entry_zone_hit_rate)>=25?"warn":"bad"}">${pctRaw(p.historical_frequencies?.entry_zone_hit_rate,0)}${p.zone_fragility?.median_miss_pct?`<span class="muted" style="font-size:10px"> (miss ±${n(p.zone_fragility.median_miss_pct,1)}%)</span>`:""}</td>
             <td>${n(p.historical_frequencies?.avg_hold_days,0)}d</td>
             <td>${pctRaw(p.div_yield_lo,2)} – ${pctRaw(p.div_yield_hi,2)}</td>
             <td class="${tagClass(normalizeTailRiskLevel(p.tail_risk))}">${esc(p.tail_risk?.tail_level_display || "-")}</td>
-            <td class="${toBool(p.zone_fragility?.fragility_warning)?"warn":"good"}">${toBool(p.zone_fragility?.fragility_warning)?"Yes":"No"}</td>
+            <td class="${fragSev?fragSev.tone:(toBool(p.zone_fragility?.fragility_warning)?"warn":"good")}">${fragSev?esc(fragSev.label):(toBool(p.zone_fragility?.fragility_warning)?"Yes":"No")}</td>
           </tr>`
         }).join("")}
         </tbody>
@@ -3275,7 +3281,7 @@ function panelStrategy(data){
   <div class="sr-card">
     <span class="sr-pill" style="background:var(--color-background-warning);color:var(--color-text-warning)">Fragility</span>
     <p class="sr-title">Zone is often missed in historical cycles</p>
-    <p class="sr-body">fragility_warning fires when more than 30% of clean cycles never entered the projected zone. That means the zone may be too easy to miss in practice — either price often stays too shallow or falls straight through it. Treat the zone as approximate rather than dependable.</p>
+    <p class="sr-body">How often the projected zone was missed historically. The underlying number (<code>entry_zone_hit_rate</code>) is always shown; the qualitative flag is graded relative to every other stock currently loaded (bottom 25%, below median, near median, or top 25%) rather than a fixed cutoff — across this tracked universe, a fixed "more than 30% missed" bar turned out to trip on nearly every series, so it stopped being able to separate a relatively fragile setup from a relatively sound one. Treat the zone as approximate rather than dependable either way — even a top-quartile zone still gets missed some of the time.</p>
   </div>
 </div>
 <div class="sr-card">
@@ -3544,22 +3550,52 @@ function renderPriceChart(data){
 
   svg.innerHTML=html;
 
-  // layer toggles
+  // layer toggles — renderPriceChart re-runs on every date-range keystroke,
+  // preset click, and zoom/pan, but these checkboxes persist across renders
+  // (only svg.innerHTML is replaced). Attaching a fresh listener every call
+  // would accumulate indefinitely, so each checkbox is bound at most once
+  // (dataset.layerBindInit guard). The sync functions re-look-up their target
+  // element/rects on every call rather than closing over one instance, so the
+  // toggle keeps working against whatever is currently in the DOM instead of
+  // a stale, detached reference from a prior render.
   function bindLayer(tgId,layerId){
-    const tg=document.getElementById(tgId),layer=document.getElementById(layerId);
-    if(!tg||!layer)return;
-    const sync=()=>layer.style.display=tg.checked?"":"none";
-    tg.addEventListener("change",sync);sync()
+    const tg=document.getElementById(tgId);
+    if(!tg)return;
+    const sync=()=>{
+      const layer=document.getElementById(layerId);
+      if(layer)layer.style.display=tg.checked?"":"none";
+    };
+    sync();
+    if(!tg.dataset.layerBindInit){
+      tg.dataset.layerBindInit="1";
+      tg.addEventListener("change",sync);
+    }
   }
   bindLayer("tgDivs","layerDivs");bindLayer("tgLows","layerLows");bindLayer("tgPeaks","layerPeaks");
 
-  const tgPrice=document.getElementById("tgPrice"),layerPrice=document.getElementById("layerPrice");
-  if(tgPrice&&layerPrice){tgPrice.addEventListener("change",()=>layerPrice.style.display=tgPrice.checked?"":"none")}
+  const tgPrice=document.getElementById("tgPrice");
+  if(tgPrice){
+    const syncPrice=()=>{
+      const layerPrice=document.getElementById("layerPrice");
+      if(layerPrice)layerPrice.style.display=tgPrice.checked?"":"none";
+    };
+    syncPrice();
+    if(!tgPrice.dataset.layerBindInit){
+      tgPrice.dataset.layerBindInit="1";
+      tgPrice.addEventListener("change",syncPrice);
+    }
+  }
 
   const tgZones=document.getElementById("tgZones");
   if(tgZones){
-    const zoneRects=svg.querySelectorAll("[id^='zoneRect_']");
-    tgZones.addEventListener("change",()=>zoneRects.forEach(r=>r.style.display=tgZones.checked?"":"none"));
+    const syncZones=()=>{
+      svg.querySelectorAll("[id^='zoneRect_']").forEach(r=>r.style.display=tgZones.checked?"":"none");
+    };
+    syncZones();
+    if(!tgZones.dataset.layerBindInit){
+      tgZones.dataset.layerBindInit="1";
+      tgZones.addEventListener("change",syncZones);
+    }
   }
 
   // tooltips — use fixed positioning relative to viewport so scroll doesn't offset them
@@ -3712,7 +3748,7 @@ function panelGlossary(){
     ["Too Risky","Triggered when tail risk is Severe. The broader pattern may still exist, but downside is too harsh for a live setup."],
     ["Trade Planner","Planning view for the nearest next cycle only. It turns the projected setup into milestone timelines for watch, dip, exit, and ex-div. Official ex-div date, official dividend amount, and planned entry price can be overridden without changing the historical ratings."],
     ["Updated schedule and plan","Planner section that shows what changes after overrides are applied. It updates after any planner override is set. Official ex-div date changes the live milestone dates and days-away counts. Official dividend amount updates dividend and yield-related planner outputs. Planned entry price updates the planned entry, expected gain, and related execution metrics. It does not change the historical ratings such as timing, tail risk, fragility, or exit-mode verdict."],
-    ["Zone Fragility","Percent of clean cycles where price never entered the entry zone. The warning appears when more than 30% of clean cycles missed the zone."],
+    ["Zone Fragility","Percent of clean cycles where price never entered the entry zone. Graded relative to whatever's currently loaded (bottom 25% / below median / near median / top 25%) rather than a fixed cutoff — a flat 30%-missed threshold turned out to trip on nearly every tracked series, so it stopped being able to tell a relatively fragile setup from a relatively sound one."],
     ["Stability Trend","Direction of pattern stability scores across recent cycles. Improving appears when slope > 5 and recent average score > 70. Degrading appears when slope < -5 and recent average score < 60. Otherwise the trend is Stable."],
     ["Exit Mode","Historical summary of which bounded exit path looked stronger. Pre-Exdiv Peak Exit preferred means average pre-exdiv gain is at least 95% of average ex-div-date gain when ex-div-date gain is positive. Ex-Div Date Exit preferred means average optimal gain is more than 105% of average ex-div-date gain and fewer than 40% of optimal exits happened before ex-div."],
     ["S2 (peak return)","Peak price vs PrevDP expressed as a percentage. Measures the upside captured above the dividend entry price, not just vs the dip."],
@@ -3734,6 +3770,27 @@ function stockKey(data,filename){
 
 function stockList(){return Object.values(state.stocks)}
 function activeStockList(){return stockList().filter(s=>s.data?.meta?.active!==false)}
+
+// fragility_warning (analyze-stock.py) fires past a fixed 30% zone-miss rate --
+// across the tracked universe that trips on effectively every series, so as a
+// boolean it can no longer tell a relatively fragile setup from a relatively
+// sound one. This computes standing against whatever's currently loaded
+// instead of a fixed number, so the signal discriminates again. Returns null
+// when too few stocks are loaded for a percentile comparison to mean anything.
+function fragilitySeverity(hitRate){
+  if(hitRate==null)return null;
+  const allRates=activeStockList().flatMap(s=>Object.values(s.data?.proj_series||{})
+    .map(p=>p.historical_frequencies?.entry_zone_hit_rate)
+    .filter(v=>v!=null));
+  if(allRates.length<8)return null;
+  const sorted=[...allRates].sort((a,b)=>a-b);
+  const pctAt=p=>sorted[Math.min(sorted.length-1,Math.floor((p/100)*sorted.length))];
+  const p25=pctAt(25),p50=pctAt(50),p75=pctAt(75);
+  if(hitRate<=p25)return{tone:"bad",label:"Bottom 25%",detail:`vs loaded stocks (median ${n(p50,0)}%)`};
+  if(hitRate<p50)return{tone:"warn",label:"Below median",detail:`vs loaded stocks (median ${n(p50,0)}%)`};
+  if(hitRate>=p75)return{tone:"good",label:"Top 25%",detail:`vs loaded stocks (median ${n(p50,0)}%)`};
+  return{tone:"",label:"Near median",detail:`vs loaded stocks (median ${n(p50,0)}%)`};
+}
 function persistedStocksPayload(){
   return stockList().map(entry=>({
     key:entry.key,
@@ -6747,11 +6804,18 @@ function renderMiniCard(s){
   const normalized=(window.DividendGroupedStocks&&typeof window.DividendGroupedStocks.normalizeStock==="function")
     ? window.DividendGroupedStocks.normalizeStock(data,{})
     : null;
+  // Use the same tail-risk-aware verdict as the drill-down view, not just the
+  // raw zone-position chip -- otherwise a Severe-tail-risk stock sitting
+  // inside its zone reads as a plain green "go" until you click in.
+  const finalVerdict=normalized?getFinalVerdict(normalized):null;
   const metrics=normalized?buildMetricsSummary(normalized):null;
   const plan=plannerProjectionData(data,s.key);
   const executionSummary=(metrics&&plan)?compactExecutionSummary(metrics,plan):"";
   const entityMeta=entityMetaInline(m.ticker||s.key);
   const nameBits=[m.stock_name||"", m.exchange||"", m.frequency_display||"", entityMeta].filter(Boolean);
+  const statusChip=finalVerdict
+    ?verdictPill(finalVerdict.label,finalVerdict.tone)
+    :`<span class="chip ${entryStatus==="INSIDE"?"good":entryStatus==="ABOVE"?"warn":""}" style="font-size:10px">${entryStatus?esc(up?.proj?.entry_status_display || "–"):"–"}</span>`;
 
   return`<div class="mini-card${isSelected?" selected":""}" data-key="${esc(s.key)}">
     <div class="mini-card-head">
@@ -6761,7 +6825,7 @@ function renderMiniCard(s){
             <div class="mini-card-name">${esc(nameBits.join(" · "))}</div>
           </div>
         </div>
-      <span class="chip ${entryStatus==="INSIDE"?"good":entryStatus==="ABOVE"?"warn":""}" style="font-size:10px">${entryStatus?esc(up?.proj?.entry_status_display || "–"):"–"}</span>
+      ${statusChip}
     </div>
     <div class="mini-card-price">${ccy(data.current_price,m.currency)}</div>
     <div class="mini-card-stats">
@@ -6871,6 +6935,136 @@ function bindStateSelect(id,stateKey,afterChange){
   });
 }
 
+// Shared "How this works" modal for the 4 top-level tabs that don't have their
+// own dedicated help surface (Review already has one, kept separate on purpose --
+// see analysis-calculations.md discussion). One copy of this content, several
+// entry points (see the helpBtn wiring in renderOverviewView below), so nothing
+// can drift out of sync the way the Glossary's old Zone Fragility text did.
+function dashboardHelpModalHtml(){
+  return`<div id="dashboardHelpModal" class="rev-help-overlay" style="display:none">
+    <div class="rev-help-modal">
+      <button id="dashboardHelpClose" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--mu);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px" title="Close">&times;</button>
+      <div style="font-size:16px;font-weight:700;margin-bottom:14px">How This Works</div>
+      <div class="rev-help-tabs">
+        <button class="rev-help-tab active" data-tab="overview">Overview</button>
+        <button class="rev-help-tab" data-tab="potential">Potential &amp; Upcoming</button>
+        <button class="rev-help-tab" data-tab="planner">Trade Planner</button>
+        <button class="rev-help-tab" data-tab="comparison">Comparison</button>
+      </div>
+
+      <div class="rev-help-panel active" data-tab="overview">
+        <h4>Current Verdict</h4>
+        <p>The colored chip on each mini-card and the coloring of Setup Map points. It answers a different question from Potential Score &mdash; not &ldquo;how strong is the structural pattern&rdquo; but &ldquo;what should I do with this stock right now.&rdquo; It's derived from price position vs. the projected zone, timing reliability, tail risk, and how close the next ex-div is.</p>
+        <div class="rev-help-rule">
+          <strong style="color:var(--rd)">Too Risky</strong> &mdash; tail risk is Severe, regardless of anything else<br>
+          <strong>Wait</strong> &mdash; price is too far above the zone (&gt;3%), or near it but the next ex-div is more than 90 days out<br>
+          <strong style="color:#c9a227">Small Trades Advised</strong> &mdash; price is inside (or just slightly below) the zone, but tail risk is High or timing is Unreliable<br>
+          <strong style="color:var(--gn)">Actionable Now</strong> &mdash; price is inside the zone (or slightly below it with Low/Moderate tail risk) and the caution rule above didn't trigger<br>
+          <strong>Watch Closely</strong> &mdash; price is within ~3% above the zone and the next ex-div is within 90 days<br>
+          <strong>Watch Only</strong> &mdash; next ex-div is within 90 days, but price isn't in position yet<br>
+          <strong>On Radar</strong> &mdash; structurally interesting, not yet close to action
+        </div>
+        <p style="margin-top:8px">Rules are checked in this order and the first match wins &mdash; a stock can be structurally strong (high Potential Score) and still show &ldquo;Wait&rdquo; or &ldquo;On Radar&rdquo; if price simply isn't in the right place today. See Review's help (Score tab) for what Potential Score itself measures.</p>
+        <hr class="rev-help-divider">
+        <h4>Setup Map</h4>
+        <p>Every loaded stock plotted at once, colored by Current Verdict.</p>
+        <ul>
+          <li><strong>Map mode</strong> &mdash; x-axis is price position relative to the projected zone (left = below, shaded middle = inside, right = above); y-axis is possible gain if the next cycle plays out. Hover any point for full detail, click to drill in.</li>
+          <li><strong>List mode</strong> &mdash; the same stocks split into three sortable columns (Below / Inside / Above zone). Click a column's Ticker/Name/5yr/Gain header to sort by it; the 5yr column is colored green &ge;15%, amber &ge;0%, red below that.</li>
+        </ul>
+        <p style="margin-top:8px">If a stock doesn't appear, it usually means it isn't currently loaded, or is marked inactive/monitoring-only &mdash; check &ldquo;Edit stock list.&rdquo;</p>
+        <hr class="rev-help-divider">
+        <h4>Reading combinations</h4>
+        <div class="rev-help-rule">
+          <strong>Small Trades Advised, not Too Risky</strong> &mdash; the ladder checks tail risk first, and Severe always exits straight to Too Risky before any other rule runs. So Small Trades Advised tells you tail risk topped out at High, never Severe &mdash; a similarly cautious-sounding label that's actually ruling the worse case out, not staying silent on it.
+        </div>
+        <div class="rev-help-rule">
+          <strong>Inside the zone on Setup Map, but the verdict isn't Actionable Now</strong> &mdash; entry position is only one input to Current Verdict. If tail risk is High or timing is Unreliable, an inside-zone stock is downgraded to Small Trades Advised instead. Hover the point for its tail risk, or check the Potential &amp; Upcoming tab where both pills sit right next to the verdict.
+        </div>
+      </div>
+
+      <div class="rev-help-panel" data-tab="potential">
+        <h4>Potential Stocks &amp; Upcoming Stocks to Watch</h4>
+        <p>A simpler, threshold-only grouping by raw Potential Score &mdash; not the same classification as the Review tab, which weighs zone hit rate, pattern stability, and 5yr growth together through six explicit rules.</p>
+        <div class="rev-help-rule">
+          <strong style="color:var(--gn)">Strong Potential</strong> &mdash; score &ge; 75<br>
+          <strong style="color:#c9a227">Watchlist</strong> &mdash; score &ge; 60<br>
+          <strong>Borderline</strong> &mdash; score &ge; 50<br>
+          <span style="display:block;margin-top:4px;color:var(--mu)">Below n_effective = 3, the raw score still shows but the label is withheld &mdash; too little history to give a confident shortlist tag.</span>
+        </div>
+        <p style="margin-top:8px"><strong>Why a stock can look different here than in Review:</strong> this tab only asks &ldquo;how strong is the structural score.&rdquo; Review additionally asks &ldquo;does the zone actually get touched, and is the pattern holding up or degrading&rdquo; &mdash; a stock can be Strong Potential here (high score) but land in Review's Worth Watching or even To Remove column if its zone hit rate is thin or the pattern is Degrading. Treat this tab as a first-pass scan and Review as the more disciplined second pass before acting.</p>
+        <hr class="rev-help-divider">
+        <h4>Reading combinations</h4>
+        <div class="rev-help-rule">
+          <strong>Timing: Unreliable</strong> &mdash; pair this with the calendar-window spread on Review's Calendar tab. They're two measurements of the same thing: how consistently the dip lands, judged by weeks-before-ex-div in one case and by calendar month in the other, over the same clean-cycle history. If both read poorly, the dip genuinely doesn't follow a dependable pattern by either clock &mdash; don't expect the Trade Planner's watch/dip dates to be precise here.
+        </div>
+        <div class="rev-help-rule">
+          <strong>Tail Risk: High/Severe and Timing: Unreliable together</strong> &mdash; this exact pairing is what pushes Current Verdict to Small Trades Advised (or Too Risky once tail risk is Severe). It isn't two unrelated warnings sitting side by side on the card; the verdict ladder reacts to precisely this combination.
+        </div>
+        <div class="rev-help-rule">
+          <strong>Strong Potential Score but a cautious verdict pill</strong> &mdash; the score grades the structural pattern; the verdict grades today's price position. A high score paired with Wait or On Radar just means the pattern looks fine but price hasn't pulled back into the zone yet &mdash; check the Entry pill on the same card to see which side it's sitting on.
+        </div>
+        <div class="rev-help-rule">
+          <strong>Missing from either list entirely (not just missing its label)</strong> &mdash; check the stock's edge-case flags in its drill-in. Irregular Schedule stocks are structurally barred from a Potential Score label, not merely penalized. Short History (under 2 years of price data) uses the exact same 2-year cutoff as this tab's own eligibility gate, and a thin Clean Cycles count is the same shortfall that limits confidence everywhere else on the stock.
+        </div>
+      </div>
+
+      <div class="rev-help-panel" data-tab="planner">
+        <h4>Setup Summary</h4>
+        <p>A compressed execution read for the live plan, built from the nearest next cycle only &mdash; it doesn't create a new forecast, just reframes what's already calculated.</p>
+        <ul>
+          <li><strong>Execution state</strong> &mdash; a narrower version of Current Verdict for planning purposes: Actionable Now&rarr;Ready, Small Trades Advised&rarr;Caution, Watch Closely/Watch Only&rarr;Watch, Too Risky&rarr;Too risky.</li>
+          <li><strong>Timing window</strong> &mdash; Upcoming (before the watch date), Open (between watch and ex-div), or Past (after ex-div).</li>
+          <li><strong>Exit bias</strong> &mdash; a short version of the exit-mode verdict (pre-exdiv vs. ex-div-date preferred).</li>
+        </ul>
+        <div class="rev-help-rule">
+          <strong>Confidence</strong> combines sample adequacy, timing reliability, and tail risk &mdash; not n_effective alone:<br>
+          <strong style="color:var(--rd)">Low</strong> &mdash; sample is Insufficient, or timing is Unreliable, or tail risk is Severe<br>
+          <strong style="color:var(--gn)">High</strong> &mdash; sample Adequate, n_effective &ge; 6, timing Reliable, and tail risk Low or Moderate<br>
+          <strong>Moderate</strong> &mdash; everything else
+        </div>
+        <hr class="rev-help-divider">
+        <h4>Overrides</h4>
+        <p>Official ex-div date, official dividend amount, and planned entry price can each be set without touching the underlying historical model.</p>
+        <div class="rev-help-rule">
+          <strong>Changes:</strong> effective ex-div date, days-away, watch/dip/exit milestone dates, planner ordering, planner yield outputs, expected gain<br>
+          <strong>Does not change:</strong> timing rating, tail risk, fragility, exit-mode verdict, Potential Score, or Current Verdict outside the planner
+        </div>
+        <p style="margin-top:8px">The historical dip-timing offsets are preserved and re-anchored to whatever ex-div date you set &mdash; overriding the date shifts the whole schedule forward or back, it doesn't recalculate the pattern itself.</p>
+        <hr class="rev-help-divider">
+        <h4>Reading combinations</h4>
+        <div class="rev-help-rule">
+          <strong>Confidence: Low, with nothing else obviously wrong</strong> &mdash; Confidence isn't a separate signal; it's a deterministic roll-up of sample adequacy, timing rating, and tail risk, each already shown elsewhere on the stock. If it reads Low, at least one of those three is already failing on its own &mdash; sample adequacy or timing alone is enough to force it, independent of tail risk.
+        </div>
+      </div>
+
+      <div class="rev-help-panel" data-tab="comparison">
+        <h4>Reading the table</h4>
+        <p>One row per stock's nearest upcoming series. Click any column header to sort by it, drag horizontally to see every metric, click a stock's name or chip to drill in. Every column header has its own hover tooltip with the exact definition.</p>
+        <hr class="rev-help-divider">
+        <h4>Zone Outcome Map</h4>
+        <p>Tests the zone idea directly against real outcomes, rather than just showing the projection.</p>
+        <ul>
+          <li><strong>Current cycle</strong> &mdash; shown once the nearest projected series' estimated low window has already started. X-axis: where the observed low actually landed relative to the zone (0% = zone bottom, 100% = zone top; below 0 = undershot, above 100 = never got there). Y-axis: realized rebound vs. the model's expected gain.</li>
+          <li><strong>Recent completed cycles</strong> &mdash; the same idea, replayed over recent completed cycles of that same series, so you can see the zone's track record rather than just today's single setup.</li>
+        </ul>
+        <p style="margin-top:8px">If no point is plotted, there simply isn't a comparable cycle yet for that stock &mdash; the chart doesn't force a misleading point when there's nothing to show.</p>
+        <hr class="rev-help-divider">
+        <h4>Reading combinations</h4>
+        <div class="rev-help-rule">
+          <strong>CGC Top Series / CGC Win Rate #1 both show &ldquo;-&rdquo;</strong> &mdash; not missing data. A stock with only one dividend series (no separate months/quarters to rank against each other) is left out of CGC ranking on purpose, rather than ranked against itself.
+        </div>
+        <div class="rev-help-rule">
+          <strong>Low Clean Cycles alongside an Unreliable/Bimodal Timing rating</strong> &mdash; both come from the same clean-cycle history for that series. A stock light on clean cycles hasn't just scored fewer cycles; there's also less data behind its timing rating &mdash; treat a low count as a reason to trust the timing rating less, not just an unrelated metric to note in passing.
+        </div>
+        <div class="rev-help-rule">
+          <strong>Wide scatter on Zone Outcome Map</strong> &mdash; the same walk-forward zone-miss history behind that scatter is what a stock's own drill-in page reports as its zone fragility. Points scattered far outside the shaded band across recent cycles and a poor fragility reading on that same stock's page are one underlying pattern, not two independent checks that happen to agree.
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderOverviewView(){
   const stocks=activeStockList();
   document.title="Dividend Cycle Dashboard";
@@ -6884,6 +7078,11 @@ function renderOverviewView(){
       <button class="tab ${mode==="review"?"active":""}" id="ovModeReview">Review</button>
       <button class="tab ${mode==="compare"?"active":""}" id="ovModeCompare">Comparison</button>
     </div>`;
+
+  // Review already has its own dedicated help button/modal, so this shared one
+  // only needs an entry point for the other 4 modes.
+  const helpTabForMode={overview:"overview",grouped:"potential",planner:"planner",compare:"comparison"}[mode];
+  const helpBtn=helpTabForMode?`<button data-dash-help-open="${helpTabForMode}" style="font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid var(--bd);background:var(--sf);color:var(--mu);cursor:pointer;white-space:nowrap;flex-shrink:0">About this view</button>`:"";
 
   let body="";
   if(mode==="grouped"){
@@ -6901,10 +7100,11 @@ function renderOverviewView(){
   app.innerHTML=`
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
     <h1 style="margin:0;font-size:22px;font-weight:700">Portfolio Overview <span style="font-size:14px;color:var(--mu);font-weight:400">${stocks.length} stock${stocks.length!==1?"s":""}</span></h1>
-    ${modeToggle}
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${modeToggle}${helpBtn}</div>
   </div>
   <div class="section-note" style="margin:-4px 0 14px">All outputs are rule-based from uploaded Dividend Cycle Analysis data. No LLM inference is used.</div>
   ${body}
+  ${dashboardHelpModalHtml()}
   <div class="foot">Dividend Cycle Analysis dashboard · No LLM required · Click any stock to drill in</div>`;
 
   app.querySelectorAll(".mini-card[data-key]").forEach(el=>{
@@ -7162,6 +7362,34 @@ function renderOverviewView(){
       document.querySelectorAll("#reviewHelpModal .rev-help-panel").forEach(p=>p.classList.remove("active"));
       tab.classList.add("active");
       document.querySelector(`#reviewHelpModal .rev-help-panel[data-tab="${tab.dataset.tab}"]`).classList.add("active");
+    });
+  });
+  // Shared "How this works" modal -- one modal, several entry points (the
+  // "About this view" button on Overview/Potential & Upcoming/Trade
+  // Planner/Comparison each open it pre-selected to their own tab).
+  document.querySelectorAll("[data-dash-help-open]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const m=document.getElementById("dashboardHelpModal");
+      if(!m)return;
+      const tabKey=btn.dataset.dashHelpOpen;
+      m.querySelectorAll(".rev-help-tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===tabKey));
+      m.querySelectorAll(".rev-help-panel").forEach(p=>p.classList.toggle("active",p.dataset.tab===tabKey));
+      m.style.display="flex";
+    });
+  });
+  document.getElementById("dashboardHelpClose")?.addEventListener("click",()=>{
+    const m=document.getElementById("dashboardHelpModal");
+    if(m)m.style.display="none";
+  });
+  document.getElementById("dashboardHelpModal")?.addEventListener("click",e=>{
+    if(e.target===e.currentTarget)e.currentTarget.style.display="none";
+  });
+  document.querySelectorAll("#dashboardHelpModal .rev-help-tab").forEach(tab=>{
+    tab.addEventListener("click",()=>{
+      document.querySelectorAll("#dashboardHelpModal .rev-help-tab").forEach(t=>t.classList.remove("active"));
+      document.querySelectorAll("#dashboardHelpModal .rev-help-panel").forEach(p=>p.classList.remove("active"));
+      tab.classList.add("active");
+      document.querySelector(`#dashboardHelpModal .rev-help-panel[data-tab="${tab.dataset.tab}"]`).classList.add("active");
     });
   });
   document.getElementById("plannerExportCsv")?.addEventListener("click",e=>{

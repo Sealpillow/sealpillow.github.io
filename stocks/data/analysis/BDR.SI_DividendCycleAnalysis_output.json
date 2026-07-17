@@ -5,7 +5,7 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-07-16",
+    "today": "2026-07-17",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
@@ -32,8 +32,8 @@
     "zero_volume_rows": 136,
     "zero_volume_pct": 26.1,
     "issues_found": [
-      "1 rows share same date as dividend rows \u2014 verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (136/522, 26.1%) \u2014 analysis continues, but thin trading may reduce reliability"
+      "1 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date",
+      "Zero-volume rows exceed 5% (136/522, 26.1%) \u00e2\u20ac\u201d analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -64,7 +64,7 @@
       "id": "S1_2017",
       "series": "S1",
       "exdiv_date": "2017-08-10",
-      "div_amt": 0.0463,
+      "div_amt": 0.0464,
       "prev_dp": 0.7455,
       "low_px": 0.5091,
       "low_date": "2017-03-17",
@@ -76,13 +76,13 @@
       "rebound": 46.4349,
       "wks_before": 20.8571,
       "wks_to_peak": 19.0,
-      "div_yield": 6.2106,
-      "s1": 19.5854,
-      "s1_floored": "False",
+      "div_yield": 6.224,
+      "s1": 19.6277,
+      "s1_floored": false,
       "s2": 7.3105,
       "degen": false,
       "incomplete": false,
-      "outlier": "False",
+      "outlier": false,
       "macro": false,
       "macro_detail": {
         "market_index_return": 4.6714,
@@ -93,7 +93,7 @@
       "volume_trend": "INCREASING",
       "max_drawdown_pre_exdiv": -18.5732,
       "recovery_time_days": 146,
-      "success": "True",
+      "success": true,
       "pattern_stability_score": null,
       "zone_hit": null,
       "exit_analysis": {
@@ -116,7 +116,7 @@
       "id": "S1_2018",
       "series": "S1",
       "exdiv_date": "2018-08-07",
-      "div_amt": 0.0627,
+      "div_amt": 0.0628,
       "prev_dp": 1.0636,
       "low_px": 0.9091,
       "low_date": "2018-03-23",
@@ -128,13 +128,13 @@
       "rebound": 16.9948,
       "wks_before": 19.5714,
       "wks_to_peak": 11.0,
-      "div_yield": 5.8951,
-      "s1": 40.5825,
-      "s1_floored": "False",
+      "div_yield": 5.9045,
+      "s1": 40.6472,
+      "s1_floored": false,
       "s2": 0.8556,
       "degen": false,
       "incomplete": false,
-      "outlier": "False",
+      "outlier": false,
       "macro": false,
       "macro_detail": {
         "market_index_return": -5.7606,
@@ -145,7 +145,7 @@
       "volume_trend": "DECLINING",
       "max_drawdown_pre_exdiv": -12.7063,
       "recovery_time_days": 137,
-      "success": "True",
+      "success": true,
       "pattern_stability_score": null,
       "zone_hit": null,
       "exit_analysis": {
@@ -182,11 +182,11 @@
       "wks_to_peak": 2.0,
       "div_yield": 5.7217,
       "s1": 73.1111,
-      "s1_floored": "False",
+      "s1_floored": false,
       "s2": 13.0435,
       "degen": false,
       "incomplete": false,
-      "outlier": "False",
+      "outlier": false,
       "macro": false,
       "macro_detail": {
         "market_index_return": -0.8427,
@@ -197,7 +197,7 @@
       "volume_trend": "DECLINING",
       "max_drawdown_pre_exdiv": -11.6667,
       "recovery_time_days": 82,
-      "success": "True",
+      "success": true,
       "pattern_stability_score": null,
       "zone_hit": null,
       "exit_analysis": {
@@ -234,11 +234,11 @@
       "wks_to_peak": 13.0,
       "div_yield": 8.0143,
       "s1": 30.3243,
-      "s1_floored": "False",
+      "s1_floored": false,
       "s2": 6.4286,
       "degen": false,
       "incomplete": false,
-      "outlier": "False",
+      "outlier": false,
       "macro": false,
       "macro_detail": {
         "market_index_return": 5.4193,
@@ -249,9 +249,9 @@
       "volume_trend": "STABLE",
       "max_drawdown_pre_exdiv": -2.0134,
       "recovery_time_days": 147,
-      "success": "True",
+      "success": true,
       "pattern_stability_score": 79.67,
-      "zone_hit": "False",
+      "zone_hit": false,
       "exit_analysis": {
         "opt_exit_px": 0.745,
         "opt_exit_date": "2021-06-11",
@@ -266,7 +266,8 @@
         "exdiv_date_exit_px": 0.7,
         "exdiv_date_exit_date": "2021-08-06",
         "post_exdiv_exit_gain_pct": 35.9223
-      }
+      },
+      "zone_miss_pct": 7.12
     }
   ],
   "ss_series": {
@@ -571,14 +572,8 @@
       "zone_fragility": {
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 25.0,
-        "fragility_warning": "True"
-      },
-      "macro_context": {
-        "current_regime": null,
-        "sector_etf": null,
-        "sector_performance": "IN_LINE",
-        "interest_rate_trend": "STABLE",
-        "last_update": "2026-07-16"
+        "fragility_warning": true,
+        "median_miss_pct": 7.12
       }
     }
   },
@@ -606,7 +601,7 @@
     {
       "yr": 2004,
       "count": 1,
-      "total": 0.0386,
+      "total": 0.0387,
       "series": [
         "S1"
       ],
@@ -616,7 +611,7 @@
     {
       "yr": 2005,
       "count": 1,
-      "total": 0.04,
+      "total": 0.0401,
       "series": [
         "S1"
       ],
@@ -626,7 +621,7 @@
     {
       "yr": 2006,
       "count": 1,
-      "total": 0.0419,
+      "total": 0.042,
       "series": [
         "S1"
       ],
@@ -636,7 +631,7 @@
     {
       "yr": 2007,
       "count": 1,
-      "total": 0.0582,
+      "total": 0.0583,
       "series": [
         "S1"
       ],
@@ -646,7 +641,7 @@
     {
       "yr": 2008,
       "count": 1,
-      "total": 0.053,
+      "total": 0.0531,
       "series": [
         "S1"
       ],
@@ -716,7 +711,7 @@
     {
       "yr": 2017,
       "count": 1,
-      "total": 0.0463,
+      "total": 0.0464,
       "series": [
         "S1"
       ],
@@ -726,7 +721,7 @@
     {
       "yr": 2018,
       "count": 1,
-      "total": 0.0627,
+      "total": 0.0628,
       "series": [
         "S1"
       ],
@@ -773,35 +768,35 @@
       "id": "S1_2004",
       "series": "S1",
       "date": "2004-08-04",
-      "amount": 0.0386,
+      "amount": 0.0387,
       "note": "Dividend"
     },
     {
       "id": "S1_2005",
       "series": "S1",
       "date": "2005-08-03",
-      "amount": 0.04,
+      "amount": 0.0401,
       "note": "Dividend"
     },
     {
       "id": "S1_2006",
       "series": "S1",
       "date": "2006-08-03",
-      "amount": 0.0419,
+      "amount": 0.042,
       "note": "Dividend"
     },
     {
       "id": "S1_2007",
       "series": "S1",
       "date": "2007-08-07",
-      "amount": 0.0582,
+      "amount": 0.0583,
       "note": "Dividend"
     },
     {
       "id": "S1_2008",
       "series": "S1",
       "date": "2008-08-06",
-      "amount": 0.053,
+      "amount": 0.0531,
       "note": "Dividend"
     },
     {
@@ -850,14 +845,14 @@
       "id": "S1_2017",
       "series": "S1",
       "date": "2017-08-10",
-      "amount": 0.0463,
+      "amount": 0.0464,
       "note": "Dividend"
     },
     {
       "id": "S1_2018",
       "series": "S1",
       "date": "2018-08-07",
-      "amount": 0.0627,
+      "amount": 0.0628,
       "note": "Dividend"
     },
     {

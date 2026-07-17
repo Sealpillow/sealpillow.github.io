@@ -191,12 +191,17 @@ td.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .chip-miss-above{background:rgba(245,158,11,.18);color:#fbbf24}
 .chip-unresolved{background:rgba(100,116,139,.18);color:#94a3b8}
 
-/* date range display */
-.date-range{display:flex;flex-direction:column;gap:1px}
+/* date range display -- intentionally not flex/grid: the content returned by
+   dtClusterRange() mixes bare text with a <br> and a <span>, and a <br> only
+   acts as a line break in normal block flow, not as a grid/flex container's
+   direct child (there it becomes its own empty flex item, inserting a blank
+   line and breaking the cluster-label/date grouping). Plain block flow with
+   line-height already gives the intended compact 2-line layout. */
+.date-range{line-height:1.5}
 .date-best{font-weight:600}
 .date-window{color:var(--mu);font-size:11px}
-.date-cluster{display:flex;flex-direction:column;gap:3px}
-.cluster-label{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--mu2)}
+.date-cluster{line-height:1.6}
+.cluster-label{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--mu2);margin-right:4px}
 .date-wide{font-size:10px;color:var(--warn);margin-left:3px;font-style:italic}
 
 /* error value coloring */

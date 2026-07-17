@@ -5,7 +5,7 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-07-16",
+    "today": "2026-07-17",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
@@ -32,8 +32,8 @@
     "zero_volume_rows": 174,
     "zero_volume_pct": 33.3,
     "issues_found": [
-      "1 rows share same date as dividend rows \u2014 verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (174/522, 33.3%) \u2014 analysis continues, but thin trading may reduce reliability"
+      "1 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date",
+      "Zero-volume rows exceed 5% (174/522, 33.3%) \u00e2\u20ac\u201d analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -76,11 +76,11 @@
       "wks_to_peak": -5.0,
       "div_yield": 2.1243,
       "s1": 26.6667,
-      "s1_floored": "False",
+      "s1_floored": false,
       "s2": 15.0823,
       "degen": false,
       "incomplete": false,
-      "outlier": "False",
+      "outlier": false,
       "macro": false,
       "macro_detail": {
         "market_index_return": -9.0771,
@@ -91,7 +91,7 @@
       "volume_trend": "DECLINING",
       "max_drawdown_pre_exdiv": -20.0277,
       "recovery_time_days": 95,
-      "success": "True",
+      "success": true,
       "pattern_stability_score": null,
       "zone_hit": null,
       "exit_analysis": {
@@ -128,11 +128,11 @@
       "wks_to_peak": 3.0,
       "div_yield": 5.9111,
       "s1": 16.986,
-      "s1_floored": "False",
+      "s1_floored": false,
       "s2": 6.6667,
       "degen": false,
       "incomplete": false,
-      "outlier": "False",
+      "outlier": false,
       "macro": false,
       "macro_detail": {
         "market_index_return": 2.8975,
@@ -143,7 +143,7 @@
       "volume_trend": "STABLE",
       "max_drawdown_pre_exdiv": -26.65,
       "recovery_time_days": 105,
-      "success": "True",
+      "success": true,
       "pattern_stability_score": null,
       "zone_hit": null,
       "exit_analysis": {
@@ -180,11 +180,11 @@
       "wks_to_peak": 20.0,
       "div_yield": 5.0606,
       "s1": 18.2116,
-      "s1_floored": "False",
+      "s1_floored": false,
       "s2": 4.0303,
       "degen": false,
       "incomplete": false,
-      "outlier": "False",
+      "outlier": false,
       "macro": false,
       "macro_detail": {
         "market_index_return": -4.1521,
@@ -195,7 +195,7 @@
       "volume_trend": "INCREASING",
       "max_drawdown_pre_exdiv": -9.6494,
       "recovery_time_days": 151,
-      "success": "True",
+      "success": true,
       "pattern_stability_score": null,
       "zone_hit": null,
       "exit_analysis": {
@@ -232,11 +232,11 @@
       "wks_to_peak": -15.0,
       "div_yield": 2.08,
       "s1": 23.6364,
-      "s1_floored": "False",
+      "s1_floored": false,
       "s2": 13.6,
       "degen": false,
       "incomplete": false,
-      "outlier": "False",
+      "outlier": false,
       "macro": false,
       "macro_detail": {
         "market_index_return": 13.5601,
@@ -247,9 +247,9 @@
       "volume_trend": "STABLE",
       "max_drawdown_pre_exdiv": -19.7183,
       "recovery_time_days": 39,
-      "success": "True",
+      "success": true,
       "pattern_stability_score": 76.42,
-      "zone_hit": "False",
+      "zone_hit": false,
       "exit_analysis": {
         "opt_exit_px": 0.66,
         "opt_exit_date": "2024-11-29",
@@ -264,7 +264,8 @@
         "exdiv_date_exit_px": 0.64,
         "exdiv_date_exit_date": "2024-11-15",
         "post_exdiv_exit_gain_pct": 12.2807
-      }
+      },
+      "zone_miss_pct": 102.59
     },
     {
       "id": "S1_2025",
@@ -284,11 +285,11 @@
       "wks_to_peak": -6.0,
       "div_yield": 1.371,
       "s1": 42.5,
-      "s1_floored": "False",
+      "s1_floored": false,
       "s2": 8.0645,
       "degen": false,
       "incomplete": false,
-      "outlier": "False",
+      "outlier": false,
       "macro": false,
       "macro_detail": {
         "market_index_return": 15.0823,
@@ -299,9 +300,9 @@
       "volume_trend": "DECLINING",
       "max_drawdown_pre_exdiv": -10.4478,
       "recovery_time_days": 82,
-      "success": "True",
+      "success": true,
       "pattern_stability_score": 56.1,
-      "zone_hit": "False",
+      "zone_hit": false,
       "exit_analysis": {
         "opt_exit_px": 0.63,
         "opt_exit_date": "2025-10-31",
@@ -316,7 +317,8 @@
         "exdiv_date_exit_px": 0.62,
         "exdiv_date_exit_date": "2025-11-21",
         "post_exdiv_exit_gain_pct": 3.3333
-      }
+      },
+      "zone_miss_pct": 6.77
     }
   ],
   "ss_series": {
@@ -629,14 +631,8 @@
       "zone_fragility": {
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 100.0,
-        "fragility_warning": "True"
-      },
-      "macro_context": {
-        "current_regime": null,
-        "sector_etf": null,
-        "sector_performance": "IN_LINE",
-        "interest_rate_trend": "STABLE",
-        "last_update": "2026-07-16"
+        "fragility_warning": true,
+        "median_miss_pct": 54.68
       }
     }
   },
