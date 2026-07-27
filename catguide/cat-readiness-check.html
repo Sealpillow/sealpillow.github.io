@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Readiness Check — The Feline Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2B211B;
+    --ink-soft:#68564A;
+    --ink-faint:#938173;
+    --canvas:#FBF2E6;
+    --canvas-dim:#F1E2CF;
+    --panel:#FFF9F2;
+    --line:#DEC8B0;
+    --line-strong:#CBAE90;
+    --forest:#A05A3A;
+    --forest-deep:#4D3227;
+    --brass:#B78A47;
+    --brass-light:#D8AE64;
+    --clay:#B86543;
+    --teal:#6F7D82;
+    --plum:#7A5D60;
+    --olive:#9A7842;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:var(--canvas);
+    color:var(--ink);
+    font-family:'Archivo', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:inherit;}
+
+  .top-bar{
+    background:var(--forest-deep);
+    border-bottom:1px solid rgba(201,166,72,0.25);
+    padding:14px 20px;
+  }
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:#DCE5DC;
+    text-decoration:none;
+  }
+  .back-link:hover{color:#fff;}
+
+  .page-hero{
+    padding:44px 24px 40px;
+    text-align:center;
+    background:var(--forest-deep);
+    color:#F2EFE3;
+    position:relative;
+  }
+  .page-hero::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:3px;
+    background:var(--brass);
+  }
+  .page-hero .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--brass-light);
+    margin-bottom:16px;
+  }
+  .page-hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(1.8rem, 4.5vw, 2.6rem);
+    margin:0 0 14px;
+  }
+  .page-hero p{
+    max-width:480px;
+    margin:0 auto;
+    color:#C7CCC0;
+    font-size:14.5px;
+    line-height:1.65;
+  }
+  .toolkit-nav{
+    max-width:980px;
+    margin:0 auto;
+    padding:18px 24px 0;
+  }
+  .toolkit-nav-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+  }
+  .toolkit-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:38px;
+    padding:9px 14px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:var(--panel);
+    color:var(--ink-soft);
+    text-decoration:none;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    transition:border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+  .toolkit-pill:hover{
+    color:var(--forest);
+    border-color:var(--line-strong);
+    transform:translateY(-1px);
+  }
+  .toolkit-pill.active{
+    background:var(--forest);
+    border-color:var(--forest);
+    color:#F2EFE3;
+  }
+
+  .check-wrap{
+    max-width:560px;
+    margin:40px auto 20px;
+    padding:0 24px;
+  }
+
+  /* ---------- READINESS GAUGE ---------- */
+  .readiness-gauge{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-top:3px solid var(--brass);
+    border-radius:4px 4px 14px 14px;
+    padding:28px 26px 26px;
+    box-shadow:0 20px 40px rgba(21,45,34,0.1);
+  }
+  .gauge-visual{
+    max-width:260px;
+    margin:0 auto;
+  }
+  .gauge-svg{width:100%; height:auto; display:block;}
+  .gauge-zone{fill:none; stroke-width:16; stroke-linecap:round;}
+  .zone-red{stroke:var(--clay);}
+  .zone-amber{stroke:var(--brass-light);}
+  .zone-green{stroke:var(--forest);}
+  .gauge-needle{
+    stroke:var(--ink);
+    stroke-width:3;
+    stroke-linecap:round;
+    transition:transform 0.5s cubic-bezier(.34,1.4,.64,1);
+  }
+  .gauge-pivot{fill:var(--ink);}
+  .gauge-readout{text-align:center; margin:8px 0 20px;}
+  .gauge-verdict{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:1.1rem;
+    color:var(--ink);
+    margin-bottom:5px;
+  }
+  .gauge-verdict.verdict-green{color:var(--forest);}
+  .gauge-verdict.verdict-amber{color:var(--olive);}
+  .gauge-verdict.verdict-red{color:var(--clay);}
+  .gauge-progress{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-faint);
+    letter-spacing:0.04em;
+  }
+  .gauge-questions{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    margin-bottom:20px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+  .gauge-question p{font-size:14.5px; color:var(--ink-soft); margin:0 0 10px; line-height:1.55;}
+  .gauge-options{display:flex; gap:8px; flex-wrap:wrap;}
+  .gauge-option{font-family:'JetBrains Mono', monospace; font-size:12px; cursor:pointer;}
+  .gauge-option input{position:absolute; opacity:0; width:1px; height:1px; pointer-events:none;}
+  .gauge-option span{
+    display:inline-block;
+    padding:7px 16px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    color:var(--ink-soft);
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .gauge-option:hover span{border-color:var(--brass);}
+  .gauge-option input:checked + span{
+    background:var(--forest);
+    border-color:var(--forest);
+    color:#F2EFE3;
+  }
+  .gauge-reset{
+    display:block;
+    margin:0 auto;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    background:none;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 18px;
+    cursor:pointer;
+  }
+  .gauge-reset:hover{border-color:var(--clay); color:var(--clay);}
+
+  .related-note{
+    max-width:560px;
+    margin:0 auto;
+    padding:0 24px;
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    text-align:center;
+  }
+  .related-note a{color:var(--forest); text-decoration:underline; text-underline-offset:2px;}
+
+  footer{
+    text-align:center;
+    color:var(--ink-faint);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:40px 20px 50px;
+    letter-spacing:0.03em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+
+  @media (max-width:560px){
+    .page-hero{padding:36px 18px 32px;}
+    .readiness-gauge{padding:22px 18px 22px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-link" href="cat-breed-catalog.html">&larr; Back to The Feline Index</a>
+</div>
+
+<div class="page-hero">
+  <div class="eyebrow">Before You Get a Cat</div>
+  <h1>Are You Ready for a Cat?</h1>
+  <p>Eight honest questions, scored live — not a verdict, just a gut-check before you adopt or buy. Nothing here is saved or tracked; refresh and it resets.</p>
+</div>
+
+<nav class="toolkit-nav" aria-label="Cat care toolkit">
+  <div class="toolkit-nav-row">
+    <a class="toolkit-pill" href="cat-emergency-sheet.html">Emergency Sheet</a>
+    <a class="toolkit-pill active" href="cat-readiness-check.html">Readiness Check</a>
+    <a class="toolkit-pill" href="cat-knowledge-quiz.html">Knowledge Quiz</a>
+    <a class="toolkit-pill" href="cat-routine-care-planner.html">Care Planner</a>
+  </div>
+</nav>
+
+<div class="check-wrap">
+  <div class="readiness-gauge" id="readinessGauge">
+    <div class="gauge-visual">
+      <svg viewBox="0 0 200 112" class="gauge-svg">
+        <path d="M 20 100 A 80 80 0 0 1 60 30.72" class="gauge-zone zone-red"/>
+        <path d="M 60 30.72 A 80 80 0 0 1 140 30.72" class="gauge-zone zone-amber"/>
+        <path d="M 140 30.72 A 80 80 0 0 1 180 100" class="gauge-zone zone-green"/>
+        <line x1="100" y1="100" x2="100" y2="28" class="gauge-needle" id="gaugeNeedle"/>
+        <circle cx="100" cy="100" r="6" class="gauge-pivot"/>
+      </svg>
+    </div>
+    <div class="gauge-readout">
+      <div class="gauge-verdict" id="gaugeVerdict">Answer the 8 questions below to see where you land.</div>
+      <div class="gauge-progress" id="gaugeProgress">0 of 8 answered</div>
+    </div>
+    <div class="gauge-questions" id="gaugeQuestions"></div>
+    <button type="button" class="gauge-reset" id="gaugeReset">Reset</button>
+  </div>
+</div>
+
+<p class="related-note">Each question ties back to something covered in the <a href="cat-breed-catalog.html">guide</a> itself — mostly Before You Get a Cat, plus a few from Adoption, Health & Safety, and Travel & Boarding — worth reading those for the full reasoning behind each one. Want to test what you actually know instead? Try the <a href="cat-knowledge-quiz.html">Cat Care Knowledge Quiz</a>.</p>
+
+<footer>
+  General reference only — not a substitute for thinking it through with everyone in the household.
+</footer>
+
+<script>
+/* ============ READINESS GAUGE ============
+   One question per card in the guide's "Before You Get a Cat" tab. */
+const READINESS_QUESTIONS = [
+  {key:"commitment", text:"Are you prepared for a 15–20 year commitment, including possible moves, relationship changes, or career shifts?"},
+  {key:"budget", text:"Have you budgeted for routine monthly costs — food, litter, and vet care commonly run $100–250/month in Singapore — plus a separate buffer for emergency or senior-year vet bills?"},
+  {key:"legal", text:"If you're in an HDB flat or a rental, have you confirmed you're within the cat limit and actually allowed to keep one?"},
+  {key:"lifestyle", text:"Does your day-to-day lifestyle — time away, allergies, other pets or kids — genuinely fit a cat right now?"},
+  {key:"caregiver", text:"Is there one specific person (not just \"the family\") who will own daily feeding, litter, and vet care?"},
+  {key:"homeSafety", text:"Have you checked that your windows, gates, and balcony can actually be meshed or secured against falls?"},
+  {key:"vetAccess", text:"Do you already know which vet clinic you'd go to — not just for emergencies, but for regular checkups?"},
+  {key:"travelPlan", text:"If you travel, do you already have a plan (a sitter, boarding, or a trusted family member) for who looks after the cat?"}
+];
+const gaugeAnswers = {};
+
+function buildGaugeQuestions(){
+  const container = document.getElementById('gaugeQuestions');
+  container.innerHTML = READINESS_QUESTIONS.map(q =>
+    '<div class="gauge-question">' +
+      '<p>' + q.text + '</p>' +
+      '<div class="gauge-options">' +
+        [['1','Yes'],['0','No']].map(([val,label])=>
+          '<label class="gauge-option">' +
+            '<input type="radio" name="gauge-' + q.key + '" value="' + val + '">' +
+            '<span>' + label + '</span>' +
+          '</label>'
+        ).join('') +
+      '</div>' +
+    '</div>'
+  ).join('');
+  container.querySelectorAll('input[type="radio"]').forEach(input=>{
+    input.addEventListener('change', (e)=>{
+      const key = e.target.name.replace('gauge-','');
+      gaugeAnswers[key] = Number(e.target.value);
+      updateGauge();
+    });
+  });
+}
+
+function updateGauge(){
+  const total = READINESS_QUESTIONS.length;
+  const answeredKeys = Object.keys(gaugeAnswers);
+  const answeredCount = answeredKeys.length;
+  const answeredSum = answeredKeys.reduce((sum,k)=>sum+gaugeAnswers[k], 0);
+  const maxScore = total;
+  // Unanswered questions count as half a point (there's no "neutral" answer anymore — Yes/No is deliberately firm)
+  // purely so the needle previews live instead of sitting pinned at one edge.
+  const projectedScore = answeredSum + (total - answeredCount) * 0.5;
+  const deg = (projectedScore / maxScore) * 180 - 90;
+  document.getElementById('gaugeNeedle').setAttribute('transform', 'rotate(' + deg + ' 100 100)');
+  document.getElementById('gaugeProgress').textContent = answeredCount + ' of ' + total + ' answered';
+
+  const verdict = document.getElementById('gaugeVerdict');
+  if(answeredCount < total){
+    verdict.textContent = "Answer all " + total + " — the needle's just previewing so far.";
+    verdict.className = 'gauge-verdict';
+    return;
+  }
+  const pct = answeredSum / maxScore;
+  if(pct >= 0.8){
+    verdict.textContent = "Looks like a good fit — sounds like you've thought this through.";
+    verdict.className = 'gauge-verdict verdict-green';
+  } else if(pct >= 0.4){
+    verdict.textContent = "A few things worth sorting out first — not a no, just not fully ready yet.";
+    verdict.className = 'gauge-verdict verdict-amber';
+  } else {
+    verdict.textContent = "Might not be the right time yet — worth revisiting the guide before deciding.";
+    verdict.className = 'gauge-verdict verdict-red';
+  }
+}
+
+document.getElementById('gaugeReset').addEventListener('click', ()=>{
+  Object.keys(gaugeAnswers).forEach(k=> delete gaugeAnswers[k]);
+  document.querySelectorAll('#gaugeQuestions input[type="radio"]').forEach(i=> i.checked = false);
+  updateGauge();
+});
+
+buildGaugeQuestions();
+updateGauge();
+</script>
+
+</body>
+</html>

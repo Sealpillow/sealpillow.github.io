@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Routine Care Planner — The Feline Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2B211B;
+    --ink-soft:#68564A;
+    --ink-faint:#938173;
+    --canvas:#FBF2E6;
+    --canvas-dim:#F1E2CF;
+    --panel:#FFF9F2;
+    --line:#DEC8B0;
+    --line-strong:#CBAE90;
+    --forest:#A05A3A;
+    --forest-deep:#4D3227;
+    --brass:#B78A47;
+    --brass-light:#D8AE64;
+    --clay:#B86543;
+    --teal:#6F7D82;
+    --olive:#9A7842;
+    --sticky-mid-offset:clamp(12px, calc(50vh - 220px), 160px);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--canvas);
+    color:var(--ink);
+    font-family:'Archivo', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  .top-bar{
+    background:var(--forest-deep);
+    border-bottom:1px solid rgba(201,166,72,0.25);
+    padding:14px 20px;
+  }
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:#DCE5DC;
+    text-decoration:none;
+  }
+  .back-link:hover{color:#fff;}
+  .page-hero{
+    padding:44px 24px 40px;
+    text-align:center;
+    background:var(--forest-deep);
+    color:#F2EFE3;
+    position:relative;
+  }
+  .page-hero::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:3px;
+    background:var(--brass);
+  }
+  .page-hero .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--brass-light);
+    margin-bottom:16px;
+  }
+  .page-hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(1.8rem, 4.5vw, 2.6rem);
+    margin:0 0 14px;
+  }
+  .page-hero p{
+    max-width:560px;
+    margin:0 auto;
+    color:#C7CCC0;
+    font-size:14.5px;
+    line-height:1.65;
+  }
+  .toolkit-nav{
+    max-width:980px;
+    margin:0 auto;
+    padding:18px 24px 0;
+  }
+  .toolkit-nav-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+  }
+  .toolkit-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:38px;
+    padding:9px 14px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:var(--panel);
+    color:var(--ink-soft);
+    text-decoration:none;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    transition:border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+  .toolkit-pill:hover{
+    color:var(--forest);
+    border-color:var(--line-strong);
+    transform:translateY(-1px);
+  }
+  .toolkit-pill.active{
+    background:var(--forest);
+    border-color:var(--forest);
+    color:#F2EFE3;
+  }
+  .planner-wrap{
+    max-width:1160px;
+    margin:36px auto 20px;
+    padding:0 24px;
+    display:grid;
+    grid-template-columns:minmax(260px, 30%) minmax(0, 1fr);
+    gap:22px;
+    align-items:start;
+  }
+  .planner-summary{
+    position:sticky;
+    top:var(--sticky-mid-offset);
+    z-index:20;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px;
+    box-shadow:0 8px 20px rgba(27,36,30,0.06);
+  }
+  .planner-content{
+    min-width:0;
+  }
+  .planner-summary-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:12px;
+  }
+  .planner-summary h2{
+    margin:0 0 4px;
+    font-family:'Fraunces', serif;
+    font-size:1.1rem;
+    font-weight:500;
+    color:var(--forest);
+  }
+  .planner-summary p{
+    margin:0;
+    font-size:12.5px;
+    line-height:1.55;
+    color:var(--ink-soft);
+    max-width:470px;
+  }
+  .planner-reset{
+    flex:none;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    background:none;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 14px;
+    cursor:pointer;
+  }
+  .planner-reset:hover{border-color:var(--clay); color:var(--clay);}
+  .planner-progress{
+    width:100%;
+    height:8px;
+    background:var(--canvas-dim);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:10px;
+  }
+  .planner-progress span{
+    display:block;
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg, var(--brass), var(--forest));
+    transition:width 0.2s ease;
+  }
+  .planner-summary-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+    margin-top:12px;
+  }
+  .planner-picker{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:8px;
+    margin-top:14px;
+  }
+  .planner-picker-option{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-height:40px;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--panel);
+    color:var(--ink-soft);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+  .planner-picker-option:hover{
+    border-color:var(--line-strong);
+    color:var(--forest);
+    transform:translateY(-1px);
+  }
+  .planner-picker-option input{
+    width:16px;
+    height:16px;
+    margin:0;
+    accent-color:var(--forest);
+    flex:none;
+  }
+  .planner-picker-option span{
+    display:block;
+    line-height:1.3;
+  }
+  .planner-picker-option.active{
+    border-color:var(--line-strong);
+    background:color-mix(in srgb, var(--canvas-dim) 52%, white);
+    color:var(--forest);
+  }
+  .planner-empty{
+    border:1px dashed var(--line-strong);
+    border-radius:10px;
+    background:var(--canvas);
+    padding:20px 18px;
+    text-align:center;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--ink-soft);
+  }
+  .planner-summary-card{
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--canvas);
+    padding:10px 12px;
+  }
+  .planner-summary-card-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .planner-summary-card-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--teal);
+  }
+  .planner-summary-card-count{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.03em;
+    color:var(--ink-faint);
+  }
+  .planner-summary-grid .planner-progress{
+    height:7px;
+    margin-bottom:0;
+  }
+  .planner-summary-line{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.03em;
+    color:var(--ink-soft);
+  }
+  .planner-section{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px 18px 16px;
+    margin-bottom:16px;
+  }
+  .planner-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .planner-chip{
+    display:inline-flex;
+    align-items:center;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:5px 10px;
+    background:var(--canvas);
+    color:var(--teal);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .planner-section h3{
+    margin:0 0 4px;
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:1.08rem;
+    color:var(--ink);
+  }
+  .planner-section p{
+    margin:0;
+    font-size:13px;
+    line-height:1.55;
+    color:var(--ink-soft);
+  }
+  .planner-count{
+    flex:none;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .planner-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .planner-item{
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--canvas);
+    padding:11px 12px;
+  }
+  .planner-item label{
+    display:grid;
+    grid-template-columns:22px 1fr;
+    gap:10px;
+    align-items:flex-start;
+    cursor:pointer;
+  }
+  .planner-item input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+  }
+  .planner-box{
+    width:22px;
+    height:22px;
+    border-radius:6px;
+    border:1px solid var(--line-strong);
+    background:#fff;
+    margin-top:1px;
+    position:relative;
+    transition:background 0.15s ease, border-color 0.15s ease;
+  }
+  .planner-box::after{
+    content:"";
+    position:absolute;
+    left:6px; top:2px;
+    width:6px; height:12px;
+    border-right:2px solid transparent;
+    border-bottom:2px solid transparent;
+    transform:rotate(40deg);
+  }
+  .planner-item input:checked + .planner-box{
+    background:var(--forest);
+    border-color:var(--forest);
+  }
+  .planner-item input:checked + .planner-box::after{
+    border-right-color:#F2EFE3;
+    border-bottom-color:#F2EFE3;
+  }
+  .planner-text strong{
+    display:block;
+    margin-bottom:3px;
+    font-size:13.5px;
+    color:var(--ink);
+  }
+  .planner-text span{
+    display:block;
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .planner-links{
+    margin-top:7px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .planner-links a{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--forest);
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .planner-links a:hover{color:var(--clay);}
+  .related-note{
+    max-width:760px;
+    margin:0 auto;
+    padding:0 24px;
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    text-align:center;
+  }
+  .related-note a{color:var(--forest); text-decoration:underline; text-underline-offset:2px;}
+  footer{
+    text-align:center;
+    color:var(--ink-faint);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:40px 20px 50px;
+    letter-spacing:0.03em;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+  @media (max-width:640px){
+    .page-hero{padding:36px 18px 32px;}
+    .planner-wrap{
+      display:block;
+      padding:0 16px;
+      margin-top:28px;
+    }
+    .planner-summary{
+      top:8px;
+      padding:14px;
+      margin-bottom:14px;
+    }
+    .planner-summary-top{
+      flex-direction:column;
+      align-items:stretch;
+    }
+    .planner-reset{width:100%;}
+    .planner-summary-grid{grid-template-columns:1fr;}
+    .planner-picker{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-link" href="cat-breed-catalog.html">&larr; Back to The Feline Index</a>
+</div>
+
+<div class="page-hero">
+  <div class="eyebrow">Care Guide Toolkit</div>
+  <h1>Routine Care Planner</h1>
+  <p>A practical maintenance checklist for the things that are easy to forget once the cat is already home — daily basics, recurring care, senior-year watchpoints, and one-time Singapore admin setup.</p>
+</div>
+
+<nav class="toolkit-nav" aria-label="Cat care toolkit">
+  <div class="toolkit-nav-row">
+    <a class="toolkit-pill" href="cat-emergency-sheet.html">Emergency Sheet</a>
+    <a class="toolkit-pill" href="cat-readiness-check.html">Readiness Check</a>
+    <a class="toolkit-pill" href="cat-knowledge-quiz.html">Knowledge Quiz</a>
+    <a class="toolkit-pill active" href="cat-routine-care-planner.html">Care Planner</a>
+  </div>
+</nav>
+
+<div class="planner-wrap">
+  <div class="planner-summary">
+    <div class="planner-summary-top">
+      <div>
+        <h2>Care Snapshot</h2>
+        <p>Nothing here is saved anywhere. Tick things off for this session, use the guide links when you need a refresher, and reset anytime.</p>
+      </div>
+      <button type="button" class="planner-reset" id="plannerReset">Reset</button>
+    </div>
+    <div class="planner-progress"><span id="plannerProgressBar"></span></div>
+    <div class="planner-summary-line" id="plannerSummaryLine">0 of 29 checked overall</div>
+    <div class="planner-picker" id="plannerPicker"></div>
+    <div class="planner-summary-grid" id="plannerSummaryGrid"></div>
+  </div>
+
+  <div class="planner-content">
+    <div id="plannerSections"></div>
+  </div>
+</div>
+
+<p class="related-note">This planner pulls together habits and admin tasks already covered across the <a href="cat-breed-catalog.html">main guide</a> — mostly Daily Care, Life Stages, Health &amp; Safety, Diet &amp; Nutrition, and Singapore-specific setup.</p>
+
+<footer>
+  General reference only — not a substitute for veterinary advice or a medical record.
+</footer>
+
+<script>
+const PLANNER_SECTIONS = [
+  {
+    key:"daily",
+    chip:"Daily",
+    title:"Quick Daily Scan",
+    desc:"The baseline things that tell you fastest when something is drifting off normal.",
+    items:[
+      {label:"Fresh water checked", detail:"Make sure bowls or fountains are clean, full, and actually being used.", links:[{label:"Daily Care", url:"cat-breed-catalog.html#care"}]},
+      {label:"Appetite looks normal", detail:"Note sudden food refusal, scavenging, or a cat that seems interested in food but doesn't eat.", links:[{label:"My Cat Won't Eat", url:"cat-breed-catalog.html"}]},
+      {label:"Litter-box output seems normal", detail:"Watch for straining, diarrhea, no urine, or suddenly avoiding the box.", links:[{label:"Monitor or Vet?", url:"cat-breed-catalog.html"}]},
+      {label:"Energy and behavior feel normal", detail:"Hiding, restlessness, unusual clinginess, or sudden lethargy matter even before obvious physical signs appear.", links:[{label:"Emergencies", url:"cat-breed-catalog.html"}]}
+    ]
+  },
+  {
+    key:"weekly",
+    chip:"Weekly",
+    title:"Hands-On Weekly Checks",
+    desc:"Short checks that catch skin, coat, weight, and habit changes before they become a bigger problem.",
+    items:[
+      {label:"Body-condition check", detail:"Feel the ribs, look for a waist from above, and notice if weight is changing without meaning to.", links:[{label:"Life Stages", url:"cat-breed-catalog.html"}]},
+      {label:"Coat and skin scan", detail:"Look for dandruff, fleas, over-groomed patches, hot spots, scabs, or mats.", links:[{label:"Allergies & Sensitivities", url:"cat-breed-catalog.html"}]},
+      {label:"Eyes, ears, and nose check", detail:"Watch for discharge, crusting, redness, smell, or repeated face-rubbing.", links:[{label:"Monitor or Vet?", url:"cat-breed-catalog.html"}]},
+      {label:"Paws and nails check", detail:"Look for overgrown nails, paw tenderness, or debris stuck between pads.", links:[{label:"Daily Care", url:"cat-breed-catalog.html"}]},
+      {label:"Rotate or refresh enrichment", detail:"Swap toys, reset puzzle feeders, or vary the play setup so the environment stays interesting.", links:[{label:"Daily Care", url:"cat-breed-catalog.html"}]}
+    ]
+  },
+  {
+    key:"monthly",
+    chip:"Monthly",
+    title:"Monthly Maintenance",
+    desc:"The deeper cleanups and reminders that keep day-to-day care from getting sloppy over time.",
+    items:[
+      {label:"Deep-clean litter boxes", detail:"Wash and fully refresh the boxes rather than just topping up litter forever.", links:[{label:"Daily Care", url:"cat-breed-catalog.html"}]},
+      {label:"Review food transitions or new treats", detail:"If anything in the diet has changed, make sure the switch is still gradual rather than sudden.", links:[{label:"Diet & Nutrition", url:"cat-breed-catalog.html"}]},
+      {label:"Parasite-prevention reminder", detail:"Check whether flea or parasite prevention is due, and whether all cats in the home are covered consistently.", links:[{label:"Health & Safety", url:"cat-breed-catalog.html"}]},
+      {label:"Carrier and emergency kit check", detail:"Make sure the carrier is accessible, the towel/blanket is there, and emergency numbers are still saved.", links:[{label:"Emergency Sheet", url:"cat-emergency-sheet.html"}]},
+      {label:"Update household backup-care plan", detail:"Confirm who covers feeding, litter, and observation if you travel or get stuck out unexpectedly.", links:[{label:"Travel & Boarding", url:"cat-breed-catalog.html"}]}
+    ]
+  },
+  {
+    key:"yearly",
+    chip:"6–12 Months",
+    title:"Recurring Vet & Health Planning",
+    desc:"The structured care that tends to slip when nothing looks wrong on the surface.",
+    items:[
+      {label:"Book routine vet check", detail:"Adult cats often stay on annual checks; many seniors shift to twice-yearly visits.", links:[{label:"Health & Safety", url:"cat-breed-catalog.html"}]},
+      {label:"Review vaccines and deworming schedule", detail:"Confirm what's actually due rather than guessing from memory.", links:[{label:"Life Stages", url:"cat-breed-catalog.html"}]},
+      {label:"Dental-health review", detail:"Check whether bad breath, drooling, or dropping food while eating has started creeping in.", links:[{label:"Life Stages", url:"cat-breed-catalog.html"}]},
+      {label:"Budget reset for upcoming care", detail:"Revisit food, litter, routine-care, and emergency-buffer assumptions before costs surprise you.", links:[{label:"Before You Get a Cat", url:"cat-breed-catalog.html"}]}
+    ]
+  },
+  {
+    key:"senior",
+    chip:"Senior",
+    title:"Senior Cat Extra Watchpoints",
+    desc:"These matter most once the cat is getting older, but they're worth knowing before then too.",
+    items:[
+      {label:"Appetite change", detail:"Even a still-eating senior cat can be changing patterns: slower eating, fussier eating, or eating but losing weight.", links:[{label:"Life Stages", url:"cat-breed-catalog.html"}]},
+      {label:"Water intake increase", detail:"Suddenly draining bowls more often can be one of the earliest signs of kidney or thyroid trouble.", links:[{label:"Life Stages", url:"cat-breed-catalog.html"}]},
+      {label:"Reluctance to jump", detail:"Watch for using steps, hesitating, or choosing lower surfaces instead of favorite old spots.", links:[{label:"Monitor or Vet?", url:"cat-breed-catalog.html"}]},
+      {label:"Litter-box pattern changes", detail:"High sides, stairs, or joint stiffness can all affect whether the box is still easy to use.", links:[{label:"Daily Care", url:"cat-breed-catalog.html"}]},
+      {label:"Coat getting rougher or less groomed", detail:"A cat that is grooming less thoroughly can be signaling pain, stiffness, dental trouble, or illness.", links:[{label:"Daily Care", url:"cat-breed-catalog.html"}]}
+    ]
+  },
+  {
+    key:"admin",
+    chip:"Admin & Setup",
+    title:"One-Time or Occasional Admin Checks",
+    desc:"Not recurring care habits — just the setup and paperwork details that are easy to neglect once the cat is settled.",
+    items:[
+      {label:"Microchip implanted", detail:"Confirm the cat is actually chipped, not just assumed to be.", links:[{label:"Adoption", url:"cat-breed-catalog.html"}]},
+      {label:"Microchip owner details correct", detail:"Worth checking after a move, phone-number change, adoption, or rehoming.", links:[{label:"Adoption", url:"cat-breed-catalog.html"}]},
+      {label:"PALS license completed", detail:"For Singapore cats, make sure the cat is actually licensed and not just verbally planned for later.", links:[{label:"Know Before You Adopt (Singapore)", url:"cat-breed-catalog.html"}]},
+      {label:"Vet and vaccination records collected", detail:"Know where the records are, not just which clinic probably has them.", links:[{label:"Health & Safety", url:"cat-breed-catalog.html"}]},
+      {label:"Emergency clinic numbers saved", detail:"Keep a real after-hours plan, not just a hope that your usual clinic will answer.", links:[{label:"Emergency Contacts", url:"cat-breed-catalog.html"}]},
+      {label:"Backup caregiver identified", detail:"Someone should know the basics if you're suddenly unavailable.", links:[{label:"Travel & Boarding", url:"cat-breed-catalog.html"}]}
+    ]
+  }
+];
+
+const plannerState = {};
+const visiblePlannerSections = {};
+PLANNER_SECTIONS.forEach(section=>{ visiblePlannerSections[section.key] = true; });
+
+function getVisiblePlannerSections(){
+  return PLANNER_SECTIONS.filter(section=> visiblePlannerSections[section.key]);
+}
+
+function renderPlannerPicker(){
+  const picker = document.getElementById('plannerPicker');
+  picker.innerHTML = PLANNER_SECTIONS.map(section=>
+    '<label class="planner-picker-option' + (visiblePlannerSections[section.key] ? ' active' : '') + '">' +
+      '<input type="checkbox" data-section-key="'+section.key+'"' + (visiblePlannerSections[section.key] ? ' checked' : '') + '>' +
+      '<span>'+section.chip+'</span>' +
+    '</label>'
+  ).join('');
+
+  picker.querySelectorAll('input[type="checkbox"]').forEach(input=>{
+    input.addEventListener('change', ()=>{
+      visiblePlannerSections[input.dataset.sectionKey] = input.checked;
+      renderPlanner();
+      updatePlannerSummary();
+    });
+  });
+}
+
+function renderPlanner(){
+  const visibleSections = getVisiblePlannerSections();
+  const host = document.getElementById('plannerSections');
+  host.innerHTML = visibleSections.length ? visibleSections.map(section=>{
+    const itemsHtml = section.items.map((item, i)=>{
+      const key = section.key + '::' + i;
+      const checked = plannerState[key] ? ' checked' : '';
+      const links = item.links && item.links.length
+        ? '<div class="planner-links">' + item.links.map(l=>'<a href="'+l.url+'">'+l.label+' ↗</a>').join('') + '</div>'
+        : '';
+      return '<li class="planner-item">' +
+        '<label>' +
+          '<input type="checkbox" data-key="'+key+'"'+checked+'>' +
+          '<span class="planner-box" aria-hidden="true"></span>' +
+          '<span class="planner-text"><strong>'+item.label+'</strong><span>'+item.detail+'</span>'+links+'</span>' +
+        '</label>' +
+      '</li>';
+    }).join('');
+
+    return '<section class="planner-section">' +
+      '<div class="planner-head">' +
+        '<div><span class="planner-chip">'+section.chip+'</span><h3>'+section.title+'</h3><p>'+section.desc+'</p></div>' +
+        '<div class="planner-count" id="count-'+section.key+'">0 of '+section.items.length+' checked</div>' +
+      '</div>' +
+      '<ul class="planner-list">'+itemsHtml+'</ul>' +
+    '</section>';
+  }).join('') : '<div class="planner-empty">Select at least one checklist above to show the planner sections you want to work on.</div>';
+
+  renderPlannerPicker();
+
+  document.getElementById('plannerSummaryGrid').innerHTML = visibleSections.map(section=>
+    '<div class="planner-summary-card">' +
+      '<div class="planner-summary-card-top">' +
+        '<span class="planner-summary-card-label">'+section.chip+'</span>' +
+        '<span class="planner-summary-card-count" id="summary-count-'+section.key+'">0 of '+section.items.length+'</span>' +
+      '</div>' +
+      '<div class="planner-progress"><span id="summary-bar-'+section.key+'"></span></div>' +
+    '</div>'
+  ).join('');
+
+  host.querySelectorAll('input[type="checkbox"]').forEach(input=>{
+    input.addEventListener('change', ()=>{
+      plannerState[input.dataset.key] = input.checked;
+      updatePlannerSummary();
+    });
+  });
+}
+
+function updatePlannerSummary(){
+  let total = 0;
+  let done = 0;
+  const visibleKeys = new Set(getVisiblePlannerSections().map(section=> section.key));
+
+  PLANNER_SECTIONS.forEach(section=>{
+    let sectionDone = 0;
+    const isVisible = visibleKeys.has(section.key);
+    section.items.forEach((_, i)=>{
+      if(isVisible) total++;
+      if(plannerState[section.key + '::' + i]){
+        if(isVisible) done++;
+        sectionDone++;
+      }
+    });
+    const countEl = document.getElementById('count-' + section.key);
+    if(countEl) countEl.textContent = sectionDone + ' of ' + section.items.length + ' checked';
+    const summaryCountEl = document.getElementById('summary-count-' + section.key);
+    const summaryBarEl = document.getElementById('summary-bar-' + section.key);
+    if(summaryCountEl) summaryCountEl.textContent = sectionDone + ' of ' + section.items.length;
+    if(summaryBarEl) summaryBarEl.style.width = ((sectionDone / section.items.length) * 100) + '%';
+  });
+
+  document.getElementById('plannerSummaryLine').textContent = total ? (done + ' of ' + total + ' checked overall') : 'No checklist selected';
+  document.getElementById('plannerProgressBar').style.width = total ? (((done / total) * 100) + '%') : '0%';
+}
+
+document.getElementById('plannerReset').addEventListener('click', ()=>{
+  Object.keys(plannerState).forEach(k=> delete plannerState[k]);
+  renderPlanner();
+  updatePlannerSummary();
+});
+
+renderPlanner();
+updatePlannerSummary();
+</script>
+
+</body>
+</html>

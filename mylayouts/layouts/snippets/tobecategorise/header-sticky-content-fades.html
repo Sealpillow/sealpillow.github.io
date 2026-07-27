@@ -1,0 +1,420 @@
+<!-- ============================= -->
+<!-- Dependencies                  -->
+<!-- ============================= -->
+<!-- No external dependencies used -->
+
+<!-- ============================= -->
+<!-- HTML                          -->
+<!-- ============================= -->
+<div class="timeline-page">
+  <section class="intro-section">
+    <h1>Company Timeline</h1>
+    <p>Scroll down to explore our journey year by year. Once you pass the year selector below, it will lock to the top of the page as a sticky header.</p>
+  </section>
+
+  <div class="carousel-sentinel" id="carouselSentinel"></div>
+
+  <div class="carousel-wrapper" id="carouselWrapper">
+    <nav class="year-carousel" id="yearCarousel" aria-label="Year navigation">
+      <ul class="year-list" id="yearList">
+        <!-- Year items injected by JS -->
+      </ul>
+    </nav>
+  </div>
+
+  <div class="carousel-placeholder" id="carouselPlaceholder"></div>
+
+  <main class="content" id="content">
+    <!-- Sections injected by JS -->
+  </main>
+</div>
+
+<!-- ============================= -->
+<!-- CSS                           -->
+<!-- ============================= -->
+<style>
+  :root {
+    --header-height: 64px;
+    --accent-color: #1a1a2e;
+    --accent-highlight: #e94560;
+    --bg-color: #f5f5f7;
+    --section-bg: #ffffff;
+    --text-color: #333333;
+    --muted-color: #9a9a9a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .timeline-page {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  /* Intro content before the carousel */
+  .intro-section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 24px 64px;
+    text-align: center;
+  }
+
+  .intro-section h1 {
+    font-size: 40px;
+    margin: 0 auto;
+    text-align: center;
+    color: var(--accent-color);
+  }
+
+  .intro-section p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted-color);
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .carousel-sentinel {
+    height: 1px;
+  }
+
+  /* Carousel wrapper: inline by default, fixed once "stuck" */
+  .carousel-wrapper {
+    width: 100%;
+  }
+
+  .carousel-wrapper.is-fixed {
+    position: fixed;
+    top: 9%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
+
+  /* Placeholder keeps content from jumping when wrapper becomes fixed */
+  .carousel-placeholder {
+    display: none;
+  }
+
+  .carousel-placeholder.is-active {
+    display: block;
+  }
+
+  .year-carousel {
+    width: 100%;
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    cursor: grab;
+    -webkit-overflow-scrolling: touch;
+    user-select: none;
+    background: #ffffff;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .carousel-wrapper.is-fixed .year-carousel {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .year-carousel.dragging {
+    cursor: grabbing;
+    scroll-behavior: auto;
+  }
+
+  .year-carousel::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .year-carousel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+  }
+
+  .year-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0 24px;
+    gap: 8px;
+    width: max-content;
+  }
+
+  .year-item {
+    flex: 0 0 auto;
+  }
+
+  .year-btn {
+    background: none;
+    border: none;
+    color: #9a9a9a;
+    font-size: 15px;
+    font-weight: 400;
+    padding: 10px 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: color 0.25s ease, background-color 0.25s ease, font-weight 0.25s ease;
+    white-space: nowrap;
+    -webkit-user-drag: none;
+  }
+
+  .year-btn:hover {
+    color: #555555;
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .year-btn.active {
+    color: #000000;
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  /* Content Sections */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .year-section {
+    background: var(--section-bg);
+    border-radius: 10px;
+    padding: 48px 32px;
+    margin-bottom: 24px;
+    min-height: 260px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    scroll-margin-top: calc(var(--header-height) + 16px);
+
+    /* Fade-in-on-scroll: initial hidden state */
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .year-section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .year-section h2 {
+    margin: 0 0 12px;
+    font-size: 28px;
+    color: var(--accent-color);
+  }
+
+  .year-section p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--muted-color);
+  }
+</style>
+
+<!-- ============================= -->
+<!-- JavaScript                    -->
+<!-- ============================= -->
+<script>
+  (function () {
+    const START_YEAR = 2000;
+    const END_YEAR = 2026;
+
+    const yearList = document.getElementById('yearList');
+    const contentEl = document.getElementById('content');
+    const carousel = document.getElementById('yearCarousel');
+    const carouselWrapper = document.getElementById('carouselWrapper');
+    const carouselSentinel = document.getElementById('carouselSentinel');
+    const carouselPlaceholder = document.getElementById('carouselPlaceholder');
+
+    const years = [];
+    for (let y = START_YEAR; y <= END_YEAR; y++) years.push(y);
+
+    // Build carousel items and content sections
+    const buttons = {};
+    years.forEach((year) => {
+      // Carousel button
+      const li = document.createElement('li');
+      li.className = 'year-item';
+
+      const btn = document.createElement('button');
+      btn.className = 'year-btn';
+      btn.type = 'button';
+      btn.textContent = year;
+      btn.dataset.year = year;
+      btn.addEventListener('click', () => {
+        if (carousel.dataset.wasDragged === 'true') return; // ignore click after drag
+        const section = document.getElementById(`section-${year}`);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+
+      li.appendChild(btn);
+      yearList.appendChild(li);
+      buttons[year] = btn;
+
+      // Content section
+      const section = document.createElement('section');
+      section.className = 'year-section';
+      section.id = `section-${year}`;
+      section.dataset.year = year;
+
+      const heading = document.createElement('h2');
+      heading.textContent = year;
+
+      const desc = document.createElement('p');
+      desc.textContent = `Content for the year ${year}. Replace this placeholder with real information relevant to ${year}.`;
+
+      section.appendChild(heading);
+      section.appendChild(desc);
+      contentEl.appendChild(section);
+    });
+
+    function setActiveYear(year) {
+      Object.keys(buttons).forEach((y) => {
+        buttons[y].classList.toggle('active', Number(y) === Number(year));
+      });
+
+      const activeBtn = buttons[year];
+      if (activeBtn && carousel.dataset.dragging !== 'true') {
+        activeBtn.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+    }
+
+    // Scrollspy via IntersectionObserver
+    const sections = document.querySelectorAll('.year-section');
+
+    function getHeaderHeight() {
+      return carousel.offsetHeight;
+    }
+
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveYear(entry.target.dataset.year);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: `-${getHeaderHeight()}px 0px -70% 0px`,
+        threshold: 0
+      }
+    );
+
+    sections.forEach((section) => sectionObserver.observe(section));
+
+    // ---- Fade-in-on-scroll for each year section (repeats both directions) ----
+	const fadeInObserver = new IntersectionObserver(
+	(entries) => {
+		entries.forEach((entry) => {
+		entry.target.classList.toggle('is-visible', entry.isIntersecting);
+		});
+	},
+	{
+		root: null,
+		rootMargin: '0px 0px -10% 0px', // trigger slightly before fully in view
+		threshold: 0.15
+	}
+	);
+
+	sections.forEach((section) => fadeInObserver.observe(section));
+
+    // ---- Carousel becomes a fixed header once scrolled past its original position ----
+    function toggleFixedHeader(isFixed) {
+      if (isFixed) {
+        const height = carousel.offsetHeight;
+        carouselPlaceholder.style.height = `${height}px`;
+        carouselPlaceholder.classList.add('is-active');
+        carouselWrapper.classList.add('is-fixed');
+      } else {
+        carouselWrapper.classList.remove('is-fixed');
+        carouselPlaceholder.classList.remove('is-active');
+        carouselPlaceholder.style.height = '0px';
+      }
+    }
+
+    const stickyObserver = new IntersectionObserver(
+      ([entry]) => {
+        // Sentinel scrolled above viewport -> lock carousel as fixed header
+        toggleFixedHeader(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      {
+        root: null,
+        threshold: 0
+      }
+    );
+
+    stickyObserver.observe(carouselSentinel);
+
+    // ---- Drag-to-scroll for the carousel (mouse + touch) ----
+    let isPointerDown = false;
+    let startX = 0;
+    let startScrollLeft = 0;
+    let moved = false;
+    const DRAG_THRESHOLD = 5; // px before it's considered a drag, not a click
+
+    function pointerX(e) {
+      return e.touches ? e.touches[0].clientX : e.clientX;
+    }
+
+    function dragStart(e) {
+      isPointerDown = true;
+      moved = false;
+      carousel.dataset.wasDragged = 'false';
+      carousel.dataset.dragging = 'true';
+      startX = pointerX(e);
+      startScrollLeft = carousel.scrollLeft;
+    }
+
+    function dragMove(e) {
+      if (!isPointerDown) return;
+      const x = pointerX(e);
+      const delta = x - startX;
+
+      if (Math.abs(delta) > DRAG_THRESHOLD) {
+        moved = true;
+        carousel.classList.add('dragging');
+        if (!e.touches) e.preventDefault();
+      }
+
+      if (moved) {
+        carousel.scrollLeft = startScrollLeft - delta;
+      }
+    }
+
+    function dragEnd() {
+      if (!isPointerDown) return;
+      isPointerDown = false;
+      carousel.classList.remove('dragging');
+      carousel.dataset.dragging = 'false';
+
+      if (moved) {
+        carousel.dataset.wasDragged = 'true';
+        setTimeout(() => {
+          carousel.dataset.wasDragged = 'false';
+        }, 50);
+      }
+    }
+
+    carousel.addEventListener('mousedown', dragStart);
+    window.addEventListener('mousemove', dragMove);
+    window.addEventListener('mouseup', dragEnd);
+    carousel.addEventListener('mouseleave', () => {
+      if (isPointerDown) dragEnd();
+    });
+
+    carousel.addEventListener('touchstart', dragStart, { passive: true });
+    carousel.addEventListener('touchmove', dragMove, { passive: true });
+    carousel.addEventListener('touchend', dragEnd);
+
+    // Set initial active year
+    setActiveYear(START_YEAR);
+  })();
+</script>

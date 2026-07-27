@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cat Care Knowledge Quiz — The Feline Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2B211B;
+    --ink-soft:#68564A;
+    --ink-faint:#938173;
+    --canvas:#FBF2E6;
+    --canvas-dim:#F1E2CF;
+    --panel:#FFF9F2;
+    --line:#DEC8B0;
+    --line-strong:#CBAE90;
+    --forest:#A05A3A;
+    --forest-deep:#4D3227;
+    --brass:#B78A47;
+    --brass-light:#D8AE64;
+    --clay:#B86543;
+    --teal:#6F7D82;
+    --plum:#7A5D60;
+    --olive:#9A7842;
+    --sticky-mid-offset:clamp(12px, calc(50vh - 220px), 160px);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:var(--canvas);
+    color:var(--ink);
+    font-family:'Archivo', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:inherit;}
+
+  .top-bar{
+    background:var(--forest-deep);
+    border-bottom:1px solid rgba(201,166,72,0.25);
+    padding:14px 20px;
+  }
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:#DCE5DC;
+    text-decoration:none;
+  }
+  .back-link:hover{color:#fff;}
+
+  .page-hero{
+    padding:44px 24px 40px;
+    text-align:center;
+    background:var(--forest-deep);
+    color:#F2EFE3;
+    position:relative;
+  }
+  .page-hero::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:3px;
+    background:var(--brass);
+  }
+  .page-hero .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--brass-light);
+    margin-bottom:16px;
+  }
+  .page-hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(1.8rem, 4.5vw, 2.6rem);
+    margin:0 0 14px;
+  }
+  .page-hero p{
+    max-width:480px;
+    margin:0 auto;
+    color:#C7CCC0;
+    font-size:14.5px;
+    line-height:1.65;
+  }
+  .toolkit-nav{
+    max-width:980px;
+    margin:0 auto;
+    padding:18px 24px 0;
+  }
+  .toolkit-nav-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+  }
+  .toolkit-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:38px;
+    padding:9px 14px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:var(--panel);
+    color:var(--ink-soft);
+    text-decoration:none;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    transition:border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+  .toolkit-pill:hover{
+    color:var(--forest);
+    border-color:var(--line-strong);
+    transform:translateY(-1px);
+  }
+  .toolkit-pill.active{
+    background:var(--forest);
+    border-color:var(--forest);
+    color:#F2EFE3;
+  }
+
+  .knowledge-section{
+    max-width:1160px;
+    margin:40px auto 20px;
+    padding:0 24px;
+    display:grid;
+    grid-template-columns:minmax(260px, 30%) minmax(0, 1fr);
+    gap:22px;
+    align-items:start;
+  }
+  .kq-summary-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:18px;
+    position:sticky;
+    top:var(--sticky-mid-offset);
+    z-index:20;
+    box-shadow:0 0 0 rgba(0,0,0,0);
+    transition:padding 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  }
+  .kq-content{
+    min-width:0;
+  }
+  .kq-summary{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.03em;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  .kq-progress{
+    width:100%;
+    height:8px;
+    background:var(--canvas-dim);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:12px;
+  }
+  .kq-progress span{
+    display:block;
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg, var(--brass), var(--forest));
+    transition:width 0.2s ease;
+  }
+  .kq-verdict{
+    font-size:13px;
+    line-height:1.55;
+    color:var(--ink-soft);
+    max-height:4.5em;
+    overflow:hidden;
+    transition:max-height 0.18s ease, opacity 0.18s ease, margin 0.18s ease;
+  }
+  .kq-verdict.strong{color:var(--forest);}
+  .kq-verdict.mid{color:var(--olive);}
+  .kq-verdict.low{color:var(--clay);}
+  body.kq-sticky-compact .kq-summary-card{
+    padding:10px 14px;
+    border-color:var(--line-strong);
+    box-shadow:0 8px 20px rgba(27,36,30,0.08);
+  }
+  body.kq-sticky-compact .kq-summary{
+    margin-bottom:8px;
+    font-size:11.5px;
+  }
+  body.kq-sticky-compact .kq-progress{
+    height:6px;
+    margin-bottom:0;
+  }
+  body.kq-sticky-compact .kq-verdict{
+    max-height:0;
+    opacity:0;
+    margin:0;
+  }
+  .kq-reset{
+    width:100%;
+    margin-top:14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:#F2EFE3;
+    background:var(--forest);
+    border:1px solid var(--forest);
+    border-radius:999px;
+    padding:10px 14px;
+    cursor:pointer;
+  }
+  .kq-reset:hover{
+    background:var(--forest-deep);
+    border-color:var(--forest-deep);
+  }
+  .kq-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .kq-chip,
+  .kq-number{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+  .kq-chip{
+    display:inline-flex;
+    align-items:center;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:5px 10px;
+    background:var(--canvas);
+    color:var(--forest);
+  }
+  .kq-number{
+    color:var(--ink-faint);
+  }
+  .kq-question{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px 18px;
+    margin-bottom:14px;
+  }
+  .kq-prompt{
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    margin:0 0 12px;
+    line-height:1.5;
+  }
+  .kq-options{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .kq-option{
+    text-align:left;
+    font-family:'Archivo', sans-serif;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--canvas);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:9px 14px;
+    cursor:pointer;
+    transition:border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+  .kq-option:hover:not(:disabled){border-color:var(--brass);}
+  .kq-option:disabled{cursor:default;}
+  .kq-option.correct{
+    background:rgba(31,69,52,0.1);
+    border-color:var(--forest);
+    color:var(--forest);
+    font-weight:600;
+  }
+  .kq-option.incorrect{
+    background:rgba(138,59,43,0.1);
+    border-color:var(--clay);
+    color:var(--clay);
+  }
+  .kq-explanation{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed var(--line);
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.55;
+  }
+  .kq-explanation.correct-text{color:var(--forest);}
+  .kq-explanation.incorrect-text{color:var(--clay);}
+  .kq-source{
+    display:block;
+    margin-top:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .kq-reset{
+    display:block;
+    margin:6px auto 0;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    background:none;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 18px;
+    cursor:pointer;
+  }
+  .kq-reset:hover{border-color:var(--clay); color:var(--clay);}
+
+  .related-note{
+    max-width:560px;
+    margin:0 auto;
+    padding:0 24px;
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    text-align:center;
+  }
+  .related-note a{color:var(--forest); text-decoration:underline; text-underline-offset:2px;}
+
+  footer{
+    text-align:center;
+    color:var(--ink-faint);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:40px 20px 50px;
+    letter-spacing:0.03em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+
+  @media (max-width:640px){
+    .page-hero{padding:36px 18px 32px;}
+    .knowledge-section{
+      display:block;
+      margin:28px auto 18px;
+      padding:0 16px;
+    }
+    .kq-summary-card{
+      top:8px;
+      padding:14px 14px;
+      margin-bottom:14px;
+      border-radius:8px;
+    }
+    .kq-summary{
+      font-size:11.5px;
+      margin-bottom:8px;
+    }
+    .kq-progress{
+      height:7px;
+      margin-bottom:10px;
+    }
+    .kq-verdict{
+      font-size:12px;
+      line-height:1.45;
+    }
+    body.kq-sticky-compact .kq-summary-card{
+      top:6px;
+      padding:8px 10px;
+      margin-bottom:12px;
+      border-radius:7px;
+    }
+    body.kq-sticky-compact .kq-summary{
+      font-size:10.5px;
+      margin-bottom:6px;
+    }
+    body.kq-sticky-compact .kq-progress{
+      height:5px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-link" href="cat-breed-catalog.html">&larr; Back to The Feline Index</a>
+</div>
+
+<div class="page-hero">
+  <div class="eyebrow">Care Guide</div>
+  <h1>Test Your Cat Care Knowledge</h1>
+  <p>Twenty questions pulled straight from the guide — allergies, emergencies, diet, daily care, life stages, and a few Singapore-specific facts. Pick an answer to see if you're right — you can change your pick anytime.</p>
+</div>
+
+<nav class="toolkit-nav" aria-label="Cat care toolkit">
+  <div class="toolkit-nav-row">
+    <a class="toolkit-pill" href="cat-emergency-sheet.html">Emergency Sheet</a>
+    <a class="toolkit-pill" href="cat-readiness-check.html">Readiness Check</a>
+    <a class="toolkit-pill active" href="cat-knowledge-quiz.html">Knowledge Quiz</a>
+    <a class="toolkit-pill" href="cat-routine-care-planner.html">Care Planner</a>
+  </div>
+</nav>
+
+<div class="knowledge-section">
+  <div class="kq-summary-card">
+    <div class="kq-summary" id="kqSummary">0 correct so far — 0 of 20 answered</div>
+    <div class="kq-progress"><span id="kqProgressBar"></span></div>
+    <div class="kq-verdict" id="kqVerdict">Twenty guide-based questions, with instant explanations and a few Singapore-specific checks mixed in.</div>
+    <button type="button" class="kq-reset" id="kqReset">Reset</button>
+  </div>
+  <div class="kq-content">
+    <div id="kqQuestions"></div>
+  </div>
+</div>
+
+<p class="related-note">Every question and explanation traces back to a fact already written in the <a href="cat-breed-catalog.html">guide</a> — worth a read for the full context behind each one. Want a self-assessment instead of a trivia test? Try the <a href="cat-readiness-check.html">Readiness Check</a>.</p>
+
+<footer>
+  General reference only — not veterinary advice.
+</footer>
+
+<script>
+/* ============ KNOWLEDGE QUIZ ============
+   Every question and explanation traces back to a fact already written in the main
+   guide (cat-breed-catalog.html) — nothing here is invented for the quiz. */
+const KNOWLEDGE_QUESTIONS = [
+  {
+    tag: "Allergies",
+    source: "Allergies & Sensitivities",
+    q: "What's the single most common cause of allergic skin reactions in cats?",
+    correct: 1,
+    options: [
+      {text:"Pollen", feedback:"Pollen can trigger environmental (atopic) allergies in cats — but that's less common than flea allergy dermatitis, and in cats it shows up as skin issues rather than sneezing. (Allergies & Sensitivities)"},
+      {text:"Flea saliva", feedback:"Right — flea allergy dermatitis is the single most common cat allergy. A sensitive cat can react intensely to just one bite, not just an ongoing infestation. (Allergies & Sensitivities)"},
+      {text:"Dust mites", feedback:"Dust mites are one of the three usual suspects behind environmental allergies — but flea allergy dermatitis is still more common overall. (Allergies & Sensitivities)"},
+      {text:"A specific food protein", feedback:"Food allergies do happen — usually to beef, dairy, fish, or chicken — but they're less common than flea allergy dermatitis. (Allergies & Sensitivities)"}
+    ]
+  },
+  {
+    tag: "Allergies",
+    source: "Allergies & Sensitivities",
+    q: "Unlike in humans, environmental allergies (pollen, dust mites, mold) in cats usually show up as:",
+    correct: 1,
+    options: [
+      {text:"Sneezing and watery eyes", feedback:"That's the classic human pattern — cats react differently, and this is exactly the assumption worth unlearning. (Allergies & Sensitivities)"},
+      {text:"Face-rubbing, ear infections, or grooming one spot bald", feedback:"Right — it rarely shows up as sneezing in cats. Look for face-rubbing, recurring ear infections, or excessive grooming in one spot instead. (Allergies & Sensitivities)"},
+      {text:"Vomiting", feedback:"Vomiting leans more toward a food-allergy sign than an environmental one. (Allergies & Sensitivities)"},
+      {text:"Loss of appetite", feedback:"That's a general sickness sign rather than a specific tell for environmental allergies. (Allergies & Sensitivities)"}
+    ]
+  },
+  {
+    tag: "Emergencies",
+    source: "Emergencies",
+    q: "When is open-mouth breathing or panting normal in a cat?",
+    correct: 3,
+    options: [
+      {text:"After exercise", feedback:"Unlike dogs, cats don't pant from exertion — this is actually never normal in a cat, whatever the trigger. (Emergencies)"},
+      {text:"In hot weather", feedback:"Heat doesn't make panting normal in cats the way it does in dogs — it's still a reason to see a vet. (Emergencies)"},
+      {text:"When stressed at the vet", feedback:"Stress can make a cat breathe faster, but open-mouth panting is still worth flagging, not writing off as 'just nerves.' (Emergencies)"},
+      {text:"Never — it's always a reason to see a vet", feedback:"Right — open-mouth breathing or panting is always abnormal and always urgent in a cat, whatever the underlying cause turns out to be. (Emergencies)"}
+    ]
+  },
+  {
+    tag: "Emergencies",
+    source: "Emergencies",
+    q: "A urinary blockage (unable to urinate) is most common and most dangerous in:",
+    correct: 1,
+    options: [
+      {text:"Female cats", feedback:"Female cats have a shorter, wider urethra, so a complete blockage is far less common in them. (Emergencies)"},
+      {text:"Male cats", feedback:"Right — a male cat's longer, narrower urethra makes a complete blockage far more likely, and it can be fatal within 24–48 hours with no home fix. (Emergencies)"},
+      {text:"Kittens under 6 months", feedback:"Age isn't the main risk factor here — anatomy is. This can happen at any age, but male cats specifically are most at risk. (Emergencies)"},
+      {text:"Senior cats only", feedback:"It's not age-restricted — this is about male vs. female anatomy, not life stage. (Emergencies)"}
+    ]
+  },
+  {
+    tag: "Diet",
+    source: "Diet & Nutrition",
+    q: "Which of these is safe to feed your cat?",
+    correct: 3,
+    options: [
+      {text:"A small piece of dark chocolate", feedback:"Chocolate contains theobromine, which cats metabolize far more slowly than humans — darker chocolate is more dangerous, not less. (Diet & Nutrition)"},
+      {text:"A few grapes", feedback:"Grapes (and raisins) are linked to sudden kidney failure in some pets, even in small quantities. (Diet & Nutrition)"},
+      {text:"Dog food as a regular substitute", feedback:"Dog food isn't fortified with the taurine levels a cat's metabolism needs — a steady diet of it can cause real harm over time. (Diet & Nutrition)"},
+      {text:"None of the above", feedback:"Right — chocolate, grapes, and dog food are each unsafe for their own reason. See Foods to Avoid and Obligate Carnivore in Diet & Nutrition."}
+    ]
+  },
+  {
+    tag: "Diet",
+    source: "Diet & Nutrition",
+    q: "Taurine, an amino acid essential to cats, is found only in:",
+    correct: 0,
+    options: [
+      {text:"Animal tissue", feedback:"Right — cats can't synthesize enough taurine themselves, and it isn't present in plant sources. A deficiency can cause heart disease and blindness. (Diet & Nutrition)"},
+      {text:"Leafy greens", feedback:"Taurine doesn't occur in plant matter at all — this is exactly why a plant-based diet can't meet a cat's needs. (Diet & Nutrition)"},
+      {text:"Grains", feedback:"Grains don't supply taurine either, which is part of why homemade or plant-heavy diets need careful vet supervision. (Diet & Nutrition)"},
+      {text:"Dairy", feedback:"Dairy isn't a taurine source, and plenty of cats are lactose-sensitive on top of that. (Diet & Nutrition)"}
+    ]
+  },
+  {
+    tag: "Home Safety",
+    source: "Health & Safety",
+    q: "Which common houseplant is considered one of the most dangerous to cats?",
+    correct: 0,
+    options: [
+      {text:"Sago palm", feedback:"Right — every part of the sago palm is toxic and can cause liver failure. It's sold locally as an ordinary ornamental, so it's easy to bring home without realizing. (Health & Safety)"},
+      {text:"Basil", feedback:"Basil is generally considered safe for cats in small amounts — not the concern here. (Health & Safety)"},
+      {text:"Spider plant", feedback:"Spider plants are mildly stimulating to some cats (a bit like catnip) but are considered non-toxic. (Health & Safety)"},
+      {text:"Bamboo palm", feedback:"Bamboo palm is commonly listed as a cat-safe houseplant — sago palm is the similarly-named one that's actually dangerous. (Health & Safety)"}
+    ]
+  },
+  {
+    tag: "Daily Care",
+    source: "Daily Care",
+    q: "Following the 'n+1' rule, how many litter boxes should a 2-cat household ideally have?",
+    correct: 2,
+    options: [
+      {text:"1", feedback:"That's not even one box per cat — the rule is one per cat, plus one extra on top. (Daily Care)"},
+      {text:"2", feedback:"That covers one per cat, but misses the '+1' — the extra box matters for reducing competition over a shared one. (Daily Care)"},
+      {text:"3", feedback:"Right — one box per cat, plus one extra. Two cats means three boxes. (Daily Care)"},
+      {text:"4", feedback:"That's more than the standard rule calls for — three boxes covers two cats under n+1. (Daily Care)"}
+    ]
+  },
+  {
+    tag: "Life Stages",
+    source: "Life Stages",
+    q: "The critical socialization window for kittens — when positive exposure to new people, sounds, and handling matters most — is roughly:",
+    correct: 0,
+    options: [
+      {text:"2 to 9 weeks", feedback:"Right — this early window is when positive, low-stress exposure to new people, sounds, and handling shapes lifelong confidence and adaptability. (Life Stages)"},
+      {text:"6 months to 1 year", feedback:"By 6 months a kitten's temperament is already substantially set — the window that matters most is much earlier. (Life Stages)"},
+      {text:"The first 24 hours only", feedback:"That's far too narrow — the real window spans several weeks, not a single day. (Life Stages)"},
+      {text:"After 1 year", feedback:"By then socialization is much harder to influence — the critical window falls in the first couple of months. (Life Stages)"}
+    ]
+  },
+  {
+    tag: "Singapore",
+    source: "Before You Get a Cat / Adoption",
+    q: "Under HDB's Animals Rules, how many cats can a Singapore HDB flat keep?",
+    correct: 1,
+    options: [
+      {text:"1", feedback:"The actual cap is a little higher than that. (Before You Get a Cat / Adoption)"},
+      {text:"2", feedback:"Right — up to 2 cats per HDB flat, a hard cap enforceable with fines up to $4,000 for non-compliance. (Before You Get a Cat / Adoption)"},
+      {text:"3", feedback:"That's above the actual HDB limit of 2 cats per flat. (Before You Get a Cat / Adoption)"},
+      {text:"No limit with approval", feedback:"There's no approval process to exceed the cap — 2 cats per flat is a hard limit, not a starting point you can apply to raise. (Before You Get a Cat / Adoption)"}
+    ]
+  },
+  {
+    tag: "Home Safety",
+    source: "Health & Safety",
+    q: "Why is a swallowed string, ribbon, or hair elastic especially dangerous for cats?",
+    correct: 1,
+    options: [
+      {text:"It's a choking hazard, same as for a small child", feedback:"Choking is a risk with any small object, but string has a more specific danger for cats than that. (Health & Safety)"},
+      {text:"If part of it gets caught under the tongue while the rest is swallowed, it can saw through the intestine as it passes", feedback:"Right — that sawing action as the intestine tries to move it along is a genuine surgical emergency. (Health & Safety)"},
+      {text:"Cats are allergic to synthetic fibers", feedback:"That's not a documented cat allergy — the real risk with string is mechanical, not allergic. (Health & Safety)"},
+      {text:"It's only dangerous if a needle is attached", feedback:"A needle raises the stakes further, but plain string alone is already a genuine surgical risk on its own. (Health & Safety)"}
+    ]
+  },
+  {
+    tag: "Travel",
+    source: "Travel & Boarding",
+    q: "Compared to dogs, cats are generally considered more ___, which is why in-home pet-sitting is often less stressful for them than boarding.",
+    correct: 1,
+    options: [
+      {text:"Food-motivated", feedback:"Food motivation isn't the relevant trait here — territorial attachment is. (Travel & Boarding)"},
+      {text:"Territorial", feedback:"Right — cats bond to territory more than dogs do, so staying in a familiar space with a sitter is usually gentler than a new environment. (Travel & Boarding)"},
+      {text:"Social with strangers", feedback:"If anything cats are often slower to warm to strangers than dogs — that's not the reason sitting tends to suit them better. (Travel & Boarding)"},
+      {text:"Vocal", feedback:"Vocalness varies a lot by breed and individual — it's not the reason behind the sitting-vs-boarding recommendation. (Travel & Boarding)"}
+    ]
+  },
+  {
+    tag: "Singapore",
+    source: "Adoption",
+    q: "Why does the guide stress window mesh so strongly before bringing a cat home in Singapore?",
+    correct: 2,
+    options: [
+      {text:"It keeps the home cooler in hot weather", feedback:"That may be a side effect for some mesh products, but it's not why the guide pushes it. (Adoption)"},
+      {text:"Cats in Singapore are legally required to stay indoors at all times", feedback:"The guide argues for secure windows and balconies, but not because cats are simply never allowed outside under all circumstances. (Adoption)"},
+      {text:"High-rise falls are a real risk, and secure meshing is part of responsible setup before the cat arrives", feedback:"Right — the guide treats window and balcony safety as a before-the-cat-arrives issue, not something to get around to later. (Adoption)"},
+      {text:"Mesh replaces the need for a carrier or gate", feedback:"Mesh is one layer of home-proofing, not a substitute for all the other basic safety gear. (Adoption)"}
+    ]
+  },
+  {
+    tag: "Singapore",
+    source: "Health & Safety",
+    q: "Why isn't the rabies vaccine a core requirement for cats in Singapore?",
+    correct: 1,
+    options: [
+      {text:"Cats are naturally immune to rabies", feedback:"Cats aren't immune to rabies — the real reason is about Singapore's disease status, not feline biology. (Health & Safety)"},
+      {text:"Singapore is officially rabies-free", feedback:"Right — since Singapore is rabies-free, the vaccine isn't core here the way it is in many other countries, though some vets still offer it for cats that travel overseas. (Health & Safety)"},
+      {text:"It hasn't been approved for use in cats", feedback:"It's an approved vaccine — it's just not required, given Singapore's rabies-free status. (Health & Safety)"},
+      {text:"It's only required for kittens", feedback:"Age isn't the deciding factor here — Singapore's rabies-free status is. (Health & Safety)"}
+    ]
+  },
+  {
+    tag: "Life Stages",
+    source: "Life Stages",
+    q: "Which of these is NOT one of the four conditions the guide flags as most common in senior cats?",
+    correct: 3,
+    options: [
+      {text:"Kidney disease", feedback:"Kidney disease is one of the four — often noticeable first as increased thirst and urination. (Life Stages)"},
+      {text:"Hyperthyroidism", feedback:"Hyperthyroidism is one of the four — weight loss despite a normal or increased appetite is the classic tell. (Life Stages)"},
+      {text:"Arthritis", feedback:"Arthritis is one of the four — watch for reluctance to jump or stiffness after resting. (Life Stages)"},
+      {text:"Diabetes", feedback:"Right — diabetes is a real health risk in older cats too, it's just not one of the four specifically called out in the guide (kidney disease, hyperthyroidism, arthritis, and dental disease). (Life Stages)"}
+    ]
+  },
+  {
+    tag: "Life Stages",
+    source: "Life Stages",
+    q: "When checking a cat's body condition at home, what should you be able to do?",
+    correct: 1,
+    options: [
+      {text:"See the ribs clearly without touching", feedback:"Visibly prominent ribs usually points toward underweight rather than the ideal — the check relies on feel, not just sight. (Life Stages)"},
+      {text:"Feel the ribs easily without pressing hard, with a visible waist from above", feedback:"Right — the WSAVA 'look-feel-look' method: ribs should be easy to feel without pressing hard, plus a visible waist from above. (Life Stages)"},
+      {text:"Press firmly before finding any rib at all", feedback:"Having to press firmly to find the ribs at all is actually a sign of excess weight, not a healthy baseline. (Life Stages)"},
+      {text:"Weigh the cat weekly and compare to breed averages", feedback:"Weight alone doesn't account for frame size — body condition (feel and visible waist) is the more reliable gauge. (Life Stages)"}
+    ]
+  },
+  {
+    tag: "Daily Care",
+    source: "Daily Care",
+    q: "Most cats actually prefer which kind of litter?",
+    correct: 1,
+    options: [
+      {text:"Strongly scented, to mask odor", feedback:"Fragranced litter is more for the owner's benefit than the cat's — a strong scent can actually discourage use. (Daily Care)"},
+      {text:"Unscented", feedback:"Right — most cats prefer unscented litter, and a strong fragrance can put them off the box entirely. (Daily Care)"},
+      {text:"Whatever matches the box color", feedback:"Box or litter color isn't a documented preference factor — scent is the bigger one. (Daily Care)"},
+      {text:"Scented specifically with citrus", feedback:"Citrus isn't a specific cat-litter preference — unscented is the safer general default. (Daily Care)"}
+    ]
+  },
+  {
+    tag: "Life Stages",
+    source: "Life Stages",
+    q: "Besides preventing unwanted litters, what's a real health benefit of spaying a female cat?",
+    correct: 0,
+    options: [
+      {text:"It eliminates the risk of uterine infections", feedback:"Right — spaying eliminates uterine infection risk and significantly cuts the risk of mammary tumors too. (Life Stages)"},
+      {text:"It prevents all future weight gain", feedback:"Spaying doesn't guarantee weight control on its own — metabolism can shift afterward, so feeding often needs adjusting. (Life Stages)"},
+      {text:"It makes vaccines unnecessary", feedback:"Sterilization and vaccination are unrelated — a spayed cat still needs the full vaccine schedule. (Life Stages)"},
+      {text:"It guarantees a calmer temperament", feedback:"Reduced roaming and marking is common, but temperament isn't 'guaranteed' to change — the clearest benefits are the specific health risks it removes. (Life Stages)"}
+    ]
+  },
+  {
+    tag: "Life Stages",
+    source: "Life Stages",
+    q: "How many times a day should a kitten typically be fed kitten-formula food?",
+    correct: 2,
+    options: [
+      {text:"Once", feedback:"Once a day is too infrequent for a kitten's fast growth and calorie needs. (Life Stages)"},
+      {text:"Twice, same as an adult cat", feedback:"That's the adult standard — kittens need more frequent meals to fuel rapid growth. (Life Stages)"},
+      {text:"3 to 4 times a day", feedback:"Right — kittens need roughly twice the calories per kilogram of an adult cat, split across 3–4 meals a day. (Life Stages)"},
+      {text:"Continuously via free-feeding only", feedback:"Free-feeding isn't the specific guidance here — measured, frequent meals (3–4 times a day) is what's recommended. (Life Stages)"}
+    ]
+  },
+  {
+    tag: "Singapore",
+    source: "Products & Services / Emergencies",
+    q: "If your cat has a crisis at 2am in Singapore, which kind of listing matters most?",
+    correct: 2,
+    options: [
+      {text:"Any groomer that's still reachable by message", feedback:"Groomers can be useful contacts in everyday care, but they're not the answer to an urgent overnight crisis. (Products & Services / Emergencies)"},
+      {text:"A regular daytime clinic near your home, even if it's closed", feedback:"A familiar day clinic matters for routine care, but after-hours urgency is exactly why the guide separates emergency hospitals from general clinics. (Products & Services / Emergencies)"},
+      {text:"A 24hr emergency clinic or hospital", feedback:"Right — the guide intentionally separates round-the-clock emergency hospitals from general veterinary clinics because the distinction matters most when it's urgent and after-hours. (Products & Services / Emergencies)"},
+      {text:"A boarding cattery with staff on site", feedback:"Boarding staff aren't a substitute for emergency clinical care, even if they know cats well. (Products & Services / Emergencies)"}
+    ]
+  }
+];
+
+let kqScore = 0;
+let kqAnswered = 0;
+let kqAnswers = new Array(KNOWLEDGE_QUESTIONS.length).fill(null);
+let kqCompactLocked = false;
+
+function buildKnowledgeQuiz(){
+  const container = document.getElementById('kqQuestions');
+  container.innerHTML = KNOWLEDGE_QUESTIONS.map((q, qi) =>
+    '<div class="kq-question" data-qi="' + qi + '">' +
+      '<div class="kq-head"><span class="kq-chip">' + q.tag + '</span><span class="kq-number">Q' + String(qi + 1).padStart(2, '0') + '</span></div>' +
+      '<p class="kq-prompt">' + q.q + '</p>' +
+      '<div class="kq-options">' +
+        q.options.map((opt, oi) =>
+          '<button type="button" class="kq-option" data-qi="' + qi + '" data-oi="' + oi + '">' + opt.text + '</button>'
+        ).join('') +
+      '</div>' +
+      '<div class="kq-explanation" style="display:none;"></div>' +
+    '</div>'
+  ).join('');
+
+  container.querySelectorAll('.kq-option').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      answerKnowledgeQuestion(Number(btn.dataset.qi), Number(btn.dataset.oi));
+    });
+  });
+}
+
+function answerKnowledgeQuestion(qi, oi){
+  const q = KNOWLEDGE_QUESTIONS[qi];
+  const previous = kqAnswers[qi];
+  if(previous === oi) return; // already your current pick
+
+  const wasAnswered = previous !== null;
+  const wasCorrect = wasAnswered && previous === q.correct;
+  const isCorrect = oi === q.correct;
+
+  kqAnswers[qi] = oi;
+  if(!wasAnswered) kqAnswered++;
+  if(wasCorrect && !isCorrect) kqScore--;
+  else if(!wasCorrect && isCorrect) kqScore++;
+
+  const qEl = document.querySelector('.kq-question[data-qi="' + qi + '"]');
+  qEl.querySelectorAll('.kq-option').forEach((btn, bi)=>{
+    btn.classList.remove('correct', 'incorrect');
+    if(bi === q.correct) btn.classList.add('correct');
+    else if(bi === oi) btn.classList.add('incorrect');
+  });
+
+  const expl = qEl.querySelector('.kq-explanation');
+  expl.innerHTML = q.options[oi].feedback + '<span class="kq-source">From: ' + q.source + '</span>';
+  expl.className = 'kq-explanation ' + (isCorrect ? 'correct-text' : 'incorrect-text');
+  expl.style.display = 'block';
+
+  updateKnowledgeSummary();
+}
+
+function updateKnowledgeSummary(){
+  const total = KNOWLEDGE_QUESTIONS.length;
+  const summary = document.getElementById('kqSummary');
+  const verdict = document.getElementById('kqVerdict');
+  const progress = document.getElementById('kqProgressBar');
+  progress.style.width = ((kqAnswered / total) * 100) + '%';
+  verdict.className = 'kq-verdict';
+  if(kqAnswered < total){
+    summary.textContent = kqScore + ' correct so far — ' + kqAnswered + ' of ' + total + ' answered';
+    if(kqAnswered === 0) verdict.textContent = 'Twenty guide-based questions, with instant explanations and a few Singapore-specific checks mixed in.';
+    else if(kqScore / Math.max(1, kqAnswered) >= 0.75){
+      verdict.textContent = 'Strong start — keep going, and change any answer if the explanation changes your mind.';
+      verdict.classList.add('strong');
+    }else if(kqScore / Math.max(1, kqAnswered) >= 0.5){
+      verdict.textContent = 'Decent so far — the explanations are meant to teach, not just score you.';
+      verdict.classList.add('mid');
+    }else{
+      verdict.textContent = 'Worth revisiting a few sections as you go — especially Emergencies, Daily Care, and Singapore-specific setup.';
+      verdict.classList.add('low');
+    }
+    return;
+  }
+  const pct = kqScore / total;
+  let verdictText;
+  if(pct >= 0.8){
+    verdictText = 'Solid grasp of the essentials — you probably only need the guide as a refresher.';
+    verdict.classList.add('strong');
+  }else if(pct >= 0.5){
+    verdictText = 'Decent foundation — worth re-reading a few weaker sections before you rely on memory alone.';
+    verdict.classList.add('mid');
+  }else{
+    verdictText = 'Worth spending more time in the guide — especially the emergency, setup, and everyday-care basics.';
+    verdict.classList.add('low');
+  }
+  summary.textContent = kqScore + ' / ' + total + ' correct';
+  verdict.textContent = verdictText;
+}
+
+function updateStickyQuizSummary(){
+  const card = document.querySelector('.kq-summary-card');
+  if(!card) return;
+  const trigger = card.offsetTop + 24;
+  const shouldCompact = window.scrollY > trigger;
+  if(shouldCompact !== kqCompactLocked){
+    document.body.classList.toggle('kq-sticky-compact', shouldCompact);
+    kqCompactLocked = shouldCompact;
+  }
+}
+
+document.getElementById('kqReset').addEventListener('click', ()=>{
+  kqScore = 0;
+  kqAnswered = 0;
+  kqAnswers = new Array(KNOWLEDGE_QUESTIONS.length).fill(null);
+  buildKnowledgeQuiz();
+  updateKnowledgeSummary();
+});
+
+buildKnowledgeQuiz();
+updateKnowledgeSummary();
+updateStickyQuizSummary();
+window.addEventListener('scroll', updateStickyQuizSummary, {passive:true});
+window.addEventListener('resize', updateStickyQuizSummary);
+</script>
+
+</body>
+</html>

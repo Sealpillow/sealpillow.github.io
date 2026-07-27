@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trail & Co — Company Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Lora:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EFEBE1;
+    --ink: #23201C;
+    --muted: rgba(35,32,28,0.6);
+    --line: rgba(35,32,28,0.15);
+    --accent: #7A3B2E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--paper);
+    font-family: 'Lora', serif;
+    color: var(--ink);
+    overflow-x: auto;
+    overflow-y: hidden;
+    cursor: grab;
+  }
+
+  body.grabbing { cursor: grabbing; }
+
+  body::-webkit-scrollbar { height: 3px; }
+  body::-webkit-scrollbar-track { background: transparent; }
+  body::-webkit-scrollbar-thumb { background: var(--line); }
+
+  .timeline-wrapper {
+    display: flex;
+    width: max-content;
+  }
+
+  .intro {
+    min-width: 40vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 7vw;
+    border-right: 1px solid var(--line);
+  }
+
+  .intro .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .intro h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(34px, 4.5vw, 52px);
+    line-height: 1.1;
+    max-width: 11ch;
+  }
+
+  .intro p {
+    margin-top: 20px;
+    max-width: 34ch;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .timeline-section {
+    min-width: 56vw;
+    max-width: 560px;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 0 6vw;
+    border-right: 1px solid var(--line);
+  }
+
+  .entry {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .entry.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .entry .number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 22px;
+  }
+
+  .entry .date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .entry .title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 27px;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    max-width: 14ch;
+  }
+
+  .entry .description {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--muted);
+    font-style: italic;
+    max-width: 38ch;
+  }
+
+  /* thin progress line, bottom of viewport */
+  .progress {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 100%;
+    background: var(--line);
+    z-index: 10;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.05s linear;
+  }
+</style>
+</head>
+<body>
+
+  <div class="timeline-wrapper" id="timelineWrapper">
+    <div class="intro">
+      <div class="eyebrow">Trail &amp; Co — Est. 2020</div>
+      <h1>Seven years on the last</h1>
+      <p>One entry per milestone, in order. Scroll or drag to read on.</p>
+    </div>
+    <!-- Timeline sections injected here -->
+  </div>
+
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+<script>
+(function () {
+  const timelineData = [
+    { number: "01", date: "Jan 2020", title: "First Last Carved", description: "A single wooden last, cut by hand, became the pattern every shoe in the line still traces back to." },
+    { number: "02", date: "Mar 2020", title: "The Workbench Sample", description: "Three stitched prototypes, none for sale, all for testing whether the idea survived contact with a real foot." },
+    { number: "03", date: "Jul 2020", title: "Fifty Pairs, Friends Only", description: "A trial run sent to people who'd tell us the truth. Half the seams got redrawn after their notes came back." },
+    { number: "04", date: "Dec 2020", title: "Opening the Ledger", description: "Version one went on sale with a paper care card in every box, numbered by hand at a kitchen table." },
+    { number: "05", date: "Jun 2021", title: "The Reinforced Heel", description: "Our most-returned complaint became our most-rebuilt part. The fix outlasted the shoe it was fixing." },
+    { number: "06", date: "Jan 2022", title: "Second Workshop Opens", description: "A cutting floor twice the size, three time zones of wholesale partners, and a lot more tags to print." },
+    { number: "07", date: "Sep 2022", title: "10,000th Pair Logged", description: "The ledger crossed five digits. We kept the numbering system anyway — it's the only part we never redesigned." }
+  ];
+
+  const wrapper = document.getElementById('timelineWrapper');
+  const progressFill = document.getElementById('progressFill');
+  const sections = [];
+
+  timelineData.forEach((item) => {
+    const section = document.createElement('div');
+    section.className = 'timeline-section';
+    section.innerHTML = `
+      <div class="entry">
+        <div class="number">${item.number}</div>
+        <div class="date">${item.date}</div>
+        <div class="title">${item.title}</div>
+        <p class="description">${item.description}</p>
+      </div>
+    `;
+    wrapper.appendChild(section);
+    sections.push(section);
+  });
+
+  // Fade entries in/out as they cross the viewport, both directions
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        entry.target.querySelector('.entry').classList.toggle('is-visible', entry.isIntersecting);
+      });
+    },
+    { root: null, threshold: 0.35 }
+  );
+  sections.forEach((s) => observer.observe(s));
+
+  // Wheel -> horizontal scroll
+  window.addEventListener('wheel', (e) => {
+    if (e.deltaY !== 0) {
+      e.preventDefault();
+      document.body.scrollLeft += e.deltaY;
+    }
+  }, { passive: false });
+
+  // Drag to scroll
+  let isDown = false, startX = 0, startScroll = 0;
+  document.body.addEventListener('mousedown', (e) => {
+    isDown = true;
+    document.body.classList.add('grabbing');
+    startX = e.clientX;
+    startScroll = document.body.scrollLeft;
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    document.body.scrollLeft = startScroll - (e.clientX - startX);
+  });
+  window.addEventListener('mouseup', () => {
+    isDown = false;
+    document.body.classList.remove('grabbing');
+  });
+
+  // Progress line
+  function updateProgress() {
+    const max = document.body.scrollWidth - window.innerWidth;
+    const pct = max > 0 ? (document.body.scrollLeft / max) * 100 : 0;
+    progressFill.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, true);
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+})();
+</script>
+</body>
+</html>
