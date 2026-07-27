@@ -1360,6 +1360,15 @@
           <a class="readiness-callout-btn" href="cat-routine-care-planner.html">Open the Care Planner ↗</a>
         </div>
       </div>
+      <div class="callout-group" id="businessEnquiryCallout" style="display:none;">
+        <div class="readiness-callout">
+          <div class="readiness-callout-text">
+            <h4>Run one of these businesses?</h4>
+            <p>Spot an error in your listing, want one added, or have another business enquiry — get in touch directly.</p>
+          </div>
+          <a class="readiness-callout-btn" href="mailto:luatan68@hotmail.com">Email luatan68@hotmail.com ↗</a>
+        </div>
+      </div>
       <div class="card-grid" id="careGrid"></div>
     </div>
   </div>
@@ -1431,6 +1440,7 @@
 
   <footer>
     <p class="disclaimer">General reference only — not veterinary advice. Any sudden change in eating, litter habits, or coat condition is worth a call to an actual vet, not a card catalog.</p>
+    <p class="disclaimer">Business or listing enquiries — corrections, removals, additions — welcome at <a href="mailto:luatan68@hotmail.com">luatan68@hotmail.com</a>.</p>
     41 wild species. 1 domestic species. Countless opinions about the Sphynx.
     <p class="last-reviewed">Last reviewed: July 2026</p>
   </footer>
@@ -3625,6 +3635,9 @@ function careRenderGrid(){
 
   const dailyPlannerCallout = document.getElementById('dailyPlannerCallout');
   dailyPlannerCallout.style.display = (cat.key === 'daily' && !term) ? 'flex' : 'none';
+
+  const businessEnquiryCallout = document.getElementById('businessEnquiryCallout');
+  businessEnquiryCallout.style.display = (cat.key === 'resources' && !term) ? 'flex' : 'none';
 
   if(filtered.length === 0){
     const empty = document.createElement('div');
