@@ -1,6 +1,6 @@
 # Breed Data Sources
 
-Citation trail for the new structured fields (`personality`, `lifestyleBadges`, `groomingDifficulty`, `shedding`, `health`, `relatedBreeds`, `cost`, `timeline`) added to `cat-breed-catalog.html` per `breed-guide-implementation-plan.md`. (A `superlative` field/card ribbon existed briefly for 5 breeds — Largest Breed, Oldest Natural Breed, Fastest Domestic Breed, Longest Lifespan, Rare Breed — but was removed at the user's request as not useful.)
+Citation trail for the new structured fields (`personality`, `lifestyleBadges`, `groomingDifficulty`, `shedding`, `health`, `relatedBreeds`, `cost`, `timeline`) added to `index.html` per `breed-guide-implementation-plan.md`. (A `superlative` field/card ribbon existed briefly for 5 breeds — Largest Breed, Oldest Natural Breed, Fastest Domestic Breed, Longest Lifespan, Rare Breed — but was removed at the user's request as not useful.)
 
 **How to read this file**: health/genetic-risk claims and historical dates are backed by the specific sources listed. Personality star ratings (1-5) have no scientific instrument behind them — they're synthesized from cross-checking that multiple independent descriptive sources agree on a trait, not pulled from a single canonical number. `lifestyleBadges` are only added when directly supported by a source or by the breed's own existing `bestFor`/`detail` text; badges are deliberately omitted rather than guessed when evidence is thin. Cost indicators (`cost`) are approximate by nature, per the roadmap's own framing, and aren't independently sourced facts.
 

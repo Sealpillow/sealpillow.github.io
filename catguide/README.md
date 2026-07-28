@@ -1,6 +1,6 @@
 # The Feline Index
 
-A small toolkit of static HTML pages for domestic cat breeds and cat care, styled like a natural history collection's specimen catalog. Open `cat-breed-catalog.html` in any browser — there's no build step, no server, and no dependencies beyond three Google Fonts. Four smaller companion pages branch off it for specific jobs (a printable emergency sheet, a readiness gauge, a trivia quiz, a routine-care checklist) and link back to it.
+A small toolkit of static HTML pages for domestic cat breeds and cat care, styled like a natural history collection's specimen catalog. Open `index.html` in any browser — there's no build step, no server, and no dependencies beyond three Google Fonts. Four smaller companion pages branch off it for specific jobs (a printable emergency sheet, a readiness gauge, a trivia quiz, a routine-care checklist) and link back to it.
 
 ## Why this exists
 
@@ -12,7 +12,7 @@ It's also deliberately *not* a business directory pretending to be a blog. Where
 
 The sticky nav now also carries a small Bengal mascot logo at the top left, so there is no separate hero/banner block to maintain on the main page anymore.
 
-`cat-breed-catalog.html` is the main file. It has two top-level sections, toggled from the sticky nav bar: **Care Guide** (the default view) and **Breed Index** — plus a shared search box that searches whichever one is active.
+`index.html` is the main file. It has two top-level sections, toggled from the sticky nav bar: **Care Guide** (the default view) and **Breed Index** — plus a shared search box that searches whichever one is active.
 
 ### Care Guide
 
@@ -103,13 +103,13 @@ A few choices were deliberate enough to be worth writing down, mostly because th
 
 ## Maintaining this file
 
-To make hand-editing easier, `cat-breed-catalog.html` now includes a few deliberate inline comments marking the parts most likely to be changed manually:
+To make hand-editing easier, `index.html` now includes a few deliberate inline comments marking the parts most likely to be changed manually:
 - the sticky header / mascot logo area
 - the shared search row
 - the Care Guide and Breed Index view shells
 - the main script data sources: `categories`, `SHOPS`, and `careCategories`
 
-Everything for the main catalog lives in `cat-breed-catalog.html` — one `<style>` block, one `<script>` block, no separate files. The four companion pages each duplicate the same core CSS variables and font imports rather than sharing a stylesheet — a palette or font change needs to be applied in all five files, not just one.
+Everything for the main catalog lives in `index.html` — one `<style>` block, one `<script>` block, no separate files. The four companion pages each duplicate the same core CSS variables and font imports rather than sharing a stylesheet — a palette or font change needs to be applied in all five files, not just one.
 
 - **Breeds** are defined in the `categories` array (grouped by breed type). Beyond the original fields (`name`, `tag`, `note`, `origin`, `weight`, `lifespan`, `coat`, `energy`, `bestFor`, `detail`, `images`, `link`), each breed also carries: `links` (an array, not just one — TICA plus a second cross-check source), `personality` (six 1–5 scores), `sources` (citations for personality/health, shown as "Sourced from" footnotes in the modal), `lifestyleBadges`, `groomingDifficulty`/`shedding`, `health` (`concerns`, `geneticRisk`, `screeningNote`), `relatedBreeds`, `cost` (four 1–5 scores), and two optional fields: `decisionGuide` (hand-written "Ideal For"/"Key Caution" text — omit it and the modal synthesizes both from the other fields automatically) and `timeline` (an array of age-labeled milestones, rendered under the write-up when present). Filtering and the Compare tool read these same fields automatically — there's no separate list to keep in sync when adding a breed.
 - **Care Guide tabs** are defined in the `careCategories` array, in display order. Each tab has `key` (used for `internal:` jump links), `label`, `code`, `title`, `desc`, and `items` (or `groups` for the two directory-style tabs).
@@ -119,7 +119,7 @@ Everything for the main catalog lives in `cat-breed-catalog.html` — one `<styl
 - **Internal jump links** use `url:"internal:<tabKey>"` — clicking them switches the active Care Guide tab, clears any search term, closes the open modal, and scrolls back to the guide. Keep these honest: if a card's text says "see the X tab," it should have a matching link, not just the words.
 
 - **Header mascot/logo** lives at `images/brand/bengal-mascot-logo.png`. The markup for it is near the top of the `<body>`, inside the sticky `quickjump` nav.
-- **Shared search UI** lives in the `global-search-row` block near the top of the page. The input, clear button, placeholder swapping, and per-view search behavior are all kept in `cat-breed-catalog.html`.
+- **Shared search UI** lives in the `global-search-row` block near the top of the page. The input, clear button, placeholder swapping, and per-view search behavior are all kept in `index.html`.
 
 ## Disclaimer
 
