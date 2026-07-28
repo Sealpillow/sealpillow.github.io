@@ -305,6 +305,68 @@
     .nav-card   { min-height: 200px; }
     .site-footer { padding: 24px; flex-direction: column; gap: 10px; text-align: center; }
   }
+
+  /* Secret panel */
+  .secret-panel {
+    position: fixed;
+    bottom: 72px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #080808;
+    border: 1px solid rgba(200, 169, 110, 0.2);
+    padding: 24px 36px;
+    min-width: 220px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    z-index: 500;
+    text-align: center;
+  }
+
+  .secret-panel.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .secret-eyebrow {
+    font-size: 8px;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+
+  .secret-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .secret-links a {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .secret-links a:hover { color: var(--cream); }
+
+  .secret-close {
+    margin-top: 20px;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(136, 136, 136, 0.3);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    user-select: none;
+  }
+
+  .secret-close:hover { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -351,6 +413,15 @@
   </div>
 </main>
 
+<div class="secret-panel" id="secretPanel">
+  <p class="secret-eyebrow">You found something.</p>
+  <ul class="secret-links">
+    <li><a href="catguide/">Cat Guide</a></li>
+    <li><a href="stocks/">Stocks</a></li>
+  </ul>
+  <div class="secret-close" id="secretClose">&#215; close</div>
+</div>
+
 <footer class="site-footer">
   <span class="footer-mark">Brian Lua</span>
 </footer>
@@ -366,6 +437,26 @@
     document.body.style.transition = 'opacity 0.2s ease';
     document.body.style.opacity = '0';
     setTimeout(function() { window.location.href = href; }, 200);
+  });
+
+  // Easter egg: click the gold rule to reveal hidden links
+  var rule = document.querySelector('.header-rule');
+  var panel = document.getElementById('secretPanel');
+  var closeBtn = document.getElementById('secretClose');
+
+  rule.addEventListener('click', function(e) {
+    e.stopPropagation();
+    panel.classList.toggle('active');
+  });
+
+  closeBtn.addEventListener('click', function() {
+    panel.classList.remove('active');
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!panel.contains(e.target)) {
+      panel.classList.remove('active');
+    }
   });
 </script>
 </body>
