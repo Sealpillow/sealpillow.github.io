@@ -47,11 +47,30 @@
     z-index:20;
     display:flex;
     justify-content:center;
+    align-items:center;
     gap:8px;
     padding:14px 16px;
     background:var(--forest);
     border-bottom:1px solid rgba(201,166,72,0.25);
     box-shadow:0 4px 14px rgba(21,45,34,0.3);
+  }
+  /* Small mascot logo pinned into the existing sticky header.
+     If you want it larger/smaller later, adjust `.quickjump-brand` only. */
+  .quickjump-brand{
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .quickjump-brand img{
+    display:block;
+    width:100%;
+    height:auto;
   }
   .quickjump a{
     font-family:'JetBrains Mono', monospace;
@@ -83,50 +102,6 @@
 
   .view-section{display:none;}
   .view-section.visible{display:block;}
-
-  /* ---------- HERO ---------- */
-  .hero{
-    padding:72px 24px 56px;
-    text-align:center;
-    color:#F2EFE3;
-    background:var(--forest-deep);
-    position:relative;
-  }
-  .hero::after{
-    content:"";
-    position:absolute;
-    left:0; right:0; bottom:0;
-    height:3px;
-    background:var(--brass);
-  }
-  .hero-eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size:11.5px;
-    letter-spacing:0.28em;
-    text-transform:uppercase;
-    color:var(--brass-light);
-    margin-bottom:20px;
-  }
-  .hero h1{
-    font-family:'Fraunces', serif;
-    font-weight:500;
-    font-optical-sizing:auto;
-    font-size:clamp(1.9rem, 4.2vw, 3rem);
-    margin:0 0 16px;
-    letter-spacing:-0.01em;
-  }
-  .hero h1 em{
-    font-style:italic;
-    font-weight:500;
-    color:var(--brass-light);
-  }
-  .hero p{
-    max-width:520px;
-    margin:0 auto;
-    color:#C7CCC0;
-    font-size:15px;
-    line-height:1.65;
-  }
 
   .section-heading{
     max-width:1000px;
@@ -229,7 +204,9 @@
     max-width:420px;
   }
 
-  /* ---------- SEARCH ---------- */
+  /* ---------- SEARCH ----------
+     Shared search box used by both top-level views. The JS swaps placeholder text
+     and result behavior depending on whether Care Guide or Breed Index is active. */
   .global-search-row{
     max-width:1000px;
     margin:28px auto 0;
@@ -611,7 +588,14 @@
   }
 
   @media (max-width:560px){
-    .hero{padding:52px 18px 40px;}
+    .quickjump{
+      padding-left:60px;
+    }
+    .quickjump-brand{
+      left:14px;
+      width:30px;
+      height:30px;
+    }
     .drawer-body{padding:22px 16px 28px;}
     .card-grid{grid-template-columns:1fr 1fr;}
     .quickjump{gap:6px;}
@@ -1292,17 +1276,20 @@
 </head>
 <body>
 
+  <!-- Main top navigation.
+       The mascot logo lives inside this sticky header on purpose, so there is no
+       separate hero/banner block to maintain anymore. -->
   <nav class="quickjump">
+    <div class="quickjump-brand" aria-hidden="true">
+      <img src="images/brand/bengal-mascot-logo.webp" alt="">
+    </div>
     <a href="#" id="navCare" class="active">Care Guide</a>
     <a href="#" id="navBreeds">Breed Index</a>
   </nav>
 
-  <div class="hero">
-    <div class="hero-eyebrow">Felis catus &middot; domestic breeds &amp; care</div>
-    <h1>The Feline <em>Index</em></h1>
-    <p>An index of domestic cat breeds and everyday care, arranged the way a natural history collection catalogs its specimens.</p>
-  </div>
-
+  <!-- Shared search row.
+       `#globalSearchInput` and `#globalSearchClear` are the only elements you usually
+       need to touch if you want to change the search copy or clear-button behavior. -->
   <div class="global-search-row">
     <div class="search-box">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1312,6 +1299,8 @@
     <div class="search-results-msg" id="searchResultsMsg"></div>
   </div>
 
+  <!-- Care Guide view shell.
+       The tab rail is rendered into `#careRail` from `careCategories` in the script. -->
   <div id="care" class="view-section visible">
   <div class="section-heading">
     <div class="eyebrow">Reference section</div>
@@ -1374,6 +1363,8 @@
   </div>
   </div>
 
+  <!-- Breed Index view shell.
+       The breed cards / compare table are both driven from `categories` in the script. -->
   <div id="breeds" class="view-section">
   <div class="cabinet">
     <div class="drawer-rail" id="drawerRail"></div>
@@ -1440,7 +1431,7 @@
 
   <footer>
     <p class="disclaimer">General reference only — not veterinary advice. Any sudden change in eating, litter habits, or coat condition is worth a call to an actual vet, not a card catalog.</p>
-    <p class="disclaimer">Business or listing enquiries — corrections, removals, additions — welcome at <a href="mailto:luatan68@hotmail.com">luatan68@hotmail.com</a>.</p>
+    <p class="disclaimer">Listing corrections or business enquiries: <a href="mailto:luatan68@hotmail.com">luatan68@hotmail.com</a></p>
     41 wild species. 1 domestic species. Countless opinions about the Sphynx.
     <p class="last-reviewed">Last reviewed: July 2026</p>
   </footer>
@@ -1545,6 +1536,9 @@ function productPlaceholder(){
 }
 
 /* ============ BREED CATALOG ============https://www.pexels.com/search/siberian%20cat/ */
+/* ---------------- BREED DATA ----------------
+   Main Breed Index source of truth.
+   Add/edit breeds here; the cards, filters, modal, and compare tools all read this. */
 const categories = [
   {
     key:"natural", label:"Natural", code:"NATURAL", title:"Natural Breeds",
@@ -2710,14 +2704,12 @@ function renderGrid(){
 buildTabs();
 renderGrid();
 
-/* ============ SHARED SHOP DIRECTORY ============
-   Single source of truth for every real-world business referenced anywhere in the guide
-   (vets, groomers, stores, mesh installers). An address, phone, or link only needs
-   updating in one place, and every mention renders through the same chip. */
+/* ---------------- SHARED SHOP DIRECTORY ----------------
+   Define each real business once here, then reference it from care cards/tabs. */
 const SHOPS = {
   atlasVet:{name:"Atlas Veterinary Clinic & Surgery", tag:"4.9★ · Bukit Merah", color:"#3d6b6d",
     address:"163 Bukit Merah Central, #03-3573", phone:"+65 6980 8038", tel:"+6569808038",
-    image:"images/care-guide/logos/atlas-vet-logo.png",
+    image:"images/care-guide/logos/atlas-vet-logo.webp",
     imageFit:"contain",
     blurb:"General practice with WhatsApp follow-ups between visits; on-site ICU, cardiology, and surgery. Mon–Fri 10am–12:30pm & 2–6:30pm, Sat/Sun 10am–12:30pm & 2–4:30pm, closed public holidays.",
     mapsUrl:"https://www.google.com/maps/place/?q=place_id:ChIJv0OglfMb2jERZOIDRlip4Qc"},
@@ -2747,14 +2739,14 @@ const SHOPS = {
     mapsUrl:"https://www.google.com/maps/place/?q=place_id:ChIJzy-K38M92jERh78glk3GhdU"},
   pawpyKisses:{name:"Pawpy Kisses Pet Shop & Grooming", tag:"4.9★ · Shop + groom", color:"#6b4a7a",
     address:"238 Balestier Rd", phone:"+65 9060 6501", tel:"+6590606501",
-    image:"images/care-guide/logos/pawpy-kisses-logo.png",
+    image:"images/care-guide/logos/pawpy-kisses-logo.webp",
     imageFit:"contain",
     blurb:"Grooming hub — the retail shop for food and accessories is a separate unit at 232 Balestier Rd. Known for styled cuts and free pet-transport pickup across several central/north-east zones. Tue–Sat 10am–6pm, closed Sun/Mon.",
     mapsUrl:"https://www.google.com/maps/place/?q=place_id:ChIJPz582lYW2jERhWT6a8loUkI"},
   polypet:{name:"Polypet", tag:"4.5★ · Online + store", color:"#8a6b1f",
     address:"109 Clementi Street 11", phone:"+65 6779 5309", tel:"+6567795309",
     website:"https://polypet.com.sg/",
-    image:"images/care-guide/logos/polypet-logo.png",
+    image:"images/care-guide/logos/polypet-logo.webp",
     imageFit:"contain",
     blurb:"Sells cat food (Royal Canin, Orijen, Hill's Science Diet, Purina Pro Plan and more), litter, and supplements, with reliable islandwide delivery. Trading since 2004. Mon–Sat 9am–7pm, closed Sundays & public holidays.",
     mapsUrl:"https://www.google.com/maps/place/?q=place_id:ChIJs1eHtIYa2jERR6jOXK674Ns"},
@@ -2773,13 +2765,13 @@ const SHOPS = {
     mapsUrl:"https://www.google.com/maps/place/?q=place_id:ChIJpUW1vFgZ2jERK1JWTopXcho"},
   aPetMart:{name:"aPetMart", tag:"4.8★ · Online store", color:"#8a6b1f",
     address:"1014 Geylang East Ave 3, #05-216", website:"https://apetmart.com/",
-    image:"images/care-guide/logos/apetmart-logo.png",
+    image:"images/care-guide/logos/apetmart-logo.webp",
     imageFit:"contain",
     blurb:"Sells cat food across 180+ brands, plus litter and accessories; convenient for bulk or recurring orders. Islandwide delivery including Sentosa; self-collection needs an online appointment, no walk-ins.",
     mapsUrl:"https://www.google.com/maps/place/?q=place_id:ChIJQTfrXC8Z2jERuAqe276CURY"},
   westsideVet:{name:"Westside Vet Emergency & Referral", tag:"4.3★ · 24hr Emergency", color:"#3d6b6d", short:"North/Central Singapore",
     address:"86 Serangoon Garden Wy", phone:"+65 6931 0095", tel:"+6569310095",
-    image:"images/care-guide/logos/westside-vet-logo.png",
+    image:"images/care-guide/logos/westside-vet-logo.webp",
     imageFit:"contain",
     blurb:"Genuinely open 24/7, every day including public holidays — one of only three registered veterinary hospitals in Singapore, with ICU, ultrasound, and CT imaging.",
     mapsUrl:"https://www.google.com/maps/place/?q=place_id:ChIJResu3XgR2jERS0q4o65mCHM"},
@@ -2809,43 +2801,43 @@ const SHOPS = {
     mapsUrl:"https://www.google.com/maps/place/?q=place_id:ChIJRWljPMgZ2jERxkO83GKeqDo"},
   kuroCatHotel:{name:"Kuro Cat Hotel", tag:"5.0★ · Cats-only", color:"#5B3A5C",
     address:"21A Kreta Ayer Road", phone:"+65 8775 7025", tel:"+6587757025", website:"https://kurocats.sg/",
-    image:"images/care-guide/logos/kuro-cat-hotel-icon.png",
+    image:"images/care-guide/logos/kuro-cat-hotel-icon.webp",
     imageFit:"contain",
     blurb:"Cats-only boarding in Chinatown, no shared rooms — 24/7 in-suite camera per suite, Fear Free® certified staff, AVS-licensed (AVS00145). From $60/night (1–2 cats) to $120/night (up to 5 cats); owner covers emergency vet costs if needed.",
     mapsUrl:"https://www.google.com/maps/search/?api=1&query=21A+Kreta+Ayer+Road%2C+Singapore+088991"},
   catzillaHotel:{name:"Catzilla Hotel", tag:"4.9★ · Cats-only", color:"#5B3A5C",
     address:"261 Geylang Road, #02-01", phone:"+65 6513 0002", tel:"+6565130002", website:"https://catzillahotel.com/",
-    image:"images/care-guide/logos/catzilla-hotel-icon.png",
+    image:"images/care-guide/logos/catzilla-hotel-icon.webp",
     imageFit:"contain",
     blurb:"Cats-only boarding, explicitly never housed near dogs. AVS-licensed (AVS00075), partner vet on call 24/7, free door-to-door pickup/drop-off. From $48/night (1 cat) to $108+/night (up to 4 cats); daily update is a video + photos rather than a live camera.",
     mapsUrl:"https://www.google.com/maps/search/?api=1&query=261+Geylang+Road%2C+%2302-01%2C+Singapore+389317"},
   shangriPaw:{name:"Shangri-Paw", tag:"Cats-only · Senior specialist", color:"#5B3A5C",
     phone:"+65 8073 4156", tel:"+6580734156", website:"https://www.shangri-paw.sg/",
-    image:"images/care-guide/logos/shangri-paw-icon.png",
+    image:"images/care-guide/logos/shangri-paw-icon.webp",
     imageFit:"contain",
     blurb:"Cats-only boarding specialising in senior and medically complex cats; Fear Free® certified staff, 24/7 CCTV or use of your own camera. Check-in by appointment only at a central shophouse location — pricing isn't published, so confirm directly.",
     mapsUrl:""},
   sundaysCatHotel:{name:"Sundays Cat Hotel & Resort", tag:"Cats-only · Serangoon Gdns", color:"#5B3A5C",
     address:"182 Yio Chu Kang Road", phone:"+65 8399 3040", tel:"+6583993040", website:"https://www.sundays.sg/",
-    image:"images/care-guide/logos/sundays-cat-hotel-icon.png",
+    image:"images/care-guide/logos/sundays-cat-hotel-icon.webp",
     imageFit:"contain",
     blurb:"Cats-only boarding near NEX Mall, AVS-licensed, 24/7 two-way-voice CCTV and a daily 30-minute personalised session. From $54/night (1 cat) to $128/night (up to 3 cats), plus a peak-season surcharge.",
     mapsUrl:"https://www.google.com/maps/search/?api=1&query=182+Yio+Chu+Kang+Road%2C+Singapore+545629"},
   nekoyaCatSitting:{name:"Nekoya Cat Sitting", tag:"In-home sitting", color:"#3d6b6d",
     phone:"+65 6288 3636", tel:"+6562883636", website:"https://nekoya.co/cat-sitting/",
-    image:"images/care-guide/logos/nekoya-cat-sitting-icon.png",
+    image:"images/care-guide/logos/nekoya-cat-sitting-icon.webp",
     imageFit:"contain",
     blurb:"In-home visits island-wide — feeding, water, litter refresh, and a wellness check per visit; sitters are background-checked. From $35 (15 min) to $80 (up to 3 cats, 60 min); +$20 for medication. A couple of reviews wanted more photo/video updates during visits.",
     mapsUrl:""},
   catWhisperer:{name:"The Cat Whisperer Singapore", tag:"In-home sitting · Behaviourist", color:"#3d6b6d",
     phone:"+65 8100 7084", tel:"+6581007084", website:"https://www.thecatwhisperer.com.sg/catsitting",
-    image:"images/care-guide/logos/cat-whisperer-icon.png",
+    image:"images/care-guide/logos/cat-whisperer-icon.webp",
     imageFit:"contain",
     blurb:"In-home sitting from a feline-behaviour specialist, island-wide; also handles vet/groomer transport and AVS quarantine visits. From $35/visit. Requires a signed declaration and 50% upfront — cancelling within 7 days forfeits 30%, stricter than most competitors.",
     mapsUrl:""},
   catParadise:{name:"Cat Paradise (Cat Sitting Services)", tag:"In-home sitting · Joo Chiat", color:"#3d6b6d",
     address:"169 Joo Chiat Road, Level 2", phone:"+65 8066 0867", tel:"+6580660867", website:"https://catparadisehotel.sg/cat-sitting-services",
-    image:"images/care-guide/logos/cat-paradise-icon.png",
+    image:"images/care-guide/logos/cat-paradise-icon.webp",
     imageFit:"contain",
     blurb:"In-home sitting island-wide, run out of a Joo Chiat cattery/salon; covers seniors, kittens, and special-needs cats. Single 30-min visit $40 (+$15/extra cat) up to a 12-hour overnight at $120 (+$40/extra cat).",
     mapsUrl:"https://www.google.com/maps/search/?api=1&query=169+Joo+Chiat+Road%2C+Singapore+427729"}
@@ -2954,6 +2946,9 @@ const TRAVEL_SHOP_GROUPS = [
 /* Shared 24hr emergency vet contacts — reused across every emergency card so the numbers are always one tap away */
 const emergencyContactLinks = shopLinks(['advancedVetCareBedok','westsideVet','vesWhitley','beecroft']);
 
+/* ---------------- CARE GUIDE DATA ----------------
+   Main Care Guide source of truth.
+   Add/edit tabs and cards here; the rail and card grid render from this array. */
 const careCategories = [
   {
     key:"emergencies", label:"Emergencies", code:"URGENT", title:"Emergencies",
@@ -2961,7 +2956,7 @@ const careCategories = [
     items:[
       {name:"Is This an Emergency?", tag:"Start here", color:"#8A3B2B", severity:"emergency",
        note:"A quick checklist of signs that mean go now — not tomorrow, not after monitoring overnight.",
-       images:[{url:"images/care-guide/cards/is-this-an-emergency.png", alt:"An orange tabby cat surrounded by clear emergency warning icons for breathing, urination, trauma, and poisoning"}],
+       images:[{url:"images/care-guide/cards/is-this-an-emergency.webp", alt:"An orange tabby cat surrounded by clear emergency warning icons for breathing, urination, trauma, and poisoning"}],
        detail:"Cats are good at hiding illness, which makes it hard to know when 'acting weird' is actually urgent. Get to a vet immediately — don't wait to see if it passes — if you notice any of the following:\n\n• Difficulty breathing, open-mouth breathing, or panting (never normal in a cat)\n• Straining to urinate with little or no output, or crying in the litter box\n• A seizure lasting more than 2–3 minutes, or more than one in a day\n• Collapse, unresponsiveness, or inability to stand or walk normally\n• Uncontrolled bleeding, or pale, white, or blue-tinged gums\n• A hard, swollen, or painful abdomen\n• Known or suspected ingestion of something toxic\n• Any trauma — hit by a car, a fall from height, or an animal attack — even if the cat seems fine afterward\n\nWhen in doubt, call a clinic and describe what you're seeing — a quick phone triage is free and can tell you whether to come in immediately.",
        linkGroups:[
          {mode:"entities", heading:"24hr Emergency Vets (Singapore)", links: emergencyContactLinks},
@@ -2974,13 +2969,13 @@ const careCategories = [
        ]},
       {name:"Before Leaving for the Vet", tag:"Don't forget", color:"#8A6A2E",
        note:"A few practical things people forget to grab in a panic — worth a glance on your way out the door.",
-       images:[{url:"images/care-guide/cards/before-leaving-for-vet.png", alt:"An orange tabby beside a carrier and essential items like medication and samples to bring to the vet"}],
+       images:[{url:"images/care-guide/cards/before-leaving-for-vet.webp", alt:"An orange tabby beside a carrier and essential items like medication and samples to bring to the vet"}],
        detail:"☐ Bring any medication, packaging, or plant matter — especially if poisoning is suspected, since it changes what the vet can do\n☐ Bring a fresh vomit or stool sample, if that's part of what's going on\n☐ Keep the cat in a secure carrier for the trip, even if it's normally calm — stress can make a cat bolt somewhere it never would at home\n☐ Avoid offering food or water unless a vet has told you to — sedation or surgery may be needed shortly after\n☐ Call ahead if you can, so the clinic can prepare before you arrive",
        linksMode:"references",
        links:[internalLink('resources', "Vet clinics in Singapore, if you don't already have one to call")]},
       {name:"My Cat Won't Eat", tag:"Answer a few questions", color:"#8A6A2E",
        note:"Answer a few quick questions below — the right response depends on how long it's been and what else is going on.",
-       images:[{url:"images/care-guide/cards/cat-wont-eat.png", alt:"A lethargic cat lying next to a full bowl of dry food, uninterested in eating"}],
+       images:[{url:"images/care-guide/cards/cat-wont-eat.webp", alt:"A lethargic cat lying next to a full bowl of dry food, uninterested in eating"}],
        tree:{
          start:"q1",
          nodes:{
@@ -3011,7 +3006,7 @@ const careCategories = [
        ]},
       {name:"Can't Urinate (Urinary Blockage)", tag:"No home fix", color:"#8A3B2B", severity:"emergency",
        note:"Straining in the litter box with little or no urine — especially in male cats — can be fatal within 24–48 hours.",
-       images:[{url:"images/care-guide/cards/urinary-blockage.png", alt:"An orange tabby cat straining beside a litter box with a distressed posture"}],
+       images:[{url:"images/care-guide/cards/urinary-blockage.webp", alt:"An orange tabby cat straining beside a litter box with a distressed posture"}],
        detail:"A urinary blockage happens when the urethra gets obstructed, most often in male cats because their urethra is longer and narrower. It stops urine flow entirely, and toxins build up in the bloodstream fast.\n\n<b>Watch for:</b>\n\n• Frequent trips to the litter box with little or no urine\n• Crying or straining while trying to go\n• Excessive licking of the genital area\n• A hard or painful lower abdomen\n• Vomiting, or sudden lethargy and hiding\n\nThere is no safe home first-aid step for this one — no bandaid, no waiting it out. A complete blockage can cause kidney failure or death within 24–48 hours, so the only correct action is to get to a vet immediately, even in the middle of the night.",
        linkGroups:[
          {mode:"entities", heading:"24hr Emergency Vets (Singapore)", links: emergencyContactLinks},
@@ -3021,7 +3016,7 @@ const careCategories = [
        ]},
       {name:"Difficulty Breathing", tag:"Never normal", color:"#8A3B2B", severity:"emergency",
        note:"Open-mouth breathing or panting in a cat is always serious — there's no 'wait and see' with this one.",
-       images:[{url:"images/care-guide/cards/difficulty-breathing.png", alt:"An orange tabby cat sitting upright with visible labored breathing and distress"}],
+       images:[{url:"images/care-guide/cards/difficulty-breathing.webp", alt:"An orange tabby cat sitting upright with visible labored breathing and distress"}],
        detail:"Unlike dogs, cats don't pant from heat or exercise — open-mouth breathing, rapid breathing, or visible effort to breathe is always abnormal and always urgent, whatever the cause turns out to be (asthma, fluid in the chest, heart disease, or trauma).\n\n<b>While getting to a vet:</b>\n\n• Keep the cat as calm and still as possible — stress and struggling increase oxygen demand and can make breathing worse\n• Don't restrain or hold the cat tightly against its chest\n• Transport in a well-ventilated carrier, ideally propped slightly upright rather than flat\n• Don't attempt to give food or water\n\nThis is one of the clearest 'go now' signs in this whole guide — by the time breathing looks distressed, the underlying problem is usually already serious.",
        linkGroups:[
          {mode:"entities", heading:"24hr Emergency Vets (Singapore)", links: emergencyContactLinks},
@@ -3032,7 +3027,7 @@ const careCategories = [
        ]},
       {name:"Seizures", tag:"Time it, don't touch", color:"#5B3A5C", severity:"emergency",
        note:"Clear the area, don't touch the mouth, and time how long it lasts — that detail matters most to the vet.",
-       images:[{url:"images/care-guide/cards/seizures.png", alt:"An orange tabby cat lying safely on its side during a seizure episode with subtle motion cues around the body"}],
+       images:[{url:"images/care-guide/cards/seizures.webp", alt:"An orange tabby cat lying safely on its side during a seizure episode with subtle motion cues around the body"}],
        detail:"During a seizure a cat may fall over, twitch or paddle, drool, and lose control of bladder or bowel. It looks alarming, but the most useful thing you can do is stay calm and observe.\n\n<b>Do:</b>\n\n• Move nearby objects out of the way so the cat doesn't injure itself\n• Time the seizure on your phone\n• Dim harsh lights and reduce noise\n• Stay nearby speaking softly once it ends\n\n<b>Don't:</b>\n\n• Put your hands near the mouth (cats don't swallow their tongues, and you risk being bitten)\n• Try to restrain the movements\n\nA single seizure under 2–3 minutes that resolves on its own still needs a follow-up vet visit, but isn't necessarily a mid-seizure emergency drive. It becomes an immediate emergency if it lasts more than 5 minutes, if there's more than one in a 24-hour period (cluster seizures), or if breathing looks labored afterward.",
        linkGroups:[
          {mode:"entities", heading:"24hr Emergency Vets (Singapore)", links: emergencyContactLinks},
@@ -3044,7 +3039,7 @@ const careCategories = [
        ]},
       {name:"Suspected Poisoning", tag:"Don't induce vomiting", color:"#8A3B2B", severity:"emergency",
        note:"Call a vet immediately — and don't try to make the cat vomit unless you're specifically told to.",
-       images:[{url:"images/care-guide/cards/suspected-poisoning.png", alt:"An orange tabby cat beside common toxic items with warning symbols"}],
+       images:[{url:"images/care-guide/cards/suspected-poisoning.webp", alt:"An orange tabby cat beside common toxic items with warning symbols"}],
        detail:"Common culprits include lilies and other toxic plants, human medication, rodent or slug bait, and household chemicals (see the Home-Proofing card in Health & Safety for a fuller list). Signs of poisoning include vomiting, diarrhea, drooling, seizures, collapse, or skin irritation from a caustic substance.\n\n<b>The single most important rule:</b> do not induce vomiting unless a vet or poison control specifically tells you to. Some substances cause more damage coming back up than staying down, especially anything corrosive.\n\n• If you know what was ingested, bring the packaging, plant, or a sample with you — it changes what the vet can do\n• If the substance touched the skin or fur, rinse the area with water for about 15 minutes before you leave\n• Call your regular vet first if they're reachable; otherwise go straight to a 24hr clinic",
        linkGroups:[
          {mode:"entities", heading:"24hr Emergency Vets (Singapore)", links: emergencyContactLinks},
@@ -3057,7 +3052,7 @@ const careCategories = [
        ]},
       {name:"Heatstroke", tag:"Cool first, transport second", color:"#8A6A2E", severity:"emergency",
        note:"Move to a cool space and start gentle cooling immediately — then get to a vet regardless of how quickly they recover.",
-       images:[{url:"images/care-guide/cards/heatstroke.png", alt:"A cat lying on a cool tile floor, panting and looking distressed"}],
+       images:[{url:"images/care-guide/cards/heatstroke.webp", alt:"A cat lying on a cool tile floor, panting and looking distressed"}],
        detail:"Cats can't cool themselves the way humans do — they rely mainly on finding shade and grooming, which makes them vulnerable if trapped somewhere hot (a car, an unventilated room, direct sun with no shade).\n\n<b>Early signs:</b> panting, drooling, restlessness, seeking cool surfaces.\n\n<b>Severe signs:</b> collapse, vomiting, staggering, seizures, gums turning dark red, white, or bluish.\n\n<b>First aid, in order:</b>\n\n1. Move the cat to a cool, shaded, or air-conditioned space immediately\n2. Apply cool — not ice-cold — damp towels to the belly, paws, and ears; ice water can cause blood vessels to constrict and is counterproductive\n3. Offer small sips of water only if the cat is alert enough to drink on its own, never force it\n4. Stop active cooling once things seem to improve, to avoid overshooting into hypothermia\n\nEven if your cat seems to recover in the car, organ damage from heatstroke can develop hours later — treat every case as one that needs a same-day vet visit, not just home cooling.",
        linkGroups:[
          {mode:"entities", heading:"24hr Emergency Vets (Singapore)", links: emergencyContactLinks},
@@ -3068,7 +3063,7 @@ const careCategories = [
        ]},
       {name:"Trauma, Falls & Bleeding", tag:"Move as little as possible", color:"#8A3B2B", severity:"emergency",
        note:"Hit by a car, a fall from height, or an animal attack — minimize movement and go, even if the cat looks okay.",
-       images:[{url:"images/care-guide/cards/trauma-falls-bleeding.png", alt:"An injured orange tabby cat with trauma cues and emergency transport emphasis"}],
+       images:[{url:"images/care-guide/cards/trauma-falls-bleeding.webp", alt:"An injured orange tabby cat with trauma cues and emergency transport emphasis"}],
        detail:"This covers the sudden, physical emergencies: being hit by a vehicle, a fall from a window or balcony ('high-rise syndrome' — see the Adoption and Home-Proofing cards on why meshing matters), or an attack by another animal.\n\n<b>First aid:</b>\n\n• Minimize how much the cat moves — use a towel or a flat, firm surface like a board or box lid as an improvised stretcher rather than letting the cat walk\n• Keep the cat warm (this is the one exception where you don't want cooling)\n• For visible bleeding, apply gentle, direct pressure with a clean cloth — don't use a tourniquet, and don't apply human antiseptics or peroxide, which can damage tissue further\n• Don't offer food or water in case sedation or surgery is needed shortly after\n\nThe hardest part of this one: a cat can look normal minutes after real trauma and still have internal bleeding or organ damage that takes hours to become obvious. Any cat involved in a fall, a collision, or a serious animal attack needs to be examined the same day, even with no visible injury.",
        linkGroups:[
          {mode:"entities", heading:"24hr Emergency Vets (Singapore)", links: emergencyContactLinks},
@@ -3081,7 +3076,7 @@ const careCategories = [
        ]},
       {name:"Emergency Contacts (Singapore)", tag:"Save these numbers", color:"#2C5D5A",
        note:"Four 24-hour clinics spread across Singapore — worth saving in your phone before you ever need them.",
-       images:[{url:"images/care-guide/cards/emergency-contacts.png", alt:"An orange tabby cat beside a phone and emergency clinic contact symbols"}],
+       images:[{url:"images/care-guide/cards/emergency-contacts.webp", alt:"An orange tabby cat beside a phone and emergency clinic contact symbols"}],
        linkGroups:[
          {mode:"entities", heading:"24hr Emergency Vets (Singapore)", links: emergencyContactLinks},
          {mode:"references", links:[{label:"Open the printable Emergency Sheet ↗", url:"cat-emergency-sheet.html", meta:"One page: these numbers, warning signs, and dangerous foods/plants — save or print it"},
@@ -3095,7 +3090,7 @@ const careCategories = [
     items:[
       {name:"Vomiting or Diarrhea", tag:"Depends on frequency", color:"#8A6A2E", severity:"vet",
        note:"One isolated stomach-upset episode is different from repeated vomiting, blood, or a cat that won't keep water down.",
-       images:[{url:"images/care-guide/cards/cat-wont-eat.png", alt:"A subdued orange tabby near a food bowl, used here as a general stomach-upset triage cue"}],
+       images:[{url:"images/care-guide/cards/cat-wont-eat.webp", alt:"A subdued orange tabby near a food bowl, used here as a general stomach-upset triage cue"}],
        tree:{
          start:"q1",
          nodes:{
@@ -3126,7 +3121,7 @@ const careCategories = [
        ]},
       {name:"Sneezing, Runny Eyes, or Mild Coughing", tag:"Watch the breathing", color:"#3d6b6d", severity:"monitor",
        note:"Many upper-respiratory infections start mild, but breathing effort and appetite are the things that change the urgency.",
-       images:[{url:"images/care-guide/cards/environmental-allergies.png", alt:"An orange tabby with mild facial irritation cues, used here for upper-respiratory and irritation triage"}],
+       images:[{url:"images/care-guide/cards/environmental-allergies.webp", alt:"An orange tabby with mild facial irritation cues, used here for upper-respiratory and irritation triage"}],
        tree:{
          start:"q1",
          nodes:{
@@ -3157,7 +3152,7 @@ const careCategories = [
        ]},
       {name:"Limping or Sudden Reluctance to Jump", tag:"Severity depends on function", color:"#8A6A2E", severity:"vet",
        note:"A cat still walking carefully is different from a cat that won't bear weight at all or cries when touched.",
-       images:[{url:"images/care-guide/cards/senior-stage.png", alt:"An orange tabby near a low step, used here to suggest movement and jumping concerns"}],
+       images:[{url:"images/care-guide/cards/senior-stage.webp", alt:"An orange tabby near a low step, used here to suggest movement and jumping concerns"}],
        tree:{
          start:"q1",
          nodes:{
@@ -3188,7 +3183,7 @@ const careCategories = [
        ]},
       {name:"Small Wound, Bite, or Swelling", tag:"Looks small can still infect", color:"#8A3B2B", severity:"vet",
        note:"Cat bites and tiny punctures can look trivial on the surface but abscess badly underneath.",
-       images:[{url:"images/care-guide/cards/trauma-falls-bleeding.png", alt:"An orange tabby with minor injury cues, used here for wound and swelling triage"}],
+       images:[{url:"images/care-guide/cards/trauma-falls-bleeding.webp", alt:"An orange tabby with minor injury cues, used here for wound and swelling triage"}],
        tree:{
          start:"q1",
          nodes:{
@@ -3225,7 +3220,7 @@ const careCategories = [
     items:[
       {name:"The 15–20 Year Commitment", tag:"Long-term", color:"#3f5443",
        note:"A cat's average lifespan runs 12 to 20 years — long enough to outlast a few apartments, jobs, and relationships.",
-       images:[{url:"images/care-guide/cards/long-term-commitment.png", alt:"An orange tabby cat paired with long-term commitment cues for a many-year responsibility"}],
+       images:[{url:"images/care-guide/cards/long-term-commitment.webp", alt:"An orange tabby cat paired with long-term commitment cues for a many-year responsibility"}],
        detail:"Cats routinely live into their late teens, and indoor-only cats on the higher end of that range aren't unusual — see the Life Stages tab for what changes decade to decade. That's a genuinely long planning horizon, longer than most first jobs, most leases, and plenty of relationships.\n\nWorth thinking through before committing, not after:\n\n• Where realistically might you be in 5, 10, 15 years — a different country, a smaller place, a partner or kids who may or may not want a cat around\n• Who takes over care if you can't — travel for work, a health issue, or simply burnout — is there a backup person, even informally\n• Whether you're prepared for a senior cat's rising vet costs in its final years, often the most expensive stretch of ownership (see Health & Safety and Life Stages)\n\nNone of this is meant to talk anyone out of it — it's the same honesty a good shelter screening interview already asks for (see the Adoption tab), just worth answering for yourself first.",
        linksMode:"references",
        links:[{label:"Jump to Life Stages tab ↓", url:"internal:stages", meta:"What changes decade to decade, and what a senior cat actually costs"},
@@ -3233,7 +3228,7 @@ const careCategories = [
               {label:"Jump to Adoption tab ↓", url:"internal:adoption", meta:"The same honesty a shelter screening interview already asks for"}]},
       {name:"What It Actually Costs", tag:"Budget", color:"#a15a3a",
        note:"Upfront costs are once-off; the ongoing monthly costs are the ones people underestimate.",
-       images:[{url:"images/care-guide/cards/cat-costs.png", alt:"An orange tabby cat with cost and budgeting cues for ongoing cat ownership expenses"}],
+       images:[{url:"images/care-guide/cards/cat-costs.webp", alt:"An orange tabby cat with cost and budgeting cues for ongoing cat ownership expenses"}],
        detail:"<b>Upfront, one-time:</b> (tick these off as you go)\n\n☐ Adoption fee ($25–$200) or breeder price ($1,000–$5,000+) — see the Adoption tab for the comparison\n☐ Sterilisation, core vaccinations, and microchipping, if not already bundled into an adoption fee\n☐ An initial vet check-up\n☐ Carrier, litter box, scratching post, and starter food and litter\n\n<b>Ongoing, monthly or recurring:</b>\n\n• Food — see Diet & Nutrition for wet vs. dry cost and quality tradeoffs\n• Litter, replaced regularly rather than topped up indefinitely\n• Parasite prevention (flea/worm treatment), typically monthly\n• A vet fund or pet insurance — set aside something even if nothing's wrong, since emergency and senior-year care both spike fast (see Emergencies and Health & Safety)\n• Grooming, especially for long-haired breeds needing professional grooming a few times a year\n• PALS licence renewal (see the card below)\n\nAs a rough Singapore benchmark, food, litter, and routine vet care combined commonly land around <b>$100–250 a month</b> — but there's no single 'correct' figure since it depends heavily on food quality and whether insurance is involved. Budgeting for surprise vet bills specifically, not just routine costs, is the part most first-time owners skip.",
        linksMode:"references",
        links:[{label:"Pawrenthood: Cat Costs in Singapore ↗", url:"https://www.pawrenthood.sg/cost-owning-cat-singapore/", meta:"Monthly cost breakdown by category"},
@@ -3245,14 +3240,14 @@ const careCategories = [
               {label:"Jump to Health & Safety tab ↓", url:"internal:health", meta:"Annual vs. biannual vet visit costs by life stage"}]},
       {name:"HDB & Rental Rules (Singapore)", tag:"Legal", color:"#8A3B2B",
        note:"Up to 2 cats per HDB flat, PALS licensing is mandatory, and private landlords or condo MCSTs can add their own rules on top.",
-       images:[{url:"images/care-guide/cards/hdb-rental-rules.png", alt:"An orange tabby cat with housing and rule-related cues for HDB and rental regulations in Singapore"}],
+       images:[{url:"images/care-guide/cards/hdb-rental-rules.webp", alt:"An orange tabby cat with housing and rule-related cues for HDB and rental regulations in Singapore"}],
        detail:"Under HDB's Animals Rules, a flat may keep up to <b>2 cats</b> (alongside one approved-breed dog) — this is a hard cap, not a guideline, enforceable with fines up to $4,000 for non-compliance.\n\nSince 1 September 2024, every pet cat in Singapore must be microchipped and licensed through AVS's Pet Animal Licensing System (PALS), as part of the same National Cat Management Framework covered in the Adoption tab. Licensing is free during a transition period running until 31 August 2026. First-time applicants also need to complete a short, free online pet ownership course before a licence is issued.\n\nOwners who already had more than 2 cats before 1 September 2024 can keep them, provided every cat gets licensed during the transition window — this grandfathering doesn't extend to new cats added after that date.\n\n<b>If you're renting or in a condo:</b> HDB's rules don't automatically apply to private property. Check your tenancy agreement and your building's MCST by-laws separately — some private leases still prohibit pets outright regardless of what HDB or AVS permit, and that's a landlord-level restriction, not a legal loophole to test.",
        linksMode:"references",
        links:[{label:"AVS: Cat Ownership Limits ↗", url:"https://avs.nparks.gov.sg/noticeboard/cat-management-framework/cat-ownership-limits/", meta:"Official 2-cats-per-flat rule and transition period details"},
               {label:"Jump to Adoption tab ↓", url:"internal:adoption", meta:"PALS licensing and window-meshing requirements before a shelter will hand over a cat"}]},
       {name:"Lifestyle Fit Checklist", tag:"Self-check", color:"#3d6b6d",
        note:"A few honest questions worth answering before, not after.",
-       images:[{url:"images/care-guide/cards/lifestyle-fit-checklist.png", alt:"An orange tabby cat with simple lifestyle and household compatibility checklist cues"}],
+       images:[{url:"images/care-guide/cards/lifestyle-fit-checklist.webp", alt:"An orange tabby cat with simple lifestyle and household compatibility checklist cues"}],
        detail:"• How many hours a day are you realistically away from home, and who covers feeding/litter if a trip runs long\n• Does anyone in the household have a cat allergy — worth testing exposure with a friend's cat first if unsure, rather than finding out after\n• How would a cat fit with any existing pets, and with young kids specifically (supervised introductions, not assumptions)\n• Are you genuinely prepared for the indoor-only-plus-meshed-windows commitment that's now standard practice in Singapore (see Adoption and Health & Safety)\n• Is everyone in the household actually on board — not just the person filling out the adoption form\n\nNone of these have a 'right' answer that applies to everyone — they're just the questions worth being honest about before, rather than after, a cat is already home.",
        linksMode:"references",
        links:[{label:"Jump to Adoption tab ↓", url:"internal:adoption", meta:"Window meshing and what shelters actually check for"},
@@ -3260,7 +3255,7 @@ const careCategories = [
               {label:"Jump to Travel & Boarding tab ↓", url:"internal:travel", meta:"What actually happens to the cat when a trip runs long"}]},
       {name:"Who's the Primary Caregiver?", tag:"Household", color:"#5B3A5C",
        note:"Shared responsibility, in practice, often means nobody's responsibility — one person should own the daily routine.",
-       images:[{url:"images/care-guide/cards/primary-caregiver.png", alt:"An orange tabby cat with caregiver and shared-household responsibility cues"}],
+       images:[{url:"images/care-guide/cards/primary-caregiver.webp", alt:"An orange tabby cat with caregiver and shared-household responsibility cues"}],
        detail:"Feeding schedule, litter scooping, and vet appointments go more smoothly when one person is clearly responsible for them day to day, even in a household where everyone loves the cat. This matters most in two common situations:\n\n• A child's promise to 'take care of it' — a good way to build responsibility, but not a substitute for an adult who owns the actual routine and the vet decisions\n• Shared households or couples — worth a quick conversation up front about who does what, rather than assuming it'll sort itself out\n\nIt's also worth naming a backup caregiver for when the primary person travels, gets sick, or simply has a bad week — a cat's routine (especially medication, if any) doesn't pause for that."}
     ]
   },
@@ -3270,13 +3265,13 @@ const careCategories = [
     items:[
       {name:"Adoption vs. Breeder", tag:"Consider first", color:"#8a6b1f",
        note:"Adoption fees are far lower than breeder prices and usually bundle in the vet costs a breeder cat needs arranged separately.",
-       images:[{url:"images/care-guide/cards/adoption-vs-breeder.png", alt:"An orange tabby cat with simple adoption-versus-breeder comparison cues"}],
+       images:[{url:"images/care-guide/cards/adoption-vs-breeder.webp", alt:"An orange tabby cat with simple adoption-versus-breeder comparison cues"}],
        detail:"Shelters and rescues in Singapore are typically full of mixed-breed 'Singapore Special' cats and the occasional purebred surrendered by a previous owner — so choosing to adopt doesn't always mean giving up on a specific look.\n\n<b>Adoption:</b> roughly $25–$200 depending on the org and cat, usually bundling in sterilisation, vaccination, and microchipping — work that would otherwise cost several hundred dollars separately.\n\n<b>Buying from a breeder:</b> typically $1,000–$5,000+ depending on the breed. A reputable breeder should provide health screening records, a vaccination history, and be willing to show you the kitten's parents.\n\n<b>Red flags for backyard breeders or kitten mills:</b>\n\n• Never allowing a home or facility visit\n• Multiple litters or breeds available year-round\n• Refusing to provide any paperwork\n\nThe trade-off worth knowing: a breeder can usually tell you a kitten's full lineage and expected traits, while a shelter cat's early history is often unknown — though many shelters and especially foster-based orgs can tell you a lot about a cat's day-to-day personality since it's been living in a real home, not a breeding facility.",
        linksMode:"references",
        links:[{label:"Compare adoption orgs & fees ↗", url:"https://www.pawrenthood.sg/adopt-cat-singapore/", meta:"Side-by-side look at SPCA, CWS, KiSS — fees, process, and what's included"}]},
       {name:"The Adoption Process", tag:"Step by step", color:"#3d6b6d",
        note:"Browse → apply → viewing appointment → screening/home check → sign & pay → bring your cat home.",
-       images:[{url:"images/care-guide/cards/adoption-process.png", alt:"An orange tabby cat with step-by-step adoption process cues"}],
+       images:[{url:"images/care-guide/cards/adoption-process.webp", alt:"An orange tabby cat with step-by-step adoption process cues"}],
        detail:"Steps vary slightly by organization, but most follow the same shape:\n\n1. Browse available cats online — most orgs post photos, age, and personality notes.\n2. Submit an application covering your household situation, past pet experience, work schedule, and who the primary caregiver will be.\n3. Book a viewing appointment to meet the cat in person — some orgs require more than one visit before approving a match.\n4. Pass a screening interview and a home check, which for cats usually means proving your windows and gates are fully meshed (photo or video evidence is often accepted in lieu of an in-person visit).\n5. Sign an adoption agreement — typically including clauses like keeping the cat indoors, not declawing, and contacting the org first if you can no longer keep the cat rather than rehoming it yourself.\n6. Pay the adoption fee and bring your cat home. Some orgs follow up with a post-adoption check-in.\n\n<b>Why 'no declawing' is a standard clause:</b> declawing (onychectomy) amputates the last bone of each toe, not just the claw itself. The AVMA's current policy strongly discourages the procedure whenever a cat's scratching is a behavioral rather than medical issue, citing it as an acutely painful surgery that can lead to chronic pain, complications, and maladaptive behavior — which is why most shelters and rescues write it into the adoption agreement rather than leaving it optional.\n\nExpect the whole process to take anywhere from a few days to a few weeks — faster for older or special-needs cats that are harder to place, slower for popular kittens with several interested applicants.",
        linksMode:"references",
        links:[{label:"AVMA: Declawing of Domestic Cats ↗", url:"https://www.avma.org/resources-tools/avma-policies/declawing-domestic-cats", meta:"Current official policy and welfare rationale"},
@@ -3284,7 +3279,7 @@ const careCategories = [
               {label:"SPCA: Rehoming & Screening Questions ↗", url:"https://spca.org.sg/services/rehoming/", meta:"The actual questions applicants are asked"}]},
       {name:"Know Before You Adopt (Singapore)", tag:"Legal requirement", color:"#a15a3a",
        note:"Cat licensing via PALS is now mandatory, and full window meshing is required before handover.",
-       images:[{url:"images/care-guide/cards/know-before-adopt-singapore.png", alt:"An orange tabby cat with legal and before-you-adopt information cues for Singapore"}],
+       images:[{url:"images/care-guide/cards/know-before-adopt-singapore.webp", alt:"An orange tabby cat with legal and before-you-adopt information cues for Singapore"}],
        detail:"<b>Cat licensing (PALS):</b> since 1 September 2024, as part of Singapore's National Cat Management Framework, every pet cat must be licensed through AVS's Pet Animal Licensing System — the same portal already used for dog licensing. This is a legal requirement, not optional paperwork, and covers microchip ownership transfer into your name at the same time.\n\n<b>Window meshing:</b> most shelters enforce their own physical safety requirement before they'll hand over a cat — every window and gate, including bathroom ventilation windows and top-hung push-out windows, needs to be fully meshed with a strong, cat-proof mesh. Partial meshing isn't accepted, and flimsy options like velcro mesh, standard mosquito mesh, or magnetic mesh are usually rejected as not strong enough to hold a cat's weight or claws. Approved mesh types are listed on Cat Welfare Society's site.\n\n<b>Why both rules exist:</b> Singapore records roughly 250 cases a year of cats falling from height, largely because so much of the population lives in high-rise HDB flats and condos. Shelters treat this as seriously as the legal licensing requirement, and will typically ask for photo or video proof of meshing at your adoption appointment.",
        linksMode:"references",
        links:[{label:"AVS Pet Animal Licensing System (PALS) ↗", url:"https://pals.avs.gov.sg", meta:"Where cat licensing and microchip registration are done"},
@@ -3292,7 +3287,7 @@ const careCategories = [
               internalLink('triage', "Limping or Sudden Reluctance to Jump — when a fall or awkward landing is not clearly an ER, but still needs judgment")]},
       {name:"Adoption Centres", tag:"4 options", color:"#3d6b6d",
        note:"Four established routes to adopt a cat in Singapore — tap through for site, address, and fees.",
-       images:[{url:"images/care-guide/cards/adoption-centres.png", alt:"An orange tabby cat beside a clearly marked adoption centre building"}],
+       images:[{url:"images/care-guide/cards/adoption-centres.webp", alt:"An orange tabby cat beside a clearly marked adoption centre building"}],
        detail:"The four differ more than they might look at a glance:\n\n<b>SPCA Singapore</b> is the most structured route — a traditional shelter with an appointment-based viewing process, and the adoption fee covers sterilisation, vaccination, and microchipping in one go. Good if you want a single, comprehensive transaction.\n\n<b>Cat Welfare Society</b> isn't a shelter at all — it's a public adoption board where independent fosterers list cats they're already caring for in their own homes. The upside is you get a fosterer who can tell you the cat's real personality firsthand, rather than its behavior in a cage.\n\n<b>Animal Lovers League</b> is a large no-kill shelter housing several hundred cats and dogs, many rescued as strays. It's appointment-based, and WhatsApp is genuinely the fastest way to reach them for cat-specific questions.\n\n<b>Kitten Sanctuary Singapore</b> is the option if you specifically want a kitten — it's Singapore's only dedicated neonatal kitten nursery, entirely volunteer-run, and visits are bookable so you can interact with kittens directly rather than choosing from photos alone.",
        linksMode:"entities",
        links:[{label:"SPCA Singapore ↗", url:"https://spca.org.sg/services/adoption/", meta:"50 Sungei Tengah Rd · +65 6287 5355 · $80–$200 fee incl. sterilisation, vaccination & microchip · by appointment"},
@@ -3301,7 +3296,7 @@ const careCategories = [
               {label:"Kitten Sanctuary Singapore (KiSS) ↗", url:"https://www.kittensanctuarysg.org/adopt", meta:"576A Geylang Rd, #02-01 · +65 9126 7379 · Singapore's only neonatal kitten nursery, bookable visits"}]},
       {name:"Bringing Your Cat Home", tag:"First days", color:"#3d6b6d",
        note:"A quiet base room first, then the rest of the house gradually — not the full run of the home on day one.",
-       images:[{url:"images/care-guide/cards/bringing-cat-home.png", alt:"An orange tabby cat arriving home with a calm first-day setup cue"}],
+       images:[{url:"images/care-guide/cards/bringing-cat-home.webp", alt:"An orange tabby cat arriving home with a calm first-day setup cue"}],
        detail:"The instinct to let a new cat explore the whole home immediately is understandable, but a smaller, quieter start almost always goes better.\n\n<b>Set up a base room first</b> — a spare room or a quiet bathroom works — with a litter box, food and water (kept apart from each other), a bed or blanket, and somewhere to hide (a covered carrier or box left open is enough). Close the door to the rest of the house for the first few days and let the cat decompress at its own pace rather than forcing introductions.\n\n<b>Expand room by room, gradually</b> — once the cat is eating, using the litter box, and seeming relaxed in the base room, open access to one additional room at a time over the following days to weeks, rather than all at once. Supervise the first few visits to each new room.\n\n<b>Let the cat choose to approach</b> — sit quietly nearby rather than picking the cat up or chasing it out from under furniture; most cats come around faster when the human isn't the one initiating contact. Keep visitors and loud household activity to a minimum for the first week or so.\n\n<b>Once settled, spread supplies to their permanent spots</b> — food, water, and litter boxes (one per cat plus one extra) move from the base room out to where they'll actually live long-term.",
        linksMode:"references",
        links:[{label:"Jump to Daily Care tab ↓", url:"internal:daily", meta:"Feeding, litter box setup, and how to train a new cat to use the box"},
@@ -3314,7 +3309,7 @@ const careCategories = [
     items:[
       {name:"Kitten (0–12 months)", tag:"Growth phase", color:"#8a6b1f",
        note:"Kitten-formula food, a core vaccine series, and the main socialization window all happen in this first year.",
-       images:[{url:"images/care-guide/cards/kitten-stage.png", alt:"A kitten version of the orange tabby beside a food bowl and toy mouse"}],
+       images:[{url:"images/care-guide/cards/kitten-stage.webp", alt:"A kitten version of the orange tabby beside a food bowl and toy mouse"}],
        detail:"<b>Feeding:</b> a kitten-formula food 3–4 times a day — kittens need roughly twice the calories per kilogram of an adult cat to fuel rapid growth, plus more protein and fat than an adult diet provides.\n\n<b>Vaccines:</b> core vaccines (typically covering feline viral rhinotracheitis, calicivirus, and panleukopenia — often shortened to FVRCP) run as a series of shots from about 6 to 16 weeks, since a kitten's immunity from its mother fades unpredictably during that window and a single shot can't be timed to catch it reliably. Deworming usually happens alongside these visits.\n\n<b>Socialization:</b> 2 to 9 weeks is considered the critical window — positive, low-stress exposure to new people, sounds, handling, and (carefully) other vaccinated animals shapes how confident and adaptable the cat is for life.\n\nMost vets schedule spay/neuter around 5–6 months. Beyond preventing unwanted litters, it meaningfully lowers long-term health risk — spaying eliminates the risk of uterine infections and significantly cuts the risk of mammary tumors, while neutering prevents testicular cancer — and both tend to reduce roaming, spraying, territorial marking, and fighting with other cats. Kittens are typically transitioned to adult food somewhere between 10 and 12 months, once growth has largely leveled off.",
        timeline:[
          {age:"2–9 WK", text:"Critical socialization window — positive, low-stress exposure to new people, sounds, and handling."},
@@ -3330,7 +3325,7 @@ const careCategories = [
               internalLink('health', "The same 6-to-16-week vaccine schedule, from the check-up side")]},
       {name:"Adult (1–10 years)", tag:"Maintenance", color:"#3f5443",
        note:"Two measured meals a day plus an annual vet visit is the steady baseline most general advice assumes.",
-       images:[{url:"images/care-guide/cards/adult-stage.png", alt:"An adult orange tabby cat seated beside a food bowl and grooming brush"}],
+       images:[{url:"images/care-guide/cards/adult-stage.webp", alt:"An adult orange tabby cat seated beside a food bowl and grooming brush"}],
        detail:"Two measured meals a day is standard for a healthy adult cat, with portion size guided less by the bag's suggested amount and more by regularly checking body condition — being able to feel (but not see prominently) the ribs, with a visible waist from above, is a more reliable gauge than weight alone since it accounts for frame size.\n\nAn annual vet visit covers vaccine boosters, a dental check, and weight tracking — dental disease in particular is easy to miss day to day but extremely common by middle age, since cats are good at hiding the discomfort of a sore mouth.\n\nThis is the life stage most general feeding, grooming, and enrichment advice is written for by default, since metabolism, activity level, and disease risk are at their most stable and predictable here compared to the kitten and senior years on either side.\n\n<b>How to actually check body condition at home</b> (the WSAVA 'look-feel-look' method, takes under a minute):\n\n1. Stand the cat up rather than checking while it's hunched in a lap, since a curled-up cat always looks heavier\n2. Feel — place a flat hand on each side of the ribcage; in an ideal-weight cat you should feel each rib easily, like running a finger over the back of your other hand, without pressing hard\n3. Look from above — there should be a visible inward waist behind the ribs\n4. Look from the side — a slight upward tuck from ribs to hind legs\n\nIf you have to press firmly to find the ribs at all, or there's no waist visible, that's worth mentioning at the next vet visit rather than adjusting food on your own.",
        linksMode:"references",
        links:[{label:"Cornell: Feeding Your Cat ↗", url:"https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/feeding-your-cat", meta:"Cornell Feline Health Center — nutrition basics for adult cats"},
@@ -3340,7 +3335,7 @@ const careCategories = [
               internalLink('health', "What the annual vet visit itself actually covers")]},
       {name:"Senior (10+ years)", tag:"Extra watch", color:"#a15a3a",
        note:"Twice-yearly vet visits and watching for kidney, thyroid, joint, and dental issues become the priority.",
-       images:[{url:"images/care-guide/cards/senior-stage.png", alt:"A senior orange tabby cat resting on a low supportive bed beside a small step"}],
+       images:[{url:"images/care-guide/cards/senior-stage.webp", alt:"A senior orange tabby cat resting on a low supportive bed beside a small step"}],
        detail:"Many vets shift to twice-yearly visits starting around age 7–10, since conditions in older cats tend to progress faster between checkups than they do in younger adults. Four conditions account for most senior cat health issues:\n\n• Kidney disease — often first noticeable as increased thirst and urination, sometimes before a cat looks unwell in any other way.\n• Hyperthyroidism — weight loss despite a normal or increased appetite is the classic tell.\n• Arthritis — look for reluctance to jump onto furniture, stiffness after resting, or skipping the litter box if it has high sides.\n• Dental disease — bad breath, drooling, or dropping food while eating.\n\nSenior diets tend to be softer and lower in phosphorus (easier on aging kidneys), and practical home changes help too: a low-sided litter box for stiff joints, extra litter boxes on the same floor so a cat doesn't have to climb stairs, and a warm, easily-accessible bed. Twice-yearly bloodwork can catch several of the above conditions before symptoms are obvious.",
        linksMode:"references",
        links:[{label:"Cornell: The Special Needs of the Senior Cat ↗", url:"https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/special-needs-senior-cat", meta:"Cornell Feline Health Center — aging changes to watch for"},
@@ -3355,14 +3350,14 @@ const careCategories = [
     items:[
       {name:"Obligate Carnivore", tag:"Biology", color:"#3d6b6d",
        note:"Cats need meat-based protein and can't thrive on a plant-based diet the way dogs or humans can.",
-       images:[{url:"images/care-guide/cards/obligate-carnivore.png", alt:"An orange tabby cat beside a meat-based meal with fish and chicken, plus a small crossed-out plant cue"}],
+       images:[{url:"images/care-guide/cards/obligate-carnivore.webp", alt:"An orange tabby cat beside a meat-based meal with fish and chicken, plus a small crossed-out plant cue"}],
        detail:"Cats are obligate carnivores — their bodies are built to run on animal-derived nutrients specifically, not just protein in general. Taurine, an amino acid found only in animal tissue, is the clearest example: cats can't synthesize enough of it themselves, and a deficiency can cause dilated cardiomyopathy (a serious, sometimes fatal, weakening of the heart muscle) and irreversible retinal degeneration leading to blindness. This is also why dog food isn't a safe substitute for cats even short-term — it isn't fortified with the taurine or arachidonic acid levels a cat's metabolism requires.\n\nCommercial cat foods are formulated to meet these needs, which is why homemade or plant-based diets require careful veterinary supervision if attempted at all — it's very easy to under-supply what looks like a perfectly balanced meal by human standards.",
        linksMode:"references",
        links:[{label:"Cornell: Feeding Your Cat ↗", url:"https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/feeding-your-cat", meta:"Cornell Feline Health Center — why cats need animal protein"},
               internalLink('allergies', "What happens when one of these same proteins triggers a reaction instead")]},
       {name:"Wet vs. Dry Food", tag:"Format", color:"#6b4a7a",
        note:"Wet food adds hydration and is gentler on kidneys; dry food is convenient and helps a little with dental wear.",
-       images:[{url:"images/care-guide/cards/wet-vs-dry-food.png", alt:"An orange tabby cat between wet food with water droplets and a bowl of dry kibble"}],
+       images:[{url:"images/care-guide/cards/wet-vs-dry-food.webp", alt:"An orange tabby cat between wet food with water droplets and a bowl of dry kibble"}],
        detail:"<b>Wet food</b> is typically 70–80% moisture, versus roughly 10% for dry kibble — a meaningful difference, since cats evolved from desert-dwelling ancestors and instinctively drink less water than they probably should, even when it's freely available. That makes wet food a genuine tool for supporting kidney health, especially as cats age.\n\n<b>Dry food</b> is more convenient, shelf-stable after opening, and its crunch does provide some mechanical scraping of plaque — though this effect is modest and shouldn't be relied on as a substitute for actual dental care or brushing. Once opened, canned wet food should generally be refrigerated and used within a few days.\n\nMany owners mix both: dry food available for grazing, wet food for at least one measured meal a day to boost hydration. The ratio often shifts toward more wet food as a cat ages or develops kidney or urinary issues.",
        linkGroups:[
          {mode:"entities", links:[shopChip('polypet', {label:"Polypet — Cat Food Range", meta:"Stocks Royal Canin, Orijen, Hill's Science Diet, Purina Pro Plan & more, both wet and dry",
@@ -3372,7 +3367,7 @@ const careCategories = [
        ]},
       {name:"Foods to Avoid", tag:"Toxic list", color:"#a15a3a",
        note:"<strong>Onion</strong>, <strong>garlic</strong>, <strong>chocolate</strong>, <strong>grapes/raisins</strong>, and <strong>xylitol</strong> are all toxic to cats, even in small amounts.",
-       images:[{url:"images/care-guide/cards/foods-to-avoid.png", alt:"An orange tabby cat sniffing near onion, garlic, chocolate, grapes, and milk marked with warning symbols"}],
+       images:[{url:"images/care-guide/cards/foods-to-avoid.webp", alt:"An orange tabby cat sniffing near onion, garlic, chocolate, grapes, and milk marked with warning symbols"}],
        detail:"• <strong>Onion & garlic</strong> (cooked, raw, or powdered) — contain compounds that damage red blood cells, leading to hemolytic anemia. The damage is cumulative, so repeated small exposures can be just as harmful as one large one.\n• <strong>Chocolate</strong> — contains theobromine, a stimulant cats metabolize far more slowly than humans; darker chocolate has more of it and is more dangerous.\n• <strong>Grapes & raisins</strong> — linked to sudden kidney failure in some pets even in small quantities, and the exact toxic mechanism still isn't fully understood, which is part of why vets treat any amount as a concern.\n• <strong>Xylitol</strong> (a sugar substitute in sugar-free gum and baked goods) — well documented as dangerous in dogs and treated with the same caution in cats.\n• <strong>Raw bread dough</strong> — can continue to rise in a warm stomach and expand dangerously, alongside producing alcohol as it ferments.\n• <strong>Milk and dairy</strong> — a persistent myth, not a treat: most adult cats lose the enzyme needed to digest lactose after weaning, so milk usually causes gas, diarrhea, or vomiting within 8–12 hours rather than anything more severe.\n• <strong>Lilies</strong> — severely toxic to cats specifically; even pollen brushed onto fur and later licked off during grooming can cause kidney failure.\n\nIf you suspect your cat has eaten any of these, contact a vet or emergency clinic immediately rather than waiting for symptoms.",
        linksMode:"references",
        links:[{label:"ASPCA: People Foods to Avoid Feeding Your Pets ↗", url:"https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets", meta:"Full list with the reason each food is dangerous"},
@@ -3381,7 +3376,7 @@ const careCategories = [
               internalLink('emergencies', "What to do if your cat has already eaten one of these")]},
       {name:"Where to Buy", tag:"Local options", color:"#3f5443",
        note:"Specialty pet stores stock a wider range of vet-recommended formulas than supermarkets, and deliver islandwide.",
-       images:[{url:"images/care-guide/cards/where-to-buy-food.png", alt:"An orange tabby cat beside a pet food bag, a delivery box, and a storefront location pin"}],
+       images:[{url:"images/care-guide/cards/where-to-buy-food.webp", alt:"An orange tabby cat beside a pet food bag, a delivery box, and a storefront location pin"}],
        detail:"Specialty pet stores generally stock a wider range of vet-recommended formulas than supermarkets do, and staff can usually advise on which brands suit specific issues (sensitive stomachs, weight management, kidney support) better than general signage can.\n\nIf you're switching a cat's food for any reason, doing it gradually over 7–10 days — mixing increasing proportions of the new food into the old — helps avoid the vomiting or loose stool a sudden switch can trigger. Specialty stores can usually advise on a transition schedule specific to the brands they carry.\n\nBelow are two Singapore options that deliver islandwide — more choices, including physical stores you can browse in person, are in the Products & Services tab.",
        linkGroups:[
          {mode:"entities", links:[shopChip('polypet', {label:"Polypet", meta:"Clementi storefront + online, trading since 2004"}),
@@ -3396,7 +3391,7 @@ const careCategories = [
     items:[
       {name:"Flea Allergy Dermatitis", tag:"Most common", color:"#a15a3a", severity:"vet",
        note:"The single most common cat allergy — one bite can trigger intense itching around the tail base and neck.",
-       images:[{url:"images/care-guide/cards/flea-allergy-dermatitis.png", alt:"A striped tabby cat twisting to scratch and bite at the base of its tail with a flea comb nearby"}],
+       images:[{url:"images/care-guide/cards/flea-allergy-dermatitis.webp", alt:"A striped tabby cat twisting to scratch and bite at the base of its tail with a flea comb nearby"}],
        detail:"This is the single most common allergy in cats. A cat sensitive to flea saliva can react intensely to just one bite, rather than needing an ongoing infestation to react — so owners are often surprised their indoor cat has it at all, not realizing a flea can hitch a ride in on another pet, on clothing, or through a window screen.\n\nThe classic pattern is intense itching and hair loss concentrated around the tail base, lower back, and neck, sometimes with small crusty bumps (miliary dermatitis) rather than visible fleas themselves, since affected cats often groom the evidence away. In tropical, humid climates like Singapore, fleas breed year-round rather than seasonally, so vets generally recommend consistent monthly prevention rather than only treating during a visible outbreak.\n\n<b>How to actually check, rather than guess:</b>\n\n1. Run a fine-toothed flea comb through the fur close to the skin, focusing on the tail base, armpits, and groin — the spots fleas favor\n2. After each pass, tap whatever comes off onto a damp white paper towel\n3. Live fleas will visibly move; small black specks are 'flea dirt' (digested blood) — confirm by adding a drop of water, since genuine flea dirt dissolves into a reddish-brown smear within about a minute, while ordinary debris won't\n\nFinding nothing doesn't fully rule it out (a cat can groom away most of the evidence), but finding either fleas or that red smear confirms it, and it's worth doing this check before starting any treatment rather than assuming.",
        linksMode:"references",
        links:[{label:"Cornell: Flea Allergy ↗", url:"https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/flea-allergy", meta:"Cornell Feline Health Center"},
@@ -3404,14 +3399,14 @@ const careCategories = [
               internalLink('daily', "The Grooming card's monthly scan already checks for this during routine brushing")]},
       {name:"Food Allergies", tag:"Protein source", color:"#8a6b1f", severity:"vet",
        note:"Usually a reaction to a specific protein — beef, dairy, fish, and chicken are the most common culprits.",
-       images:[{url:"images/care-guide/cards/food-allergies.png", alt:"A striped tabby cat beside two food bowls, one marked as a problem food and one marked as a safe special-diet option"}],
+       images:[{url:"images/care-guide/cards/food-allergies.webp", alt:"A striped tabby cat beside two food bowls, one marked as a problem food and one marked as a safe special-diet option"}],
        detail:"Food allergies are usually a reaction to a specific protein rather than a brand or ingredient category — beef, dairy, fish, and chicken are the most frequently reported culprits, somewhat counterintuitively since these are also the most common proteins in cat food generally (more exposure means more opportunity to react).\n\nSigns tend to be itching, vomiting, or soft stool rather than sneezing or respiratory symptoms, which makes food allergies easy to mistake for a sensitive stomach or a different skin condition. A true food allergy can also develop at any age, even to a protein a cat has eaten without issue for years — it isn't only a kitten or new-food problem.\n\n<b>Diagnosis</b> requires a strict elimination diet, typically a novel or hydrolyzed protein the cat has never eaten before, fed exclusively (no treats, no flavored medication) for 8–12 weeks before reintroducing the suspected trigger to confirm it.",
        linksMode:"references",
        links:[{label:"Cornell: Food Allergies ↗", url:"https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/food-allergies", meta:"Cornell Feline Health Center — signs and elimination-diet process"},
               internalLink('diet', "Why cats need these same proteins in the first place")]},
       {name:"Environmental Allergies", tag:"Atopic", color:"#3d6b6d", severity:"vet",
        note:"Pollen, dust mites, and mold can trigger atopic dermatitis — usually shown through skin, not sneezing.",
-       images:[{url:"images/care-guide/cards/environmental-allergies.png", alt:"A striped tabby cat rubbing at one cheek while surrounded by subtle pollen, dust, and leaf cues"}],
+       images:[{url:"images/care-guide/cards/environmental-allergies.webp", alt:"A striped tabby cat rubbing at one cheek while surrounded by subtle pollen, dust, and leaf cues"}],
        detail:"Pollen, dust mites, and mold can all trigger atopic dermatitis in cats. Unlike in humans, it rarely shows up as sneezing or watery eyes — look instead for face-rubbing, recurring ear infections, or excessive grooming concentrated in one spot, which can eventually create a bald patch even without fleas or a food trigger present.\n\nPollen-driven reactions tend to be seasonal, while dust mite or mold sensitivity tends to be fairly constant year-round, which is one way vets start narrowing down the cause. Treatment options are more limited in cats than in dogs or humans — antihistamines have inconsistent efficacy, so vets often move toward allergy testing, prescription diets or supplements, or short courses of steroids to control bad flare-ups, and sometimes immunotherapy for a confirmed, specific trigger.",
        linksMode:"references",
        links:[{label:"Cornell: The Challenge of Skin Disorders ↗", url:"https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/challenge-skin-disorders", meta:"Cornell Feline Health Center — how the three allergy types are told apart"},
@@ -3423,7 +3418,7 @@ const careCategories = [
     desc:"The routine tasks that keep a cat comfortable day to day, regardless of age or breed.",
     items:[
       {name:"Feeding & Water", tag:"Daily", color:"#a15a3a",
-       images:[{url:"images/care-guide/cards/feeding-and-water.png", alt:"A striped tabby cat eating from a food bowl with a separate water bowl and a scoop for measured portions"}],
+       images:[{url:"images/care-guide/cards/feeding-and-water.webp", alt:"A striped tabby cat eating from a food bowl with a separate water bowl and a scoop for measured portions"}],
        note:"Measured meals on a schedule beat free-feeding, and water should sit away from the food bowl.",
        detail:"<b>Meals:</b> measured meals on a schedule beat free-feeding for most adult cats — it's the single easiest way to notice a change in appetite early, which is often the first sign something's wrong long before other symptoms appear. Two meals a day is standard; some owners split into three or four smaller ones for cats prone to vomiting from eating too fast.\n\n<b>How much food, roughly:</b> WSAVA's own guideline puts a healthy 4kg adult cat at around 225–250 kcal a day, rising to roughly 250–290 kcal for a 5kg cat — as a rough rule of thumb, that works out to about 50–60 kcal per kg of body weight for a typical indoor cat, more for an active or outdoor one. Check the calories-per-serving figure on your specific food's packaging (this varies a lot between brands) and divide by that number to get an actual measured portion — a bag's own 'feeding guide' table is usually a reasonable starting point too. Use this as a first guess, not a fixed target: the body condition check in the Adult card under Life Stages is what tells you whether to adjust it up or down.\n\n<b>Water:</b> keep it available at all times, placed away from the food bowl — cats instinctively avoid drinking near where they eat, a leftover survival instinct from the wild where food scraps near water could attract predators or contamination. As a rough benchmark, cats need about 50ml of water per kg of body weight a day (from all sources combined) — so a 4kg cat needs roughly 200ml a day in total. A cat eating mostly wet food will visibly drink less from the bowl, since a lot of that water comes from the food itself. Ceramic, glass, or steel bowls are generally preferred over plastic, which can harbor bacteria and, for some cats, trigger chin acne from repeated contact. A water fountain (moving water) encourages some cats to drink more than a still bowl does, which matters more as a cat ages and kidney health becomes a bigger factor.",
        linksMode:"references",
@@ -3433,7 +3428,7 @@ const careCategories = [
               {label:"Cornell: Hydration ↗", url:"https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/hydration", meta:"Cornell Feline Health Center — source for the water-per-kg guideline"},
               {label:"Jump to Life Stages tab ↓", url:"internal:stages", meta:"The Adult card's body-condition check that tells you whether to adjust portions"}]},
       {name:"Grooming", tag:"Weekly+", color:"#6b4a7a", severity:"monitor",
-       images:[{url:"images/care-guide/cards/grooming.png", alt:"A striped tabby cat relaxing while gentle hands brush its coat"}],
+       images:[{url:"images/care-guide/cards/grooming.webp", alt:"A striped tabby cat relaxing while gentle hands brush its coat"}],
        note:"Short-haired cats mostly self-groom; long-haired breeds need brushing every day or two to prevent mats.",
        detail:"Short-haired cats mostly self-groom, but a weekly brush still cuts down on shedding and the hairballs that come with a cat swallowing loose fur. Long-haired breeds need brushing every day or two — mats aren't just cosmetic, they pull painfully at the skin and, left long enough, can restrict movement or trap moisture against the skin.\n\nDouble-coated breeds (Maine Coon, Siberian, Norwegian Forest Cat) benefit from an undercoat rake during seasonal shedding, and most cats need nail trims roughly every 2–3 weeks.\n\n<b>Turn one grooming session a month into a full nose-to-tail scan</b> — it takes a few extra minutes and catches most early problems before they become vet visits:\n\n• Ears — look inside for redness, dark buildup, or odor\n• Eyes — should be clear, no discharge or squinting\n• Gums and teeth — lift the lip; pink and moist gums, no redness at the gumline or visible tartar\n• Whole body — run flat hands over it feeling for new lumps, bumps, or tender spots the cat pulls away from\n• Tail base and groin — check for fleas or flea dirt (see the Flea Allergy card in Allergies for the exact test)\n• Nails — check for overgrowth or splitting\n• Ribs and waist — the body-condition check described in the Adult card under Life Stages\n\nNothing here needs special tools — just doing it on the same schedule every month is what makes it useful, since you're comparing against last month's cat, not a stranger's.",
        linksMode:"references",
@@ -3441,14 +3436,14 @@ const careCategories = [
               {label:"Jump to Allergies tab ↓", url:"internal:allergies", meta:"The Flea Allergy card's fleas-vs-flea-dirt test"},
               {label:"Jump to Life Stages tab ↓", url:"internal:stages", meta:"The Adult card's body-condition check"}]},
       {name:"Litter Box", tag:"Daily scoop", color:"#3f5443", severity:"monitor",
-       images:[{url:"images/care-guide/cards/litter-box.png", alt:"A striped tabby cat calmly using a clean litter box with a scoop nearby"}],
+       images:[{url:"images/care-guide/cards/litter-box.webp", alt:"A striped tabby cat calmly using a clean litter box with a scoop nearby"}],
        note:"Scoop daily, and keep one box per cat plus one extra — box avoidance is often an early warning sign.",
        detail:"<b>Setup:</b> scoop at least once a day, and keep one box per cat plus one extra (the standard rule of thumb is n+1), placed in quiet, easy-to-reach spots away from loud appliances that might startle a cat mid-use. A box should be roughly 1.5 times the cat's body length — many commercial boxes are actually too small for adult cats, which can itself cause avoidance.\n\n<b>Training a new cat or kitten:</b> most cats take to the box instinctively, but placing the cat inside gently after meals and naps, and lightly scratching the litter with a finger to demonstrate, helps a kitten or a nervous new arrival make the connection faster. Praise or a small treat right after use reinforces it — never scold or physically punish a miss, which tends to create anxiety around the box rather than fixing anything. Learning pace varies a lot by individual cat, so give it more than a day or two before assuming something's wrong.\n\n<b>Litter type:</b> most cats prefer unscented litter; fragranced litter is more for the owner's benefit than the cat's, and a strong scent can actually discourage use. Clumping litter is easier to spot-clean daily, while non-clumping needs a full change more frequently to stay hygienic. Box avoidance — going near the box but not in it, or avoiding it entirely — is one of the most common early signs that something, behavioral or medical (like a urinary tract issue), is wrong, and is worth investigating rather than just correcting as a habit problem.\n\n<b>Monitoring:</b> the daily scoop is also your best early-warning system, since you're already looking in the box anyway.\n\n• Frequency — more trips than usual, or noticeably fewer\n• Clump size — shrinking output over a few days is worth watching\n• Color — pink-tinged or reddish is never normal\n• Sound — straining or crying while in the box\n\nThis matters most for male cats — frequent trips producing little or no urine, or crying while trying to go, is the single most time-critical sign in this whole guide (see the Can't Urinate card in Emergencies) — it's not something to monitor overnight and see how it goes.",
        linksMode:"references",
        links:[{label:"Ohio State: Litter Boxes ↗", url:"https://indoorpet.osu.edu/cats/basic-indoor-cat-needs/litter-boxes", meta:"Indoor Pet Initiative — size, placement, and covered vs. uncovered"},
               {label:"Jump to Emergencies tab ↓", url:"internal:emergencies", meta:"Can't Urinate (Urinary Blockage) — signs and why there's no home fix"}]},
       {name:"Enrichment & Play", tag:"Daily", color:"#8a6b1f",
-       images:[{url:"images/care-guide/cards/enrichment-and-play.png", alt:"A striped tabby cat actively batting at a feather wand toy beside a scratching post"}],
+       images:[{url:"images/care-guide/cards/enrichment-and-play.webp", alt:"A striped tabby cat actively batting at a feather wand toy beside a scratching post"}],
        note:"Short daily play sessions plus vertical space help prevent the boredom that shows up as stress or destruction.",
        detail:"Cats stay natural hunters even indoors, and short daily play sessions with a wand toy — mimicking the stalk-chase-catch sequence of real hunting — satisfy that instinct in a way that batting at a stationary toy doesn't. Ending a play session by letting the cat 'catch' the toy, followed by a small snack, mimics the natural hunt-eat-groom-sleep cycle and tends to settle a cat down afterward rather than leaving it wound up.\n\nVertical space matters as much as floor space — cat trees, wall shelves, or a window perch give a cat territory to survey from, which is a real behavioral need, not just a nice-to-have. Puzzle feeders slow down cats that eat too fast and add mental stimulation to a meal that would otherwise take thirty seconds. Rotating toys every week or two (rather than leaving everything out permanently) helps prevent a cat from simply habituating to all of it. This matters most in single-cat, fully indoor households, where the cat has no other outlet for these instincts at all.\n\n<b>Scratching is instinctive, not a behavior problem</b> — it sharpens claws, stretches muscles, and marks territory with scent glands in the paws, so the goal is redirecting it, not stopping it. Put a sturdy post (cardboard, sisal rope, or wood — cats vary in what they prefer) near, not instead of, whatever furniture is already getting scratched, and add a second one in another favorite spot; vertical posts near a doorway or window tend to get used the most. Rubbing a little catnip into a new post, or rewarding use with praise or a treat, speeds up the switch. Covering the furniture temporarily during the transition helps more than it might seem, since a surface that's already shredded keeps getting chosen out of habit.\n\nOne related quirk worth knowing: cats can genuinely learn that a limp or a dramatic meow gets extra attention, and repeat it — not out of deception, but ordinary reinforcement learning (an injury once got a big sympathetic reaction, so the behavior resurfaces later when the cat wants that same attention). This is real, but it's also narrow: it applies to mild, inconsistent limping or attention-seeking vocalizing, never to vomiting, bleeding, lethargy, or difficulty breathing. The safe default is the same either way — rule out a genuine injury with a vet first, and only chalk it up to attention-seeking once that's been ruled out.\n\n<b>A few things you can check yourself before that vet visit</b>, none of which require touching anything painful:\n\n• Watch unobserved — record on your phone from another room; a limp disappearing the moment the cat is distracted, playing, or doesn't know you're watching is a tell, since genuine injuries don't clock an audience\n• Check consistency — always the same leg or spot points toward something real; switching between episodes points the other way\n• Look for visible signs — swelling, heat, a wound, a thorn, or matted fur hiding something underneath\n• Gentle touch test — very gently pressing around the area usually gets a clear reaction from a real injury (pulling away, hissing), while no reaction at all favors learned behavior\n• Check the rest of the picture — appetite, energy, and litter box habits staying completely normal makes attention-seeking more plausible; any of them slipping points back toward a real problem\n\nNone of this replaces a vet exam; it just helps you describe what you're seeing more precisely if you call one.",
        linksMode:"references",
@@ -3462,22 +3457,22 @@ const careCategories = [
     groups:[{label:"Advice"}, ...TRAVEL_SHOP_GROUPS],
     items:[
       {name:"Boarding vs. In-Home Sitting", tag:"Which to choose", color:"#3d6b6d", group:"Advice",
-       images:[{url:"images/care-guide/cards/boarding-vs-in-home-sitting.png", alt:"A striped tabby cat relaxing at home beside its bed, food bowl, and a nearby carrier"}],
+       images:[{url:"images/care-guide/cards/boarding-vs-in-home-sitting.webp", alt:"A striped tabby cat relaxing at home beside its bed, food bowl, and a nearby carrier"}],
        note:"Cats bond to territory more than dogs do, so in-home sitting is usually gentler — but boarding still has a place.",
        detail:"Cats are territorial in a way dogs typically aren't, and a lot of feline stress behavior — hiding, not eating, over-grooming — shows up specifically when a cat is moved somewhere unfamiliar. That's the main reason most cat behaviourists lean toward in-home sitting as the lower-stress default, when it's available.\n\n<b>In-home sitting tends to suit:</b>\n\n• Trips of roughly one to two weeks or shorter\n• Cats that already stress visibly at vet visits or in new places\n• Multi-cat households, where the existing feeding-spot and litter-box routine matters\n\n<b>Boarding tends to suit:</b>\n\n• Longer trips, or last-minute travel with no sitter available\n• Cats needing closer supervision than a once- or twice-daily visit gives — medication schedules, senior cats, recovery from a procedure\n• Situations where nobody trusted has access to your home while you're away\n\nNeither option is risk-free, which is why the next two cards matter regardless of which you pick — what to actually check in a cattery, and what to hand a sitter or relative before you leave."},
       {name:"What to Look For in a Cattery", tag:"Boarding checklist", color:"#a15a3a", group:"Advice",
-       images:[{url:"images/care-guide/cards/what-to-look-for-in-a-cattery.png", alt:"A striped tabby cat resting in a clean boarding suite with a separate bed shelf, litter box, and water bowl"}],
+       images:[{url:"images/care-guide/cards/what-to-look-for-in-a-cattery.webp", alt:"A striped tabby cat resting in a clean boarding suite with a separate bed shelf, litter box, and water bowl"}],
        note:"Cats-only housing, vaccination requirements, and how they actually update you matter more than the price per night.",
        detail:"Ask about each of these before booking:\n\n☐ <b>Cats-only housing</b> — a cattery that keeps cats fully separate from dogs (sight, sound, and smell) reduces a major source of stress; ask specifically, don't assume from the name\n☐ <b>Vaccination requirements</b> — a cattery that insists on up-to-date core vaccinations for every boarder is also protecting your cat from what other boarders might carry\n☐ <b>Space and enrichment</b> — a private suite/cage with room to move, a litter box separate from the sleeping area, and some vertical space or a window view\n☐ <b>Vet arrangement</b> — ask exactly what happens in a medical emergency: is there a vet on call, which clinic, and who approves treatment and pays for it\n☐ <b>Updates</b> — live camera access, daily photos/video, or neither — decide what actually reassures you rather than assuming more is always better\n☐ <b>AVS licensing</b> — Singapore boarding facilities should hold a valid AVS licence; it's reasonable to ask for the licence number\n\nBook well ahead of school holidays and festive periods specifically — reputable catteries fill up weeks in advance for those windows."},
       {name:"Briefing a Friend, Relative, or Sitter", tag:"Before you leave", color:"#8a6b1f", group:"Advice",
-       images:[{url:"images/care-guide/cards/briefing-a-sitter.png", alt:"A striped tabby cat beside a care instruction sheet, medicine bottle, food bowl, and carrier"}],
+       images:[{url:"images/care-guide/cards/briefing-a-sitter.webp", alt:"A striped tabby cat beside a care instruction sheet, medicine bottle, food bowl, and carrier"}],
        note:"Written instructions beat a rushed verbal handover — cover feeding, litter, and who to call if something's wrong.",
        detail:"A friend or relative watching your cat is often cheaper and more familiar than boarding, but it only works as well as the instructions you leave. Worth writing down, not just saying out loud on your way out the door:\n\n• Exact feeding schedule and amounts — 'a bit of food' means something different to everyone\n• Litter box location(s) and how often to scoop (see Daily Care)\n• Any medication, with dose and timing, written out plainly\n• Your regular vet's contact, plus a 24-hour emergency vet as backup (see Emergencies)\n• What's actually urgent versus what can wait for you to be reachable — a sitter who doesn't know your cat can't tell a hairball from something serious on their own\n• Where the carrier is, in case a vet trip becomes necessary\n\nIt's also worth doing a short trial — a weekend rather than two weeks the first time — so you both find out what you missed while the stakes are lower.",
        linksMode:"references",
        links:[{label:"Jump to Daily Care tab ↓", url:"internal:daily", meta:"Feeding amounts and litter box routine to hand off"},
               {label:"Jump to Emergencies tab ↓", url:"internal:emergencies", meta:"What actually counts as urgent, and the 24hr vet contacts to leave behind"}]},
       {name:"Pre-Trip Checklist", tag:"Self-check", color:"#5B3A5C", group:"Advice",
-       images:[{url:"images/care-guide/cards/pre-trip-checklist.png", alt:"A striped tabby cat beside a carrier, folded blanket, and clipboard checklist for travel prep"}],
+       images:[{url:"images/care-guide/cards/pre-trip-checklist.webp", alt:"A striped tabby cat beside a carrier, folded blanket, and clipboard checklist for travel prep"}],
        note:"A few things worth confirming before you book anything.",
        detail:"☐ Book a cattery or sitter as early as you can — good ones fill up weeks ahead of school holidays and festive periods\n☐ Confirm your cat's PALS licence and microchip details are current, in case it goes missing while you're away (see the Adoption tab)\n☐ Pack something familiar for boarding — their own blanket or a toy with a familiar scent can ease the transition\n☐ Leave a recent photo with whoever's caring for your cat, useful if it ever needs to be described to a vet or, worst case, reported missing\n☐ Confirm payment terms and cancellation policy before booking — some sitters and catteries require a deposit or full payment upfront\n\nNone of this replaces knowing your own cat — a cat that's never tolerated change well is a stronger case for in-home sitting specifically, whatever a listing's star rating says.",
        linksMode:"references",
@@ -3490,7 +3485,7 @@ const careCategories = [
     desc:"Regular checkups and a home free of the hazards cats are most likely to get into.",
     items:[
       {name:"Vet Visits", tag:"Annual→biannual", color:"#3d6b6d",
-       images:[{url:"images/care-guide/cards/vet-visits.png", alt:"A striped tabby cat standing calmly on a vet exam table while a veterinarian listens with a stethoscope"}],
+       images:[{url:"images/care-guide/cards/vet-visits.webp", alt:"A striped tabby cat standing calmly on a vet exam table while a veterinarian listens with a stethoscope"}],
        note:"Healthy adults need a yearly check-up; kittens need a tighter schedule, seniors move to every six months.",
        detail:"A standard wellness exam covers more than it might seem from the outside: weight and body condition, temperature, listening to heart and lungs, palpating the abdomen for anything unusual, a dental check, and a conversation about any behavior changes you've noticed — often the most useful part, since owners catch subtle shifts a single exam can't.\n\nVaccination boosters follow a core vs. non-core split — core vaccines (like FVRCP) are recommended for essentially all cats, while non-core ones (like feline leukemia) depend on lifestyle, such as any outdoor access or contact with other cats. Parasite prevention is typically a monthly topical or oral treatment covering fleas, and often heartworm or intestinal parasites depending on the product.\n\n<b>Deworming:</b> most cats pick up roundworms, tapeworms, or hookworms at some point — from an infected prey animal, contaminated food or water, or contact with infected soil or feces — causing vomiting, diarrhea, weight loss, or reduced appetite if the burden gets high enough (some worm species can also transmit to humans). Vets typically recommend deworming once or twice a year as routine prevention rather than waiting for symptoms, alongside the monthly parasite topical mentioned above.\n\n<b>Rabies note (Singapore):</b> Singapore is officially rabies-free, so the rabies vaccine isn't a core requirement here the way it is in many other countries. Some vets still offer it, mainly for cats that travel overseas — worth a conversation with your vet rather than assuming it's a default part of the schedule.\n\nKittens need a tighter early schedule tied to their vaccine series (roughly every 3–4 weeks from 6 to 16 weeks), healthy adults generally need a check-up once a year, and seniors typically move to every six months once age-related conditions become more likely to progress quickly between visits.\n\n<b>Gum color</b> is one quick check you can do yourself between visits, borrowed from what a vet does in an exam: gently lift the upper lip; healthy gum tissue is a consistent bubblegum pink and moist to the touch. Press a fingertip against it for a second, then release — the color should return within 1–2 seconds (capillary refill time). Pale, white, or bluish gums, or a refill that takes noticeably longer, is a reason to call a vet, not just note and monitor.\n\n<b>The skin-tent test</b> is the other: gently lift a fold of skin between the shoulder blades and let go; in a well-hydrated cat it snaps back almost immediately. Skin that sinks back slowly, or stays 'tented,' suggests dehydration. Neither test is perfect on its own (senior cats naturally have less skin elasticity, and gum pigment varies by cat), so use them as one more data point, not a standalone diagnosis.",
        linksMode:"references",
@@ -3498,7 +3493,7 @@ const careCategories = [
               {label:"Cornell: Hydration ↗", url:"https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/hydration", meta:"Cornell Feline Health Center — why hydration matters and signs to watch for"},
               {label:"Jump to Products & Services tab ↓", url:"internal:resources", meta:"Atlas, Advanced VetCare, Dr Paws — vet clinics in Singapore"}]},
       {name:"Home-Proofing", tag:"Ongoing", color:"#a15a3a",
-       images:[{url:"images/care-guide/cards/home-proofing.png", alt:"A striped tabby cat beside a meshed window with common hazards nearby including pills, string, and a lily plant"}],
+       images:[{url:"images/care-guide/cards/home-proofing.webp", alt:"A striped tabby cat beside a meshed window with common hazards nearby including pills, string, and a lily plant"}],
        note:"Toxic plants, string, meds, tip-prone furniture, and unsecured windows are the hazards cats most often get into.",
        detail:"• <strong>Toxic houseplants</strong> — lilies are the most dangerous of the common ones: even pollen brushed onto fur and licked off later during grooming can cause kidney failure, making them worth banning outright rather than just keeping out of reach. Sago palm is arguably worse (every part of the plant is toxic and can cause liver failure) and is sold locally as an ordinary ornamental, so it's easy to bring home without realizing what it is. Aloe vera, poinsettia, dracaena, cyclamen, asparagus fern, jade, and snake plant are milder but still cause vomiting, diarrhea, or skin irritation — worth checking any new houseplant against a toxic-plant list before it comes inside.\n• <strong>String, thread, ribbon, hair elastics</strong> — a serious swallowing risk. If part of a string gets caught under the tongue while the rest is swallowed, it can saw through the intestine as it tries to pass — a genuine surgical emergency.\n• <strong>Human medication</strong> — over-the-counter painkillers like ibuprofen are highly toxic to cats even in small doses; keep pill bottles and blister packs somewhere a cat can't knock them onto the floor.\n• <strong>Essential oil diffusers</strong> — some oils (tea tree is a frequently cited one) can be absorbed through the skin or inhaled and cause toxicity.\n• <strong>Electrical cords</strong> — a chewing risk, especially for kittens.\n• <strong>Tip-prone furniture</strong> — cats climb, and a falling TV or bookshelf is a real injury risk; anti-tip anchor kits (the same ones sold for babyproofing) are a cheap fix for anything tall and top-heavy.\n• <strong>Appliances and bins</strong> — check inside washing machines and dryers before starting a cycle, since a warm, enclosed drum is exactly the kind of spot a cat investigates; keep trash lidded and close appliance doors when not in use.\n• <strong>Unsecured windows and balconies</strong> — 'high-rise syndrome,' where a cat falls while chasing a bird or insect outside a window, is a real and common injury in cats living in high-rise buildings, which is most homes in Singapore.\n\nThis last one is exactly why shelters and now Singapore law require meshing (see the Adoption tab for details). Wire mesh and invisible grilles are the two most common ways owners secure windows — a few Singapore installers who specifically offer cat-safe options are below.",
        linkGroups:[
@@ -3510,7 +3505,7 @@ const careCategories = [
          ]}
        ]},
       {name:"Common Mistakes to Avoid", tag:"Quick reference", color:"#8A3B2B",
-       images:[{url:"images/care-guide/cards/common-mistakes-to-avoid.png", alt:"A striped tabby cat turning away from unsafe items like milk, pills, and lilies toward proper cat food and a scratch post"}],
+       images:[{url:"images/care-guide/cards/common-mistakes-to-avoid.webp", alt:"A striped tabby cat turning away from unsafe items like milk, pills, and lilies toward proper cat food and a scratch post"}],
        note:"A consolidated list of the mistakes covered in more detail elsewhere in this guide — milk, declawing, and human painkillers among them.",
        detail:"<b>Toxic exposure — never do this:</b>\n\n• Give milk or dairy as a treat — most adult cats are lactose intolerant; it's a common myth, not a kindness\n• Feed onion, garlic, chocolate, grapes/raisins, or xylitol\n• Substitute dog food for cat food, even short-term\n• Leave human painkillers (e.g. ibuprofen) somewhere a cat can reach\n• Keep lilies or sago palm in the house\n• Run an essential oil diffuser near a cat\n\n<b>Emergency instincts that make things worse:</b>\n\n• Induce vomiting after suspected poisoning, unless a vet specifically tells you to\n• Touch the mouth or restrain a cat mid-seizure\n• Use a tourniquet, or human antiseptic/peroxide, on a wound\n• Assume panting or open-mouth breathing is normal, the way it is in a dog\n\n<b>Everyday habits worth rethinking:</b>\n\n• Scold or punish a litter box miss\n• Declaw a cat as a first response to scratching, rather than trying alternatives\n• Switch food abruptly instead of over 7–10 days\n• Leave a window or balcony unmeshed\n\nThe Home-Proofing card in this same tab covers the toxic-plant and hazard list in full detail.",
        linksMode:"references",
@@ -4207,6 +4202,8 @@ careBuildTabs();
 careRenderGrid();
 
 /* ============ SECTION TOGGLE ============ */
+/* ---------------- TOP-LEVEL VIEW TOGGLE ----------------
+   Controls the two root views: Care Guide and Breed Index. */
 const navBreeds = document.getElementById('navBreeds');
 const navCare = document.getElementById('navCare');
 const breedsSection = document.getElementById('breeds');
