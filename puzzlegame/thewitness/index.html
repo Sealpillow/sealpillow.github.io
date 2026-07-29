@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insight — A Puzzle Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <h1>Insight</h1>
+      <p id="puzzle-title" class="puzzle-title"></p>
+    </header>
+
+    <div class="board-wrap">
+      <svg id="board" class="board" viewBox="0 0 480 480">
+        <g class="grid-lines"></g>
+        <g class="symbols"></g>
+        <g class="player-path"></g>
+        <g class="mirror-path"></g>
+        <g class="nodes"></g>
+      </svg>
+    </div>
+
+    <p id="status" class="status" aria-live="polite"></p>
+
+    <div class="controls">
+      <button id="reset-btn" type="button">Reset</button>
+      <button id="next-btn" type="button" disabled>Next Level</button>
+    </div>
+
+    <nav id="puzzle-nav" class="puzzle-nav" aria-label="Level selection"></nav>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

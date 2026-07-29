@@ -1,0 +1,291 @@
+:root {
+  --bg: #1b1f24;
+  --panel: #22272e;
+  --line: #4b5561;
+  --line-blocked: #7a3b3b;
+  --line-required: #e8b64f;
+  --node: #d7dde3;
+  --start: #f4f7fa;
+  --dot: #7aa2f7;
+  --triangle: #e8b64f;
+  --region-black: #12151a;
+  --region-white: #eef1f4;
+  --region-blue: #5a7fd6;
+  --eliminator: #d9724c;
+  --polyomino: #e8b64f;
+  --mirror: #b98ce8;
+  --mirror-success: #a389d9;
+  --mirror-fail: #c97b7b;
+  --path: #f2c94c;
+  --path-success: #6fcf97;
+  --path-fail: #eb5757;
+  --text: #d7dde3;
+  --text-muted: #8a94a0;
+  --accent: #f2c94c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  width: 100%;
+  max-width: 560px;
+}
+
+.app-header {
+  text-align: center;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+}
+
+.puzzle-title {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.board-wrap {
+  width: 100%;
+  max-width: 480px;
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.board {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+}
+
+.grid-edge {
+  stroke: var(--line);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.grid-edge.blocked {
+  stroke: var(--line-blocked);
+}
+
+.grid-edge.required {
+  stroke: var(--line-required);
+  stroke-width: 5;
+}
+
+.blocked-marker {
+  fill: var(--line-blocked);
+}
+
+.triangle {
+  fill: var(--triangle);
+}
+
+.region-chip {
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+
+.region-chip.region-black {
+  fill: var(--region-black);
+}
+
+.region-chip.region-white {
+  fill: var(--region-white);
+}
+
+.region-chip.region-blue {
+  fill: var(--region-blue);
+}
+
+.star {
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+
+.star.star-black {
+  fill: var(--region-black);
+}
+
+.star.star-white {
+  fill: var(--region-white);
+}
+
+.star.star-blue {
+  fill: var(--region-blue);
+}
+
+.eliminator-ring {
+  fill: none;
+  stroke: var(--eliminator);
+  stroke-width: 3;
+}
+
+.eliminator-mark {
+  stroke: var(--eliminator);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.polyomino-cell {
+  fill: var(--polyomino);
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+
+.node {
+  fill: var(--node);
+}
+
+.dot {
+  fill: var(--dot);
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+
+.start-node {
+  fill: var(--start);
+}
+
+.exit-tick {
+  stroke: var(--node);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.player-line {
+  fill: none;
+  stroke: var(--path);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.player-line.success {
+  stroke: var(--path-success);
+}
+
+.player-line.fail {
+  stroke: var(--path-fail);
+}
+
+.path-start-cap {
+  fill: var(--path);
+}
+
+.mirror-start-node {
+  fill: none;
+  stroke: var(--mirror);
+  stroke-width: 2;
+}
+
+.mirror-exit-tick {
+  stroke: var(--node);
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+.mirror-line {
+  fill: none;
+  stroke: var(--mirror);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+
+.mirror-line.success {
+  stroke: var(--mirror-success);
+}
+
+.mirror-line.fail {
+  stroke: var(--mirror-fail);
+}
+
+.status {
+  min-height: 1.2rem;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--path-success);
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+button {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  background: #2c333b;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.puzzle-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: left;
+  max-width: 480px;
+}
+
+.nav-dot {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-dot.current {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.nav-dot.completed {
+  background: var(--path-success);
+  color: #10231a;
+  border-color: var(--path-success);
+}
