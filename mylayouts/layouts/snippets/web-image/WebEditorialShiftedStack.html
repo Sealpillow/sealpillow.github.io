@@ -1,0 +1,74 @@
+<!-- ============================================================
+     Snippet: editorial-stacked-single
+     Use case: Lookbook/editorial block — a SINGLE vertical flow of
+     image → copy → image (not two parallel columns). Each block is
+     its own row, stacked normally top to bottom, but each row has a
+     different horizontal position (left / left / right) to create
+     the shifted rhythm — no overlap between rows.
+     Assets: landscape.jpg (top image), portrait.jpg (bottom image)
+     ============================================================ -->
+
+<style>
+  .editorial-stack {
+    width: 100%;
+    margin: 100px auto;
+  }
+
+  .editorial-stack__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* Block 1: landscape image, left-aligned, narrower column */
+  .editorial-stack__img--top {
+    width: 50%;
+    padding: 10% 0 0 10%;
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Block 2: copy, same left position/width as the image above it */
+  .editorial-stack__copy {
+    width: 65%;
+    margin: 5% 0 5% 5%;
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    color: #1a1a1a;
+  }
+
+  /* Block 3: portrait image, its own row, shifted right */
+  .editorial-stack__img--bottom {
+    width: 50%;
+    padding: 0 10% 10% 0;
+    margin-left: 50%;
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Mobile: plain stack, no shifting */
+  @media (max-width: 768px) {
+    .editorial-stack__img--top,
+    .editorial-stack__copy,
+    .editorial-stack__img--bottom {
+      width: 84%;
+      margin: 0 auto 24px auto;
+      padding: 0;
+    }
+  }
+</style>
+
+<section class="editorial-stack">
+  <a class="js-shop-the-collection" data-pid="PW2-15060012-4_BLK.CA" href="$url('Product-Show', 'pid','PM1-66210004_DK.TAU')$">
+    <img class="editorial-stack__img editorial-stack__img--top" src="images/homepage/2026/13jul26/a_mainbanner_pw_productimage_1.webp?$staticlink$" alt="">
+  </a>
+  <p class="editorial-stack__copy">
+    Home, perhaps, is less a place than a feeling carried forward; found
+    in the pieces reached for without hesitation, time after time. The
+    collection is an invitation to return, not to where we began, but to
+    the enduring comfort of what continues to feel true.
+  </p>
+  <a class="js-shop-the-collection" data-pid="PW2-15060012-4_BLK.CA" href="$url('Product-Show', 'pid','PM1-66210004_DK.TAU')$">
+    <img class="editorial-stack__img editorial-stack__img--bottom" src="images/homepage/2026/13jul26/a_mainbanner_pw_productimage_1.webp?$staticlink$" alt="">
+  </a>
+</section>

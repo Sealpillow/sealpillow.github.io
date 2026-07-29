@@ -1,0 +1,99 @@
+<!-- ============================================================
+     Snippet: editorial-staggered-duo
+     Use case: Lookbook/editorial intro block — copy paragraph
+     paired with two staggered images (portrait + landscape),
+     right image sits higher than left to create asymmetric rhythm.
+     Assets: portrait.jpg, landscape.jpg (standard library assets)
+     ============================================================ -->
+
+<style>
+  .editorial-duo {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .editorial-duo__copy {
+    width: 52%;
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    color: #1a1a1a;
+    margin: 100px 0 50px 2%;
+  }
+
+  .editorial-duo__grid {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  /* Left column: portrait image, pushed down to sit lower than the landscape shot */
+  .editorial-duo__col--left {
+    flex: 0 0 45%;
+    margin-top: 140px;
+    padding-left: 10%;
+  }
+
+  /* Right column: landscape image, sits higher, anchors the top of the block */
+  .editorial-duo__col--right {
+    flex: 0 0 55%;
+    margin-left: auto;
+    padding-left: 10%;
+  }
+
+  .editorial-duo__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .editorial-duo__col--left .editorial-duo__img {
+    aspect-ratio: 3 / 4;
+  }
+
+  .editorial-duo__col--right .editorial-duo__img {
+    aspect-ratio: 16 / 10;
+  }
+
+  /* Mobile: stack in natural order, drop the offset */
+  @media (max-width: 768px) {
+    .editorial-duo__copy {
+      width: 80%;
+      margin: 50px auto;
+    }
+    .editorial-duo__grid {
+      flex-direction: column;
+      gap: 24px;
+    }
+    .editorial-duo__col--left,
+    .editorial-duo__col--right {
+      flex: 0 0 100%;
+      margin: 0;
+      padding:0;
+    }
+    .editorial-duo__col--left{
+      order:2;
+    }
+    .editorial-duo__col--right{
+      order:1;
+    }
+  }
+</style>
+
+<section class="editorial-duo">
+  <p class="editorial-duo__copy">
+    A restrained palette draws from domestic interiors, while tactile surfaces
+    and balanced proportions lend each piece a sense of ease. Designed to be
+    lived with rather than simply worn, every detail reveals itself gradually
+    over time.
+  </p>
+
+  <div class="editorial-duo__grid">
+    <div class="editorial-duo__col--left">
+      <img class="editorial-duo__img" src="portrait.jpg" alt="">
+    </div>
+    <div class="editorial-duo__col--right">
+      <img class="editorial-duo__img" src="landscape.jpg" alt="">
+    </div>
+  </div>
+</section>

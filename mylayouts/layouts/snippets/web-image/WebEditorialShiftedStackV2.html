@@ -1,0 +1,73 @@
+<!-- ============================================================
+     Snippet: editorial-stacked-single
+     Use case: Lookbook/editorial block — a SINGLE vertical flow of
+     image → copy → image (not two parallel columns). Each block is
+     its own row, stacked normally top to bottom, but each row has a
+     different horizontal position (left / left / right) to create
+     the shifted rhythm — no overlap between rows.
+     Assets: landscape.jpg (top image), portrait.jpg (bottom image)
+     ============================================================ -->
+
+<style>
+  .editorial-stack-2 {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .editorial-stack-2__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* Block 1: landscape image, left-aligned, narrower column */
+  .editorial-stack-2__img--top {
+    width: 50%;
+    padding: 10% 0 0 10%;
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Block 2: copy, same left position/width as the image above it */
+  .editorial-stack-2__img--middle {
+    width: 50%;
+    padding-right: 15%;
+    margin-left: 60%;
+  }
+
+  /* Block 3: portrait image, its own row, shifted right */
+  .editorial-stack-2__img--bottom {
+    width: 50%;
+    margin: 50px auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Mobile: plain stack, no shifting */
+  @media (max-width: 768px) {
+    .editorial-stack-2 {
+      width: 100%;
+      margin: 100px auto;
+    }
+    .editorial-stack-2__img--top,
+    .editorial-stack-2__img--middle,
+    .editorial-stack-2__img--bottom {
+      width: 84%;
+      margin: 0 auto 50px auto;
+      padding: 0;
+    }
+  }
+</style>
+
+<section class="editorial-stack-2">
+  <a class="js-shop-the-collection" data-pid="PW2-15060012-4_BLK.CA" href="$url('Product-Show', 'pid','PM1-66210004_DK.TAU')$">
+    <img class="editorial-stack-2__img editorial-stack-2__img--top" src="images/homepage/2026/13jul26/a_mainbanner_pw_productimage_1.webp?$staticlink$" alt="">
+  </a>
+
+  <a class="js-shop-the-collection" data-pid="PW2-15060012-4_BLK.CA" href="$url('Product-Show', 'pid','PM1-66210004_DK.TAU')$">
+    <img class="editorial-stack-2__img editorial-stack-2__img--middle" src="images/homepage/2026/13jul26/g_keycapsule_pm_modelimage_1.webp?$staticlink$" alt="">
+  </a>
+
+  <a class="js-shop-the-collection" data-pid="PW2-15060012-4_BLK.CA" href="$url('Product-Show', 'pid','PM1-65110296-4_BLACK')$"> 
+    <img class="editorial-stack-2__img editorial-stack-2__img--bottom" src="images/homepage/2026/13jul26/a_mainbanner_pw_productimage_1.webp?$staticlink$" alt="">
+  </a>
+</section>
