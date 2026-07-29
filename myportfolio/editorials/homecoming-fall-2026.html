@@ -1,0 +1,678 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+
+<style>
+/* Body > Html */
+body,
+    html {
+  color: black;
+  height:auto;
+  margin: 0;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+/* Folder Header */
+.folder-header {
+  display: none;
+  visibility: hidden;
+}
+
+/* Folder_Post > Folder Container > Container */
+.folder_post .folder-container .container {
+  display: none;
+}
+
+/* Page > Parallax */
+.page.parallax {
+  padding-top: 0px !important;
+}
+
+/* Img Wrap */
+.img-wrap {
+  display: block;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Img Wrap > Img */
+.img-wrap img {
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Middle Image */
+.middle-image {
+  display: block;
+  margin: 0 auto;
+  width: 40%;
+}
+
+/* Middle Caption */
+.middle-caption {
+  font-size: 16px;
+  margin: 100px auto;
+  text-align: center;
+  width: 40%;
+}
+.middle-image-link {
+  display: block;
+  margin: 0 auto;
+  width: 40%;
+}
+.middle-image-link .middle-image {
+  width: 100%; /* fills the anchor, anchor controls the actual sizing */
+}
+
+/* Mobile â€” max-width: 768px */
+@media (max-width: 768px) {
+  /* Middle Image > Middle Caption */
+  .middle-image,
+    .middle-caption {
+    width: 80%;
+  }
+  .middle-image-link {
+    width: 80%;
+  }
+}
+
+/* Pair Container */
+.pair-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+}
+
+/* Pair Container Item */
+.pair-container-item {
+  display: block;
+  position: relative;
+  text-align: center;
+  width: 50%;
+}
+
+/* Pair Container Item > Img */
+.pair-container-item img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Pair Container Top */
+.pair-container-top {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Pair Container Bottom */
+.pair-container-bottom {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Pair Container Item > Pair Container Bottom */
+.pair-container-item:hover .pair-container-bottom {
+  text-decoration: underline;
+}
+
+/* Mobile â€” max-width: 767px */
+@media (max-width: 767px) {
+  /* Pair Container Item */
+  .pair-container-item {
+    width: 100%;
+  }
+
+  /* Item 1 */
+  .item-1 {
+    order: 1;
+  }
+
+  /* Item 2 */
+  .item-2 {
+    order: 2;
+  }
+}
+
+  .editorial-duo {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .editorial-duo__copy {
+    width: 52%;
+    font-size: 25px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    color: black;
+    margin: 100px 0 100px 2%;
+  }
+
+  .editorial-duo__grid {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 100px;
+  }
+
+  /* Left column: portrait image, pushed down to sit lower than the landscape shot */
+  .editorial-duo__col--left {
+    flex: 0 0 45%;
+    margin-top: 140px;
+    padding-left: 10%;
+  }
+
+  /* Right column: landscape image, sits higher, anchors the top of the block */
+  .editorial-duo__col--right {
+    flex: 0 0 55%;
+    margin-left: auto;
+    padding-left: 10%;
+  }
+
+  .editorial-duo__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .editorial-duo__col--left .editorial-duo__img {
+    aspect-ratio: 3 / 4;
+  }
+
+  .editorial-duo__col--right .editorial-duo__img {
+    aspect-ratio: 16 / 10;
+  }
+
+  /* Mobile: stack in natural order, drop the offset */
+  @media (max-width: 768px) {
+    .editorial-duo__copy {
+      width: 80%;
+      margin: 100px auto;
+    }
+    .editorial-duo__grid {
+      flex-direction: column;
+      gap: 24px;
+    }
+    .editorial-duo__col--left,
+    .editorial-duo__col--right {
+      flex: 0 0 100%;
+      margin: 0 auto;
+      padding:0;
+    }
+    .editorial-duo__col--left{
+      order:2;
+      width: 80%;
+    }
+    .editorial-duo__col--right{
+      order:1;
+      width: 90%;
+    }
+  }
+  /* Img Fluid */
+.img-fluid {
+  height: auto;
+  max-width: 100%;
+}
+
+/* Responsive Container */
+.responsive-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 100px auto;
+  width: 100%;
+}
+
+/* Responsive Container > A */
+.responsive-container a {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+/* Mobile â€” max-width: 767px */
+@media (max-width: 767px) {
+  /* Responsive Container */
+  .responsive-container {
+    width: 80%;
+  }
+}
+
+/* Desktop â€” min-width: 768px */
+@media (min-width: 768px) {
+  /* Responsive Container */
+  .responsive-container {
+    flex-direction: column;
+    width: 33%;
+  }
+}
+
+/* Responsive Width */
+.responsive-width {
+  display: block;
+  margin: 100px auto;
+  width: 33%;
+}
+
+/* Responsive Width > Img */
+.responsive-width img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+/* Mobile â€” max-width: 768px */
+@media (max-width: 768px) {
+  /* Responsive Width */
+  .responsive-width {
+    width: 90%;
+  }
+}
+
+  .editorial-stack {
+    width: 100%;
+    margin: 0px auto;
+  }
+
+  .editorial-stack__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* Block 1: landscape image, left-aligned, narrower column */
+  .editorial-stack__img--top {
+    width: 50%;
+    padding: 100px 0 0 10%;
+  }
+
+  /* Block 2: copy, same left position/width as the image above it */
+  .editorial-stack__copy {
+    width: 65%;
+    margin: 100px 0 100px 5%;
+    font-size: 25px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    color: black;
+  }
+
+  /* Block 3: portrait image, its own row, shifted right */
+  .editorial-stack__link--bottom {
+    display: block;
+    width: 50%;
+    margin-left: auto;
+    box-sizing: border-box;
+    padding: 0 10% 100px 0;
+  }
+  .editorial-stack__link--bottom .editorial-stack__img--bottom {
+    width: 100%;
+    padding: 0;
+    margin-left: 0;
+  }
+  /* Mobile: plain stack, no shifting */
+  @media (max-width: 768px) {
+    .editorial-stack{
+      margin: 100px auto;
+    }
+    
+    .editorial-stack__img--top,
+    .editorial-stack__link--bottom {
+      width: 90%;
+      margin: 0 auto 100px auto;
+      padding: 0;
+    }
+    .editorial-stack__copy{
+      width: 80%;
+      margin: 0 auto 100px auto;
+      padding: 0;
+    }
+  }
+
+
+  .editorial-stack-2 {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .editorial-stack-2__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* Block 1: landscape image, left-aligned, narrower column */
+  .editorial-stack-2__img--top {
+    width: 50%;
+    padding: 10% 0 0 10%;
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Block 2: copy, same left position/width as the image above it */
+  .editorial-stack-2__img--middle {
+    width: 40%;
+    padding-right: 10%;
+    margin-left: auto;
+  }
+
+  /* Block 3: portrait image, its own row, shifted right */
+  .editorial-stack-2__img--bottom {
+    width: 50%;
+    margin: 50px auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .editorial-stack-2__link--middle {
+  display: block;
+  box-sizing: border-box;
+  width: 40%;          /* 40% + 10% padding, made explicit */
+  padding-right: 10%;
+  margin-left: auto;
+}
+.editorial-stack-2__link--middle .editorial-stack-2__img--middle {
+  width: 100%;
+  padding: 0;
+  margin-left: 0;
+}
+
+.editorial-stack-2__link--bottom {
+  display: block;
+  width: 50%;
+  margin: 100px auto;
+}
+.editorial-stack-2__link--bottom .editorial-stack-2__img--bottom {
+  width: 100%;
+  margin: 0;
+}
+  /* Mobile: plain stack, no shifting */
+  @media (max-width: 768px) {
+    .editorial-stack-2 {
+      width: 100%;
+      margin: 100px auto;
+    }
+    .editorial-stack-2__img--top,
+    .editorial-stack-2__link--bottom{
+      width: 90%;
+      margin: 0 auto 50px auto;
+      padding: 0;
+    }
+    .editorial-stack-2__link--middle{
+      width: 80%;
+      margin: 0 auto 50px auto;
+      padding: 0;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+
+<section class="d-block text-center" style="margin: 100px 0px 50px;">
+    <!-- Common Title -->
+    <p class="mb-0 p-0 col-md-12" style="font-family:aktiv-grotesk-extended; font-size:50px; width:100%; margin: 0 auto; text-align: center; line-height:33px;">
+      Homecoming
+    </p>
+    <br>
+
+    <!-- Desktop Description -->
+    <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:proxima-nova; font-size:16px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+      Fall 2026
+    </p>
+
+    <!-- Mobile Description -->
+    <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:proxima-nova; font-size:14px; width: 100%; margin: 0 auto; text-align: center; font-weight: 400; line-height:normal;">
+      Fall 2026
+    </p>
+
+</section>
+
+<div class="img-wrap ">
+  <picture>
+      <img class="d-md-block d-none" src="images/homecoming-fall-2026/homecoming-fall-editorial_01.webp?$staticlink$"/>
+      <img class="d-block d-md-none" src="images/homecoming-fall-2026/homecoming-fall-editorial_01.webp?$staticlink$"/>
+  </picture>
+</div>
+
+
+<div style="margin-bottom: 100px">
+    <div class="middle-caption">
+      Some places remain with us long after we've left them. They reveal themselves in familiar routines, in the character of lived spaces and in the objects that accompany us through each day. For Fall 2026, PEDRO reflects on these enduring traces, considering how a sense of home can influence the way we see, dress and live.
+    </div>    
+    <a class="js-shop-the-collection middle-image-link" data-pid="PW2-46390030-2_OLIVE,PM2-25210276_EP.BRW" href="$url('Product-Show','pid','PW2-46390030-2_OLIVE')$">
+        <img 
+        src="images/homecoming-fall-2026/homecoming-fall-editorial_02.webp?$staticlink$" 
+        class="middle-image">
+    </a>
+</div>
+
+
+<div class="pair-container">
+  <!-- Item 1 -->
+  <a class="js-shop-the-collection pair-container-item item-1" data-pid="PW2-46390030-2_OLIVE,PW1-45480038_SAND" href="$url('Product-Show', 'pid','PW2-46390030-2_OLIVE')$" >
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="images/homecoming-fall-2026/homecoming-fall-editorial_03.webp?$staticlink$">
+      <!-- Desktop Image -->
+      <img src="images/homecoming-fall-2026/homecoming-fall-editorial_03.webp?$staticlink$" alt="Bag" loading="lazy">
+    </picture>
+
+  </a>
+
+  <!-- Item 2 -->
+  <a class="js-shop-the-collection pair-container-item item-2" data-pid="PM2-26390004-2_ESB.SU" href="$url('Product-Show', 'pid','PM2-26390004-2_ESB.SU')$" >
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="images/homecoming-fall-2026/homecoming-fall-editorial_04.webp?$staticlink$">
+      <!-- Desktop Image -->
+      <img src="images/homecoming-fall-2026/homecoming-fall-editorial_04.webp?$staticlink$" alt="Bag" loading="lazy">
+    </picture>
+  </a>
+</div>
+
+
+<section class="editorial-duo">
+  <p class="editorial-duo__copy">
+    A restrained palette draws from domestic interiors, while tactile surfaces
+    and balanced proportions lend each piece a sense of ease. Designed to be
+    lived with rather than simply worn, every detail reveals itself gradually
+    over time.
+  </p>
+
+  <div class="editorial-duo__grid">
+    <div class="editorial-duo__col--left">
+      <a class="js-shop-the-collection" data-pid="PW2-75210181-2_SAN.WE" href="$url('Product-Show', 'pid','PW2-75210181-2_SAN.WE')$"> 
+        <img class="editorial-duo__img" src="images/homecoming-fall-2026/homecoming-fall-editorial_06.webp?$staticlink$" alt="Top Image">
+      </a>
+      </div>
+    <div class="editorial-duo__col--right">
+      <a class="js-shop-the-collection" data-pid="PW2-46390030-2_OLIVE,PW1-66600030_SND.SU" href="$url('Product-Show', 'pid','PW2-46390030-2_OLIVE')$"> 
+        <img class="editorial-duo__img" src="images/homecoming-fall-2026/homecoming-fall-editorial_05.webp?$staticlink$" alt="Bottom Image">
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<div class="pair-container">
+  <!-- Item 1 -->
+  <a class="js-shop-the-collection pair-container-item item-1" data-pid="PM2-26320286_DTA.TU" href="$url('Product-Show', 'pid','PM2-26320286_DTA.TU')$" >
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="images/homecoming-fall-2026/homecoming-fall-editorial_07.webp?$staticlink$">
+      <!-- Desktop Image -->
+      <img src="images/homecoming-fall-2026/homecoming-fall-editorial_07.webp?$staticlink$" alt="Bag" loading="lazy">
+    </picture>
+
+  </a>
+
+  <!-- Item 2 -->
+  <a class="js-shop-the-collection pair-container-item item-2" data-pid="PW2-46390030-2_OLIVE" href="$url('Product-Show', 'pid','PW2-46390030-2_OLIVE')$" >
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="images/homecoming-fall-2026/homecoming-fall-editorial_08.webp?$staticlink$">
+      <!-- Desktop Image -->
+      <img src="images/homecoming-fall-2026/homecoming-fall-editorial_08.webp?$staticlink$" alt="Bag" loading="lazy">
+    </picture>
+  </a>
+</div>
+
+
+<!-- Responsive container -->
+<div class="container-fluid px-0 responsive-container">
+
+  <!-- Top Image (Same for both mobile and web) -->
+  <a class="js-shop-the-collection" data-pid="PW2-36390023_MHGNY" href="$url('Product-Show', 'pid','PW2-36390023_MHGNY')$"> 
+    <img src="images/homecoming-fall-2026/homecoming-fall-editorial_09.webp?$staticlink$" alt="Top Image" class="img-fluid w-100"/>
+  </a>
+
+  <!-- Bottom Image (Same for both mobile and web) -->
+  <a class="js-shop-the-collection" data-pid="PW2-36390023_MHGNY,PW1-66050046_MHGNY" href="$url('Product-Show', 'pid','PW2-36390023_MHGNY')$"> 
+    <img src="images/homecoming-fall-2026/homecoming-fall-editorial_10.webp?$staticlink$" alt="Bottom Image" class="img-fluid w-100"/>
+  </a>
+</div>
+
+<div class="img-wrap ">
+  <a class="js-shop-the-collection" data-pid="PW2-55060029_D.OLIV" href="$url('Product-Show', 'pid','PW2-55060029_D.OLIV')$"> 
+    <picture>
+        <img class="d-md-block d-none" src="images/homecoming-fall-2026/homecoming-fall-editorial_11.webp?$staticlink$"/>
+        <img class="d-block d-md-none" src="images/homecoming-fall-2026/homecoming-fall-editorial_11.webp?$staticlink$"/>
+    </picture>
+  </a>
+</div>
+
+
+
+<div class="responsive-width">
+    <a class="js-shop-the-collection" data-pid="PM1-96600014-2_DCA.SU" href="$url('Product-Show','pid','PM1-96600014-2_DCA.SU')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source srcset="images/homecoming-fall-2026/homecoming-fall-editorial_12.webp?$staticlink$" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/homecoming-fall-2026/homecoming-fall-editorial_12.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+
+<div class="pair-container">
+  <!-- Item 1 -->
+  <a class="js-shop-the-collection pair-container-item item-1" data-pid="PM1-66600003-1_DCA.SU" href="$url('Product-Show', 'pid','PM1-66600003-1_DCA.SU')$" >
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="images/homecoming-fall-2026/homecoming-fall-editorial_13.webp?$staticlink$">
+      <!-- Desktop Image -->
+      <img src="images/homecoming-fall-2026/homecoming-fall-editorial_13.webp?$staticlink$" alt="Bag" loading="lazy">
+    </picture>
+
+  </a>
+
+  <!-- Item 2 -->
+  <a class="js-shop-the-collection pair-container-item item-2" data-pid="PW2-46390030-2_OLIVE" href="$url('Product-Show', 'pid','PW2-46390030-2_OLIVE')$" >
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="images/homecoming-fall-2026/homecoming-fall-editorial_14.webp?$staticlink$">
+      <!-- Desktop Image -->
+      <img src="images/homecoming-fall-2026/homecoming-fall-editorial_14.webp?$staticlink$" alt="Bag" loading="lazy">
+    </picture>
+  </a>
+</div>
+
+
+
+<section class="editorial-stack">
+  <img class="editorial-stack__img editorial-stack__img--top" src="images/homecoming-fall-2026/homecoming-fall-editorial_15.webp?$staticlink$" alt="">
+  <p class="editorial-stack__copy">
+    Home, perhaps, is less a place than a feeling carried forward; found
+    in the pieces reached for without hesitation, time after time. The
+    collection is an invitation to return, not to where we began, but to
+    the enduring comfort of what continues to feel true.
+  </p>
+  <a class="js-shop-the-collection editorial-stack__link--bottom" data-pid="PW2-36390023_MHGNYâ€‹" href="$url('Product-Show', 'pid','PW2-36390023_MHGNYâ€‹')$">
+    <img class="editorial-stack__img editorial-stack__img--bottom" src="images/homecoming-fall-2026/homecoming-fall-editorial_16.webp?$staticlink$" alt="">
+  </a>
+</section>
+
+
+<div class="img-wrap">
+  <a class="js-shop-the-collection" data-pid="PM1-65110334_BLK.TUâ€‹" href="$url('Product-Show', 'pid','PM1-65110334_BLK.TUâ€‹')$"> 
+    <picture>
+        <img class="d-md-block d-none" src="images/homecoming-fall-2026/homecoming-fall-editorial_17.webp?$staticlink$"/>
+        <img class="d-block d-md-none" src="images/homecoming-fall-2026/homecoming-fall-editorial_17.webp?$staticlink$"/>
+    </picture>
+  </a>
+</div>
+
+
+<section class="editorial-stack-2">
+    <img class="editorial-stack-2__img editorial-stack-2__img--top" src="images/homecoming-fall-2026/homecoming-fall-editorial_18.webp?$staticlink$" alt="">
+  <a class="js-shop-the-collection editorial-stack-2__link--middle" data-pid="PM1-76210287-1_DK.BRWâ€‹" href="$url('Product-Show', 'pid','PM1-76210287-1_DK.BRWâ€‹')$">
+    <img class="editorial-stack-2__img editorial-stack-2__img--middle" src="images/homecoming-fall-2026/homecoming-fall-editorial_19.webp?$staticlink$" alt="">
+  </a>
+
+  <a class="js-shop-the-collection editorial-stack-2__link--bottom" data-pid="PW2-36390023_MHGNY,PW1-66210003-2_BEG.SUâ€‹" href="$url('Product-Show', 'pid','PW2-36390023_MHGNYâ€‹')$"> 
+    <img class="editorial-stack-2__img editorial-stack-2__img--bottom" src="images/homecoming-fall-2026/homecoming-fall-editorial_20.webp?$staticlink$" alt="">
+  </a>
+</section>
+
+
+
+<div class="pair-container">
+  <!-- Item 1 -->
+  <a class="js-shop-the-collection pair-container-item item-1" data-pid="PM2-25210275_EP.BRW" href="$url('Product-Show', 'pid','PM2-25210275_EP.BRW')$" >
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="images/homecoming-fall-2026/homecoming-fall-editorial_21.webp?$staticlink$">
+      <!-- Desktop Image -->
+      <img src="images/homecoming-fall-2026/homecoming-fall-editorial_21.webp?$staticlink$" alt="Bag" loading="lazy">
+    </picture>
+
+  </a>
+
+  <!-- Item 2 -->
+  <a class="js-shop-the-collection pair-container-item item-2" data-pid="PW2-75210182-3_DAR.CAâ€‹" href="$url('Product-Show', 'pid','PW2-75210182-3_DAR.CAâ€‹')$" >
+    <picture>
+      <!-- Mobile Image -->
+      <source media="(max-width: 767px)" srcset="images/homecoming-fall-2026/homecoming-fall-editorial_22.webp?$staticlink$">
+      <!-- Desktop Image -->
+      <img src="images/homecoming-fall-2026/homecoming-fall-editorial_22.webp?$staticlink$" alt="Bag" loading="lazy">
+    </picture>
+  </a>
+</div>
+
+<!-- Publish Content -->
+<div class="publish-content" style = "padding-top: 50px; padding-left: 40px;">
+    <span style="font-size: 18px;">
+        Published on 27 July 2026
+        <br><br>
+        <a href="$url('Search-Show','cgid','pwnewarrivals')$">
+            SHOP WOMEN'S NEW ARRIVALS
+        </a> &gt;
+        <br>
+        <a href="$url('Search-Show','cgid','pmnewarrivals')$">
+            SHOP MEN'S NEW ARRIVALS
+        </a> &gt;
+    </span>
+</div>
+
+
+
+</body>
+
+</html>
