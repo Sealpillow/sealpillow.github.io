@@ -15,9 +15,15 @@ const LEVELS_FILE = './src/puzzles/levels.json';
 const svg = document.getElementById('board');
 const puzzleTitle = document.getElementById('puzzle-title');
 const puzzleNav = document.getElementById('puzzle-nav');
+const pagerPrev = document.getElementById('pager-prev');
+const pagerNext = document.getElementById('pager-next');
+const pagerLabel = document.getElementById('pager-label');
 const resetBtn = document.getElementById('reset-btn');
 const nextBtn = document.getElementById('next-btn');
 const statusEl = document.getElementById('status');
+
+const NAV_PAGE_SIZE = 24;
+let navPage = 0;
 
 let levels = [];
 let save = loadSave();
@@ -109,8 +115,18 @@ nextBtn.addEventListener('click', () => {
 });
 
 function renderPuzzleNav() {
+  renderPuzzleNavPage(Math.floor(currentIndex / NAV_PAGE_SIZE));
+}
+
+function renderPuzzleNavPage(page) {
+  const pageCount = Math.ceil(levels.length / NAV_PAGE_SIZE);
+  navPage = Math.max(0, Math.min(page, pageCount - 1));
+  const start = navPage * NAV_PAGE_SIZE;
+  const end = Math.min(start + NAV_PAGE_SIZE, levels.length);
+
   puzzleNav.innerHTML = '';
-  levels.forEach((puzzle, i) => {
+  for (let i = start; i < end; i++) {
+    const puzzle = levels[i];
     const unlocked = isLevelUnlocked(i);
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -125,7 +141,14 @@ function renderPuzzleNav() {
       btn.addEventListener('click', () => loadLevel(i));
     }
     puzzleNav.appendChild(btn);
-  });
+  }
+
+  pagerLabel.textContent = `Page ${navPage + 1} of ${pageCount}`;
+  pagerPrev.disabled = navPage === 0;
+  pagerNext.disabled = navPage >= pageCount - 1;
 }
+
+pagerPrev.addEventListener('click', () => renderPuzzleNavPage(navPage - 1));
+pagerNext.addEventListener('click', () => renderPuzzleNavPage(navPage + 1));
 
 init();

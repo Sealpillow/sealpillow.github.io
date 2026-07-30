@@ -14,8 +14,8 @@ export class InputController {
     this.handlePointerMove = this.handlePointerMove.bind(this);
     this.handlePointerUp = this.handlePointerUp.bind(this);
 
-    svg.addEventListener('pointerdown', this.handlePointerDown);
-    svg.addEventListener('pointermove', this.handlePointerMove);
+    svg.addEventListener('pointerdown', this.handlePointerDown, { passive: false });
+    svg.addEventListener('pointermove', this.handlePointerMove, { passive: false });
     window.addEventListener('pointerup', this.handlePointerUp);
     window.addEventListener('pointercancel', this.handlePointerUp);
   }
@@ -68,6 +68,11 @@ export class InputController {
 
   handlePointerDown(evt) {
     if (!this.puzzle) return;
+    // Belt-and-suspenders alongside the board's `touch-action: none` CSS: on some mobile
+    // browsers a touch that starts even slightly outside the exact SVG rect (e.g. on the
+    // padded wrapper) can still get claimed by the native scroll gesture before touch-action
+    // takes effect. Calling preventDefault() here stops that for any touch on the board.
+    evt.preventDefault();
 
     if (this.tracing) {
       // A click while a path is already armed submits it, whether the player got here by
@@ -89,6 +94,7 @@ export class InputController {
 
   handlePointerMove(evt) {
     if (!this.tracing) return;
+    evt.preventDefault();
     const { node, dist } = this.nearestNode(this.svgPoint(evt));
     const grabRadius = this.grid.cellSize * 0.9;
     if (dist > grabRadius) return;
