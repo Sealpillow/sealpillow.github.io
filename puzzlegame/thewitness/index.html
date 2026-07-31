@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Insight — A Puzzle Game</title>
+  <title>The Vision - A Puzzle Game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="app">
     <header class="app-header">
-      <h1>Insight</h1>
+      <h1>The Vision</h1>
       <p id="puzzle-title" class="puzzle-title"></p>
     </header>
 
@@ -23,10 +23,39 @@
       </svg>
     </div>
 
+    <aside id="mobile-scope" class="mobile-scope" hidden aria-hidden="true">
+      <div class="mobile-scope-header">Thumb Scope</div>
+      <div class="mobile-scope-stage">
+        <svg id="mobile-scope-board" class="mobile-scope-board" viewBox="0 0 480 480">
+          <g class="grid-lines"></g>
+          <g class="symbols"></g>
+          <g class="player-path"></g>
+          <g class="mirror-path"></g>
+          <g class="nodes"></g>
+        </svg>
+        <div class="mobile-scope-reticle" aria-hidden="true"></div>
+      </div>
+      <p class="mobile-scope-hint">Drag or tap here to steer the path. Release to recenter the scope.</p>
+    </aside>
+    <button id="mobile-scope-reopen" class="mobile-scope-reopen" type="button" hidden>
+      Scope
+    </button>
+    <button id="scope-settings-btn" class="scope-settings-btn" type="button" aria-expanded="false" aria-label="Scope settings">
+      &#9881;
+    </button>
+    <section id="scope-settings-panel" class="scope-settings-panel" hidden aria-hidden="true" aria-label="Scope position settings">
+      <p class="scope-settings-title">Scope Position</p>
+      <div class="scope-settings-options">
+        <button id="scope-side-right" type="button" data-scope-side="right">Right Hand</button>
+        <button id="scope-side-left" type="button" data-scope-side="left">Left Hand</button>
+      </div>
+    </section>
+
     <p id="status" class="status" aria-live="polite"></p>
 
     <div class="controls">
       <button id="reset-btn" type="button">Reset</button>
+      <button id="solution-btn" type="button" hidden>Show Solution</button>
       <button id="next-btn" type="button" disabled>Next Level</button>
     </div>
 
@@ -40,9 +69,9 @@
 
     <nav id="puzzle-nav" class="puzzle-nav" aria-label="Level selection"></nav>
     <div id="puzzle-pager" class="puzzle-pager">
-      <button id="pager-prev" type="button">‹</button>
+      <button id="pager-prev" type="button">&lsaquo;</button>
       <span id="pager-label"></span>
-      <button id="pager-next" type="button">›</button>
+      <button id="pager-next" type="button">&rsaquo;</button>
     </div>
   </main>
 

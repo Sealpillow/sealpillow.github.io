@@ -19,6 +19,7 @@
   --path: #f2c94c;
   --path-success: #6fcf97;
   --path-fail: #eb5757;
+  --symbol-fail: #ff6b6b;
   --text: #d7dde3;
   --text-muted: #8a94a0;
   --accent: #f2c94c;
@@ -84,6 +85,148 @@ body {
   touch-action: none;
 }
 
+.mobile-scope {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  width: min(42vw, 12rem);
+  padding: 0.6rem;
+  border: 1px solid rgba(215, 221, 227, 0.18);
+  border-radius: 14px;
+  background: rgba(34, 39, 46, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+  z-index: 30;
+}
+
+.mobile-scope.scope-left {
+  left: 1rem;
+  right: auto;
+}
+
+.mobile-scope-header {
+  margin-bottom: 0.45rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.mobile-scope-stage {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1e242c;
+}
+
+.mobile-scope-board {
+  width: 100%;
+  display: block;
+  touch-action: none;
+}
+
+.mobile-scope-reticle {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-left: -1.2rem;
+  margin-top: -1.2rem;
+  border-radius: 10px;
+  pointer-events: none;
+  opacity: 0.75;
+  background:
+    linear-gradient(rgba(242, 201, 76, 0.85), rgba(242, 201, 76, 0.85)) top left / 0.8rem 2px no-repeat,
+    linear-gradient(rgba(242, 201, 76, 0.85), rgba(242, 201, 76, 0.85)) top left / 2px 0.8rem no-repeat,
+    linear-gradient(rgba(242, 201, 76, 0.85), rgba(242, 201, 76, 0.85)) top right / 0.8rem 2px no-repeat,
+    linear-gradient(rgba(242, 201, 76, 0.85), rgba(242, 201, 76, 0.85)) top right / 2px 0.8rem no-repeat,
+    linear-gradient(rgba(242, 201, 76, 0.85), rgba(242, 201, 76, 0.85)) bottom left / 0.8rem 2px no-repeat,
+    linear-gradient(rgba(242, 201, 76, 0.85), rgba(242, 201, 76, 0.85)) bottom left / 2px 0.8rem no-repeat,
+    linear-gradient(rgba(242, 201, 76, 0.85), rgba(242, 201, 76, 0.85)) bottom right / 0.8rem 2px no-repeat,
+    linear-gradient(rgba(242, 201, 76, 0.85), rgba(242, 201, 76, 0.85)) bottom right / 2px 0.8rem no-repeat;
+}
+
+.mobile-scope-reticle::before,
+.mobile-scope-reticle::after {
+  content: none;
+}
+
+.mobile-scope-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.mobile-scope-reopen {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 29;
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(34, 39, 46, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.24);
+}
+
+.mobile-scope-reopen.scope-left {
+  left: 1rem;
+  right: auto;
+}
+
+.scope-settings-btn,
+.scope-settings-panel {
+  position: fixed;
+  left: 1rem;
+  z-index: 28;
+  background: rgba(34, 39, 46, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.24);
+}
+
+.scope-settings-btn {
+  top: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.scope-settings-panel {
+  top: 4rem;
+  width: min(12rem, calc(100vw - 2rem));
+  padding: 0.8rem;
+  border: 1px solid rgba(215, 221, 227, 0.18);
+  border-radius: 14px;
+}
+
+.scope-settings-title {
+  margin: 0 0 0.6rem;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.scope-settings-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.scope-settings-options button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .grid-edge {
   stroke: var(--line);
   stroke-width: 4;
@@ -102,6 +245,7 @@ body {
 .blocked-marker {
   fill: var(--line-blocked);
 }
+
 
 .triangle {
   fill: var(--triangle);
@@ -232,6 +376,44 @@ body {
   stroke: var(--mirror-fail);
 }
 
+.symbol-fail {
+  animation: symbol-fail-pulse 1.4s ease;
+}
+
+.dot.symbol-fail,
+.triangle-cluster.symbol-fail .triangle,
+.region-chip.symbol-fail,
+.star.symbol-fail,
+.grid-edge.required.symbol-fail {
+  fill: var(--symbol-fail);
+  stroke: var(--symbol-fail);
+}
+
+.eliminator.symbol-fail .eliminator-ring,
+.eliminator.symbol-fail .eliminator-mark,
+.polyomino.symbol-fail .polyomino-fill,
+.polyomino.symbol-fail .polyomino-divider {
+  stroke: var(--symbol-fail);
+}
+
+.polyomino.symbol-fail .polyomino-fill {
+  fill: var(--symbol-fail);
+}
+
+@keyframes symbol-fail-pulse {
+  0% {
+    opacity: 1;
+  }
+
+  35% {
+    opacity: 0.45;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 .status {
   min-height: 1.2rem;
   margin: 0;
@@ -264,6 +446,13 @@ body {
   border-radius: 6px;
   padding: 0.45rem 2rem 0.45rem 0.75rem;
   font-size: 0.9rem;
+}
+
+.level-filter select:focus,
+.level-filter select:focus-visible {
+  outline: none;
+  border-color: #667282;
+  box-shadow: 0 0 0 2px rgba(103, 122, 146, 0.18);
 }
 
 button {
@@ -333,4 +522,13 @@ button:disabled {
   background: var(--path-success);
   color: #10231a;
   border-color: var(--path-success);
+}
+
+@media (pointer: fine) {
+  .mobile-scope,
+  .mobile-scope-reopen,
+  .scope-settings-btn,
+  .scope-settings-panel {
+    display: none;
+  }
 }

@@ -34,10 +34,22 @@ export class Renderer {
     this.pathGroup = svg.querySelector('.player-path');
     this.mirrorGroup = svg.querySelector('.mirror-path');
     this.nodesGroup = svg.querySelector('.nodes');
+    this.symbolRefs = {};
+    this.symbolFailTimer = null;
   }
 
   setPuzzle(puzzle) {
     this.puzzle = puzzle;
+    this.clearSymbolFailures();
+    this.symbolRefs = {
+      dots: new Map(),
+      requiredEdges: new Map(),
+      triangles: new Map(),
+      cellColors: new Map(),
+      stars: new Map(),
+      eliminators: new Map(),
+      polyominoes: new Map(),
+    };
     this.svg.setAttribute('viewBox', `0 0 ${this.grid.svgSize} ${this.grid.svgSize}`);
     this.drawGrid();
     this.drawSymbols();
@@ -49,6 +61,19 @@ export class Renderer {
 
   clearGroup(group) {
     while (group.firstChild) group.removeChild(group.firstChild);
+  }
+
+  rememberSymbol(type, key, el) {
+    if (!this.symbolRefs[type].has(key)) this.symbolRefs[type].set(key, []);
+    this.symbolRefs[type].get(key).push(el);
+  }
+
+  clearSymbolFailures() {
+    if (this.symbolFailTimer) {
+      clearTimeout(this.symbolFailTimer);
+      this.symbolFailTimer = null;
+    }
+    this.svg.querySelectorAll('.symbol-fail').forEach((el) => el.classList.remove('symbol-fail'));
   }
 
   drawGrid() {
@@ -74,6 +99,9 @@ export class Renderer {
     if (required) cls += ' required';
 
     this.gridGroup.appendChild(svgEl('line', { x1: pa.x, y1: pa.y, x2: pb.x, y2: pb.y, class: cls }));
+    if (required) {
+      this.rememberSymbol('requiredEdges', key, this.gridGroup.lastChild);
+    }
     if (blocked) {
       const mx = (pa.x + pb.x) / 2;
       const my = (pa.y + pb.y) / 2;
@@ -85,7 +113,9 @@ export class Renderer {
     this.clearGroup(this.symbolsGroup);
     for (const dot of this.puzzle.dots || []) {
       const p = this.grid.nodeToPoint(dot);
-      this.symbolsGroup.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 7, class: 'dot' }));
+      const el = svgEl('circle', { cx: p.x, cy: p.y, r: 7, class: 'dot' });
+      this.symbolsGroup.appendChild(el);
+      this.rememberSymbol('dots', this.grid.nodeKey(dot), el);
     }
     for (const [col, row, count] of this.puzzle.triangles || []) {
       this.drawTriangleCluster(col, row, count);
@@ -102,16 +132,17 @@ export class Renderer {
           class: `region-chip region-${color}`,
         })
       );
+      this.rememberSymbol('cellColors', `${col},${row}`, this.symbolsGroup.lastChild);
     }
     for (const [col, row, color] of this.puzzle.stars || []) {
       const center = this.grid.cellCenter(col, row);
       const outerR = this.grid.cellSize * 0.22;
-      this.symbolsGroup.appendChild(
-        svgEl('polygon', {
-          points: starPoints(center.x, center.y, outerR, outerR * 0.42),
-          class: `star star-${color}`,
-        })
-      );
+      const el = svgEl('polygon', {
+        points: starPoints(center.x, center.y, outerR, outerR * 0.42),
+        class: `star star-${color}`,
+      });
+      this.symbolsGroup.appendChild(el);
+      this.rememberSymbol('stars', `${col},${row}`, el);
     }
     for (const [col, row] of this.puzzle.eliminators || []) {
       this.drawEliminator(col, row);
@@ -125,8 +156,9 @@ export class Renderer {
     const center = this.grid.cellCenter(col, row);
     const r = this.grid.cellSize * 0.22;
     const arm = r * 0.55;
-    this.symbolsGroup.appendChild(svgEl('circle', { cx: center.x, cy: center.y, r, class: 'eliminator-ring' }));
-    this.symbolsGroup.appendChild(
+    const group = svgEl('g', { class: 'eliminator' });
+    group.appendChild(svgEl('circle', { cx: center.x, cy: center.y, r, class: 'eliminator-ring' }));
+    group.appendChild(
       svgEl('line', {
         x1: center.x - arm,
         y1: center.y - arm,
@@ -135,7 +167,7 @@ export class Renderer {
         class: 'eliminator-mark',
       })
     );
-    this.symbolsGroup.appendChild(
+    group.appendChild(
       svgEl('line', {
         x1: center.x + arm,
         y1: center.y - arm,
@@ -144,6 +176,8 @@ export class Renderer {
         class: 'eliminator-mark',
       })
     );
+    this.symbolsGroup.appendChild(group);
+    this.rememberSymbol('eliminators', `${col},${row}`, group);
   }
 
   // Mirrors the source game's own visual language: the icon is one solid block (its unit
@@ -168,7 +202,7 @@ export class Renderer {
     const top = center.y - totalH / 2;
 
     const angle = rotatable ? POLYOMINO_SLANT_DEG : rotationSteps * 90;
-    const group = svgEl('g', { transform: `rotate(${angle} ${center.x} ${center.y})` });
+    const group = svgEl('g', { class: 'polyomino', transform: `rotate(${angle} ${center.x} ${center.y})` });
 
     for (const [c, r] of cells) {
       group.appendChild(
@@ -195,6 +229,7 @@ export class Renderer {
     }
 
     this.symbolsGroup.appendChild(group);
+    this.rememberSymbol('polyominoes', `${col},${row}`, group);
   }
 
   drawTriangleCluster(col, row, count) {
@@ -202,6 +237,7 @@ export class Renderer {
     const size = this.grid.cellSize * 0.14;
     const gap = size * 1.6;
     const startX = center.x - ((count - 1) * gap) / 2;
+    const group = svgEl('g', { class: 'triangle-cluster' });
     for (let i = 0; i < count; i++) {
       const cx = startX + i * gap;
       const points = [
@@ -211,8 +247,10 @@ export class Renderer {
       ]
         .map(([x, y]) => `${x},${y}`)
         .join(' ');
-      this.symbolsGroup.appendChild(svgEl('polygon', { points, class: 'triangle' }));
+      group.appendChild(svgEl('polygon', { points, class: 'triangle' }));
     }
+    this.symbolsGroup.appendChild(group);
+    this.rememberSymbol('triangles', `${col},${row}`, group);
   }
 
   drawNodes() {
@@ -281,5 +319,17 @@ export class Renderer {
     const points = mirrored.map((n) => this.grid.nodeToPoint(n));
     const d = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
     this.mirrorGroup.appendChild(svgEl('path', { d, class: `mirror-line ${state}` }));
+  }
+
+  flashFailedSymbols(failures, durationMs = 1400) {
+    this.clearSymbolFailures();
+    for (const [type, keys] of Object.entries(failures)) {
+      const refs = this.symbolRefs[type];
+      if (!refs) continue;
+      keys.forEach((key) => {
+        (refs.get(key) || []).forEach((el) => el.classList.add('symbol-fail'));
+      });
+    }
+    this.symbolFailTimer = setTimeout(() => this.clearSymbolFailures(), durationMs);
   }
 }

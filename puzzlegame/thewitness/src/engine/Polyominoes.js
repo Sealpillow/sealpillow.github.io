@@ -130,3 +130,37 @@ export function satisfiesPolyominoes(grid, puzzle, path) {
   }
   return true;
 }
+
+export function findInvalidPolyominoCells(grid, puzzle, path) {
+  const failures = new Set();
+  const entries = puzzle.polyominoes || [];
+  if (entries.length === 0) return failures;
+
+  const pieceByCell = new Map();
+  for (const [col, row, shape, rotationSteps = 0, rotatable = true] of entries) {
+    if (!POLYOMINO_SHAPES[shape]) throw new Error(`Unknown polyomino shape: ${shape}`);
+    const rotations = rotatable ? POLYOMINO_ROTATIONS[shape] : [rotateShape(shape, rotationSteps)];
+    pieceByCell.set(`${col},${row}`, { rotations });
+  }
+
+  for (const region of computeRegions(grid, puzzle, path)) {
+    const pieces = [];
+    const pieceCells = [];
+    for (const [c, r] of region) {
+      const key = `${c},${r}`;
+      const piece = pieceByCell.get(key);
+      if (!piece) continue;
+      pieces.push(piece);
+      pieceCells.push(key);
+    }
+    if (pieces.length === 0) continue;
+
+    const totalPieceCells = pieces.reduce((sum, p) => sum + p.rotations[0].length, 0);
+    const remaining = new Set(region.map(([c, r]) => `${c},${r}`));
+    if (totalPieceCells !== region.length || !canTile(pieces, remaining)) {
+      pieceCells.forEach((key) => failures.add(key));
+    }
+  }
+
+  return failures;
+}

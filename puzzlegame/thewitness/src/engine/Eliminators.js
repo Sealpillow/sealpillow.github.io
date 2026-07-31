@@ -85,3 +85,29 @@ export function satisfiesEliminators(grid, puzzle, path) {
   }
   return true;
 }
+
+export function findInvalidEliminatorSymbols(grid, puzzle, path) {
+  const failures = {
+    triangles: new Set(),
+    cellColors: new Set(),
+    stars: new Set(),
+    eliminators: new Set(),
+  };
+  const eliminators = puzzle.eliminators || [];
+  if (eliminators.length === 0) return failures;
+
+  const traveled = combinedTraveledEdges(grid, puzzle, path);
+  for (const region of computeRegions(grid, puzzle, path)) {
+    const symbols = regionSymbols(region, puzzle);
+    if (regionHasValidElimination(symbols, grid, traveled)) continue;
+    for (const symbol of symbols) {
+      const key = `${symbol.col},${symbol.row}`;
+      if (symbol.type === 'triangle') failures.triangles.add(key);
+      if (symbol.type === 'color') failures.cellColors.add(key);
+      if (symbol.type === 'star') failures.stars.add(key);
+      if (symbol.type === 'eliminator') failures.eliminators.add(key);
+    }
+  }
+
+  return failures;
+}

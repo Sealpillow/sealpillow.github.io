@@ -1,8 +1,9 @@
-import { Grid } from './src/engine/Grid.js';
 import { Renderer } from './src/engine/Renderer.js';
 import { InputController } from './src/engine/Input.js';
+import { findSolutionPath } from './src/engine/Solver.js';
+import { Grid } from './src/engine/Grid.js';
 import { loadPuzzles } from './src/engine/PuzzleLoader.js';
-import { validateSolution } from './src/engine/Validator.js';
+import { analyzeSolution } from './src/engine/Validator.js';
 import {
   loadSave,
   markCompleted,
@@ -18,6 +19,13 @@ const COLLECTION_FILES = {
 };
 
 const svg = document.getElementById('board');
+const mobileScopeEl = document.getElementById('mobile-scope');
+const mobileScopeSvg = document.getElementById('mobile-scope-board');
+const mobileScopeReopenBtn = document.getElementById('mobile-scope-reopen');
+const scopeSettingsBtn = document.getElementById('scope-settings-btn');
+const scopeSettingsPanel = document.getElementById('scope-settings-panel');
+const scopeSideRightBtn = document.getElementById('scope-side-right');
+const scopeSideLeftBtn = document.getElementById('scope-side-left');
 const puzzleTitle = document.getElementById('puzzle-title');
 const puzzleNav = document.getElementById('puzzle-nav');
 const levelSourceSelect = document.getElementById('level-source');
@@ -25,8 +33,11 @@ const pagerPrev = document.getElementById('pager-prev');
 const pagerNext = document.getElementById('pager-next');
 const pagerLabel = document.getElementById('pager-label');
 const resetBtn = document.getElementById('reset-btn');
+const solutionBtn = document.getElementById('solution-btn');
 const nextBtn = document.getElementById('next-btn');
 const statusEl = document.getElementById('status');
+const FAIL_FLASH_MS = 1400;
+const SCOPE_DOCK_KEY = 'insight.scopeDock';
 
 let navPage = 0;
 let collections = {};
@@ -35,7 +46,15 @@ let save = loadSave();
 let currentIndex = 0;
 let grid;
 let renderer;
+let scopeRenderer;
 let input;
+const solutionCache = new Map();
+let debugSolutionVisible = false;
+let scopePointerActive = false;
+let scopeLockedViewBox = '';
+let scopeDismissed = false;
+let scopeDock = localStorage.getItem(SCOPE_DOCK_KEY) === 'left' ? 'left' : 'right';
+const mobileScopeEnabled = window.matchMedia?.('(pointer: coarse)').matches ?? false;
 
 // Testing backdoor: index.html?level=37 jumps straight to level 37 and unlocks
 // free navigation between all levels for the session, without touching real save progress.
@@ -80,9 +99,155 @@ function isPuzzleCompleted(puzzle) {
   );
 }
 
+function getDefaultStatusText(puzzle) {
+  return isPuzzleCompleted(puzzle) ? 'Solved' : '';
+}
+
+function setSolutionButtonState({ hidden, disabled, text }) {
+  if (hidden !== undefined) solutionBtn.hidden = hidden;
+  if (disabled !== undefined) solutionBtn.disabled = disabled;
+  if (text !== undefined) solutionBtn.textContent = text;
+}
+
+function applyScopeDock() {
+  const leftDocked = scopeDock === 'left';
+  mobileScopeEl.classList.toggle('scope-left', leftDocked);
+  mobileScopeReopenBtn.classList.toggle('scope-left', leftDocked);
+  scopeSideLeftBtn.classList.toggle('active', leftDocked);
+  scopeSideRightBtn.classList.toggle('active', !leftDocked);
+}
+
+function hideScopeSettings() {
+  scopeSettingsPanel.hidden = true;
+  scopeSettingsPanel.setAttribute('aria-hidden', 'true');
+  scopeSettingsBtn.setAttribute('aria-expanded', 'false');
+}
+
+function toggleScopeSettings() {
+  const nextHidden = !scopeSettingsPanel.hidden;
+  scopeSettingsPanel.hidden = nextHidden;
+  scopeSettingsPanel.setAttribute('aria-hidden', String(nextHidden));
+  scopeSettingsBtn.setAttribute('aria-expanded', String(!nextHidden));
+}
+
+function setScopeDock(nextDock) {
+  scopeDock = nextDock === 'left' ? 'left' : 'right';
+  localStorage.setItem(SCOPE_DOCK_KEY, scopeDock);
+  applyScopeDock();
+  hideScopeSettings();
+}
+
+function svgPointFor(svgEl, evt) {
+  const rect = svgEl.getBoundingClientRect();
+  const viewBox = svgEl.viewBox?.baseVal;
+  const minX = viewBox?.x ?? 0;
+  const minY = viewBox?.y ?? 0;
+  const width = viewBox?.width || rect.width;
+  const height = viewBox?.height || rect.height;
+  return {
+    x: minX + ((evt.clientX - rect.left) / rect.width) * width,
+    y: minY + ((evt.clientY - rect.top) / rect.height) * height,
+  };
+}
+
+function nearestNodeFor(svgEl, activeGrid, evt) {
+  const point = svgPointFor(svgEl, evt);
+  let closest = null;
+  let bestDist = Infinity;
+  for (const node of activeGrid.allNodes()) {
+    const nextPoint = activeGrid.nodeToPoint(node);
+    const dist = Math.hypot(nextPoint.x - point.x, nextPoint.y - point.y);
+    if (dist < bestDist) {
+      bestDist = dist;
+      closest = node;
+    }
+  }
+  return { node: closest, dist: bestDist };
+}
+
+function hideMobileScope() {
+  mobileScopeEl.hidden = true;
+  mobileScopeEl.setAttribute('aria-hidden', 'true');
+  scopePointerActive = false;
+  scopeLockedViewBox = '';
+  syncScopeReopenButton();
+}
+
+function syncScopeReopenButton(path = input?.getPath?.() || []) {
+  const shouldShow =
+    mobileScopeEnabled &&
+    scopeDismissed &&
+    input?.isTracing?.() &&
+    path.length > 0 &&
+    !debugSolutionVisible;
+  mobileScopeReopenBtn.hidden = !shouldShow;
+}
+
+function dismissMobileScope() {
+  scopeDismissed = true;
+  hideMobileScope();
+}
+
+function reopenMobileScope() {
+  if (!mobileScopeEnabled) return;
+  scopeDismissed = false;
+  syncMobileScope();
+}
+
+function scopeViewBoxFor(node) {
+  const center = grid.nodeToPoint(node);
+  const span = grid.cellSize * 2.75;
+  const min = 0;
+  const max = grid.svgSize - span;
+  const x = Math.max(min, Math.min(center.x - span / 2, max));
+  const y = Math.max(min, Math.min(center.y - span / 2, max));
+  return `${x} ${y} ${span} ${span}`;
+}
+
+function syncMobileScope(path = input?.getPath?.() || []) {
+  if (
+    !mobileScopeEnabled ||
+    !scopeRenderer ||
+    !input?.isTracing?.() ||
+    path.length === 0 ||
+    debugSolutionVisible ||
+    scopeDismissed
+  ) {
+    hideMobileScope();
+    return;
+  }
+
+  const tip = path[path.length - 1];
+  mobileScopeEl.hidden = false;
+  mobileScopeEl.setAttribute('aria-hidden', 'false');
+  mobileScopeReopenBtn.hidden = true;
+  mobileScopeSvg.setAttribute('viewBox', scopePointerActive && scopeLockedViewBox ? scopeLockedViewBox : scopeViewBoxFor(tip));
+  scopeRenderer.drawPath(path, 'drawing');
+  scopeRenderer.drawMirrorPath(path, 'drawing');
+}
+
+function handleScopeStep(evt) {
+  if (!mobileScopeEnabled || !input?.isTracing?.() || !grid) return;
+  evt.preventDefault();
+  const { node, dist } = nearestNodeFor(mobileScopeSvg, grid, evt);
+  const grabRadius = grid.cellSize * 0.75;
+  if (dist > grabRadius) return;
+  const changed = input.commitNode(node);
+  if (changed) {
+    const nextPath = input.getPath();
+    if (input.isTracing()) {
+      syncMobileScope(nextPath);
+    } else {
+      hideMobileScope();
+    }
+  }
+}
+
 async function init() {
   collections = await loadCollections();
   save = loadSave();
+  applyScopeDock();
+  hideScopeSettings();
   levelSourceSelect.value = DEFAULT_COLLECTION;
   setActiveCollection(DEFAULT_COLLECTION);
   currentIndex = debugMode
@@ -106,22 +271,31 @@ function loadLevel(index) {
   grid = new Grid(puzzle.width, puzzle.height);
   renderer = new Renderer(svg, grid);
   renderer.setPuzzle(puzzle);
+  scopeRenderer = new Renderer(mobileScopeSvg, grid);
+  scopeRenderer.setPuzzle(puzzle);
+  scopeDismissed = false;
+  hideMobileScope();
 
   if (input) input.destroy();
   input = new InputController(svg, grid, {
     onChange: (path) => {
       renderer.drawPath(path, 'drawing');
       renderer.drawMirrorPath(path, 'drawing');
+      syncMobileScope(path);
     },
     onRelease: (path) => handleRelease(puzzle, path),
   });
   input.setPuzzle(puzzle);
+  input.setReleaseToSubmitEnabled(!mobileScopeEnabled);
+  input.setAutoSubmitOnExit(mobileScopeEnabled);
 
   const alreadySolved = isPuzzleCompleted(puzzle);
+  debugSolutionVisible = false;
   puzzleTitle.textContent = `${getCollectionLabel(getCurrentCollectionKey())} Level ${currentIndex + 1} of ${levels.length}${
     debugMode ? ' (debug)' : ''
   }`;
   statusEl.textContent = alreadySolved ? 'Solved' : '';
+  setSolutionButtonState({ hidden: !debugMode, disabled: false, text: 'Show Solution' });
   nextBtn.disabled = !alreadySolved || currentIndex >= levels.length - 1;
 
   setCurrentLevelIndex(save, currentIndex, getCurrentCollectionKey());
@@ -129,8 +303,9 @@ function loadLevel(index) {
 }
 
 function handleRelease(puzzle, path) {
-  const solved = validateSolution(grid, puzzle, path);
-  if (solved) {
+  const result = analyzeSolution(grid, puzzle, path);
+  if (result.valid) {
+    hideMobileScope();
     renderer.drawPath(path, 'success');
     renderer.drawMirrorPath(path, 'success');
     input.reset();
@@ -139,14 +314,17 @@ function handleRelease(puzzle, path) {
     nextBtn.disabled = currentIndex >= levels.length - 1;
     renderPuzzleNav();
   } else if (path.length > 1) {
+    hideMobileScope();
     renderer.drawPath(path, 'fail');
     renderer.drawMirrorPath(path, 'fail');
+    renderer.flashFailedSymbols(result.failures, FAIL_FLASH_MS);
     input.reset();
     setTimeout(() => {
       renderer.drawPath([]);
       renderer.drawMirrorPath([]);
-    }, 300);
+    }, FAIL_FLASH_MS);
   } else {
+    hideMobileScope();
     input.reset();
   }
 }
@@ -158,16 +336,71 @@ function showEmptyCollectionState() {
   pagerLabel.textContent = 'Page 0 of 0';
   pagerPrev.disabled = true;
   pagerNext.disabled = true;
+  setSolutionButtonState({ hidden: true, disabled: true, text: 'Show Solution' });
   nextBtn.disabled = true;
+}
+
+function hideDebugSolution({ clearStatus = false } = {}) {
+  if (!renderer) return;
+  debugSolutionVisible = false;
+  setSolutionButtonState({ text: 'Show Solution' });
+  renderer.drawPath([]);
+  renderer.drawMirrorPath([]);
+  syncMobileScope();
+  syncScopeReopenButton();
+  if (clearStatus) {
+    statusEl.textContent = '';
+  } else if (levels[currentIndex]) {
+    statusEl.textContent = getDefaultStatusText(levels[currentIndex]);
+  }
+}
+
+function toggleDebugSolution() {
+  if (!debugMode || !levels[currentIndex] || !renderer || !input) return;
+  if (debugSolutionVisible) {
+    hideDebugSolution();
+    return;
+  }
+
+  const puzzle = levels[currentIndex];
+  const cacheKey = puzzle.progressKey || puzzle.id;
+  let solution = solutionCache.get(cacheKey);
+  if (!solution) {
+    solution = findSolutionPath(puzzle);
+    if (solution) solutionCache.set(cacheKey, solution);
+  }
+
+  if (!solution) {
+    statusEl.textContent = 'No solution found (debug)';
+    return;
+  }
+
+  debugSolutionVisible = true;
+  input.reset();
+  renderer.clearSymbolFailures();
+  renderer.drawPath(solution, 'success');
+  renderer.drawMirrorPath(solution, 'success');
+  setSolutionButtonState({ text: 'Hide Solution' });
+  statusEl.textContent = 'Solution shown (debug)';
 }
 
 resetBtn.addEventListener('click', () => {
   if (input && renderer) {
     input.reset();
-    renderer.drawPath([]);
-    renderer.drawMirrorPath([]);
+    hideMobileScope();
+    if (debugSolutionVisible) {
+      hideDebugSolution({ clearStatus: true });
+    } else {
+      renderer.drawPath([]);
+      renderer.drawMirrorPath([]);
+    }
+    renderer.clearSymbolFailures();
   }
-  statusEl.textContent = '';
+  if (!debugSolutionVisible) statusEl.textContent = '';
+});
+
+solutionBtn.addEventListener('click', () => {
+  toggleDebugSolution();
 });
 
 nextBtn.addEventListener('click', () => {
@@ -224,6 +457,58 @@ levelSourceSelect.addEventListener('change', () => {
     ? Math.min(Math.max(debugLevel - 1, 0), levels.length - 1)
     : Math.min(Math.max(getCurrentLevelIndex(save, getCurrentCollectionKey()), 0), levels.length - 1);
   loadLevel(currentIndex);
+});
+
+mobileScopeSvg.addEventListener('pointerdown', (evt) => {
+  if (!mobileScopeEnabled || !input?.isTracing?.()) return;
+  scopePointerActive = true;
+  scopeLockedViewBox = mobileScopeSvg.getAttribute('viewBox') || '';
+  handleScopeStep(evt);
+});
+
+mobileScopeReopenBtn.addEventListener('click', () => {
+  reopenMobileScope();
+});
+
+scopeSettingsBtn.addEventListener('click', () => {
+  toggleScopeSettings();
+});
+
+scopeSideRightBtn.addEventListener('click', () => {
+  setScopeDock('right');
+});
+
+scopeSideLeftBtn.addEventListener('click', () => {
+  setScopeDock('left');
+});
+
+document.addEventListener('pointerdown', (evt) => {
+  if (!scopeSettingsPanel.hidden && !scopeSettingsPanel.contains(evt.target) && evt.target !== scopeSettingsBtn) {
+    hideScopeSettings();
+  }
+  if (!mobileScopeEnabled || mobileScopeEl.hidden) return;
+  if (mobileScopeEl.contains(evt.target)) return;
+  if (svg.contains(evt.target)) return;
+  if (evt.target === mobileScopeReopenBtn) return;
+  if (scopeSettingsPanel.contains(evt.target) || evt.target === scopeSettingsBtn) return;
+  dismissMobileScope();
+});
+
+mobileScopeSvg.addEventListener('pointermove', (evt) => {
+  if (!scopePointerActive) return;
+  handleScopeStep(evt);
+});
+
+window.addEventListener('pointerup', () => {
+  scopePointerActive = false;
+  scopeLockedViewBox = '';
+  syncMobileScope();
+});
+
+window.addEventListener('pointercancel', () => {
+  scopePointerActive = false;
+  scopeLockedViewBox = '';
+  syncMobileScope();
 });
 
 init();

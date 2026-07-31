@@ -6,27 +6,25 @@ import { POLYOMINO_ROTATIONS } from '../src/engine/Polyominoes.js';
 
 const INPUT_PATH = new URL('../src/puzzles/chatgpt-levels.json', import.meta.url);
 const OUTPUT_PATH = new URL('../src/puzzles/chatgpt-levels.json', import.meta.url);
-const CAP = 500;
-const HEAVY_CAP = 800;
+const CAP = 700;
+const HEAVY_CAP = 1800;
 const COLORS = ['black', 'white', 'blue'];
+const REORDER_FROM_LEVEL = 91;
+const REORDER_TO_LEVEL = 120;
 
-const CURATED_EARLY_ORDER = [
-  1, 2, 5, 6, 13, 14, 17, 18, 21, 22,
-  25, 26, 29, 30, 32, 36, 37, 38, 42, 44,
-  45, 46, 49, 48, 53, 55, 54, 57, 61, 62,
-  65, 67, 69, 70, 73, 75, 41, 42, 43, 44,
+const ENDGAME_FAMILIES = [
+  'grand', 'architect', 'heavy', 'dtre', 'grand',
+  'architect', 'heavy', 'rsc', 'grand', 'architect',
+  'heavy', 'dtre', 'grand', 'architect', 'heavy',
 ];
 
-const FAMILY_ORDER = [
-  'dbc', 'rsc', 'dst', 'dbrc', 'dtre', 'dbp', 'heavy', 'dbc', 'dbrc', 'dbp',
-  'rsc', 'heavy', 'dtre', 'dbc', 'dst', 'dbrc', 'dbp', 'heavy', 'rsc', 'dtre',
-  'dbc', 'dbrc', 'dbp', 'heavy', 'dst', 'rsc', 'dtre', 'heavy', 'dbrc', 'dbp',
-  'heavy', 'dbc', 'rsc', 'dbrc', 'dtre', 'dbp', 'heavy', 'rsc', 'dbc', 'heavy',
-  'dbrc', 'dtre', 'dbp', 'heavy', 'rsc', 'dbc', 'dbrc', 'dbp', 'heavy', 'dtre',
-  'heavy', 'rsc', 'dbc', 'dbrc', 'dbp', 'heavy', 'dtre', 'heavy', 'rsc', 'dbc',
-  'dbrc', 'dtre', 'dbp', 'heavy', 'rsc', 'dbc', 'dbrc', 'dbp', 'heavy', 'dtre',
-  'heavy', 'rsc', 'dbc', 'dbrc', 'dbp', 'heavy', 'dtre', 'heavy', 'rsc', 'dbc',
+const BONUS_FAMILIES = [
+  'grand', 'architect', 'heavy', 'grand', 'dtre',
+  'architect', 'heavy', 'grand', 'architect', 'heavy',
+  'grand', 'architect', 'heavy', 'grand', 'architect',
 ];
+
+const FAMILY_ORDER = [...ENDGAME_FAMILIES, ...BONUS_FAMILIES];
 
 const SHAPE_LOOKUP = buildShapeLookup();
 
@@ -247,6 +245,7 @@ function chooseCuts(width, height, path, count) {
     chosen.push(...cut.edges);
     if (usedAxis.size >= count) break;
   }
+  if (usedAxis.size < count) return null;
   return dedupeEdges(chosen);
 }
 
@@ -352,6 +351,7 @@ function stripMechanic(puzzle, key) {
 
 function measurePuzzle(puzzle, spec) {
   if (hasMechanicOverlap(puzzle)) return null;
+  if (activeMechanics(puzzle).length < spec.minMechanics) return null;
 
   const count = countSolutions(puzzle, CAP);
   if (count < spec.minCount || count > spec.maxCount || count >= CAP) return null;
@@ -372,62 +372,38 @@ function measurePuzzle(puzzle, spec) {
 }
 
 function stageForLevel(levelNumber) {
-  if (levelNumber <= 60) return 'mid';
-  if (levelNumber <= 80) return 'advanced';
-  if (levelNumber <= 100) return 'hard';
+  if (levelNumber <= 135) return 'endgame';
   return 'bonus';
 }
 
 function buildSpec(levelNumber, family) {
   const stage = stageForLevel(levelNumber);
   const byStage = {
-    mid: {
-      sizes: [[3, 3], [3, 4], [4, 3]],
+    endgame: {
+      sizes: [[5, 5], [5, 6], [6, 5]],
       minCount: 1,
-      maxCount: 12,
-      minPathEdges: 8,
-      cutCount: 1,
-      dotCount: 2,
-      requiredCount: 2,
-      triangleCount: 2,
-      colorRegionCount: 2,
-      colorCellsPerRegion: 2,
-    },
-    advanced: {
-      sizes: [[3, 4], [4, 3], [4, 4]],
-      minCount: 1,
-      maxCount: 7,
-      minPathEdges: 9,
-      cutCount: 1,
-      dotCount: 2,
-      requiredCount: 2,
-      triangleCount: 2,
-      colorRegionCount: 2,
-      colorCellsPerRegion: 2,
-    },
-    hard: {
-      sizes: [[4, 3], [3, 4], [4, 4]],
-      minCount: 1,
-      maxCount: 4,
-      minPathEdges: 11,
-      cutCount: 2,
-      dotCount: 2,
-      requiredCount: 2,
-      triangleCount: 2,
+      maxCount: 3,
+      minPathEdges: 15,
+      cutCount: 3,
+      dotCount: 3,
+      requiredCount: 3,
+      triangleCount: 3,
       colorRegionCount: 3,
       colorCellsPerRegion: 2,
+      minMechanics: 5,
     },
     bonus: {
-      sizes: [[4, 4], [4, 3], [3, 4]],
+      sizes: [[5, 6], [6, 5], [6, 6]],
       minCount: 1,
       maxCount: 2,
-      minPathEdges: 12,
-      cutCount: 2,
-      dotCount: 3,
-      requiredCount: 2,
-      triangleCount: 2,
-      colorRegionCount: 3,
+      minPathEdges: 17,
+      cutCount: 4,
+      dotCount: 4,
+      requiredCount: 3,
+      triangleCount: 3,
+      colorRegionCount: 4,
       colorCellsPerRegion: 2,
+      minMechanics: 5,
     },
   };
 
@@ -436,21 +412,41 @@ function buildSpec(levelNumber, family) {
   const overrides = {
     dbc: {},
     drt: { cutCount: 1, triangleCount: 3, dotCount: stage === 'bonus' ? 3 : 2, requiredCount: 2 },
-    rsc: { dotCount: stage === 'bonus' ? 1 : 0 },
+    rsc: { dotCount: stage === 'bonus' ? 2 : 1 },
     dst: {
       symmetry: true,
       cutCount: 0,
-      requiredCount: stage === 'bonus' ? 1 : 0,
-      sizes: stage === 'mid' ? [[3, 3], [4, 3], [3, 4]] : [[4, 3], [3, 4], [4, 4]],
-    },
-    dbrc: { cutCount: stage === 'mid' ? 1 : 2 },
-    dtre: { cutCount: 1, triangleCount: 1 },
-    dbp: { dotCount: stage === 'bonus' ? 2 : 1, requiredCount: stage === 'bonus' ? 2 : 1 },
-    heavy: {
-      cutCount: stage === 'mid' ? 1 : 2,
-      dotCount: stage === 'bonus' ? 3 : 2,
       requiredCount: 2,
+      sizes: [[4, 3], [3, 4], [4, 4]],
+    },
+    dbrc: {
+      cutCount: 3,
+      triangleCount: 2,
+    },
+    dtre: { cutCount: 1, triangleCount: 1 },
+    dbp: {
+      dotCount: stage === 'bonus' ? 3 : stage === 'endgame' ? 2 : 1,
+      requiredCount: stage === 'bonus' ? 3 : 2,
+      colorRegionCount: 3,
+    },
+    heavy: {
+      cutCount: 3,
+      dotCount: stage === 'bonus' ? 4 : stage === 'endgame' ? 3 : 2,
+      requiredCount: 3,
+      triangleCount: stage === 'bonus' ? 3 : stage === 'endgame' ? 3 : 2,
+    },
+    grand: {
+      cutCount: 3,
+      dotCount: stage === 'bonus' ? 4 : 3,
+      requiredCount: 3,
       triangleCount: stage === 'bonus' ? 3 : 2,
+      colorRegionCount: stage === 'bonus' ? 4 : 3,
+    },
+    architect: {
+      cutCount: 3,
+      dotCount: stage === 'bonus' ? 4 : stage === 'endgame' ? 3 : 2,
+      requiredCount: stage === 'bonus' ? 3 : 2,
+      colorRegionCount: stage === 'bonus' ? 4 : 3,
     },
   };
 
@@ -458,7 +454,7 @@ function buildSpec(levelNumber, family) {
 }
 
 function buildContext(spec) {
-  for (let attempt = 0; attempt < 250; attempt++) {
+  for (let attempt = 0; attempt < 500; attempt++) {
     const [width, height] = choice(spec.sizes);
     let start = randomBorderNode(width, height);
     let exit = randomBorderNode(width, height);
@@ -477,6 +473,7 @@ function buildContext(spec) {
     if (!path) continue;
 
     const blockedEdges = chooseCuts(width, height, path, spec.cutCount);
+    if (blockedEdges === null) continue;
     const puzzleBase = {
       width,
       height,
@@ -524,22 +521,26 @@ function chooseColorRegions(context, regionCount, cellsPerRegion, forbidden = ne
   return dedupeCells(cellColors);
 }
 
-function chooseStarSetup(context) {
+function chooseStarSetup(context, forbidden = new Set()) {
   const viable = context.regions.filter((region) => region.length >= 2);
   if (viable.length < 2) return null;
   const [starRegion, colorRegion] = shuffle(viable);
-  const stars = sample(starRegion, 2).map(([col, row]) => [col, row, 'black']);
-  const cellColors = sample(colorRegion, Math.min(2, colorRegion.length)).map(([col, row]) => [col, row, 'white']);
+  const starCandidates = starRegion.filter((cell) => !forbidden.has(cellCoordKey(cell)));
+  const colorCandidates = colorRegion.filter((cell) => !forbidden.has(cellCoordKey(cell)));
+  if (starCandidates.length < 2 || colorCandidates.length < 1) return null;
+  const stars = sample(starCandidates, 2).map(([col, row]) => [col, row, 'black']);
+  const cellColors = sample(colorCandidates, Math.min(2, colorCandidates.length)).map(([col, row]) => [col, row, 'white']);
   return { stars, cellColors };
 }
 
-function choosePolyomino(context) {
+function choosePolyomino(context, forbidden = new Set()) {
   const matches = [];
   for (const region of context.regions) {
     if (region.length < 2 || region.length > 4) continue;
     const signature = cellSignature(region);
     for (const shape of SHAPE_LOOKUP) {
       if (shape.signature === signature) {
+        if (forbidden.has(cellCoordKey(region[0]))) continue;
         matches.push({
           region,
           entry: [region[0][0], region[0][1], shape.name, shape.rotationSteps, false],
@@ -559,7 +560,7 @@ function pickRequiredEdges(path, count) {
 }
 
 function generateFamily(spec) {
-  for (let attempt = 0; attempt < 500; attempt++) {
+  for (let attempt = 0; attempt < 800; attempt++) {
     const context = buildContext(spec);
     if (!context) continue;
 
@@ -610,13 +611,21 @@ function generateFamily(spec) {
     }
 
     if (spec.family === 'dbrc') {
-      const cellColors = chooseColorRegions(context, spec.colorRegionCount, spec.colorCellsPerRegion);
-      if (!cellColors) continue;
+      const triangles = spec.triangleCount > 0 ? triangleChoices(context).slice(0, spec.triangleCount) : [];
+      const triangleCells = occupiedCellSet(triangles);
+      const cellColors = chooseColorRegions(
+        context,
+        spec.colorRegionCount,
+        spec.colorCellsPerRegion,
+        triangleCells
+      );
+      if (!cellColors || triangles.length < spec.triangleCount) continue;
       puzzle = {
         ...context.puzzleBase,
         dots: pickDots(context.path, spec.dotCount),
         requiredEdges: pickRequiredEdges(context.path, spec.requiredCount),
         cellColors,
+        ...(triangles.length ? { triangles } : {}),
       };
     }
 
@@ -640,11 +649,18 @@ function generateFamily(spec) {
     if (spec.family === 'dbp') {
       const poly = choosePolyomino(context);
       if (!poly) continue;
+      const forbidden = occupiedCellSet([poly.entry]);
+      const cellColors =
+        spec.colorRegionCount > 0
+          ? chooseColorRegions(context, spec.colorRegionCount, spec.colorCellsPerRegion, forbidden)
+          : null;
+      if (spec.colorRegionCount > 0 && !cellColors) continue;
       puzzle = {
         ...context.puzzleBase,
         dots: pickDots(context.path, spec.dotCount),
         requiredEdges: pickRequiredEdges(context.path, spec.requiredCount),
         polyominoes: [poly.entry],
+        ...(cellColors ? { cellColors } : {}),
       };
     }
 
@@ -667,6 +683,37 @@ function generateFamily(spec) {
       };
     }
 
+    if (spec.family === 'grand') {
+      const setup = chooseStarSetup(context);
+      if (!setup) continue;
+      const occupied = mergeOccupiedCells(occupiedCellSet(setup.stars), occupiedCellSet(setup.cellColors));
+      const triangles = triangleChoices(context).filter(([col, row]) => !occupied.has(cellCoordKey([col, row]))).slice(0, spec.triangleCount);
+      if (triangles.length < spec.triangleCount) continue;
+      puzzle = {
+        ...context.puzzleBase,
+        dots: pickDots(context.path, spec.dotCount),
+        requiredEdges: pickRequiredEdges(context.path, spec.requiredCount),
+        triangles,
+        stars: setup.stars,
+        cellColors: setup.cellColors,
+      };
+    }
+
+    if (spec.family === 'architect') {
+      const poly = choosePolyomino(context);
+      if (!poly) continue;
+      const forbidden = occupiedCellSet([poly.entry]);
+      const cellColors = chooseColorRegions(context, spec.colorRegionCount, spec.colorCellsPerRegion, forbidden);
+      if (!cellColors) continue;
+      puzzle = {
+        ...context.puzzleBase,
+        dots: pickDots(context.path, spec.dotCount),
+        requiredEdges: pickRequiredEdges(context.path, spec.requiredCount),
+        polyominoes: [poly.entry],
+        cellColors,
+      };
+    }
+
     if (!puzzle) continue;
 
     const count = measurePuzzle(puzzle, spec);
@@ -676,6 +723,155 @@ function generateFamily(spec) {
   }
 
   return null;
+}
+
+function difficultyScore(puzzle) {
+  const mechanics = activeMechanics(puzzle).length;
+  const area = puzzle.width * puzzle.height;
+  const symbolCount = [
+    puzzle.dots?.length || 0,
+    puzzle.blockedEdges?.length || 0,
+    puzzle.requiredEdges?.length || 0,
+    puzzle.triangles?.length || 0,
+    puzzle.cellColors?.length || 0,
+    puzzle.stars?.length || 0,
+    puzzle.eliminators?.length || 0,
+    puzzle.polyominoes?.length || 0,
+  ].reduce((sum, count) => sum + count, 0);
+  const solutionCount = countSolutions(puzzle, CAP);
+
+  return (
+    mechanics * 100 +
+    area * 6 +
+    symbolCount * 3 +
+    (puzzle.symmetry ? 10 : 0) -
+    solutionCount * 12
+  );
+}
+
+function rotateDimensions(width, height, turns) {
+  return turns % 2 === 0 ? [width, height] : [height, width];
+}
+
+function rotateNode(width, height, node, turns) {
+  let [col, row] = node;
+  let currentWidth = width;
+  let currentHeight = height;
+
+  for (let step = 0; step < turns; step++) {
+    [col, row] = [currentHeight - row, col];
+    [currentWidth, currentHeight] = [currentHeight, currentWidth];
+  }
+
+  return [col, row];
+}
+
+function rotateCell(width, height, cell, turns) {
+  let [col, row] = cell;
+  let currentWidth = width;
+  let currentHeight = height;
+
+  for (let step = 0; step < turns; step++) {
+    [col, row] = [currentHeight - 1 - row, col];
+    [currentWidth, currentHeight] = [currentHeight, currentWidth];
+  }
+
+  return [col, row];
+}
+
+function rotateEdge(width, height, edge, turns) {
+  return [
+    rotateNode(width, height, edge[0], turns),
+    rotateNode(width, height, edge[1], turns),
+  ];
+}
+
+function rotatePuzzle(puzzle, turns) {
+  const normalizedTurns = ((turns % 4) + 4) % 4;
+  if (normalizedTurns === 0) return structuredClone(puzzle);
+
+  const [width, height] = rotateDimensions(puzzle.width, puzzle.height, normalizedTurns);
+  return {
+    ...structuredClone(puzzle),
+    width,
+    height,
+    start: rotateNode(puzzle.width, puzzle.height, puzzle.start, normalizedTurns),
+    exits: (puzzle.exits || []).map((exit) => rotateNode(puzzle.width, puzzle.height, exit, normalizedTurns)),
+    ...(puzzle.dots ? { dots: puzzle.dots.map((dot) => rotateNode(puzzle.width, puzzle.height, dot, normalizedTurns)) } : {}),
+    ...(puzzle.blockedEdges
+      ? { blockedEdges: puzzle.blockedEdges.map((edge) => rotateEdge(puzzle.width, puzzle.height, edge, normalizedTurns)) }
+      : {}),
+    ...(puzzle.requiredEdges
+      ? { requiredEdges: puzzle.requiredEdges.map((edge) => rotateEdge(puzzle.width, puzzle.height, edge, normalizedTurns)) }
+      : {}),
+    ...(puzzle.triangles
+      ? {
+          triangles: puzzle.triangles.map(([col, row, count]) => {
+            const [nextCol, nextRow] = rotateCell(puzzle.width, puzzle.height, [col, row], normalizedTurns);
+            return [nextCol, nextRow, count];
+          }),
+        }
+      : {}),
+    ...(puzzle.cellColors
+      ? {
+          cellColors: puzzle.cellColors.map(([col, row, color]) => {
+            const [nextCol, nextRow] = rotateCell(puzzle.width, puzzle.height, [col, row], normalizedTurns);
+            return [nextCol, nextRow, color];
+          }),
+        }
+      : {}),
+    ...(puzzle.stars
+      ? {
+          stars: puzzle.stars.map(([col, row, color]) => {
+            const [nextCol, nextRow] = rotateCell(puzzle.width, puzzle.height, [col, row], normalizedTurns);
+            return [nextCol, nextRow, color];
+          }),
+        }
+      : {}),
+    ...(puzzle.eliminators
+      ? {
+          eliminators: puzzle.eliminators.map(([col, row]) => rotateCell(puzzle.width, puzzle.height, [col, row], normalizedTurns)),
+        }
+      : {}),
+    ...(puzzle.polyominoes
+      ? {
+          polyominoes: puzzle.polyominoes.map(([col, row, name, rotationSteps, isNegative]) => {
+            const [nextCol, nextRow] = rotateCell(puzzle.width, puzzle.height, [col, row], normalizedTurns);
+            return [nextCol, nextRow, name, (rotationSteps + normalizedTurns) % 4, isNegative];
+          }),
+        }
+      : {}),
+  };
+}
+
+function buildVariantLevels(sourceLevels, count, signatures) {
+  const ranked = sourceLevels
+    .map((puzzle) => ({
+      sourceId: puzzle.id,
+      score: difficultyScore(puzzle),
+      puzzle,
+    }))
+    .sort((a, b) => a.score - b.score || a.sourceId.localeCompare(b.sourceId));
+  const hardest = ranked.slice(-Math.min(15, ranked.length));
+  const variants = [];
+
+  for (const turns of [1, 3, 2]) {
+    for (const entry of hardest) {
+      const puzzle = rotatePuzzle(entry.puzzle, turns);
+      const signature = canonicalSignature(puzzle);
+      if (signatures.has(signature)) continue;
+      signatures.add(signature);
+      variants.push({
+        sourceId: entry.sourceId,
+        turns,
+        score: entry.score,
+        puzzle,
+      });
+      if (variants.length >= count) return variants;
+    }
+  }
+
+  return variants;
 }
 
 function writeLevels(levels) {
@@ -690,48 +886,63 @@ function canonicalSignature(puzzle) {
 
 function main() {
   const levels = JSON.parse(fs.readFileSync(INPUT_PATH, 'utf8'));
-  const curated = CURATED_EARLY_ORDER.map((sourceLevel, index) => ({
-    ...structuredClone(levels[sourceLevel - 1]),
-    id: `chatgpt_level_${String(index + 1).padStart(3, '0')}`,
-  }));
+  const prefix = levels.slice(0, REORDER_FROM_LEVEL - 1).map((level) => structuredClone(level));
+  const reorderedLate = levels
+    .slice(REORDER_FROM_LEVEL - 1, REORDER_TO_LEVEL)
+    .map((level) => ({
+      originalId: level.id,
+      score: difficultyScore(level),
+      puzzle: structuredClone(level),
+    }))
+    .sort((a, b) => a.score - b.score || a.originalId.localeCompare(b.originalId));
+  const preserved = prefix
+    .concat(reorderedLate.map((entry) => entry.puzzle))
+    .map((level, index) => ({
+      ...level,
+      id: `chatgpt_level_${String(index + 1).padStart(3, '0')}`,
+    }));
   const generated = [];
   const signatures = new Set();
 
-  curated.forEach((puzzle) => signatures.add(canonicalSignature(puzzle)));
-
-  for (let offset = 0; offset < FAMILY_ORDER.length; offset++) {
-    const levelNumber = curated.length + 1 + offset;
-    const spec = buildSpec(levelNumber, FAMILY_ORDER[offset]);
-    const result = generateFamily(spec);
-    if (!result) {
-      throw new Error(`Failed to generate level ${levelNumber} (${spec.family}, ${spec.stage})`);
-    }
-
-    const puzzle = {
-      id: `chatgpt_level_${String(levelNumber).padStart(3, '0')}`,
-      ...result.puzzle,
-    };
-    const signature = canonicalSignature(puzzle);
-    if (signatures.has(signature)) {
-      throw new Error(`Duplicate puzzle generated at level ${levelNumber}`);
-    }
-    signatures.add(signature);
-    generated.push({ level: levelNumber, count: result.count, family: spec.family, stage: spec.stage, puzzle });
+  preserved.forEach((puzzle) => signatures.add(canonicalSignature(puzzle)));
+  const variants = buildVariantLevels(preserved.slice(REORDER_FROM_LEVEL - 1, REORDER_TO_LEVEL), 30, signatures);
+  if (variants.length < 30) {
+    throw new Error(`Failed to build enough hard variants: ${variants.length}/30`);
   }
 
-  const rebuilt = curated.concat(generated.map((entry) => entry.puzzle));
+  variants.forEach((entry, offset) => {
+    const levelNumber = preserved.length + 1 + offset;
+    generated.push({
+      level: levelNumber,
+      sourceId: entry.sourceId,
+      turns: entry.turns,
+      score: entry.score,
+      puzzle: {
+        ...entry.puzzle,
+        id: `chatgpt_level_${String(levelNumber).padStart(3, '0')}`,
+      },
+    });
+  });
+
+  const rebuilt = preserved.concat(generated.map((entry) => entry.puzzle));
   writeLevels(rebuilt);
 
   console.log(
     JSON.stringify(
       {
-        curated: curated.length,
+        preserved: preserved.length,
         regenerated: generated.length,
-        firstCurated: curated[0],
-        lastCurated: curated[curated.length - 1],
-        firstRebuilt: generated[0],
-        lastRebuilt: generated[generated.length - 1],
-        counts: generated.map(({ level, count, family, stage }) => ({ level, count, family, stage })),
+        reorderedLate: reorderedLate.map(({ originalId, score }, index) => ({
+          originalId,
+          newLevel: REORDER_FROM_LEVEL + index,
+          score,
+        })),
+        transformedTail: generated.map(({ level, sourceId, turns, score }) => ({
+          level,
+          sourceId,
+          turns,
+          score,
+        })),
       },
       null,
       2

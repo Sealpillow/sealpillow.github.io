@@ -1,7 +1,7 @@
 import { satisfiesSymmetry, transformNode } from './Symmetry.js';
 import { combinedTraveledNodes, combinedTraveledEdges, computeRegions } from './Regions.js';
-import { satisfiesEliminators } from './Eliminators.js';
-import { satisfiesPolyominoes } from './Polyominoes.js';
+import { satisfiesEliminators, findInvalidEliminatorSymbols } from './Eliminators.js';
+import { satisfiesPolyominoes, findInvalidPolyominoCells } from './Polyominoes.js';
 
 export function isEdgeBlocked(grid, puzzle, a, b) {
   const key = grid.edgeKey(a, b);
@@ -125,14 +125,152 @@ function satisfiesRegionMechanics(grid, puzzle, path) {
   );
 }
 
-export function validateSolution(grid, puzzle, path) {
-  return (
-    isValidPath(grid, puzzle, path) &&
-    reachesExit(grid, puzzle, path) &&
-    passesAllDots(grid, puzzle, path) &&
-    includesRequiredEdges(grid, puzzle, path) &&
-    satisfiesRegionMechanics(grid, puzzle, path) &&
-    satisfiesSymmetry(grid, puzzle, path) &&
-    satisfiesPolyominoes(grid, puzzle, path)
+function createFailureSet() {
+  return {
+    dots: new Set(),
+    requiredEdges: new Set(),
+    triangles: new Set(),
+    cellColors: new Set(),
+    stars: new Set(),
+    eliminators: new Set(),
+    polyominoes: new Set(),
+  };
+}
+
+function serializeFailures(failures) {
+  return Object.fromEntries(
+    Object.entries(failures).map(([key, values]) => [key, [...values]])
   );
+}
+
+function mergeFailures(target, source) {
+  for (const [key, values] of Object.entries(source)) {
+    if (!target[key]) continue;
+    values.forEach((value) => target[key].add(value));
+  }
+}
+
+function findMissingDots(grid, puzzle, path) {
+  const visited = combinedTraveledNodes(grid, puzzle, path);
+  return new Set(
+    (puzzle.dots || [])
+      .filter((dot) => !visited.has(grid.nodeKey(dot)))
+      .map((dot) => grid.nodeKey(dot))
+  );
+}
+
+function findMissingRequiredEdges(grid, puzzle, path) {
+  const traveled = combinedTraveledEdges(grid, puzzle, path);
+  return new Set(
+    (puzzle.requiredEdges || [])
+      .filter((edge) => !traveled.has(grid.edgeKey(edge[0], edge[1])))
+      .map((edge) => grid.edgeKey(edge[0], edge[1]))
+  );
+}
+
+function findInvalidTriangles(grid, puzzle, path, traveled = combinedTraveledEdges(grid, puzzle, path)) {
+  const invalid = new Set();
+  for (const [col, row, count] of puzzle.triangles || []) {
+    const touching = grid.cellEdges(col, row).filter(([a, b]) => traveled.has(grid.edgeKey(a, b)));
+    if (touching.length !== count) invalid.add(`${col},${row}`);
+  }
+  return invalid;
+}
+
+function findInvalidRegionColors(grid, puzzle, path, regions = computeRegions(grid, puzzle, path)) {
+  const invalid = new Set();
+  const colorByCell = new Map((puzzle.cellColors || []).map(([col, row, color]) => [`${col},${row}`, color]));
+
+  for (const region of regions) {
+    const used = region
+      .map(([col, row]) => {
+        const key = `${col},${row}`;
+        return colorByCell.has(key) ? [key, colorByCell.get(key)] : null;
+      })
+      .filter((entry) => entry !== null);
+    if (new Set(used.map(([, color]) => color)).size <= 1) continue;
+    used.forEach(([key]) => invalid.add(key));
+  }
+
+  return invalid;
+}
+
+function findInvalidStars(grid, puzzle, path, regions = computeRegions(grid, puzzle, path)) {
+  const invalid = new Set();
+  const starByCell = new Map((puzzle.stars || []).map(([col, row, color]) => [`${col},${row}`, color]));
+  const colorByCell = new Map((puzzle.cellColors || []).map(([col, row, color]) => [`${col},${row}`, color]));
+
+  for (const region of regions) {
+    const colorLike = region
+      .map(([col, row]) => {
+        const key = `${col},${row}`;
+        if (starByCell.has(key)) return { key, color: starByCell.get(key), isStar: true };
+        if (colorByCell.has(key)) return { key, color: colorByCell.get(key), isStar: false };
+        return null;
+      })
+      .filter((entry) => entry !== null);
+    const stars = colorLike.filter((entry) => entry.isStar);
+    if (stars.length === 0) continue;
+
+    const starColors = new Set(stars.map((entry) => entry.color));
+    if (starColors.size > 1) {
+      colorLike.forEach((entry) => invalid.add(entry.key));
+      continue;
+    }
+
+    const [starColor] = [...starColors];
+    const matching = colorLike.filter((entry) => entry.color === starColor).length;
+    const allMatch = colorLike.every((entry) => entry.color === starColor);
+    if (!allMatch || matching !== 2) {
+      colorLike.forEach((entry) => invalid.add(entry.key));
+    }
+  }
+
+  return invalid;
+}
+
+export function analyzeSolution(grid, puzzle, path) {
+  const failures = createFailureSet();
+  const validPath = isValidPath(grid, puzzle, path);
+  const exited = validPath && reachesExit(grid, puzzle, path);
+  if (!validPath || !exited) {
+    return {
+      valid: false,
+      failures: serializeFailures(failures),
+    };
+  }
+
+  failures.dots = findMissingDots(grid, puzzle, path);
+  failures.requiredEdges = findMissingRequiredEdges(grid, puzzle, path);
+
+  if ((puzzle.eliminators || []).length > 0) {
+    mergeFailures(failures, findInvalidEliminatorSymbols(grid, puzzle, path));
+  } else {
+    const regions = computeRegions(grid, puzzle, path);
+    const traveled = combinedTraveledEdges(grid, puzzle, path);
+    failures.triangles = findInvalidTriangles(grid, puzzle, path, traveled);
+    failures.cellColors = findInvalidRegionColors(grid, puzzle, path, regions);
+    failures.stars = findInvalidStars(grid, puzzle, path, regions);
+  }
+
+  failures.polyominoes = findInvalidPolyominoCells(grid, puzzle, path);
+
+  const valid =
+    failures.dots.size === 0 &&
+    failures.requiredEdges.size === 0 &&
+    failures.triangles.size === 0 &&
+    failures.cellColors.size === 0 &&
+    failures.stars.size === 0 &&
+    failures.eliminators.size === 0 &&
+    failures.polyominoes.size === 0 &&
+    satisfiesSymmetry(grid, puzzle, path);
+
+  return {
+    valid,
+    failures: serializeFailures(failures),
+  };
+}
+
+export function validateSolution(grid, puzzle, path) {
+  return analyzeSolution(grid, puzzle, path).valid;
 }
