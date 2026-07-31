@@ -39,6 +39,8 @@ const statusEl = document.getElementById('status');
 const FAIL_FLASH_MS = 1400;
 const SCOPE_DOCK_KEY = 'insight.scopeDock';
 const SCOPE_INTERACTING_CLASS = 'scope-interacting';
+const SCOPE_FOLLOW_EASE = 0.18;
+const SCOPE_FOLLOW_SETTLE_THRESHOLD = 0.25;
 
 let navPage = 0;
 let collections = {};
@@ -176,8 +178,8 @@ function stepScopeViewBox() {
   let settled = true;
   for (const key of ['x', 'y', 'width', 'height']) {
     const delta = scopeTargetViewBox[key] - next[key];
-    if (Math.abs(delta) > 0.35) {
-      next[key] += delta * 0.28;
+    if (Math.abs(delta) > SCOPE_FOLLOW_SETTLE_THRESHOLD) {
+      next[key] += delta * SCOPE_FOLLOW_EASE;
       settled = false;
     } else {
       next[key] = scopeTargetViewBox[key];
