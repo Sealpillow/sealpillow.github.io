@@ -39,9 +39,19 @@ function allRotations(cells) {
   return rotations;
 }
 
-const POLYOMINO_ROTATIONS = Object.fromEntries(
+export const POLYOMINO_ROTATIONS = Object.fromEntries(
   Object.entries(POLYOMINO_SHAPES).map(([key, cells]) => [key, allRotations(cells)])
 );
+
+// Rotate a shape's canonical cells by `steps` quarter-turns (0-3) and normalize — used for
+// fixed-orientation ("straight") pieces, which may need any of the 4 steps even where
+// POLYOMINO_ROTATIONS has deduped away a visually-identical duplicate (e.g. a domino at
+// steps=2 looks the same as steps=0, but a straight piece still names one specific step).
+export function rotateShape(shape, steps) {
+  let cells = POLYOMINO_SHAPES[shape];
+  for (let i = 0; i < ((steps % 4) + 4) % 4; i++) cells = rotate90(cells);
+  return normalize(cells);
+}
 
 // All ways a piece's rotations can be placed so that one of its cells lands on `anchor`,
 // with every resulting cell still inside `remaining` (unplaced region cells).
@@ -96,9 +106,11 @@ export function satisfiesPolyominoes(grid, puzzle, path) {
   if (entries.length === 0) return true;
 
   const pieceByCell = new Map();
-  for (const [col, row, shape] of entries) {
-    const rotations = POLYOMINO_ROTATIONS[shape];
-    if (!rotations) throw new Error(`Unknown polyomino shape: ${shape}`);
+  for (const [col, row, shape, rotationSteps = 0, rotatable = true] of entries) {
+    if (!POLYOMINO_SHAPES[shape]) throw new Error(`Unknown polyomino shape: ${shape}`);
+    // A "straight" piece (rotatable: false) must match its one named orientation exactly —
+    // a "slanted" piece (rotatable: true) may use any of the shape's unique rotations.
+    const rotations = rotatable ? POLYOMINO_ROTATIONS[shape] : [rotateShape(shape, rotationSteps)];
     pieceByCell.set(`${col},${row}`, { rotations });
   }
 

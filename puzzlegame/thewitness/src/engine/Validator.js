@@ -1,4 +1,4 @@
-import { satisfiesSymmetry } from './Symmetry.js';
+import { satisfiesSymmetry, transformNode } from './Symmetry.js';
 import { combinedTraveledNodes, combinedTraveledEdges, computeRegions } from './Regions.js';
 import { satisfiesEliminators } from './Eliminators.js';
 import { satisfiesPolyominoes } from './Polyominoes.js';
@@ -8,10 +8,17 @@ export function isEdgeBlocked(grid, puzzle, a, b) {
   return (puzzle.blockedEdges || []).some((edge) => grid.edgeKey(edge[0], edge[1]) === key);
 }
 
+export function isValidStartNode(grid, puzzle, node) {
+  const startKeys = new Set([grid.nodeKey(puzzle.start)]);
+  if (puzzle.symmetry) {
+    startKeys.add(grid.nodeKey(transformNode(puzzle.symmetry, grid, puzzle.start)));
+  }
+  return startKeys.has(grid.nodeKey(node));
+}
+
 export function isValidPath(grid, puzzle, path) {
   if (path.length < 2) return false;
-  const [sc, sr] = puzzle.start;
-  if (path[0][0] !== sc || path[0][1] !== sr) return false;
+  if (!isValidStartNode(grid, puzzle, path[0])) return false;
 
   const seen = new Set([grid.nodeKey(path[0])]);
   for (let i = 1; i < path.length; i++) {
@@ -26,9 +33,16 @@ export function isValidPath(grid, puzzle, path) {
   return true;
 }
 
-export function reachesExit(puzzle, path) {
+export function reachesExit(grid, puzzle, path) {
   const [lc, lr] = path[path.length - 1];
-  return (puzzle.exits || []).some(([ec, er]) => ec === lc && er === lr);
+  const exitKeys = new Set((puzzle.exits || []).map(([ec, er]) => `${ec},${er}`));
+  if (puzzle.symmetry) {
+    for (const exit of puzzle.exits || []) {
+      const [mc, mr] = transformNode(puzzle.symmetry, grid, exit);
+      exitKeys.add(`${mc},${mr}`);
+    }
+  }
+  return exitKeys.has(`${lc},${lr}`);
 }
 
 export function passesAllDots(grid, puzzle, path) {
@@ -114,7 +128,7 @@ function satisfiesRegionMechanics(grid, puzzle, path) {
 export function validateSolution(grid, puzzle, path) {
   return (
     isValidPath(grid, puzzle, path) &&
-    reachesExit(puzzle, path) &&
+    reachesExit(grid, puzzle, path) &&
     passesAllDots(grid, puzzle, path) &&
     includesRequiredEdges(grid, puzzle, path) &&
     satisfiesRegionMechanics(grid, puzzle, path) &&

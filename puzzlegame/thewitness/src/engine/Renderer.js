@@ -11,6 +11,10 @@ function svgEl(tag, attrs = {}) {
   return el;
 }
 
+// Shallow, deliberately non-90°-multiple tilt for freely-rotatable ("slanted") polyomino
+// pieces — distinguishes them at a glance from axis-aligned ("straight") ones.
+const POLYOMINO_SLANT_DEG = 22;
+
 function starPoints(cx, cy, outerR, innerR) {
   const points = [];
   for (let i = 0; i < 10; i++) {
@@ -112,8 +116,8 @@ export class Renderer {
     for (const [col, row] of this.puzzle.eliminators || []) {
       this.drawEliminator(col, row);
     }
-    for (const [col, row, shape] of this.puzzle.polyominoes || []) {
-      this.drawPolyominoIcon(col, row, shape);
+    for (const [col, row, shape, rotationSteps, rotatable] of this.puzzle.polyominoes || []) {
+      this.drawPolyominoIcon(col, row, shape, rotationSteps || 0, rotatable !== false);
     }
   }
 
@@ -142,28 +146,55 @@ export class Renderer {
     );
   }
 
-  drawPolyominoIcon(col, row, shape) {
+  // Mirrors the source game's own visual language: the icon is one solid block (its unit
+  // cells drawn flush, no gaps) with thin divider lines marking where cells join — a
+  // "straight" piece (rotatable: false) sits axis-aligned in its one required orientation
+  // (`rotationSteps`, 0-3 quarter turns), since that's the only shape that will tile its
+  // region. A "slanted" piece (rotatable: true) is tilted by a fixed shallow angle instead —
+  // any of its rotations are accepted, so the exact orientation shown doesn't matter, only
+  // that it visibly isn't grid-aligned. This is the *only* rotation cue — no separate badge.
+  drawPolyominoIcon(col, row, shape, rotationSteps = 0, rotatable = true) {
     const cells = POLYOMINO_SHAPES[shape];
     if (!cells) return;
+    const cellSet = new Set(cells.map(([c, r]) => `${c},${r}`));
     const center = this.grid.cellCenter(col, row);
     const maxCol = Math.max(...cells.map(([c]) => c)) + 1;
     const maxRow = Math.max(...cells.map(([, r]) => r)) + 1;
     const span = Math.max(maxCol, maxRow);
     const cellPx = (this.grid.cellSize * 0.5) / span;
-    const gap = cellPx * 0.12;
     const totalW = maxCol * cellPx;
     const totalH = maxRow * cellPx;
+    const left = center.x - totalW / 2;
+    const top = center.y - totalH / 2;
+
+    const angle = rotatable ? POLYOMINO_SLANT_DEG : rotationSteps * 90;
+    const group = svgEl('g', { transform: `rotate(${angle} ${center.x} ${center.y})` });
+
     for (const [c, r] of cells) {
-      this.symbolsGroup.appendChild(
+      group.appendChild(
         svgEl('rect', {
-          x: center.x - totalW / 2 + c * cellPx + gap / 2,
-          y: center.y - totalH / 2 + r * cellPx + gap / 2,
-          width: cellPx - gap,
-          height: cellPx - gap,
-          class: 'polyomino-cell',
+          x: left + c * cellPx,
+          y: top + r * cellPx,
+          width: cellPx,
+          height: cellPx,
+          class: 'polyomino-fill',
         })
       );
     }
+
+    const dividers = new Set();
+    for (const [c, r] of cells) {
+      const x = left + c * cellPx;
+      const y = top + r * cellPx;
+      if (cellSet.has(`${c + 1},${r}`)) dividers.add(`${x + cellPx},${y}|${x + cellPx},${y + cellPx}`);
+      if (cellSet.has(`${c},${r + 1}`)) dividers.add(`${x},${y + cellPx}|${x + cellPx},${y + cellPx}`);
+    }
+    for (const seg of dividers) {
+      const [[x1, y1], [x2, y2]] = seg.split('|').map((p) => p.split(',').map(Number));
+      group.appendChild(svgEl('line', { x1, y1, x2, y2, class: 'polyomino-divider' }));
+    }
+
+    this.symbolsGroup.appendChild(group);
   }
 
   drawTriangleCluster(col, row, count) {

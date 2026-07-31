@@ -4,6 +4,7 @@ function defaultSave() {
   return {
     completedPuzzles: [],
     currentLevelIndex: 0,
+    currentLevelIndexByCollection: {},
   };
 }
 
@@ -29,12 +30,20 @@ export function markCompleted(save, puzzleId) {
   return save;
 }
 
-export function getCurrentLevelIndex(save) {
+export function getCurrentLevelIndex(save, collectionKey = 'default') {
+  const byCollection = save.currentLevelIndexByCollection || {};
+  if (Number.isInteger(byCollection[collectionKey])) {
+    return byCollection[collectionKey];
+  }
   return save.currentLevelIndex || 0;
 }
 
-export function setCurrentLevelIndex(save, index) {
+export function setCurrentLevelIndex(save, index, collectionKey = 'default') {
   save.currentLevelIndex = index;
+  if (!save.currentLevelIndexByCollection || typeof save.currentLevelIndexByCollection !== 'object') {
+    save.currentLevelIndexByCollection = {};
+  }
+  save.currentLevelIndexByCollection[collectionKey] = index;
   writeSave(save);
   return save;
 }

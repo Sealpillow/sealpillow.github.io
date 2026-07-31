@@ -1,4 +1,4 @@
-import { isEdgeBlocked } from './Validator.js';
+import { isEdgeBlocked, isValidStartNode } from './Validator.js';
 
 export class InputController {
   constructor(svg, grid, { onChange, onRelease } = {}) {
@@ -84,8 +84,7 @@ export class InputController {
     const { node, dist } = this.nearestNode(this.svgPoint(evt));
     const grabRadius = this.grid.cellSize * 0.6;
     if (dist > grabRadius) return;
-    const [sc, sr] = this.puzzle.start;
-    if (node[0] !== sc || node[1] !== sr) return;
+    if (!isValidStartNode(this.grid, this.puzzle, node)) return;
 
     this.tracing = true;
     this.path = [node];

@@ -15,7 +15,9 @@ This repository contains two separate, unrelated puzzle projects:
 
 The goal is a logic puzzle game where every mechanic is discovered through play, never explained. The player draws a single line from a start node to an exit; getting it wrong a few times while the rule clicks into place is the intended experience, not a failure state. The design deliberately avoids story, combat, RPG progression, timers, and randomness — difficulty comes entirely from the interaction of simple rules, never from board size, reflexes, or memorization.
 
-This is also why the game never names its own mechanics anywhere in the UI — no "Triangles" label, no "Area 3" tab, no tutorial text. Labeling a rule before the player has worked it out themselves defeats the point. See `plan.md` Section 1 (Vision) and Section 3 (Design Philosophy) for the full statement.
+This is also why the game never names its own mechanics anywhere in the UI — no "Triangles" label, no "Area 3" tab, no tutorial text. Labeling a rule before the player has worked it out themselves defeats the point.
+
+Visually: clean architecture, minimal geometry, muted colors, soft animations. No flashy particles, no large HUDs — the interface stays out of the way of the puzzle.
 
 ## Quick start
 
@@ -33,7 +35,7 @@ Drag from the glowing start node to an exit tick on the border to solve each puz
 
 ### Testing
 
-Append `?level=N` to the URL (e.g. `http://localhost:8000/?level=37`) to jump straight to level N — it unlocks free navigation between all 120 levels for that session (labeled "(debug)" in the UI) without touching your real save progress.
+Append `?level=N` to the URL (e.g. `http://localhost:8000/?level=37`) to jump straight to level N — it unlocks free navigation between all 134 levels for that session (labeled "(debug)" in the UI) without touching your real save progress.
 
 ## Tech stack & constraints
 
@@ -50,14 +52,16 @@ src/
     Grid.js          — node/edge/cell geometry for an arbitrary width×height board
     Renderer.js      — draws the grid, symbols, and both paths as SVG
     Input.js         — pointer handling: click-to-arm / move-to-trace / click-to-submit, or classic click-and-drag
-    PuzzleLoader.js  — fetches and parses levels.json
+    PuzzleLoader.js  — fetches and parses the active level collection JSON
     Validator.js     — checks a drawn path against a puzzle's active mechanics
     Symmetry.js      — the mirrored-path transform for Symmetry puzzles
     Regions.js       — shared flood-fill region computation (used by Colored Regions, Stars, Eliminators, Polyominoes)
     Eliminators.js   — the Eliminators mechanic (backtracking pairing search)
     Polyominoes.js   — the Polyominoes/Tetris mechanic (exact-cover tiling search)
   puzzles/
-    levels.json      — all 120 levels, one flat ordered array
+    levels.json          — original 134-level campaign source
+    claude-levels.json   — Claude collection shown in the level-source dropdown
+    chatgpt-levels.json  — ChatGPT collection shown in the level-source dropdown
   save/
     SaveManager.js   — localStorage read/write
 index.html
@@ -65,7 +69,50 @@ style.css
 main.js              — wires it together: level loading, sequential unlock gating, the debug backdoor
 ```
 
-`plan.md` has the full architecture rationale and a phase-by-phase build history if you want the *why*, not just the *what*.
+Every mechanic's validation lives as a plain exported function (not a class) across the `engine/*.js` files above — `passesAllDots`, `satisfiesTriangles`, `satisfiesRegions`, `satisfiesStars`, `includesRequiredEdges` (all in `Validator.js`), plus `satisfiesSymmetry`, `satisfiesEliminators`, and `satisfiesPolyominoes` in their own modules. Each returns a plain `true`/`false`; `validateSolution` ANDs every applicable one together.
+
+## Puzzle data format
+
+Every puzzle collection lives in `src/puzzles/*.json`, one flat array per collection. A puzzle only includes the fields its active mechanics need — most levels use 0-2 of them:
+
+```js
+{
+  "id": "level_56",
+  "width": 2,
+  "height": 2,
+  "start": [0, 0],
+  "exits": [[2, 2]],
+  "eliminators": [[0, 0]],
+  "triangles": [[1, 1, 4]]
+}
+```
+
+The full set of possible fields: `dots`, `blockedEdges`, `requiredEdges`, `triangles`, `cellColors`, `stars`, `eliminators`, `polyominoes`, and a `symmetry` string (currently only `"rotational"`). A polyomino entry is `[col, row, shapeName, rotationSteps, rotatable]` — see the Polyominoes note below.
+
+## Engine internals
+
+**Validation pipeline**, in order — a puzzle only succeeds if every step passes:
+1. Valid path (grid-adjacent moves only, no revisits except retracing the immediately-previous node, no crossing a blocked edge) — enforced live during dragging, not just at the end.
+2. Reaches an exit (matches *any* entry in `exits`, not necessarily all).
+3. Passes every dot.
+4. Includes every required edge.
+5. Region-based mechanics (Triangles, Colored Regions, Stars — or, if the puzzle has Eliminators, one combined region-aware check replaces all three) and Polyominoes.
+6. Symmetry, if the puzzle defines one.
+
+**Per-mechanic implementation notes:**
+- **Colored Regions / Stars / Eliminators / Polyominoes** all share `Regions.js`'s `computeRegions`, a flood fill over grid cells that treats any edge the player's path actually traveled as a wall (`blockedEdges` are *not* flood-fill walls by themselves — only the drawn path's own edges partition regions).
+- **Symmetry** (`Symmetry.js`) derives a mirror path from the one path the player drags via a 180°-rotation transform; the mirror path's nodes/edges are credited into the dot/required/triangle/region checks (`combinedTraveledNodes`/`combinedTraveledEdges`), which is how Symmetry combines with other mechanics instead of staying standalone. `blockedEdges` are deliberately never combined with Symmetry — the grid's walls are static and not reflected per-path, so every symmetric maze would need hand-verification to guarantee the mirror path never crosses a wall the primary doesn't.
+- **Eliminators** (`Eliminators.js`) runs a small backtracking search per region: the puzzle doesn't say which other symbol each eliminator cancels, so it tries every pairing (including two eliminators cancelling each other) and accepts the region if any pairing leaves the survivors satisfying their normal rules.
+- **Polyominoes** (`Polyominoes.js`) runs an exact-cover backtracking tiling search per region. Each piece instance carries `rotationSteps` (0-3 quarter turns) and `rotatable` (boolean): a `rotatable: true` ("slanted") piece may use any of its shape's unique rotations in the search; a `rotatable: false` ("straight") piece must match `rotationSteps` exactly, a genuine solving constraint. `Renderer.js`'s `drawPolyominoIcon` draws the piece as one solid block (flush unit cells with thin divider lines) and rotates that whole block rigidly — axis-aligned at `rotationSteps*90°` for straight pieces, tilted at a fixed shallow non-90°-multiple angle for slanted ones. That tilt is the *only* rotation cue the player gets; there's no separate badge/arrow icon. This is deliberately positive-piece tiling only — no subtractive/negative pieces, since their exact rule in the source game couldn't be reconstructed with confidence.
+
+**Input rules:** snap to the nearest node within a grab radius; can't skip nodes (must be grid-adjacent to the last one); can't cross a blocked edge; can't revisit a node except stepping back onto the immediately-previous one (undo-by-retracing, not a general reverse); no interpolation — the line snaps instantly node-to-node. On Symmetry levels, either visible start point may be used.
+
+**Save shape** (`SaveManager.js`, in `localStorage`):
+```js
+{ completedPuzzles: [], currentLevelIndex: 0 }
+```
+
+**Rendering** is plain SVG with five groups in a fixed order: `grid-lines`, `symbols`, `player-path`, `mirror-path`, `nodes`.
 
 ## Mechanics
 
@@ -78,8 +125,8 @@ Nine rule types are combined across the level set (for reference here — the ga
 - **Colored Regions** — the path must partition the grid so that same-colored cells always end up in one connected region, with no two colors sharing a region. Not limited to two colors — a region just can't mix colors.
 - **Stars** — a star must pair with exactly one other same-colored cell (another star, or a plain colored square) within its region; a region holding a star can't contain anything of a different color.
 - **Eliminators** — cancels exactly one other symbol (a triangle, colored square, star, or another eliminator) in its region; the puzzle doesn't say which one, so it's solved if *any* valid pairing leaves everything else satisfied.
-- **Polyominoes** — a region containing one or more Tetris-style piece icons must be exactly tileable by all of them at once, each piece usable in any of its rotations, with no gaps or overlaps.
-- **Symmetry** — a second, mirrored path is drawn automatically alongside yours; both must be valid and the two must never touch. The mirror path's nodes/edges also count toward dots/required/triangles/regions, so Symmetry can combine with the other mechanics rather than staying standalone.
+- **Polyominoes** — a region containing one or more Tetris-style piece icons must be exactly tileable by all of them at once, with no gaps or overlaps. Each piece icon is drawn as one solid block, shown one of two ways: sitting axis-aligned ("straight") means it must fit in exactly that one orientation; tilted at an angle ("slanted") means any of its rotations are allowed.
+- **Symmetry** — a second, mirrored path is drawn automatically alongside yours; both must be valid and the two must never touch. On a Symmetry level, your drawn path may start from either visible start point and may finish on either a listed exit or that exit's mirrored counterpart. The mirror path's nodes/edges also count toward dots/required/triangles/regions, so Symmetry can combine with the other mechanics rather than staying standalone.
 
 Most puzzles have a single exit, but a level can define more than one — either ending is a valid solution, so the player may need to plan for more than one possible finish.
 
@@ -100,13 +147,23 @@ Levels are one flat, gated sequence — solving level N unlocks level N+1 (`main
 | 47-52 | Eliminators |
 | 53-58 | Polyominoes — all 9 mechanics now introduced |
 | 59-64 | Symmetry reintroduced, combined with other mechanics |
-| 65-76 | Fresh 2-3 mechanic combinations spanning all 9 mechanics |
-| 77-88 | 4-mechanic combinations |
-| 89-99 | Heaviest main-campaign combinations |
-| 100 | Grand finale |
-| 101-120 | Bonus hard-mode tier — harder than the main finale |
+| 65-80 | Fresh 2-3 mechanic combinations spanning all 9 mechanics, on genuinely varied grid shapes (3x3/3x4/4x3/4x4) |
+| 81-96 | 4-mechanic combinations on bigger boards |
+| 97-112 | Heaviest main-campaign combinations |
+| 113 | Grand finale |
+| 114-134 | Bonus hard-mode tier — harder than the main finale, each a distinct board |
 
-See `plan.md` Section 13 for the exact per-level breakdown and the reasoning behind the ordering.
+See `level-creation-rulebook.md` for the mechanic-order rationale and the exact difficulty target per tier.
+
+### Current pacing guidance
+
+The app now supports multiple collections through a level-source dropdown. The older Claude collection keeps the longer teaching-block structure above. The newer ChatGPT collection follows these pacing rules:
+
+- Both collections use the exact same engine and mechanic rules; only the authored/generated level set and pacing philosophy differ.
+- A new mechanic should usually get only `1-2` pure introduction levels.
+- Difficulty should start scaling earlier instead of waiting for a long late-game ramp.
+- Once a mechanic is introduced, it should begin combining with previously-taught rules quickly to keep the player engaged.
+- Cell-based mechanic icons must never overlap on the same cell.
 
 ## How levels are actually designed and verified
 
@@ -120,15 +177,40 @@ This part isn't obvious from playing the game, so it's worth stating explicitly:
 
 New mechanics also get unit-tested against hand-built synthetic puzzles (edge cases like "no valid target to cancel" or "piece only fits with a 180° rotation") before any real level uses them, and every engine change gets a full regression pass — every existing level re-verified, plus a simulated end-to-end playthrough checking unlock gating, solvability, and that no mechanic name ever leaks into the UI — before new content is added.
 
-The full methodology, including exact numeric targets per difficulty tier, lives in `plan.md` Section 13 ("Difficulty methodology").
+The full step-by-step design loop, exact per-tier numeric targets, named techniques, and known hazards/hard rules live in `level-creation-rulebook.md`.
+
+## Guiding principles
+
+When considering a new mechanic or feature, ask:
+- Does this encourage observation?
+- Does it introduce a genuinely new idea?
+- Can players discover the rule without being told?
+- Does it deepen existing mechanics instead of adding unnecessary complexity?
+- Does it keep the interface calm and uncluttered?
+
+If the answer to any of these is "no," reconsider whether it belongs in the game. The goal is not to imitate *The Witness*, but to share its philosophy: simple rules, deep interactions, and rewarding moments of discovery.
+
+## Possible future additions
+
+None of these are built. All could work without a backend, storing data locally or importing/exporting JSON:
+
+- Daily puzzle
+- Community level import
+- Level editor
+- Puzzle replay
+- Hint system
+- Accessibility options
+- Keyboard controls
+- Touch gestures
+- Audio (line-drawing sound, success/failure tones, ambient background) — nothing in the codebase plays sound today; if ever added, it should never distract from the puzzle.
 
 ## Status
 
-All 11 planned phases are implemented (`plan.md` Section 12) — 9 mechanic types across a 120-level campaign (100-level main sequence + a 20-level bonus hard tier). Not yet built (`plan.md` Section 18): a level editor, hint system, daily puzzle, audio, and a few other stretch ideas.
+All 9 mechanics are implemented across a 134-level campaign (113-level main sequence + a 21-level bonus hard tier). Grid shapes and wall layouts are deliberately varied across the combination/hard tiers rather than reusing one skeleton. No audio, level editor, hint system, or daily puzzle yet — see Possible future additions above.
 
 ## Further reading
 
-`plan.md` — the full design doc: architecture rationale, a phase-by-phase build history for every mechanic, the complete difficulty methodology with exact numeric targets, and a record of approaches that were tried and rejected (kept as "Superseded" notes so they don't get re-attempted from scratch).
+`level-creation-rulebook.md` — the level-creation rulebook: mechanic-introduction order and rationale, the tier-by-tier difficulty targets, the step-by-step design/verification loop for a single level, named techniques (Full Cut, density scaling, teaching devices), and hard rules/hazards to avoid (unsatisfiable triangle counts, Symmetry collision cases, mechanic-stacking, Polyomino/blockedEdges conflicts). Read it before adding or editing a level.
 
 ---
 
