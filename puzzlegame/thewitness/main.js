@@ -26,6 +26,9 @@ const scopeSettingsBtn = document.getElementById('scope-settings-btn');
 const scopeSettingsPanel = document.getElementById('scope-settings-panel');
 const scopeSideRightBtn = document.getElementById('scope-side-right');
 const scopeSideLeftBtn = document.getElementById('scope-side-left');
+const scopeFollowSpeedInput = document.getElementById('scope-follow-speed');
+const scopeFollowSpeedNumberInput = document.getElementById('scope-follow-speed-number');
+const scopeFollowSpeedLabel = document.getElementById('scope-follow-speed-label');
 const puzzleTitle = document.getElementById('puzzle-title');
 const puzzleNav = document.getElementById('puzzle-nav');
 const levelSourceSelect = document.getElementById('level-source');
@@ -38,9 +41,14 @@ const nextBtn = document.getElementById('next-btn');
 const statusEl = document.getElementById('status');
 const FAIL_FLASH_MS = 1400;
 const SCOPE_DOCK_KEY = 'insight.scopeDock';
+const SCOPE_FOLLOW_SPEED_KEY = 'insight.scopeFollowSpeed';
 const SCOPE_INTERACTING_CLASS = 'scope-interacting';
-const SCOPE_FOLLOW_EASE = 0.18;
 const SCOPE_FOLLOW_SETTLE_THRESHOLD = 0.25;
+const SCOPE_FOLLOW_SPEED_MIN = 0;
+const SCOPE_FOLLOW_SPEED_MAX = 100;
+const SCOPE_FOLLOW_SPEED_DEFAULT = 50;
+const SCOPE_FOLLOW_EASE_MIN = 0.08;
+const SCOPE_FOLLOW_EASE_MAX = 0.28;
 
 let navPage = 0;
 let collections = {};
@@ -57,6 +65,7 @@ let scopePointerActive = false;
 let scopeLockedViewBox = '';
 let scopeDismissed = false;
 let scopeDock = localStorage.getItem(SCOPE_DOCK_KEY) === 'left' ? 'left' : 'right';
+let scopeFollowSpeed = parseScopeFollowSpeed(localStorage.getItem(SCOPE_FOLLOW_SPEED_KEY));
 let scopeViewBoxState = null;
 let scopeTargetViewBox = null;
 let scopeFollowFrame = 0;
@@ -115,12 +124,41 @@ function setSolutionButtonState({ hidden, disabled, text }) {
   if (text !== undefined) solutionBtn.textContent = text;
 }
 
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function parseScopeFollowSpeed(rawValue) {
+  const parsed = Number.parseInt(rawValue ?? '', 10);
+  if (Number.isNaN(parsed)) return SCOPE_FOLLOW_SPEED_DEFAULT;
+  return clamp(parsed, SCOPE_FOLLOW_SPEED_MIN, SCOPE_FOLLOW_SPEED_MAX);
+}
+
+function scopeFollowEase() {
+  const ratio =
+    (scopeFollowSpeed - SCOPE_FOLLOW_SPEED_MIN) /
+    (SCOPE_FOLLOW_SPEED_MAX - SCOPE_FOLLOW_SPEED_MIN);
+  return SCOPE_FOLLOW_EASE_MIN + ratio * (SCOPE_FOLLOW_EASE_MAX - SCOPE_FOLLOW_EASE_MIN);
+}
+
+function scopeFollowSpeedText() {
+  if (scopeFollowSpeed <= 33) return 'Steady';
+  if (scopeFollowSpeed >= 67) return 'Fast';
+  return 'Balanced';
+}
+
 function applyScopeDock() {
   const leftDocked = scopeDock === 'left';
   mobileScopeEl.classList.toggle('scope-left', leftDocked);
   mobileScopeReopenBtn.classList.toggle('scope-left', leftDocked);
   scopeSideLeftBtn.classList.toggle('active', leftDocked);
   scopeSideRightBtn.classList.toggle('active', !leftDocked);
+}
+
+function applyScopeFollowSpeed() {
+  scopeFollowSpeedInput.value = String(scopeFollowSpeed);
+  scopeFollowSpeedNumberInput.value = String(scopeFollowSpeed);
+  scopeFollowSpeedLabel.textContent = scopeFollowSpeedText();
 }
 
 function hideScopeSettings() {
@@ -141,6 +179,12 @@ function setScopeDock(nextDock) {
   localStorage.setItem(SCOPE_DOCK_KEY, scopeDock);
   applyScopeDock();
   hideScopeSettings();
+}
+
+function setScopeFollowSpeed(nextValue) {
+  scopeFollowSpeed = parseScopeFollowSpeed(nextValue);
+  localStorage.setItem(SCOPE_FOLLOW_SPEED_KEY, String(scopeFollowSpeed));
+  applyScopeFollowSpeed();
 }
 
 function parseViewBox(viewBox) {
@@ -179,7 +223,7 @@ function stepScopeViewBox() {
   for (const key of ['x', 'y', 'width', 'height']) {
     const delta = scopeTargetViewBox[key] - next[key];
     if (Math.abs(delta) > SCOPE_FOLLOW_SETTLE_THRESHOLD) {
-      next[key] += delta * SCOPE_FOLLOW_EASE;
+      next[key] += delta * scopeFollowEase();
       settled = false;
     } else {
       next[key] = scopeTargetViewBox[key];
@@ -342,6 +386,7 @@ async function init() {
   collections = await loadCollections();
   save = loadSave();
   applyScopeDock();
+  applyScopeFollowSpeed();
   hideScopeSettings();
   levelSourceSelect.value = DEFAULT_COLLECTION;
   setActiveCollection(DEFAULT_COLLECTION);
@@ -383,6 +428,7 @@ function loadLevel(index) {
   input.setPuzzle(puzzle);
   input.setReleaseToSubmitEnabled(!mobileScopeEnabled);
   input.setAutoSubmitOnExit(mobileScopeEnabled);
+  input.setRollbackToVisitedEnabled(mobileScopeEnabled);
 
   const alreadySolved = isPuzzleCompleted(puzzle);
   debugSolutionVisible = false;
@@ -574,6 +620,18 @@ scopeSideRightBtn.addEventListener('click', () => {
 
 scopeSideLeftBtn.addEventListener('click', () => {
   setScopeDock('left');
+});
+
+scopeFollowSpeedInput.addEventListener('input', (evt) => {
+  setScopeFollowSpeed(evt.target.value);
+});
+
+scopeFollowSpeedNumberInput.addEventListener('input', (evt) => {
+  setScopeFollowSpeed(evt.target.value);
+});
+
+scopeFollowSpeedNumberInput.addEventListener('blur', () => {
+  applyScopeFollowSpeed();
 });
 
 document.addEventListener('pointerdown', (evt) => {

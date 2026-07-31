@@ -33,7 +33,7 @@ Then open the printed local address (e.g. `http://localhost:8000`) in your brows
 
 Drag from the glowing start node to an exit tick on the border to solve each puzzle - or click once to arm the line and trace it by moving the mouse without holding the button down, then click again to submit; a classic click-and-drag still works too. Progress is saved locally (`localStorage`).
 
-On touch devices, starting a path also opens a small thumb-scope panel for easier tracing. The scope mirrors the current puzzle area and softly follows the path tip while you drag, making longer thumb-only tracing easier than dragging directly across the whole board. You can tap outside it to dismiss it, reopen it with the small `Scope` button, and use the top-left cog to switch the scope between right-hand and left-hand placement. While your thumb is actively swiping inside the scope, that gesture is captured for path control rather than scrolling the page.
+On touch devices, starting a path also opens a small thumb-scope panel for easier tracing. The scope mirrors the current puzzle area and softly follows the path tip while you drag, making longer thumb-only tracing easier than dragging directly across the whole board. You can tap outside it to dismiss it, reopen it with the small `Scope` button, and use the top-left cog to switch the scope between right-hand and left-hand placement as well as tune the scope follow speed with a slider or exact numeric input. While your thumb is actively swiping inside the scope, that gesture is captured for path control rather than scrolling the page. In mobile tracing mode, tapping an earlier node already on the current path rewinds the path directly back to that point instead of forcing one-step-at-a-time undo.
 
 ### Testing
 
@@ -107,7 +107,7 @@ The full set of possible fields: `dots`, `blockedEdges`, `requiredEdges`, `trian
 - **Eliminators** (`Eliminators.js`) runs a small backtracking search per region: the puzzle doesn't say which other symbol each eliminator cancels, so it tries every pairing (including two eliminators cancelling each other) and accepts the region if any pairing leaves the survivors satisfying their normal rules.
 - **Polyominoes** (`Polyominoes.js`) runs an exact-cover backtracking tiling search per region. Each piece instance carries `rotationSteps` (0-3 quarter turns) and `rotatable` (boolean): a `rotatable: true` ("slanted") piece may use any of its shape's unique rotations in the search; a `rotatable: false` ("straight") piece must match `rotationSteps` exactly, a genuine solving constraint. `Renderer.js`'s `drawPolyominoIcon` draws the piece as one solid block (flush unit cells with thin divider lines) and rotates that whole block rigidly - axis-aligned at `rotationSteps*90deg` for straight pieces, tilted at a fixed shallow non-90-degree-multiple angle for slanted ones. That tilt is the *only* rotation cue the player gets; there's no separate badge/arrow icon. This is deliberately positive-piece tiling only - no subtractive/negative pieces, since their exact rule in the source game couldn't be reconstructed with confidence.
 
-**Input rules:** snap to the nearest node within a grab radius; can't skip nodes (must be grid-adjacent to the last one); can't cross a blocked edge; can't revisit a node except stepping back onto the immediately-previous one (undo-by-retracing, not a general reverse); no interpolation - the line snaps instantly node-to-node. On Symmetry levels, either visible start point may be used.
+**Input rules:** snap to the nearest node within a grab radius; can't skip nodes (must be grid-adjacent to the last one); can't cross a blocked edge; no interpolation - the line snaps instantly node-to-node. On desktop/fine-pointer input, revisits are limited to stepping back onto the immediately-previous node (undo-by-retracing, not a general reverse). On mobile thumb-scope input, tapping a node that is already earlier in the active path rewinds directly back to that node as a quicker touch-friendly undo. On Symmetry levels, either visible start point may be used.
 
 **Save shape** (`SaveManager.js`, in `localStorage`):
 ```js
@@ -238,7 +238,7 @@ None of these are built. All could work without a backend, storing data locally 
 
 ## Status
 
-Desktop tracing, debug solution reveal, and the mobile thumb-scope control are all live in the current build, including soft-follow camera movement, left/right-hand placement, dismiss/reopen behavior, and swipe capture that suppresses page scrolling while the scope is being dragged.
+Desktop tracing, debug solution reveal, and the mobile thumb-scope control are all live in the current build, including soft-follow camera movement, adjustable follow speed, left/right-hand placement, dismiss/reopen behavior, tap-to-rewind on visited nodes, and swipe capture that suppresses page scrolling while the scope is being dragged.
 
 All 9 mechanics are implemented and playable across multiple collections. The current shipped collections are a 120-level Claude set and a 150-level ChatGPT set, both using the same rule system but different pacing philosophies. No audio, level editor, hint system, or daily puzzle yet - see Possible future additions above.
 

@@ -225,6 +225,10 @@ body.scope-interacting {
   text-transform: uppercase;
 }
 
+.scope-settings-subtitle {
+  margin-top: 0.9rem;
+}
+
 .scope-settings-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -244,6 +248,88 @@ body.scope-interacting {
 .scope-settings-options button.active {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.scope-slider-group {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.scope-slider-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3.2rem;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.scope-slider-meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3.2rem;
+  gap: 0.6rem;
+  align-items: center;
+  margin-top: -0.05rem;
+}
+
+.scope-value-stack {
+  display: block;
+}
+
+.scope-slider {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.scope-number-input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.45rem 0.35rem;
+  color: var(--text);
+  background: #1e242c;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  font-size: 0.78rem;
+  text-align: center;
+  appearance: textfield;
+}
+
+.scope-number-input:focus,
+.scope-number-input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(242, 201, 76, 0.16);
+}
+
+.scope-number-input::-webkit-outer-spin-button,
+.scope-number-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.scope-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  width: 100%;
+}
+
+.scope-slider-labels span {
+  flex: 0 0 auto;
+}
+
+.scope-slider-labels span:last-child {
+  transform: translateX(0.3rem);
+}
+
+.scope-settings-value {
+  width: 100%;
+  text-align: center;
+  color: var(--accent);
+  font-size: 0.72rem;
+  white-space: nowrap;
 }
 
 .grid-edge {

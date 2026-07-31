@@ -11,6 +11,7 @@ export class InputController {
     this.tracing = false;
     this.releaseToSubmitEnabled = true;
     this.autoSubmitOnExit = false;
+    this.rollbackToVisitedEnabled = false;
 
     this.handlePointerDown = this.handlePointerDown.bind(this);
     this.handlePointerMove = this.handlePointerMove.bind(this);
@@ -34,6 +35,10 @@ export class InputController {
 
   setAutoSubmitOnExit(enabled) {
     this.autoSubmitOnExit = enabled;
+  }
+
+  setRollbackToVisitedEnabled(enabled) {
+    this.rollbackToVisitedEnabled = enabled;
   }
 
   isTracing() {
@@ -84,6 +89,10 @@ export class InputController {
     return this.path.some((n) => n[0] === node[0] && n[1] === node[1]);
   }
 
+  pathIndex(node) {
+    return this.path.findIndex((n) => n[0] === node[0] && n[1] === node[1]);
+  }
+
   commitNode(node) {
     if (!this.tracing || !this.puzzle) return false;
 
@@ -94,6 +103,15 @@ export class InputController {
       const prev = this.path[this.path.length - 2];
       if (prev[0] === node[0] && prev[1] === node[1]) {
         this.path.pop();
+        this.onChange(this.path);
+        return true;
+      }
+    }
+
+    if (this.rollbackToVisitedEnabled) {
+      const existingIndex = this.pathIndex(node);
+      if (existingIndex >= 0) {
+        this.path = this.path.slice(0, existingIndex + 1);
         this.onChange(this.path);
         return true;
       }
