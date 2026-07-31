@@ -33,7 +33,7 @@ Then open the printed local address (e.g. `http://localhost:8000`) in your brows
 
 Drag from the glowing start node to an exit tick on the border to solve each puzzle - or click once to arm the line and trace it by moving the mouse without holding the button down, then click again to submit; a classic click-and-drag still works too. Progress is saved locally (`localStorage`).
 
-On touch devices, starting a path also opens a small thumb-scope panel for easier tracing. The scope mirrors the current puzzle area, stays fixed while your finger is dragging, and recenters after release. You can tap outside it to dismiss it, reopen it with the small `Scope` button, and use the top-left cog to switch the scope between right-hand and left-hand placement.
+On touch devices, starting a path also opens a small thumb-scope panel for easier tracing. The scope mirrors the current puzzle area and softly follows the path tip while you drag, making longer thumb-only tracing easier than dragging directly across the whole board. You can tap outside it to dismiss it, reopen it with the small `Scope` button, and use the top-left cog to switch the scope between right-hand and left-hand placement. While your thumb is actively swiping inside the scope, that gesture is captured for path control rather than scrolling the page.
 
 ### Testing
 
@@ -238,7 +238,7 @@ None of these are built. All could work without a backend, storing data locally 
 
 ## Status
 
-Desktop tracing, debug solution reveal, and the mobile thumb-scope control (including left/right-hand placement) are all live in the current build.
+Desktop tracing, debug solution reveal, and the mobile thumb-scope control are all live in the current build, including soft-follow camera movement, left/right-hand placement, dismiss/reopen behavior, and swipe capture that suppresses page scrolling while the scope is being dragged.
 
 All 9 mechanics are implemented and playable across multiple collections. The current shipped collections are a 120-level Claude set and a 150-level ChatGPT set, both using the same rule system but different pacing philosophies. No audio, level editor, hint system, or daily puzzle yet - see Possible future additions above.
 
