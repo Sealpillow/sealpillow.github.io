@@ -38,6 +38,7 @@ const nextBtn = document.getElementById('next-btn');
 const statusEl = document.getElementById('status');
 const FAIL_FLASH_MS = 1400;
 const SCOPE_DOCK_KEY = 'insight.scopeDock';
+const SCOPE_INTERACTING_CLASS = 'scope-interacting';
 
 let navPage = 0;
 let collections = {};
@@ -170,6 +171,7 @@ function hideMobileScope() {
   mobileScopeEl.setAttribute('aria-hidden', 'true');
   scopePointerActive = false;
   scopeLockedViewBox = '';
+  document.body.classList.remove(SCOPE_INTERACTING_CLASS);
   syncScopeReopenButton();
 }
 
@@ -241,6 +243,25 @@ function handleScopeStep(evt) {
       hideMobileScope();
     }
   }
+}
+
+function beginScopePointer(evt) {
+  scopePointerActive = true;
+  scopeLockedViewBox = mobileScopeSvg.getAttribute('viewBox') || '';
+  document.body.classList.add(SCOPE_INTERACTING_CLASS);
+  if (evt.pointerId !== undefined && mobileScopeSvg.setPointerCapture) {
+    mobileScopeSvg.setPointerCapture(evt.pointerId);
+  }
+}
+
+function endScopePointer(evt) {
+  if (evt?.pointerId !== undefined && mobileScopeSvg.hasPointerCapture?.(evt.pointerId)) {
+    mobileScopeSvg.releasePointerCapture(evt.pointerId);
+  }
+  scopePointerActive = false;
+  scopeLockedViewBox = '';
+  document.body.classList.remove(SCOPE_INTERACTING_CLASS);
+  syncMobileScope();
 }
 
 async function init() {
@@ -461,10 +482,9 @@ levelSourceSelect.addEventListener('change', () => {
 
 mobileScopeSvg.addEventListener('pointerdown', (evt) => {
   if (!mobileScopeEnabled || !input?.isTracing?.()) return;
-  scopePointerActive = true;
-  scopeLockedViewBox = mobileScopeSvg.getAttribute('viewBox') || '';
+  beginScopePointer(evt);
   handleScopeStep(evt);
-});
+}, { passive: false });
 
 mobileScopeReopenBtn.addEventListener('click', () => {
   reopenMobileScope();
@@ -497,18 +517,14 @@ document.addEventListener('pointerdown', (evt) => {
 mobileScopeSvg.addEventListener('pointermove', (evt) => {
   if (!scopePointerActive) return;
   handleScopeStep(evt);
+}, { passive: false });
+
+window.addEventListener('pointerup', (evt) => {
+  endScopePointer(evt);
 });
 
-window.addEventListener('pointerup', () => {
-  scopePointerActive = false;
-  scopeLockedViewBox = '';
-  syncMobileScope();
-});
-
-window.addEventListener('pointercancel', () => {
-  scopePointerActive = false;
-  scopeLockedViewBox = '';
-  syncMobileScope();
+window.addEventListener('pointercancel', (evt) => {
+  endScopePointer(evt);
 });
 
 init();

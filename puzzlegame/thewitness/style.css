@@ -40,6 +40,11 @@ body {
   font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
+body.scope-interacting {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .app {
   display: flex;
   flex-direction: column;
@@ -97,6 +102,8 @@ body {
   backdrop-filter: blur(12px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
   z-index: 30;
+  touch-action: none;
+  overscroll-behavior: contain;
 }
 
 .mobile-scope.scope-left {
@@ -117,6 +124,8 @@ body {
   border-radius: 10px;
   overflow: hidden;
   background: #1e242c;
+  touch-action: none;
+  overscroll-behavior: contain;
 }
 
 .mobile-scope-board {
