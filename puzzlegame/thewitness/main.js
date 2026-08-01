@@ -40,6 +40,8 @@ const solutionBtn = document.getElementById('solution-btn');
 const nextBtn = document.getElementById('next-btn');
 const statusEl = document.getElementById('status');
 const FAIL_FLASH_MS = 1400;
+const MOBILE_LAYOUT_CLASS = 'mobile-layout';
+const MOBILE_LAYOUT_BREAKPOINT = 430;
 const SCOPE_DOCK_KEY = 'insight.scopeDock';
 const SCOPE_FOLLOW_SPEED_KEY = 'insight.scopeFollowSpeed';
 const SCOPE_INTERACTING_CLASS = 'scope-interacting';
@@ -72,6 +74,8 @@ let scopeViewBoxState = null;
 let scopeTargetViewBox = null;
 let scopeFollowFrame = 0;
 const mobileScopeEnabled = window.matchMedia?.('(pointer: coarse)').matches ?? false;
+const touchLayoutCapable =
+  (navigator.maxTouchPoints ?? 0) > 0 || 'ontouchstart' in window;
 
 // Testing backdoor: index.html?level=37 jumps straight to level 37 and unlocks
 // free navigation between all levels for the session, without touching real save progress.
@@ -79,12 +83,23 @@ const debugLevelParam = new URLSearchParams(window.location.search).get('level')
 const debugLevel = debugLevelParam !== null ? parseInt(debugLevelParam, 10) : null;
 const debugMode = Number.isInteger(debugLevel);
 
+syncMobileLayoutClass();
+window.addEventListener('resize', syncMobileLayoutClass);
+
 function cloneLevel(level, collectionKey) {
   const cloned = structuredClone(level);
   cloned.collectionKey = collectionKey;
   cloned.progressKey = `${collectionKey}::${level.id}`;
   if (collectionKey === 'claude') cloned.legacyId = level.id;
   return cloned;
+}
+
+function useMobileLayout() {
+  return touchLayoutCapable && window.innerWidth <= MOBILE_LAYOUT_BREAKPOINT;
+}
+
+function syncMobileLayoutClass() {
+  document.body.classList.toggle(MOBILE_LAYOUT_CLASS, useMobileLayout());
 }
 
 async function loadCollections() {
