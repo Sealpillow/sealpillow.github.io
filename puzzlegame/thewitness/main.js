@@ -11,8 +11,18 @@ import {
   setCurrentLevelIndex,
 } from './src/save/SaveManager.js';
 
-const DESKTOP_NAV_PAGE_SIZE = 20;
-const MOBILE_NAV_PAGE_SIZE = 10;
+const LAYOUT_CONFIGS = {
+  desktop: {
+    name: 'desktop',
+    navColumns: 10,
+    navRows: 2,
+  },
+  mobile: {
+    name: 'mobile',
+    navColumns: 5,
+    navRows: 2,
+  },
+};
 const DEFAULT_COLLECTION = 'claude';
 const COLLECTION_FILES = {
   claude: './src/puzzles/claude-levels.json',
@@ -31,10 +41,9 @@ const scopeFollowSpeedInput = document.getElementById('scope-follow-speed');
 const scopeFollowSpeedNumberInput = document.getElementById('scope-follow-speed-number');
 const scopeFollowSpeedLabel = document.getElementById('scope-follow-speed-label');
 const puzzleTitle = document.getElementById('puzzle-title');
+const navPanelEl = document.querySelector('.nav-panel');
 const puzzleNav = document.getElementById('puzzle-nav');
-const levelFilterEl = document.querySelector('.level-filter');
 const levelSourceSelect = document.getElementById('level-source');
-const puzzlePagerEl = document.getElementById('puzzle-pager');
 const pagerPrev = document.getElementById('pager-prev');
 const pagerNext = document.getElementById('pager-next');
 const pagerLabel = document.getElementById('pager-label');
@@ -43,8 +52,6 @@ const solutionBtn = document.getElementById('solution-btn');
 const nextBtn = document.getElementById('next-btn');
 const statusEl = document.getElementById('status');
 const FAIL_FLASH_MS = 1400;
-const MOBILE_LAYOUT_CLASS = 'mobile-layout';
-const MOBILE_STACK_CLASS = 'mobile-stack';
 const MOBILE_LAYOUT_BREAKPOINT = 500;
 const SCOPE_DOCK_KEY = 'insight.scopeDock';
 const SCOPE_FOLLOW_SPEED_KEY = 'insight.scopeFollowSpeed';
@@ -87,7 +94,7 @@ const debugLevelParam = new URLSearchParams(window.location.search).get('level')
 const debugLevel = debugLevelParam !== null ? parseInt(debugLevelParam, 10) : null;
 const debugMode = Number.isInteger(debugLevel);
 
-syncMobileLayoutClass();
+syncLayoutMode();
 window.addEventListener('resize', handleViewportChange);
 
 function cloneLevel(level, collectionKey) {
@@ -103,29 +110,32 @@ function useMobileLayout() {
   return touchLayoutCapable && shortestViewportSide <= MOBILE_LAYOUT_BREAKPOINT;
 }
 
-function syncMobileLayoutClass() {
-  const mobileLayoutActive = useMobileLayout();
-  document.body.classList.toggle(MOBILE_LAYOUT_CLASS, mobileLayoutActive);
-  syncMobileLayoutElements(mobileLayoutActive);
+function getLayoutConfig() {
+  return useMobileLayout() ? LAYOUT_CONFIGS.mobile : LAYOUT_CONFIGS.desktop;
 }
 
-function syncMobileLayoutElements(mobileLayoutActive) {
-  puzzleNav.classList.toggle(MOBILE_STACK_CLASS, mobileLayoutActive);
-  levelFilterEl?.classList.toggle(MOBILE_STACK_CLASS, mobileLayoutActive);
-  puzzlePagerEl?.classList.toggle(MOBILE_STACK_CLASS, mobileLayoutActive);
+function navPanelWidth(columns) {
+  return `calc(${columns} * 2rem + ${columns - 1} * 0.5rem)`;
 }
 
-function getNavPageSize() {
-  return useMobileLayout() ? MOBILE_NAV_PAGE_SIZE : DESKTOP_NAV_PAGE_SIZE;
+function syncLayoutMode() {
+  const layout = getLayoutConfig();
+  document.body.dataset.layout = layout.name;
+  navPanelEl?.style.setProperty('--nav-columns', String(layout.navColumns));
+  navPanelEl?.style.setProperty('--nav-panel-width', navPanelWidth(layout.navColumns));
 }
 
 function handleViewportChange() {
-  const hadMobileLayout = document.body.classList.contains(MOBILE_LAYOUT_CLASS);
-  syncMobileLayoutClass();
-  const hasMobileLayout = document.body.classList.contains(MOBILE_LAYOUT_CLASS);
-  if (levels.length > 0 && hadMobileLayout !== hasMobileLayout) {
+  const previousLayout = document.body.dataset.layout;
+  syncLayoutMode();
+  if (levels.length > 0 && previousLayout !== document.body.dataset.layout) {
     renderPuzzleNav();
   }
+}
+
+function getNavPageSize() {
+  const layout = getLayoutConfig();
+  return layout.navRows * layout.navColumns;
 }
 
 async function loadCollections() {

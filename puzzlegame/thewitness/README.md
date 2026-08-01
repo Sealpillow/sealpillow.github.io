@@ -68,7 +68,7 @@ src/
     SaveManager.js   - localStorage read/write
 index.html
 style.css
-main.js              - wires it together: level loading, sequential unlock gating, debug level jump/reveal tools, and the mobile scope UI
+main.js              - app orchestration: level loading, sequential unlock gating, shared desktop/mobile nav layout mode, debug level jump/reveal tools, and the mobile scope UI
 ```
 
 Every mechanic's validation lives as a plain exported function (not a class) across the `engine/*.js` files above - `passesAllDots`, `satisfiesTriangles`, `satisfiesRegions`, `satisfiesStars`, `includesRequiredEdges` (all in `Validator.js`), plus `satisfiesSymmetry`, `satisfiesEliminators`, and `satisfiesPolyominoes` in their own modules. Each returns a plain `true`/`false`; `validateSolution` ANDs every applicable one together.
