@@ -11,7 +11,8 @@ import {
   setCurrentLevelIndex,
 } from './src/save/SaveManager.js';
 
-const NAV_PAGE_SIZE = 20;
+const DESKTOP_NAV_PAGE_SIZE = 20;
+const MOBILE_NAV_PAGE_SIZE = 10;
 const DEFAULT_COLLECTION = 'claude';
 const COLLECTION_FILES = {
   claude: './src/puzzles/claude-levels.json',
@@ -41,7 +42,7 @@ const nextBtn = document.getElementById('next-btn');
 const statusEl = document.getElementById('status');
 const FAIL_FLASH_MS = 1400;
 const MOBILE_LAYOUT_CLASS = 'mobile-layout';
-const MOBILE_LAYOUT_BREAKPOINT = 430;
+const MOBILE_LAYOUT_BREAKPOINT = 500;
 const SCOPE_DOCK_KEY = 'insight.scopeDock';
 const SCOPE_FOLLOW_SPEED_KEY = 'insight.scopeFollowSpeed';
 const SCOPE_INTERACTING_CLASS = 'scope-interacting';
@@ -84,7 +85,7 @@ const debugLevel = debugLevelParam !== null ? parseInt(debugLevelParam, 10) : nu
 const debugMode = Number.isInteger(debugLevel);
 
 syncMobileLayoutClass();
-window.addEventListener('resize', syncMobileLayoutClass);
+window.addEventListener('resize', handleViewportChange);
 
 function cloneLevel(level, collectionKey) {
   const cloned = structuredClone(level);
@@ -95,11 +96,25 @@ function cloneLevel(level, collectionKey) {
 }
 
 function useMobileLayout() {
-  return touchLayoutCapable && window.innerWidth <= MOBILE_LAYOUT_BREAKPOINT;
+  const shortestViewportSide = Math.min(window.innerWidth, window.innerHeight);
+  return touchLayoutCapable && shortestViewportSide <= MOBILE_LAYOUT_BREAKPOINT;
 }
 
 function syncMobileLayoutClass() {
   document.body.classList.toggle(MOBILE_LAYOUT_CLASS, useMobileLayout());
+}
+
+function getNavPageSize() {
+  return useMobileLayout() ? MOBILE_NAV_PAGE_SIZE : DESKTOP_NAV_PAGE_SIZE;
+}
+
+function handleViewportChange() {
+  const hadMobileLayout = document.body.classList.contains(MOBILE_LAYOUT_CLASS);
+  syncMobileLayoutClass();
+  const hasMobileLayout = document.body.classList.contains(MOBILE_LAYOUT_CLASS);
+  if (levels.length > 0 && hadMobileLayout !== hasMobileLayout) {
+    renderPuzzleNav();
+  }
 }
 
 async function loadCollections() {
@@ -572,7 +587,7 @@ nextBtn.addEventListener('click', () => {
 });
 
 function renderPuzzleNav() {
-  renderPuzzleNavPage(Math.floor(currentIndex / NAV_PAGE_SIZE));
+  renderPuzzleNavPage(Math.floor(currentIndex / getNavPageSize()));
 }
 
 function renderPuzzleNavPage(page) {
@@ -581,10 +596,11 @@ function renderPuzzleNavPage(page) {
     return;
   }
 
-  const pageCount = Math.ceil(levels.length / NAV_PAGE_SIZE);
+  const pageSize = getNavPageSize();
+  const pageCount = Math.ceil(levels.length / pageSize);
   navPage = Math.max(0, Math.min(page, pageCount - 1));
-  const start = navPage * NAV_PAGE_SIZE;
-  const end = Math.min(start + NAV_PAGE_SIZE, levels.length);
+  const start = navPage * pageSize;
+  const end = Math.min(start + pageSize, levels.length);
 
   puzzleNav.innerHTML = '';
   for (let i = start; i < end; i++) {
