@@ -98,7 +98,7 @@ Never hand-derive a puzzle's difficulty or trust "at least one solution exists."
 
 After authoring a batch (a tier, or any meaningful chunk), re-run the full solve-count regression across every level authored *so far*, not just the new ones - this catches cross-level mistakes early. Once a full session's changes are done, regression-solve every touched collection and drive it through the real UI end-to-end (sequential unlock gating from level 1, every level solved via simulated input, no mechanic-name leak anywhere in the page text, zero console errors) before considering the work finished.
 
-Verification reminder: if the session touched input or HUD behavior, also sanity-check the mobile thumb-scope flow: appears on path start, can be dismissed/reopened cleanly, softly follows the path while dragging, does not scroll the page during an active scope swipe, preserves the chosen follow-speed setting, rewinds cleanly when the player taps an earlier visited node, and respects left/right-hand placement from the settings cog.
+Verification reminder: if the session touched input or HUD behavior, also sanity-check the mobile thumb-scope flow: appears on path start, can be dismissed/reopened cleanly, softly follows the path while dragging, does not scroll the page during an active scope swipe, preserves the chosen follow-speed setting, rewinds cleanly when the player taps an earlier visited node, respects left/right-hand placement from the settings cog, and keeps the level-navigation grid stable on narrow screens without accidental tap-triggered browser zoom.
 
 ## 6. Core techniques
 

@@ -11,7 +11,7 @@ import {
   setCurrentLevelIndex,
 } from './src/save/SaveManager.js';
 
-const NAV_PAGE_SIZE = 24;
+const NAV_PAGE_SIZE = 20;
 const DEFAULT_COLLECTION = 'claude';
 const COLLECTION_FILES = {
   claude: './src/puzzles/claude-levels.json',
@@ -49,6 +49,8 @@ const SCOPE_FOLLOW_SPEED_MAX = 100;
 const SCOPE_FOLLOW_SPEED_DEFAULT = 50;
 const SCOPE_FOLLOW_EASE_MIN = 0.08;
 const SCOPE_FOLLOW_EASE_MAX = 0.28;
+const SCOPE_VIEWBOX_MIN_SPAN = 180;
+const SCOPE_VIEWBOX_MAX_SPAN = 260;
 
 let navPage = 0;
 let collections = {};
@@ -313,7 +315,11 @@ function reopenMobileScope() {
 
 function scopeViewBoxFor(node) {
   const center = grid.nodeToPoint(node);
-  const span = grid.cellSize * 2.75;
+  const span = clamp(
+    grid.cellSize * 2.75,
+    SCOPE_VIEWBOX_MIN_SPAN,
+    SCOPE_VIEWBOX_MAX_SPAN
+  );
   const min = 0;
   const max = grid.svgSize - span;
   const x = Math.max(min, Math.min(center.x - span / 2, max));

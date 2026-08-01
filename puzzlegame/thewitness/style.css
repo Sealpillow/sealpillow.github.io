@@ -526,6 +526,10 @@ body.scope-interacting {
   color: var(--path-success);
 }
 
+.status:empty {
+  min-height: 0.35rem;
+}
+
 .controls {
   display: flex;
   gap: 0.75rem;
@@ -568,6 +572,7 @@ button {
   padding: 0.5rem 1.25rem;
   font-size: 0.9rem;
   cursor: pointer;
+  touch-action: manipulation;
   transition: background 0.2s ease, opacity 0.2s ease;
 }
 
@@ -587,6 +592,7 @@ button:disabled {
   justify-content: center;
   width: 100%;
   max-width: 480px;
+  touch-action: manipulation;
 }
 
 .puzzle-pager {
@@ -635,5 +641,35 @@ button:disabled {
   .scope-settings-btn,
   .scope-settings-panel {
     display: none;
+  }
+}
+
+@media (max-width: 430px) {
+  .app {
+    gap: 0.85rem;
+  }
+
+  .puzzle-nav {
+    grid-template-columns: repeat(5, 2rem);
+    width: auto;
+    max-width: none;
+  }
+
+  .puzzle-pager {
+    margin-top: 0.25rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .level-filter select,
+  .nav-dot,
+  .puzzle-pager button {
+    font-size: 16px;
+  }
+
+  .level-filter select,
+  .puzzle-pager,
+  .puzzle-pager button {
+    touch-action: manipulation;
   }
 }

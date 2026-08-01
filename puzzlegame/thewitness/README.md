@@ -33,7 +33,7 @@ Then open the printed local address (e.g. `http://localhost:8000`) in your brows
 
 Drag from the glowing start node to an exit tick on the border to solve each puzzle - or click once to arm the line and trace it by moving the mouse without holding the button down, then click again to submit; a classic click-and-drag still works too. Progress is saved locally (`localStorage`).
 
-On touch devices, starting a path also opens a small thumb-scope panel for easier tracing. The scope mirrors the current puzzle area and softly follows the path tip while you drag, making longer thumb-only tracing easier than dragging directly across the whole board. You can tap outside it to dismiss it, reopen it with the small `Scope` button, and use the top-left cog to switch the scope between right-hand and left-hand placement as well as tune the scope follow speed with a slider or exact numeric input. While your thumb is actively swiping inside the scope, that gesture is captured for path control rather than scrolling the page. In mobile tracing mode, tapping an earlier node already on the current path rewinds the path directly back to that point instead of forcing one-step-at-a-time undo.
+On touch devices, starting a path also opens a small thumb-scope panel for easier tracing. The scope mirrors the current puzzle area and softly follows the path tip while you drag, making longer thumb-only tracing easier than dragging directly across the whole board. You can tap outside it to dismiss it, reopen it with the small `Scope` button, and use the top-left cog to switch the scope between right-hand and left-hand placement as well as tune the scope follow speed with a slider or exact numeric input. While your thumb is actively swiping inside the scope, that gesture is captured for path control rather than scrolling the page. In mobile tracing mode, tapping an earlier node already on the current path rewinds the path directly back to that point instead of forcing one-step-at-a-time undo. The level navigation is also compacted on narrow screens into a stable 5-by-4 page of 20 levels so touch selection stays tighter and avoids accidental browser zooming.
 
 ### Testing
 
@@ -206,7 +206,7 @@ The full step-by-step design loop, exact per-tier numeric targets, named techniq
 ### Current collections
 
 - `src/puzzles/claude-levels.json` - 120 levels, longer teaching blocks, gentler early ramp.
-- `src/puzzles/chatgpt-levels.json` - 150 levels, shorter intros, earlier combination play, steeper late ramp.
+- `src/puzzles/chatgpt-levels.json` - 160 levels, shorter intros, earlier combination play, steeper late ramp.
 - `src/puzzles/levels.json` - the older 134-level single-campaign source kept as legacy reference material.
 
 The important rule is that Claude and ChatGPT collections do **not** have different mechanic rules. They share the same engine, the same validation, the same symbol meanings, and the same authoring constraints. The difference is only in collection structure, pacing, ordering, and generation style.
@@ -240,7 +240,7 @@ None of these are built. All could work without a backend, storing data locally 
 
 Desktop tracing, debug solution reveal, and the mobile thumb-scope control are all live in the current build, including soft-follow camera movement, adjustable follow speed, left/right-hand placement, dismiss/reopen behavior, tap-to-rewind on visited nodes, and swipe capture that suppresses page scrolling while the scope is being dragged.
 
-All 9 mechanics are implemented and playable across multiple collections. The current shipped collections are a 120-level Claude set and a 150-level ChatGPT set, both using the same rule system but different pacing philosophies. No audio, level editor, hint system, or daily puzzle yet - see Possible future additions above.
+All 9 mechanics are implemented and playable across multiple collections. The current shipped collections are a 120-level Claude set and a 160-level ChatGPT set, both using the same rule system but different pacing philosophies. No audio, level editor, hint system, or daily puzzle yet - see Possible future additions above.
 
 ## Further reading
 
