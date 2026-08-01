@@ -645,18 +645,54 @@ button:disabled {
 }
 
 @media (max-width: 430px) {
+  :root {
+    --mobile-nav-width: 14rem;
+  }
+
   .app {
     gap: 0.85rem;
   }
 
+  .controls,
+  .level-filter {
+    width: var(--mobile-nav-width);
+  }
+
+  .controls {
+    justify-content: space-between;
+  }
+
+  .controls button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .level-filter {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.75rem;
+  }
+
   .puzzle-nav {
     grid-template-columns: repeat(5, 2rem);
-    width: auto;
-    max-width: none;
+    width: var(--mobile-nav-width);
+    max-width: var(--mobile-nav-width);
   }
 
   .puzzle-pager {
+    width: var(--mobile-nav-width);
+    justify-content: space-between;
     margin-top: 0.25rem;
+  }
+
+  .puzzle-pager span {
+    flex: 1 1 auto;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 0.8rem;
   }
 }
 
@@ -664,7 +700,7 @@ button:disabled {
   .level-filter select,
   .nav-dot,
   .puzzle-pager button {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .level-filter select,
