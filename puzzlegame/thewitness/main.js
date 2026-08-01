@@ -32,7 +32,9 @@ const scopeFollowSpeedNumberInput = document.getElementById('scope-follow-speed-
 const scopeFollowSpeedLabel = document.getElementById('scope-follow-speed-label');
 const puzzleTitle = document.getElementById('puzzle-title');
 const puzzleNav = document.getElementById('puzzle-nav');
+const levelFilterEl = document.querySelector('.level-filter');
 const levelSourceSelect = document.getElementById('level-source');
+const puzzlePagerEl = document.getElementById('puzzle-pager');
 const pagerPrev = document.getElementById('pager-prev');
 const pagerNext = document.getElementById('pager-next');
 const pagerLabel = document.getElementById('pager-label');
@@ -42,6 +44,7 @@ const nextBtn = document.getElementById('next-btn');
 const statusEl = document.getElementById('status');
 const FAIL_FLASH_MS = 1400;
 const MOBILE_LAYOUT_CLASS = 'mobile-layout';
+const MOBILE_STACK_CLASS = 'mobile-stack';
 const MOBILE_LAYOUT_BREAKPOINT = 500;
 const SCOPE_DOCK_KEY = 'insight.scopeDock';
 const SCOPE_FOLLOW_SPEED_KEY = 'insight.scopeFollowSpeed';
@@ -101,7 +104,15 @@ function useMobileLayout() {
 }
 
 function syncMobileLayoutClass() {
-  document.body.classList.toggle(MOBILE_LAYOUT_CLASS, useMobileLayout());
+  const mobileLayoutActive = useMobileLayout();
+  document.body.classList.toggle(MOBILE_LAYOUT_CLASS, mobileLayoutActive);
+  syncMobileLayoutElements(mobileLayoutActive);
+}
+
+function syncMobileLayoutElements(mobileLayoutActive) {
+  puzzleNav.classList.toggle(MOBILE_STACK_CLASS, mobileLayoutActive);
+  levelFilterEl?.classList.toggle(MOBILE_STACK_CLASS, mobileLayoutActive);
+  puzzlePagerEl?.classList.toggle(MOBILE_STACK_CLASS, mobileLayoutActive);
 }
 
 function getNavPageSize() {

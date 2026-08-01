@@ -587,11 +587,12 @@ button:disabled {
 
 .puzzle-nav {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 2rem);
+  grid-template-columns: repeat(10, 2rem);
+  grid-auto-flow: row;
   gap: 0.5rem;
   justify-content: center;
-  width: 100%;
-  max-width: 480px;
+  width: calc(10 * 2rem + 9 * 0.5rem);
+  max-width: min(100%, 480px);
   touch-action: manipulation;
 }
 
@@ -645,7 +646,7 @@ button:disabled {
 }
 
 body.mobile-layout {
-  --mobile-nav-width: 14rem;
+  --mobile-stack-width: 14rem;
   min-height: 100vh;
   min-height: 100dvh;
   height: 100dvh;
@@ -669,12 +670,9 @@ body.mobile-layout .app {
   -webkit-overflow-scrolling: touch;
 }
 
-body.mobile-layout .controls,
-body.mobile-layout .level-filter {
-  width: var(--mobile-nav-width);
-}
-
 body.mobile-layout .controls {
+  width: 100%;
+  max-width: 480px;
   justify-content: space-between;
 }
 
@@ -685,26 +683,29 @@ body.mobile-layout .controls button {
   padding-right: 0.5rem;
 }
 
-body.mobile-layout .level-filter {
+body.mobile-layout .level-filter.mobile-stack {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 0.75rem;
+  width: var(--mobile-stack-width);
+  max-width: var(--mobile-stack-width);
 }
 
-body.mobile-layout .puzzle-nav {
+body.mobile-layout .puzzle-nav.mobile-stack {
   grid-template-columns: repeat(5, 2rem);
-  width: var(--mobile-nav-width);
-  max-width: var(--mobile-nav-width);
+  width: var(--mobile-stack-width);
+  max-width: var(--mobile-stack-width);
 }
 
-body.mobile-layout .puzzle-pager {
-  width: var(--mobile-nav-width);
+body.mobile-layout .puzzle-pager.mobile-stack {
+  width: var(--mobile-stack-width);
+  max-width: var(--mobile-stack-width);
   justify-content: space-between;
   margin-top: 0.25rem;
 }
 
-body.mobile-layout .puzzle-pager span {
+body.mobile-layout .puzzle-pager.mobile-stack span {
   flex: 1 1 auto;
   text-align: center;
   white-space: nowrap;
