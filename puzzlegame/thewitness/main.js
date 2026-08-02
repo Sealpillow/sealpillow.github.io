@@ -23,7 +23,7 @@ const LAYOUT_CONFIGS = {
     navRows: 2,
   },
 };
-const DEFAULT_COLLECTION = 'claude';
+const DEFAULT_COLLECTION = 'codex';
 const COLLECTION_FILES = {
   claude: './src/puzzles/claude-levels.json',
   codex: './src/puzzles/codex-levels.json',
