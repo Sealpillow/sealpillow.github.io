@@ -47,8 +47,14 @@ export class Renderer {
       triangles: new Map(),
       cellColors: new Map(),
       stars: new Map(),
+      regionSizes: new Map(),
       eliminators: new Map(),
       polyominoes: new Map(),
+      turnNodes: new Map(),
+      straightNodes: new Map(),
+      horizontalNodes: new Map(),
+      verticalNodes: new Map(),
+      cornerNodes: new Map(),
     };
     this.svg.setAttribute('viewBox', `0 0 ${this.grid.svgSize} ${this.grid.svgSize}`);
     this.drawGrid();
@@ -144,6 +150,9 @@ export class Renderer {
       this.symbolsGroup.appendChild(el);
       this.rememberSymbol('stars', `${col},${row}`, el);
     }
+    for (const [col, row, value] of this.puzzle.regionSizes || []) {
+      this.drawRegionSizeNumber(col, row, value);
+    }
     for (const [col, row] of this.puzzle.eliminators || []) {
       this.drawEliminator(col, row);
     }
@@ -178,6 +187,24 @@ export class Renderer {
     );
     this.symbolsGroup.appendChild(group);
     this.rememberSymbol('eliminators', `${col},${row}`, group);
+  }
+
+  drawRegionSizeNumber(col, row, value) {
+    const center = this.grid.cellCenter(col, row);
+    const group = svgEl('g', {
+      class: 'region-size-symbol',
+      transform: `rotate(-6 ${center.x} ${center.y})`,
+    });
+    group.appendChild(svgEl('text', {
+      x: center.x,
+      y: center.y,
+      class: 'region-size-value',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+    }));
+    group.lastChild.textContent = String(value);
+    this.symbolsGroup.appendChild(group);
+    this.rememberSymbol('regionSizes', `${col},${row}`, group);
   }
 
   // Mirrors the source game's own visual language: the icon is one solid block (its unit
@@ -261,6 +288,159 @@ export class Renderer {
       const p = this.grid.nodeToPoint(node);
       this.nodesGroup.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 6, class: 'node' }));
     }
+    for (const node of this.puzzle.turnNodes || []) {
+      this.drawTurnNode(node);
+    }
+    for (const node of this.puzzle.straightNodes || []) {
+      this.drawStraightNode(node);
+    }
+    for (const node of this.puzzle.horizontalNodes || []) {
+      this.drawHorizontalNode(node);
+    }
+    for (const node of this.puzzle.verticalNodes || []) {
+      this.drawVerticalNode(node);
+    }
+    for (const node of this.puzzle.cornerNodes || []) {
+      this.drawCornerNode(node);
+    }
+  }
+
+  drawTurnNode(node) {
+    const key = this.grid.nodeKey(node);
+    const p = this.grid.nodeToPoint(node);
+    const outer = this.grid.cellSize * 0.2;
+    const inner = this.grid.cellSize * 0.08;
+    const group = svgEl('g', { class: 'turn-node-symbol' });
+
+    const arcPaths = [
+      `M ${p.x - inner} ${p.y - outer} Q ${p.x - inner} ${p.y - inner} ${p.x - outer} ${p.y - inner}`,
+      `M ${p.x + inner} ${p.y - outer} Q ${p.x + inner} ${p.y - inner} ${p.x + outer} ${p.y - inner}`,
+      `M ${p.x - outer} ${p.y + inner} Q ${p.x - inner} ${p.y + inner} ${p.x - inner} ${p.y + outer}`,
+      `M ${p.x + outer} ${p.y + inner} Q ${p.x + inner} ${p.y + inner} ${p.x + inner} ${p.y + outer}`,
+    ];
+
+    for (const d of arcPaths) {
+      group.appendChild(svgEl('path', { d, class: 'turn-node-mark' }));
+    }
+
+    group.appendChild(svgEl('polygon', {
+      points: [
+        `${p.x},${p.y - inner}`,
+        `${p.x + inner},${p.y}`,
+        `${p.x},${p.y + inner}`,
+        `${p.x - inner},${p.y}`,
+      ].join(' '),
+      class: 'turn-node-center',
+    }));
+    this.nodesGroup.appendChild(group);
+    this.rememberSymbol('turnNodes', key, group);
+  }
+
+  drawStraightNode(node) {
+    const key = this.grid.nodeKey(node);
+    const p = this.grid.nodeToPoint(node);
+    const half = this.grid.cellSize * 0.22;
+    const group = svgEl('g', { class: 'straight-node-symbol' });
+    group.appendChild(
+      svgEl('line', {
+        x1: p.x - half,
+        y1: p.y,
+        x2: p.x + half,
+        y2: p.y,
+        class: 'straight-node-mark',
+      })
+    );
+    group.appendChild(
+      svgEl('line', {
+        x1: p.x,
+        y1: p.y - half,
+        x2: p.x,
+        y2: p.y + half,
+        class: 'straight-node-mark',
+      })
+    );
+    this.nodesGroup.appendChild(group);
+    this.rememberSymbol('straightNodes', key, group);
+  }
+
+  drawHorizontalNode(node) {
+    const key = this.grid.nodeKey(node);
+    const p = this.grid.nodeToPoint(node);
+    const span = this.grid.cellSize * 0.22;
+    const gap = this.grid.cellSize * 0.07;
+    const group = svgEl('g', { class: 'horizontal-node-symbol' });
+    group.appendChild(svgEl('line', {
+      x1: p.x - span,
+      y1: p.y - gap,
+      x2: p.x + span,
+      y2: p.y - gap,
+      class: 'axis-node-mark',
+    }));
+    group.appendChild(svgEl('line', {
+      x1: p.x - span,
+      y1: p.y + gap,
+      x2: p.x + span,
+      y2: p.y + gap,
+      class: 'axis-node-mark',
+    }));
+    this.nodesGroup.appendChild(group);
+    this.rememberSymbol('horizontalNodes', key, group);
+  }
+
+  drawVerticalNode(node) {
+    const key = this.grid.nodeKey(node);
+    const p = this.grid.nodeToPoint(node);
+    const span = this.grid.cellSize * 0.22;
+    const gap = this.grid.cellSize * 0.07;
+    const group = svgEl('g', { class: 'vertical-node-symbol' });
+    group.appendChild(svgEl('line', {
+      x1: p.x - gap,
+      y1: p.y - span,
+      x2: p.x - gap,
+      y2: p.y + span,
+      class: 'axis-node-mark',
+    }));
+    group.appendChild(svgEl('line', {
+      x1: p.x + gap,
+      y1: p.y - span,
+      x2: p.x + gap,
+      y2: p.y + span,
+      class: 'axis-node-mark',
+    }));
+    this.nodesGroup.appendChild(group);
+    this.rememberSymbol('verticalNodes', key, group);
+  }
+
+  drawCornerNode([col, row, orientation]) {
+    const key = `${col},${row}`;
+    const p = this.grid.nodeToPoint([col, row]);
+    const outerOffset = this.grid.cellSize * 0.078;
+    const outerSpan = this.grid.cellSize * 0.215;
+    const innerOffset = this.grid.cellSize * 0.055;
+    const group = svgEl('g', { class: 'corner-node-symbol' });
+    const orientationScale = {
+      ur: [1, -1],
+      ul: [-1, -1],
+      dr: [1, 1],
+      dl: [-1, 1],
+    }[orientation] || [1, 1];
+    const localGroup = svgEl('g', {
+      transform: `translate(${p.x} ${p.y}) scale(${orientationScale[0]} ${orientationScale[1]})`,
+    });
+
+    localGroup.appendChild(svgEl('path', {
+      d: `M ${-outerOffset} ${outerSpan} L ${-outerOffset} ${-outerOffset} L ${outerSpan} ${-outerOffset}`,
+      class: 'corner-node-mark',
+    }));
+    localGroup.appendChild(svgEl('path', {
+      d: `M ${innerOffset} ${outerSpan} L ${innerOffset} ${innerOffset} L ${outerSpan} ${innerOffset}`,
+      class: 'corner-node-mark',
+    }));
+
+    group.appendChild(localGroup);
+
+    this.nodesGroup.appendChild(group);
+    this.rememberSymbol('cornerNodes', key, group);
   }
 
   drawStartAndExits() {

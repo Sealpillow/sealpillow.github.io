@@ -1,5 +1,5 @@
 import { Grid } from './Grid.js';
-import { validateSolution, isEdgeBlocked } from './Validator.js';
+import { validateSolution, isEdgeBlocked, isNodeTransitionAllowed } from './Validator.js';
 import { transformNode } from './Symmetry.js';
 
 export function findSolutionPath(puzzle, maxExpansions = 400000) {
@@ -49,6 +49,7 @@ export function findSolutionPath(puzzle, maxExpansions = 400000) {
         const key = grid.nodeKey(next);
         if (seen.has(key)) continue;
         if (isEdgeBlocked(grid, puzzle, current, next)) continue;
+        if (!isNodeTransitionAllowed(grid, puzzle, path, next)) continue;
         seen.add(key);
         path.push(next);
         dfs();

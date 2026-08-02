@@ -7,10 +7,10 @@
 // - optional JSON / Markdown report output
 //
 // Examples:
-//   node scripts/verify-level.mjs src/puzzles/chatgpt-levels.json
-//   node scripts/verify-level.mjs src/puzzles/chatgpt-levels.json --mode blocked-edges
-//   node scripts/verify-level.mjs src/puzzles/chatgpt-levels.json --mode blocked-edges --only chatgpt_level_120
-//   node scripts/verify-level.mjs src/puzzles/chatgpt-levels.json --json-out out.json --md-out out.md
+//   node scripts/verify-level.mjs src/puzzles/codex-levels.json
+//   node scripts/verify-level.mjs src/puzzles/codex-levels.json --mode blocked-edges
+//   node scripts/verify-level.mjs src/puzzles/codex-levels.json --mode blocked-edges --only codex_level_120
+//   node scripts/verify-level.mjs src/puzzles/codex-levels.json --json-out out.json --md-out out.md
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { Grid } from '../src/engine/Grid.js';
@@ -26,6 +26,12 @@ const MECHANIC_FIELDS = [
   'stars',
   'eliminators',
   'polyominoes',
+  'turnNodes',
+  'straightNodes',
+  'horizontalNodes',
+  'verticalNodes',
+  'cornerNodes',
+  'regionSizes',
   'symmetry',
 ];
 
@@ -35,6 +41,18 @@ const DEFAULTS = {
   branchingCap: 1500,
   maxExpansions: 400000,
 };
+
+function activeMechanicFields(puzzle) {
+  return MECHANIC_FIELDS.filter((field) => {
+    const value = puzzle[field];
+    return !!value && (!Array.isArray(value) || value.length > 0);
+  });
+}
+
+function trailingLevelNumber(id) {
+  const match = `${id || ''}`.match(/(\d+)(?!.*\d)/);
+  return match ? parseInt(match[1], 10) : null;
+}
 
 // maxExpansions is a hard safety budget on DFS calls, independent of the solution cap - an
 // open board with few blockedEdges has an astronomically large self-avoiding-walk count long
@@ -157,6 +175,8 @@ export function verifyPuzzle(
   const branching = branchingCheck(puzzle, branchingCap, Math.max(maxExpansions, 600000));
 
   const issues = [];
+  const activeMechanics = activeMechanicFields(puzzle);
+  const nonBlockedMechanics = activeMechanics.filter((field) => field !== 'blockedEdges');
   for (const [field, result] of Object.entries(audit.perMechanic)) {
     if (result.truncated) {
       issues.push(
@@ -166,6 +186,22 @@ export function verifyPuzzle(
     } else if (result.count === baseline.count) {
       issues.push(`redundant: stripping "${field}" leaves solution count unchanged (${baseline.count})`);
     }
+  }
+
+  if ((puzzle.blockedEdges || []).length > 4) {
+    issues.push(
+      `style: blockedEdges count (${puzzle.blockedEdges.length}) exceeds the preferred 2-4 range; ` +
+        'move more of the deduction load into the other mechanics'
+    );
+  }
+
+  if ((puzzle.blockedEdges || []).length > 0 && nonBlockedMechanics.length === 0) {
+    const levelNumber = trailingLevelNumber(puzzle.id);
+    const note =
+      levelNumber !== null && levelNumber <= 20
+        ? 'keep this reserved for the earliest teaching stretch only'
+        : 'outside the early teaching stretch this makes the maze itself feel like the puzzle';
+    issues.push(`style: blockedEdges is the only active mechanic; ${note}`);
   }
 
   if ((puzzle.blockedEdges || []).length > 0 && !baseline.truncated && !branching.truncated && branching.count === baseline.count) {
@@ -320,15 +356,53 @@ function note(result) {
 function runFullVerification(puzzles, options) {
   const reports = puzzles.map((puzzle) => verifyPuzzle(puzzle, options));
   const issueCount = reports.reduce((count, report) => count + report.issues.length, 0);
+  const withBlockedEdges = puzzles.filter((puzzle) => (puzzle.blockedEdges || []).length > 0).length;
+  const blockedEdgesOnly = puzzles.filter((puzzle) => {
+    const active = activeMechanicFields(puzzle);
+    return active.length === 1 && active[0] === 'blockedEdges';
+  }).length;
+  let currentBlockedStreak = 0;
+  let longestBlockedStreak = 0;
+  for (const puzzle of puzzles) {
+    if ((puzzle.blockedEdges || []).length > 0) {
+      currentBlockedStreak++;
+      longestBlockedStreak = Math.max(longestBlockedStreak, currentBlockedStreak);
+    } else {
+      currentBlockedStreak = 0;
+    }
+  }
+  const blockedEdgesShare = puzzles.length ? withBlockedEdges / puzzles.length : 0;
+  const styleIssues = [];
+  if (blockedEdgesShare > 0.6) {
+    styleIssues.push(
+      `collection-style: blockedEdges appears in ${withBlockedEdges}/${puzzles.length} levels (${Math.round(blockedEdgesShare * 100)}%); ` +
+        'it is reading like the default board skeleton instead of one mechanic among many'
+    );
+  }
+  if (blockedEdgesOnly > 2) {
+    styleIssues.push(
+      `collection-style: ${blockedEdgesOnly} levels use blockedEdges as the only active mechanic; reserve that mostly for the earliest onboarding stretch`
+    );
+  }
+  if (longestBlockedStreak > 12) {
+    styleIssues.push(
+      `collection-style: longest consecutive blockedEdges streak is ${longestBlockedStreak} levels; consider inserting more zero-wall boards so walls stop feeling mandatory`
+    );
+  }
   return {
     mode: 'full',
     summary: {
       totalPuzzles: reports.length,
       puzzlesWithIssues: reports.filter((report) => report.issues.length > 0).length,
       totalIssues: issueCount,
+      withBlockedEdges,
+      blockedEdgesOnly,
+      blockedEdgesShare,
+      longestBlockedStreak,
+      styleIssues,
     },
     reports,
-    hasIssues: issueCount > 0,
+    hasIssues: issueCount > 0 || styleIssues.length > 0,
   };
 }
 
@@ -360,6 +434,13 @@ function printFullResult(result) {
   console.log(`Puzzles checked: ${result.summary.totalPuzzles}`);
   console.log(`Puzzles with issues: ${result.summary.puzzlesWithIssues}`);
   console.log(`Total issues: ${result.summary.totalIssues}`);
+  console.log(`With blockedEdges: ${result.summary.withBlockedEdges}`);
+  console.log(`BlockedEdges-only: ${result.summary.blockedEdgesOnly}`);
+  console.log(`BlockedEdges share: ${Math.round(result.summary.blockedEdgesShare * 100)}%`);
+  console.log(`Longest blockedEdges streak: ${result.summary.longestBlockedStreak}`);
+  for (const issue of result.summary.styleIssues) {
+    console.log(`STYLE: ${issue}`);
+  }
 
   for (const report of result.reports) {
     console.log(`\n=== ${report.id || '(no id)'} ===`);
@@ -413,8 +494,18 @@ function renderFullMarkdown(result, sourceFile) {
     `- Puzzles checked: \`${result.summary.totalPuzzles}\``,
     `- Puzzles with issues: \`${result.summary.puzzlesWithIssues}\``,
     `- Total issues: \`${result.summary.totalIssues}\``,
+    `- With blockedEdges: \`${result.summary.withBlockedEdges}\``,
+    `- BlockedEdges-only: \`${result.summary.blockedEdgesOnly}\``,
+    `- BlockedEdges share: \`${Math.round(result.summary.blockedEdgesShare * 100)}%\``,
+    `- Longest blockedEdges streak: \`${result.summary.longestBlockedStreak}\``,
     '',
   ];
+
+  if (result.summary.styleIssues.length) {
+    lines.push('Style issues:');
+    result.summary.styleIssues.forEach((issue) => lines.push(`- ${issue}`));
+    lines.push('');
+  }
 
   for (const report of result.reports) {
     lines.push(`## ${report.id || '(no id)'}`);
@@ -528,3 +619,5 @@ function main() {
 if (process.argv[1] && process.argv[1].endsWith('verify-level.mjs')) {
   main();
 }
+
+

@@ -1,7 +1,9 @@
-import { satisfiesSymmetry, transformNode } from './Symmetry.js';
 import { combinedTraveledNodes, combinedTraveledEdges, computeRegions } from './Regions.js';
 import { satisfiesEliminators, findInvalidEliminatorSymbols } from './Eliminators.js';
 import { satisfiesPolyominoes, findInvalidPolyominoCells } from './Polyominoes.js';
+import { mirrorPath, satisfiesSymmetry, transformNode } from './Symmetry.js';
+
+const nodeConstraintCache = new WeakMap();
 
 export function isEdgeBlocked(grid, puzzle, a, b) {
   const key = grid.edgeKey(a, b);
@@ -50,6 +52,230 @@ export function passesAllDots(grid, puzzle, path) {
   if (dots.length === 0) return true;
   const visited = combinedTraveledNodes(grid, puzzle, path);
   return dots.every((dot) => visited.has(grid.nodeKey(dot)));
+}
+
+function nodeBehaviorForSegment(prev, next) {
+  if (!prev || !next) return null;
+  if (prev[0] === next[0]) return 'vertical';
+  if (prev[1] === next[1]) return 'horizontal';
+  return 'turn';
+}
+
+function buildVisitedNodeBehaviors(grid, puzzle, path) {
+  const behaviors = new Map();
+  const paths = [path];
+  if (puzzle.symmetry) paths.push(mirrorPath(puzzle.symmetry, grid, path));
+
+  for (const currentPath of paths) {
+    for (let i = 1; i < currentPath.length - 1; i++) {
+      const key = grid.nodeKey(currentPath[i]);
+      const behavior = nodeBehaviorForSegment(currentPath[i - 1], currentPath[i + 1]);
+      if (behavior) behaviors.set(key, behavior);
+    }
+  }
+
+  return behaviors;
+}
+
+function directionBetween([fromCol, fromRow], [toCol, toRow]) {
+  if (toCol > fromCol) return 'right';
+  if (toCol < fromCol) return 'left';
+  if (toRow > fromRow) return 'down';
+  if (toRow < fromRow) return 'up';
+  return null;
+}
+
+function isHorizontalDirection(direction) {
+  return direction === 'left' || direction === 'right';
+}
+
+function isVerticalDirection(direction) {
+  return direction === 'up' || direction === 'down';
+}
+
+function getCornerOrientationDirections(orientation) {
+  return {
+    ur: ['up', 'right'],
+    ul: ['up', 'left'],
+    dr: ['down', 'right'],
+    dl: ['down', 'left'],
+  }[orientation] || null;
+}
+
+function getNodeConstraintMap(puzzle) {
+  let cached = nodeConstraintCache.get(puzzle);
+  if (cached) return cached;
+
+  const constraints = new Map();
+  for (const node of puzzle.turnNodes || []) {
+    constraints.set(`${node[0]},${node[1]}`, { type: 'turn' });
+  }
+  for (const node of puzzle.straightNodes || []) {
+    constraints.set(`${node[0]},${node[1]}`, { type: 'straight' });
+  }
+  for (const node of puzzle.horizontalNodes || []) {
+    constraints.set(`${node[0]},${node[1]}`, { type: 'horizontal' });
+  }
+  for (const node of puzzle.verticalNodes || []) {
+    constraints.set(`${node[0]},${node[1]}`, { type: 'vertical' });
+  }
+  for (const [col, row, orientation] of puzzle.cornerNodes || []) {
+    constraints.set(`${col},${row}`, { type: 'corner', orientation });
+  }
+
+  nodeConstraintCache.set(puzzle, constraints);
+  return constraints;
+}
+
+function getNodeConstraint(puzzle, node) {
+  return getNodeConstraintMap(puzzle).get(`${node[0]},${node[1]}`) || null;
+}
+
+function nodeDirectionsForState(prev, curr, next) {
+  const directions = [];
+  if (prev) {
+    const incoming = directionBetween(curr, prev);
+    if (incoming) directions.push(incoming);
+  }
+  if (next) {
+    const outgoing = directionBetween(curr, next);
+    if (outgoing) directions.push(outgoing);
+  }
+  return directions;
+}
+
+function nodeConstraintAllowsState(constraint, prev, curr, next) {
+  if (!constraint) return true;
+
+  const directions = nodeDirectionsForState(prev, curr, next);
+  if (directions.length === 0) return true;
+
+  switch (constraint.type) {
+    case 'horizontal':
+      if (!directions.every(isHorizontalDirection)) return false;
+      if (!prev || !next) return true;
+      return nodeBehaviorForSegment(prev, next) === 'horizontal';
+    case 'vertical':
+      if (!directions.every(isVerticalDirection)) return false;
+      if (!prev || !next) return true;
+      return nodeBehaviorForSegment(prev, next) === 'vertical';
+    case 'straight':
+      if (!prev || !next) return true;
+      return nodeBehaviorForSegment(prev, next) !== 'turn';
+    case 'turn':
+      if (!prev || !next) return true;
+      return nodeBehaviorForSegment(prev, next) === 'turn';
+    case 'corner': {
+      const required = getCornerOrientationDirections(constraint.orientation);
+      if (!required) return false;
+      if (directions.length < 2) return directions.every((direction) => required.includes(direction));
+      return cornerNodeMatches(new Set(directions), constraint.orientation);
+    }
+    default:
+      return true;
+  }
+}
+
+function mirroredNodeState(grid, symmetry, prev, curr, next) {
+  return {
+    prev: prev ? transformNode(symmetry, grid, prev) : null,
+    curr: transformNode(symmetry, grid, curr),
+    next: next ? transformNode(symmetry, grid, next) : null,
+  };
+}
+
+function isConstrainedNodeStateAllowed(grid, puzzle, prev, curr, next) {
+  return nodeConstraintAllowsState(getNodeConstraint(puzzle, curr), prev, curr, next);
+}
+
+export function isNodeTransitionAllowed(grid, puzzle, path, next) {
+  if (!path.length) return true;
+
+  const last = path[path.length - 1];
+  const prev = path.length > 1 ? path[path.length - 2] : null;
+  if (!isConstrainedNodeStateAllowed(grid, puzzle, prev, last, next)) return false;
+
+  if (!puzzle.symmetry) return true;
+
+  const mirroredLastState = mirroredNodeState(grid, puzzle.symmetry, prev, last, next);
+  if (!isConstrainedNodeStateAllowed(
+    grid,
+    puzzle,
+    mirroredLastState.prev,
+    mirroredLastState.curr,
+    mirroredLastState.next
+  )) {
+    return false;
+  }
+  return true;
+}
+
+function buildVisitedNodeDirections(grid, puzzle, path) {
+  const directions = new Map();
+  const paths = [path];
+  if (puzzle.symmetry) paths.push(mirrorPath(puzzle.symmetry, grid, path));
+
+  for (const currentPath of paths) {
+    for (let i = 1; i < currentPath.length - 1; i++) {
+      const prev = currentPath[i - 1];
+      const curr = currentPath[i];
+      const next = currentPath[i + 1];
+      const key = grid.nodeKey(curr);
+      const incoming = directionBetween(curr, prev);
+      const outgoing = directionBetween(curr, next);
+      if (!incoming || !outgoing) continue;
+      directions.set(key, new Set([incoming, outgoing]));
+    }
+  }
+
+  return directions;
+}
+
+function cornerNodeMatches(directions, orientation) {
+  if (!directions || directions.size !== 2) return false;
+  const required = getCornerOrientationDirections(orientation);
+  if (!required) return false;
+  return required.every((direction) => directions.has(direction));
+}
+
+export function satisfiesTurnNodes(grid, puzzle, path) {
+  const turnNodes = puzzle.turnNodes || [];
+  if (turnNodes.length === 0) return true;
+  const behaviors = buildVisitedNodeBehaviors(grid, puzzle, path);
+  return turnNodes.every((node) => behaviors.get(grid.nodeKey(node)) === 'turn');
+}
+
+export function satisfiesStraightNodes(grid, puzzle, path) {
+  const straightNodes = puzzle.straightNodes || [];
+  if (straightNodes.length === 0) return true;
+  const behaviors = buildVisitedNodeBehaviors(grid, puzzle, path);
+  return straightNodes.every((node) => {
+    const behavior = behaviors.get(grid.nodeKey(node));
+    return behavior === 'horizontal' || behavior === 'vertical';
+  });
+}
+
+export function satisfiesHorizontalNodes(grid, puzzle, path) {
+  const horizontalNodes = puzzle.horizontalNodes || [];
+  if (horizontalNodes.length === 0) return true;
+  const behaviors = buildVisitedNodeBehaviors(grid, puzzle, path);
+  return horizontalNodes.every((node) => behaviors.get(grid.nodeKey(node)) === 'horizontal');
+}
+
+export function satisfiesVerticalNodes(grid, puzzle, path) {
+  const verticalNodes = puzzle.verticalNodes || [];
+  if (verticalNodes.length === 0) return true;
+  const behaviors = buildVisitedNodeBehaviors(grid, puzzle, path);
+  return verticalNodes.every((node) => behaviors.get(grid.nodeKey(node)) === 'vertical');
+}
+
+export function satisfiesCornerNodes(grid, puzzle, path) {
+  const cornerNodes = puzzle.cornerNodes || [];
+  if (cornerNodes.length === 0) return true;
+  const directions = buildVisitedNodeDirections(grid, puzzle, path);
+  return cornerNodes.every(([col, row, orientation]) =>
+    cornerNodeMatches(directions.get(`${col},${row}`), orientation)
+  );
 }
 
 export function includesRequiredEdges(grid, puzzle, path) {
@@ -112,6 +338,26 @@ export function satisfiesStars(grid, puzzle, path) {
   return true;
 }
 
+export function satisfiesRegionSizes(grid, puzzle, path) {
+  const entries = puzzle.regionSizes || [];
+  if (entries.length === 0) return true;
+  const valueByCell = new Map(entries.map(([col, row, value]) => [`${col},${row}`, value]));
+
+  for (const region of computeRegions(grid, puzzle, path)) {
+    const numberedCells = region
+      .map(([col, row]) => {
+        const key = `${col},${row}`;
+        return valueByCell.has(key) ? { key, value: valueByCell.get(key) } : null;
+      })
+      .filter((entry) => entry !== null);
+    if (numberedCells.length === 0) continue;
+
+    const requiredSize = numberedCells.reduce((sum, entry) => sum + entry.value, 0);
+    if (region.length !== requiredSize) return false;
+  }
+  return true;
+}
+
 // Eliminators exempt a triangle/color/star from its normal rule, which satisfiesTriangles/
 // satisfiesRegions/satisfiesStars can't account for on their own (triangles in particular have
 // no notion of "region" at all). When a puzzle has no eliminators this is identical to running
@@ -132,8 +378,14 @@ function createFailureSet() {
     triangles: new Set(),
     cellColors: new Set(),
     stars: new Set(),
+    regionSizes: new Set(),
     eliminators: new Set(),
     polyominoes: new Set(),
+    turnNodes: new Set(),
+    straightNodes: new Set(),
+    horizontalNodes: new Set(),
+    verticalNodes: new Set(),
+    cornerNodes: new Set(),
   };
 }
 
@@ -229,6 +481,66 @@ function findInvalidStars(grid, puzzle, path, regions = computeRegions(grid, puz
   return invalid;
 }
 
+function findInvalidRegionSizes(grid, puzzle, path, regions = computeRegions(grid, puzzle, path)) {
+  const invalid = new Set();
+  const valueByCell = new Map((puzzle.regionSizes || []).map(([col, row, value]) => [`${col},${row}`, value]));
+
+  for (const region of regions) {
+    const numberedKeys = region.filter(([col, row]) => valueByCell.has(`${col},${row}`));
+    if (numberedKeys.length === 0) continue;
+
+    const requiredSize = numberedKeys.reduce((sum, [col, row]) => sum + valueByCell.get(`${col},${row}`), 0);
+    if (region.length !== requiredSize) {
+      numberedKeys.forEach(([col, row]) => invalid.add(`${col},${row}`));
+    }
+  }
+
+  return invalid;
+}
+
+function findInvalidTurnNodes(grid, puzzle, path, behaviors = buildVisitedNodeBehaviors(grid, puzzle, path)) {
+  return new Set(
+    (puzzle.turnNodes || [])
+      .filter((node) => behaviors.get(grid.nodeKey(node)) !== 'turn')
+      .map((node) => grid.nodeKey(node))
+  );
+}
+
+function findInvalidStraightNodes(grid, puzzle, path, behaviors = buildVisitedNodeBehaviors(grid, puzzle, path)) {
+  return new Set(
+    (puzzle.straightNodes || [])
+      .filter((node) => {
+        const behavior = behaviors.get(grid.nodeKey(node));
+        return behavior !== 'horizontal' && behavior !== 'vertical';
+      })
+      .map((node) => grid.nodeKey(node))
+  );
+}
+
+function findInvalidHorizontalNodes(grid, puzzle, path, behaviors = buildVisitedNodeBehaviors(grid, puzzle, path)) {
+  return new Set(
+    (puzzle.horizontalNodes || [])
+      .filter((node) => behaviors.get(grid.nodeKey(node)) !== 'horizontal')
+      .map((node) => grid.nodeKey(node))
+  );
+}
+
+function findInvalidVerticalNodes(grid, puzzle, path, behaviors = buildVisitedNodeBehaviors(grid, puzzle, path)) {
+  return new Set(
+    (puzzle.verticalNodes || [])
+      .filter((node) => behaviors.get(grid.nodeKey(node)) !== 'vertical')
+      .map((node) => grid.nodeKey(node))
+  );
+}
+
+function findInvalidCornerNodes(grid, puzzle, path, directions = buildVisitedNodeDirections(grid, puzzle, path)) {
+  return new Set(
+    (puzzle.cornerNodes || [])
+      .filter(([col, row, orientation]) => !cornerNodeMatches(directions.get(`${col},${row}`), orientation))
+      .map(([col, row]) => `${col},${row}`)
+  );
+}
+
 export function analyzeSolution(grid, puzzle, path) {
   const failures = createFailureSet();
   const validPath = isValidPath(grid, puzzle, path);
@@ -251,9 +563,22 @@ export function analyzeSolution(grid, puzzle, path) {
     failures.triangles = findInvalidTriangles(grid, puzzle, path, traveled);
     failures.cellColors = findInvalidRegionColors(grid, puzzle, path, regions);
     failures.stars = findInvalidStars(grid, puzzle, path, regions);
+    failures.regionSizes = findInvalidRegionSizes(grid, puzzle, path, regions);
+  }
+
+  if ((puzzle.eliminators || []).length > 0) {
+    const regions = computeRegions(grid, puzzle, path);
+    failures.regionSizes = findInvalidRegionSizes(grid, puzzle, path, regions);
   }
 
   failures.polyominoes = findInvalidPolyominoCells(grid, puzzle, path);
+  const nodeBehaviors = buildVisitedNodeBehaviors(grid, puzzle, path);
+  failures.turnNodes = findInvalidTurnNodes(grid, puzzle, path, nodeBehaviors);
+  failures.straightNodes = findInvalidStraightNodes(grid, puzzle, path, nodeBehaviors);
+  failures.horizontalNodes = findInvalidHorizontalNodes(grid, puzzle, path, nodeBehaviors);
+  failures.verticalNodes = findInvalidVerticalNodes(grid, puzzle, path, nodeBehaviors);
+  const nodeDirections = buildVisitedNodeDirections(grid, puzzle, path);
+  failures.cornerNodes = findInvalidCornerNodes(grid, puzzle, path, nodeDirections);
 
   const valid =
     failures.dots.size === 0 &&
@@ -261,8 +586,14 @@ export function analyzeSolution(grid, puzzle, path) {
     failures.triangles.size === 0 &&
     failures.cellColors.size === 0 &&
     failures.stars.size === 0 &&
+    failures.regionSizes.size === 0 &&
     failures.eliminators.size === 0 &&
     failures.polyominoes.size === 0 &&
+    failures.turnNodes.size === 0 &&
+    failures.straightNodes.size === 0 &&
+    failures.horizontalNodes.size === 0 &&
+    failures.verticalNodes.size === 0 &&
+    failures.cornerNodes.size === 0 &&
     satisfiesSymmetry(grid, puzzle, path);
 
   return {

@@ -37,7 +37,7 @@ On touch devices, starting a path also opens a small thumb-scope panel for easie
 
 ### Testing
 
-Append `?level=N` to the URL (e.g. `http://localhost:8000/?level=37`) to jump straight to level N - it unlocks free navigation within the active collection for that session (labeled "(debug)" in the UI) without touching your real save progress.
+Append `?level=N` to the URL (e.g. `http://localhost:8000/?level=37`) to jump straight to level N - it unlocks free navigation within the active collection for that session (labeled "(debug)" in the UI) without touching your real save progress. In debug mode, the UI also exposes `Guide` and `Show Solution` helper tools.
 
 ## Tech stack & constraints
 
@@ -63,12 +63,12 @@ src/
   puzzles/
     levels.json          - original 134-level campaign source
     claude-levels.json   - Claude collection shown in the level-source dropdown
-    chatgpt-levels.json  - ChatGPT collection shown in the level-source dropdown
+    codex-levels.json  - Codex collection shown in the level-source dropdown
   save/
     SaveManager.js   - localStorage read/write
 index.html
 style.css
-main.js              - app orchestration: level loading, sequential unlock gating, shared desktop/mobile nav layout mode, debug level jump/reveal tools, and the mobile scope UI
+main.js              - app orchestration: level loading, sequential unlock gating, shared desktop/mobile nav layout mode, debug level jump/reveal/guide tools, and the mobile scope UI
 ```
 
 Every mechanic's validation lives as a plain exported function (not a class) across the `engine/*.js` files above - `passesAllDots`, `satisfiesTriangles`, `satisfiesRegions`, `satisfiesStars`, `includesRequiredEdges` (all in `Validator.js`), plus `satisfiesSymmetry`, `satisfiesEliminators`, and `satisfiesPolyominoes` in their own modules. Each returns a plain `true`/`false`; `validateSolution` ANDs every applicable one together.
@@ -89,7 +89,7 @@ Every puzzle collection lives in `src/puzzles/*.json`, one flat array per collec
 }
 ```
 
-The full set of possible fields: `dots`, `blockedEdges`, `requiredEdges`, `triangles`, `cellColors`, `stars`, `eliminators`, `polyominoes`, and a `symmetry` string (currently only `"rotational"`). A polyomino entry is `[col, row, shapeName, rotationSteps, rotatable]` - see the Polyominoes note below.
+The full set of possible fields: `dots`, `blockedEdges`, `requiredEdges`, `triangles`, `cellColors`, `stars`, `eliminators`, `polyominoes`, `regionSizes`, and a `symmetry` string (currently only `"rotational"`). A polyomino entry is `[col, row, shapeName, rotationSteps, rotatable]`; a region-size entry is `[col, row, value]` - see the notes below.
 
 ## Engine internals
 
@@ -118,7 +118,7 @@ The full set of possible fields: `dots`, `blockedEdges`, `requiredEdges`, `trian
 
 ## Mechanics
 
-Nine rule types are combined across the level set (for reference here - the game itself never names them):
+The shared engine currently supports these rule types across the shipped collections (for reference here - the game itself never names them):
 
 - **Dots** - the drawn line must pass through every dot.
 - **Blocked Edges** - certain grid lines can never be crossed (shown as a broken red line); the drag input physically stops you from crossing one.
@@ -127,14 +127,20 @@ Nine rule types are combined across the level set (for reference here - the game
 - **Colored Regions** - the path must partition the grid so that same-colored cells always end up in one connected region, with no two colors sharing a region. Not limited to two colors - a region just can't mix colors.
 - **Stars** - a star must pair with exactly one other same-colored cell (another star, or a plain colored square) within its region; a region holding a star can't contain anything of a different color.
 - **Eliminators** - cancels exactly one other symbol (a triangle, colored square, star, or another eliminator) in its region; the puzzle doesn't say which one, so it's solved if *any* valid pairing leaves everything else satisfied.
-- **Polyominoes** - a region containing one or more Tetris-style piece icons must be exactly tileable by all of them at once, with no gaps or overlaps. Each piece icon is drawn as one solid block, shown one of two ways: sitting axis-aligned ("straight") means it must fit in exactly that one orientation; tilted at an angle ("slanted") means any of its rotations are allowed.
+- **Polyominoes** - a region containing one or more Tetris-style piece icons must be exactly tileable by all of them at once, with no gaps or overlaps. Each piece icon is drawn as one solid block, shown one of two ways: sitting axis-aligned ("straight") means it must fit in exactly that one orientation; tilted at an angle ("slanted") means it may be rotated to any of its valid 90-degree orientations.
+- **Turn Nodes** - if the path visits that node, it must turn there rather than pass straight through.
+- **Straight Nodes** - if the path visits that node, it must pass straight through it, either horizontally or vertically.
+- **Horizontal Nodes** - if the path visits that node, it must pass straight left-to-right through it.
+- **Vertical Nodes** - if the path visits that node, it must pass straight top-to-bottom through it.
+- **Corner Nodes** - if the path visits that node, it must form one specific L-shaped corner orientation there.
+- **Region Size Numbers** - each numbered cell adds that many cells to its region's required total. If multiple numbers appear in the same region, add them together; that region must contain exactly that many cells in any shape. Current authoring preference is to keep individual values compact, usually `2-5`, and express larger totals through multiple numbers rather than a single big value.
 - **Symmetry** - a second, mirrored path is drawn automatically alongside yours; both must be valid and the two must never touch. On a Symmetry level, your drawn path may start from either visible start point and may finish on either a listed exit or that exit's mirrored counterpart. The mirror path's nodes/edges also count toward dots/required/triangles/regions, so Symmetry can combine with the other mechanics rather than staying standalone.
 
 Most puzzles have a single exit, but a level can define more than one - either ending is a valid solution, so the player may need to plan for more than one possible finish.
 
 ## Level progression
 
-Levels are one flat, gated sequence - solving level N unlocks level N+1 (`main.js`'s `isLevelUnlocked`, based purely on which puzzle IDs are in `save.completedPuzzles`, not a separate pointer). Completed levels stay freely replayable from the level-select strip. All 9 mechanics finish teaching well before the heavy combination phases begin - no mechanic is introduced after a "finale":
+Levels are one flat, gated sequence - solving level N unlocks level N+1 (`main.js`'s `isLevelUnlocked`, based purely on which puzzle IDs are in `save.completedPuzzles`, not a separate pointer). Completed levels stay freely replayable from the level-select strip. In the legacy single-campaign structure, the original 9 core mechanics finish teaching well before the heavy combination phases begin - no mechanic is introduced after a "finale":
 
 | Levels | What's introduced |
 |---|---|
@@ -147,9 +153,9 @@ Levels are one flat, gated sequence - solving level N unlocks level N+1 (`main.j
 | 35-40 | Colored Regions, then combined with Dots, Required Edges, and Blocked Edges |
 | 41-46 | Stars |
 | 47-52 | Eliminators |
-| 53-58 | Polyominoes - all 9 mechanics now introduced |
+| 53-58 | Polyominoes - all 9 original core mechanics now introduced |
 | 59-64 | Symmetry reintroduced, combined with other mechanics |
-| 65-80 | Fresh 2-3 mechanic combinations spanning all 9 mechanics, on genuinely varied grid shapes (3x3/3x4/4x3/4x4) |
+| 65-80 | Fresh 2-3 mechanic combinations spanning all 9 original core mechanics, on genuinely varied grid shapes (3x3/3x4/4x3/4x4) |
 | 81-96 | 4-mechanic combinations on bigger boards |
 | 97-112 | Heaviest main-campaign combinations |
 | 113 | Grand finale |
@@ -157,15 +163,17 @@ Levels are one flat, gated sequence - solving level N unlocks level N+1 (`main.j
 
 See `level-creation-rulebook.md` for the mechanic-order rationale and the exact difficulty target per tier.
 
-### Current pacing guidance
+### Collection philosophy
 
-The app now supports multiple collections through a level-source dropdown. The older Claude collection keeps the longer teaching-block structure above. The newer ChatGPT collection follows these pacing rules:
+The app supports multiple collections through a level-source dropdown. Those collections do **not** define different mechanic rules; they define different pacing and ordering styles over the same shared rule system.
 
 - Both collections use the exact same engine and mechanic rules; only the authored/generated level set and pacing philosophy differ.
 - A new mechanic should usually get only `1-2` pure introduction levels.
 - Difficulty should start scaling earlier instead of waiting for a long late-game ramp.
 - Once a mechanic is introduced, it should begin combining with previously-taught rules quickly to keep the player engaged.
 - Cell-based mechanic icons must never overlap on the same cell.
+- The extended Codex block (`151-300`) is where the newer node-direction family and region-size numbers are introduced, then recombined into harder late-game boards.
+- A level may use the start or finish to frame the route, but most of the route should still be deduction-driven instead of feeling pre-drawn by node and edge constraints.
 
 ### Level design priorities
 
@@ -189,27 +197,31 @@ The practical authoring mindset is:
 5. Check whether the level belongs where it currently sits in the collection; if it reads easier than its neighbors, move or replace it.
 6. Only after the logic feels right, verify it with solve-count, redundancy, and branching checks.
 
-## How levels are actually designed and verified
+## How levels are designed and verified
 
-This part isn't obvious from playing the game, so it's worth stating explicitly: every level past the earliest teaching levels is built and checked against a real methodology, not tuned by feel.
+Every serious level is meant to be a deduction space, not just a hidden route. The board should initially support multiple believable ideas, and the symbols should collapse those ideas by logic. That means this project does **not** treat level generation as "place some symbols on a solved path and see if the validator accepts it." The reasoning standard is stricter than that.
+
+This part is not obvious from playing the game, so it is stated explicitly here: every level past the earliest teaching boards should be built and checked against a real methodology, not tuned by feel.
 
 1. **Brute-force solution counting**, not just "does at least one solution exist." A headless solver enumerates every valid path on a candidate puzzle using the real engine code, and each difficulty tier has a target ceiling (e.g. a four-mechanic level should land at <=6 solutions, not 100+).
 2. **Redundancy audit** - for every active mechanic, strip it from the puzzle and re-count. If the solution count doesn't change, that mechanic was decorative and gets repositioned to somewhere it actually rules something out.
 3. **Branching check** - strip everything except `blockedEdges` and re-count. A maze that alone already forces a near-unique path leaves nothing for the other mechanics to filter; a real puzzle needs raw branching that *collapses* to the final count, not one that starts there.
-4. **Density scales with grid size** - a bigger board needs proportionally more constraint instances, or it ends up easier despite looking more complex.
-5. **Logic over maze walls** - `blockedEdges` is the only mechanic that removes topology outright, so it's tempting to lean on it for difficulty. The standing rule is a light single cut first, then more density from the *other* mechanics, rather than a heavier wall.
+4. **Compatibility check** - a mechanic can matter against the raw maze and still be effectively constant among the candidates that survive every other rule. The real question is whether it changes the surviving candidate set.
+5. **Density scales with grid size** - a bigger board needs proportionally more meaningful constraint interaction, or it ends up easier despite looking more complex.
+6. **Logic over maze walls** - `blockedEdges` is the only mechanic that removes topology outright, so it must be used carefully. Prefer a light `2-4` edge cut and let the other mechanics do the deeper reasoning.
+7. **Walls are optional, not the default board template** - a strong collection should contain plenty of zero-wall levels. If blocked edges appear in almost every board, they stop feeling like a mechanic and start feeling like the board itself.
+8. **Directional nodes should do their own work** - if a `horizontal`, `vertical`, or oriented `corner` node already forbids certain exits, do not also block those same exits with `blockedEdges`. That duplicates information instead of creating fresh deduction space.
+9. **Start/end framing is allowed, middle-route scripting is not** - a level may frame the opening or closing approach, but the middle of the solve should still be governed by deduction.
 
 New mechanics also get unit-tested against hand-built synthetic puzzles (edge cases like "no valid target to cancel" or "piece only fits with a 180-degree rotation") before any real level uses them, and every engine change gets a full regression pass - every existing level re-verified, plus a simulated end-to-end playthrough checking unlock gating, solvability, and that no mechanic name ever leaks into the UI - before new content is added.
 
-The full step-by-step design loop, exact per-tier numeric targets, named techniques, and known hazards/hard rules live in `level-creation-rulebook.md`.
+The full reasoning standard, including what the generator is supposed to optimize for, the step-by-step design loop, exact per-tier numeric targets, constraint-design principles, and hard rules, lives in `level-creation-rulebook.md`. That file should be treated as the authoritative design document.
 
 ### Current collections
 
 - `src/puzzles/claude-levels.json` - 120 levels, longer teaching blocks, gentler early ramp.
-- `src/puzzles/chatgpt-levels.json` - 160 levels, shorter intros, earlier combination play, steeper late ramp.
+- `src/puzzles/codex-levels.json` - 300 levels, shorter intros, earlier combination play, steeper late ramp, and an extended `151-300` band for node-direction and region-size mechanics.
 - `src/puzzles/levels.json` - the older 134-level single-campaign source kept as legacy reference material.
-
-The important rule is that Claude and ChatGPT collections do **not** have different mechanic rules. They share the same engine, the same validation, the same symbol meanings, and the same authoring constraints. The difference is only in collection structure, pacing, ordering, and generation style.
 
 ## Guiding principles
 
@@ -224,7 +236,7 @@ If the answer to any of these is "no," reconsider whether it belongs in the game
 
 ## Possible future additions
 
-None of these are built. All could work without a backend, storing data locally or importing/exporting JSON:
+Some of these are not built at all; others exist only as prototypes. All could work without a backend, storing data locally or importing/exporting JSON:
 
 - Daily puzzle
 - Community level import
@@ -238,13 +250,13 @@ None of these are built. All could work without a backend, storing data locally 
 
 ## Status
 
-Desktop tracing, debug solution reveal, and the mobile thumb-scope control are all live in the current build, including soft-follow camera movement, adjustable follow speed, left/right-hand placement, dismiss/reopen behavior, tap-to-rewind on visited nodes, and swipe capture that suppresses page scrolling while the scope is being dragged.
+Desktop tracing, debug solution reveal, the debug symbol guide, and the mobile thumb-scope control are all live in the current build, including soft-follow camera movement, adjustable follow speed, left/right-hand placement, dismiss/reopen behavior, tap-to-rewind on visited nodes, and swipe capture that suppresses page scrolling while the scope is being dragged.
 
-All 9 mechanics are implemented and playable across multiple collections. The current shipped collections are a 120-level Claude set and a 160-level ChatGPT set, both using the same rule system but different pacing philosophies. No audio, level editor, hint system, or daily puzzle yet - see Possible future additions above.
+The shared engine now covers the original core mechanics plus the newer node-direction family and region-size numbers. No audio, level editor, hint system, or daily puzzle yet - see Possible future additions above.
 
 ## Further reading
 
-`level-creation-rulebook.md` - the level-creation rulebook: mechanic-introduction order and rationale, collection-specific pacing guidance, design priorities, the step-by-step design/verification loop for a single level, named techniques (Full Cut, density scaling, teaching devices), and hard rules/hazards to avoid (unsatisfiable triangle counts, Symmetry collision cases, mechanic-stacking, Polyomino/blockedEdges conflicts). Read it before adding or editing a level.
+`level-creation-rulebook.md` - the authoritative level-design document for mechanic order, collection philosophy, generator intent, design reasoning, verification flow, constraint principles, and hard rules. Read it before adding or editing a level.
 
 ---
 
@@ -275,3 +287,5 @@ Think of it like connecting the dots! You must connect all the dots before to so
 
 6: Return to Main Menu <br/>
 ![image](https://user-images.githubusercontent.com/51332449/177966074-6c658477-1cf0-4a40-9dda-c85597f176d0.png) <br/>
+
+

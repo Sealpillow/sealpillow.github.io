@@ -90,16 +90,40 @@
 
     <div class="controls">
       <button id="reset-btn" type="button">Reset</button>
+      <button id="guide-btn" type="button" hidden>Guide</button>
       <button id="solution-btn" type="button" hidden>Show Solution</button>
       <button id="next-btn" type="button" disabled>Next Level</button>
     </div>
+
+    <section
+      id="debug-guide"
+      class="debug-guide"
+      hidden
+      aria-hidden="true"
+      aria-labelledby="debug-guide-title"
+    >
+      <div class="debug-guide-backdrop" aria-hidden="true"></div>
+      <div class="debug-guide-panel" role="dialog" aria-modal="true" aria-labelledby="debug-guide-title">
+        <div class="debug-guide-header">
+          <div>
+            <p class="debug-guide-kicker">Debug</p>
+            <h2 id="debug-guide-title">Symbol Guide</h2>
+          </div>
+          <button id="debug-guide-close" class="debug-guide-close" type="button" aria-label="Close guide">
+            &times;
+          </button>
+        </div>
+        <p id="debug-guide-subtitle" class="debug-guide-subtitle"></p>
+        <div id="debug-guide-content" class="debug-guide-content"></div>
+      </div>
+    </section>
 
     <section class="nav-panel" aria-label="Level navigation">
       <div class="level-filter">
         <label for="level-source">Level Type</label>
         <select id="level-source">
           <option value="claude">Claude</option>
-          <option value="chatgpt">ChatGPT</option>
+          <option value="codex">Codex</option>
         </select>
       </div>
 

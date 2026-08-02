@@ -1,4 +1,4 @@
-import { isEdgeBlocked, isValidStartNode, reachesExit } from './Validator.js';
+import { isEdgeBlocked, isNodeTransitionAllowed, isValidStartNode, reachesExit } from './Validator.js';
 
 export class InputController {
   constructor(svg, grid, { onChange, onRelease } = {}) {
@@ -119,6 +119,7 @@ export class InputController {
 
     if (!this.grid.isAdjacent(last, node)) return false;
     if (isEdgeBlocked(this.grid, this.puzzle, last, node)) return false;
+    if (!isNodeTransitionAllowed(this.grid, this.puzzle, this.path, node)) return false;
     if (this.pathContains(node)) return false;
 
     this.path.push(node);
