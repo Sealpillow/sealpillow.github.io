@@ -168,11 +168,13 @@ See `level-creation-rulebook.md` for the mechanic-order rationale and the exact 
 The app supports multiple collections through a level-source dropdown. Those collections do **not** define different mechanic rules; they define different pacing and ordering styles over the same shared rule system.
 
 - Both collections use the exact same engine and mechanic rules; only the authored/generated level set and pacing philosophy differ.
-- A new mechanic should usually get only `1-2` pure introduction levels.
-- Difficulty should start scaling earlier instead of waiting for a long late-game ramp.
+- Codex is built with short introductions rather than long isolated teaching blocks.
+- Difficulty is meant to start scaling early instead of waiting for a long late-game ramp.
 - Once a mechanic is introduced, it should begin combining with previously-taught rules quickly to keep the player engaged.
 - Cell-based mechanic icons must never overlap on the same cell.
-- The extended Codex block (`151-300`) is where the newer node-direction family and region-size numbers are introduced, then recombined into harder late-game boards.
+- The extended Codex block (`151-300`) is built as a second progression band for the newer node-direction family and region-size numbers.
+- Within that extension, `151-162` functions as the compact introduction tier, `163-180` functions as the first bridge tier where those newer rules start mixing with older mechanics, and `181-300` carries the later combo and hard boards.
+- Later extended-band levels should usually stay in place unless a specific pacing, redundancy, or difficulty issue is observed.
 - A level may use the start or finish to frame the route, but most of the route should still be deduction-driven instead of feeling pre-drawn by node and edge constraints.
 
 ### Level design priorities
@@ -220,7 +222,7 @@ The full reasoning standard, including what the generator is supposed to optimiz
 ### Current collections
 
 - `src/puzzles/claude-levels.json` - 120 levels, longer teaching blocks, gentler early ramp.
-- `src/puzzles/codex-levels.json` - 300 levels, shorter intros, earlier combination play, steeper late ramp, and an extended `151-300` band for node-direction and region-size mechanics.
+- `src/puzzles/codex-levels.json` - 300 levels, shorter intros, earlier combination play, steeper late ramp, and an extended `151-300` band for node-direction and region-size mechanics. Within that extension, `151-162` is the compact intro tier and `163-180` is the first recombination bridge before the later combo/hard bands.
 - `src/puzzles/levels.json` - the older 134-level single-campaign source kept as legacy reference material.
 
 ## Guiding principles

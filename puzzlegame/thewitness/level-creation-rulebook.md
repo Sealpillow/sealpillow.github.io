@@ -39,6 +39,8 @@ Dots -> Blocked Edges -> Required Edges -> Symmetry -> Triangles -> Colored Regi
 
 Extended Codex continuation (`151-300`) adds: Turn Nodes -> Straight Nodes -> Horizontal Nodes -> Vertical Nodes -> Corner Nodes -> Region Size Numbers, followed by mixed late-game combinations using those newer rules together with earlier mechanics.
 
+Codex currently builds that extension as a compact second progression band rather than a long isolated teaching block. `151-162` is the introduction tier for the newer mechanics, `163-180` is the first bridge tier where they begin mixing with older mechanics, and `181-300` continues into the later combo and hard tiers. That later half is not meant to be rebuilt casually; it should usually only change when a concrete pacing, redundancy, or difficulty issue is found.
+
 Rationale, for when a new mechanic needs to be slotted in:
 - The three simple point/edge rules (Dots, Blocked Edges, Required Edges) come first - they constrain the path directly, with no indirection.
 - Symmetry comes next as a paradigm-shift breather (mirroring how the actual Witness introduces it early rather than saving it as a capstone) before the reasoning-heavy mechanics.
@@ -98,7 +100,8 @@ In practice this means a new mechanic usually gets only `1-2` pure introduction 
 The collections do **not** differ in mechanic rules. Claude and Codex share the same engine, the same validation, the same symbol meanings, and the same hard constraints. The difference is only in how the collection is paced and ordered.
 
 - **Claude collection**: longer teaching stretches, gentler onboarding, more patient early reinforcement.
-- **Codex collection**: shorter introductions, earlier combinations, earlier difficulty rise, and more aggressive replacement of soft late outliers.
+- **Codex collection**: built around shorter introductions, earlier combinations, earlier difficulty rise, and more aggressive replacement of soft late outliers.
+- **Codex extended band (`151-300`)**: built as a short introduction tier, then an early bridge tier, then later combo/hard tiers; later levels should only be revised when there is a specific observed issue rather than because the early introduction changed.
 
 ---
 

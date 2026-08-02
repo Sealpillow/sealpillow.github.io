@@ -450,145 +450,133 @@ function buildRecipes() {
   const recipes = [];
   const push = (recipe) => recipes.push(recipe);
 
-  for (let i = 0; i < 6; i++) {
+  // Levels 3-4 are already handcrafted dot introductions. Start generated intros
+  // rotating mechanics quickly so the opening does not linger on one symbol family.
+  for (let i = 0; i < 2; i++) {
     push({
       stage: 'intro',
-      family: 'dots',
-      sizes: i < 2 ? [[2, 2], [3, 2], [2, 3]] : i < 4 ? [[3, 2], [2, 3], [3, 3]] : [[3, 3], [3, 4], [4, 3]],
-      minPathEdges: i < 2 ? 3 : i < 4 ? 4 : 6,
-      cutCount: i >= 4 ? 1 : 0,
-      dotCount: i < 2 ? 1 : i < 4 ? 2 : 3,
+      family: 'blocked',
+      sizes: [[2, 2], [3, 2], [2, 3]],
+      minPathEdges: 4 + i,
+      cutCount: 1,
+      dotCount: 0,
+      requiredCount: 0,
       minCount: 1,
-      maxCount: i < 2 ? 40 : i < 4 ? 28 : 20,
+      maxCount: i === 0 ? 40 : 24,
       minMechanics: 1,
     });
   }
 
-  for (let i = 0; i < 6; i++) {
-    push({
-      stage: 'intro',
-      family: 'blocked',
-      sizes: i < 2 ? [[2, 2], [3, 2], [2, 3]] : [[3, 3], [3, 4], [4, 3]],
-      minPathEdges: i < 2 ? 4 : 6 + Math.floor(i / 2),
-      cutCount: i < 4 ? 1 : 2,
-      dotCount: i < 2 ? 0 : 1,
-      requiredCount: i >= 4 ? 1 : 0,
-      minCount: 1,
-      maxCount: i < 2 ? 40 : i < 4 ? 18 : 12,
-      minMechanics: i < 2 ? 1 : 2,
-    });
-  }
-
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 2; i++) {
     push({
       stage: 'intro',
       family: 'required',
-      sizes: i < 2 ? [[2, 2], [3, 2], [2, 3]] : [[3, 3], [3, 4], [4, 3]],
-      minPathEdges: i < 2 ? 4 : 6 + Math.floor(i / 2),
-      cutCount: i >= 4 ? 1 : 0,
-      dotCount: i < 3 ? 0 : 1,
-      requiredCount: i < 2 ? 1 : 2,
+      sizes: [[2, 2], [3, 2], [2, 3]],
+      minPathEdges: 4 + i,
+      cutCount: 0,
+      dotCount: 0,
+      requiredCount: i === 0 ? 1 : 2,
       minCount: 1,
-      maxCount: i < 2 ? 40 : i < 4 ? 18 : 12,
-      minMechanics: i < 3 ? 1 : 2,
+      maxCount: i === 0 ? 40 : 24,
+      minMechanics: 1,
     });
   }
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 2; i++) {
     push({
       stage: 'intro',
       family: 'symmetry',
       symmetry: true,
       sizes: [[3, 3], [3, 4], [4, 3]],
       minPathEdges: 5 + i,
-      dotCount: i < 2 ? 1 : 2,
-      triangleCount: i >= 2 ? 1 : 0,
+      dotCount: 1 + i,
+      triangleCount: 0,
       minCount: 1,
-      maxCount: i < 2 ? 18 : 12,
+      maxCount: i === 0 ? 18 : 12,
       minMechanics: 1,
     });
   }
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 2; i++) {
     push({
       stage: 'intro',
       family: 'triangles',
       sizes: [[3, 3], [3, 4], [4, 3]],
-      minPathEdges: 6 + Math.floor(i / 2),
-      cutCount: i >= 4 ? 1 : 0,
-      dotCount: i < 2 ? 0 : 1,
-      triangleCount: i < 2 ? 1 : 2,
+      minPathEdges: 6 + i,
+      cutCount: 0,
+      dotCount: 0,
+      triangleCount: i === 0 ? 1 : 2,
       minCount: 1,
-      maxCount: i < 2 ? 16 : i < 4 ? 12 : 8,
-      minMechanics: i < 2 ? 1 : 2,
+      maxCount: i === 0 ? 16 : 12,
+      minMechanics: 1,
     });
   }
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 2; i++) {
     push({
       stage: 'intro',
       family: 'colors',
-      sizes: i < 2 ? [[2, 2], [3, 2], [2, 3]] : [[3, 3], [3, 4], [4, 3]],
-      minPathEdges: i < 2 ? 4 : 6 + Math.floor(i / 2),
-      cutCount: i >= 4 ? 1 : 0,
-      dotCount: i < 3 ? 0 : 1,
+      sizes: i === 0 ? [[2, 2], [3, 2], [2, 3]] : [[3, 3], [3, 4], [4, 3]],
+      minPathEdges: i === 0 ? 4 : 6,
+      cutCount: 0,
+      dotCount: 0,
       colorRegionCount: 2,
-      colorCellsPerRegion: i < 2 ? 1 : 2,
+      colorCellsPerRegion: i === 0 ? 1 : 2,
       minCount: 1,
-      maxCount: i < 2 ? 40 : i < 4 ? 18 : 12,
-      minMechanics: i < 3 ? 1 : 2,
+      maxCount: i === 0 ? 40 : 18,
+      minMechanics: 1,
     });
   }
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 2; i++) {
     push({
       stage: 'intro',
       family: 'stars',
       sizes: [[3, 3], [3, 4], [4, 3]],
-      minPathEdges: 7 + Math.floor(i / 2),
-      cutCount: i >= 4 ? 1 : 0,
-      dotCount: i < 2 ? 0 : 1,
-      requiredCount: i >= 3 ? 1 : 0,
+      minPathEdges: 7 + i,
+      cutCount: 0,
+      dotCount: 0,
+      requiredCount: 0,
       minCount: 1,
-      maxCount: i < 2 ? 14 : i < 4 ? 10 : 8,
+      maxCount: i === 0 ? 14 : 10,
       minMechanics: 2,
     });
   }
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 2; i++) {
     push({
       stage: 'intro',
       family: 'eliminators',
       sizes: [[3, 3], [3, 4], [4, 3]],
-      minPathEdges: 7 + Math.floor(i / 2),
-      cutCount: i >= 4 ? 1 : 0,
-      dotCount: i < 2 ? 0 : 1,
-      requiredCount: i >= 3 ? 1 : 0,
+      minPathEdges: 7 + i,
+      cutCount: 0,
+      dotCount: 0,
+      requiredCount: 0,
       minCount: 1,
-      maxCount: i < 2 ? 12 : i < 4 ? 10 : 7,
+      maxCount: i === 0 ? 12 : 10,
       minMechanics: 2,
     });
   }
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 2; i++) {
     push({
       stage: 'intro',
       family: 'poly',
       sizes: [[3, 3], [3, 4], [4, 3], [4, 4]],
-      minPathEdges: 7 + Math.floor(i / 2),
-      cutCount: i >= 4 ? 1 : 0,
-      dotCount: i < 2 ? 0 : 1,
-      requiredCount: i >= 3 ? 1 : 0,
-      colorRegionCount: i >= 4 ? 2 : 0,
+      minPathEdges: 7 + i,
+      cutCount: 0,
+      dotCount: 0,
+      requiredCount: 0,
+      colorRegionCount: 0,
       colorCellsPerRegion: 2,
       minCount: 1,
-      maxCount: i < 2 ? 12 : i < 4 ? 9 : 7,
-      minMechanics: i >= 4 ? 2 : 1,
+      maxCount: i === 0 ? 12 : 9,
+      minMechanics: 1,
     });
   }
 
   const bridgeFamilies = ['dbc', 'drt', 'rsc', 'dst', 'dbrc', 'dtre', 'dbp'];
-  for (let i = 0; i < 34; i++) {
+  for (let i = 0; i < 46; i++) {
     push({
       stage: 'bridge',
       family: bridgeFamilies[i % bridgeFamilies.length],
@@ -596,7 +584,7 @@ function buildRecipes() {
   }
 
   const comboFamilies = ['heavy', 'grand', 'architect', 'drt', 'rsc', 'dbp'];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 42; i++) {
     push({
       stage: 'combo',
       family: comboFamilies[i % comboFamilies.length],
@@ -604,7 +592,7 @@ function buildRecipes() {
   }
 
   const hardFamilies = ['heavy', 'grand', 'architect', 'dtre', 'dbp'];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 42; i++) {
     push({
       stage: 'hard',
       family: hardFamilies[i % hardFamilies.length],
