@@ -934,7 +934,7 @@ function loadLevel(index) {
   }`;
   statusEl.textContent = alreadySolved ? 'Solved' : '';
   setGuideButtonState({ hidden: !debugMode, disabled: false, text: 'Guide' });
-  setSolutionButtonState({ hidden: !debugMode, disabled: false, text: 'Show Solution' });
+  setSolutionButtonState({ hidden: !debugMode, disabled: false, text: 'Show Sol.' });
   nextBtn.disabled = !alreadySolved || currentIndex >= levels.length - 1;
 
   setCurrentLevelIndex(save, currentIndex, getCurrentCollectionKey());
@@ -977,14 +977,14 @@ function showEmptyCollectionState() {
   pagerNext.disabled = true;
   hideDebugGuide();
   setGuideButtonState({ hidden: true, disabled: true, text: 'Guide' });
-  setSolutionButtonState({ hidden: true, disabled: true, text: 'Show Solution' });
+  setSolutionButtonState({ hidden: true, disabled: true, text: 'Show Sol.' });
   nextBtn.disabled = true;
 }
 
 function hideDebugSolution({ clearStatus = false } = {}) {
   if (!renderer) return;
   debugSolutionVisible = false;
-  setSolutionButtonState({ text: 'Show Solution' });
+  setSolutionButtonState({ text: 'Show Sol.' });
   renderer.drawPath([]);
   renderer.drawMirrorPath([]);
   syncMobileScope();
@@ -1021,7 +1021,7 @@ function toggleDebugSolution() {
   renderer.clearSymbolFailures();
   renderer.drawPath(solution, 'success');
   renderer.drawMirrorPath(solution, 'success');
-  setSolutionButtonState({ text: 'Hide Solution' });
+  setSolutionButtonState({ text: 'Hide Sol.' });
   statusEl.textContent = 'Solution shown (debug)';
 }
 

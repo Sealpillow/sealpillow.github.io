@@ -1253,10 +1253,10 @@ function buildHandcraftedLevels() {
   return [
     {
       id: 'codex_level_001',
-      width: 1,
-      height: 1,
-      start: [0, 1],
-      exits: [[1, 0]],
+      width: 2,
+      height: 2,
+      start: [0, 0],
+      exits: [[2, 2]],
     },
     {
       id: 'codex_level_002',

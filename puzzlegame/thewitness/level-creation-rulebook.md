@@ -108,7 +108,7 @@ The original 134-level set is organized into tiers. Use it as the reference ladd
 
 | Levels | Content | Solution-count target |
 |---|---|---|
-| 1-4 | Basic path only (grid ramps 1x1 -> 2x2 -> 3x3) | loose, no target |
+| 1-4 | Basic path only (small open boards before symbol introduction) | loose, no target |
 | 5-58 | Each of the 9 original core mechanics introduced one at a time, a full 6-level block each, combined with only what's already been taught | loose (teaching tier - mirrors the real game's own precedent) |
 | - | **All 9 original core mechanics fully introduced by level 58** | |
 | 59-64 | Symmetry reintroduced, combined with 1-2 other mechanics | ~10-20, gently tightening |
