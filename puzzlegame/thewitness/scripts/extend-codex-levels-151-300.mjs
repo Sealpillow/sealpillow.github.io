@@ -421,325 +421,172 @@ function buildRecipes() {
   const recipes = [];
   const push = (recipe) => recipes.push(recipe);
 
-  const rotate = (items, offset) => items.map((_, index) => items[(index + offset) % items.length]);
+  const nodeIntro = ['turn', 'straight', 'horizontal', 'vertical'];
+  for (const primary of nodeIntro) {
+    for (let i = 0; i < 6; i++) {
+      push({
+        band: 'intro-node',
+        primary,
+        sizes: [[3, 3], [3, 4]],
+        minEdges: 8,
+        cutCount: i < 2 ? 0 : 1,
+        dotCount: i < 4 ? 2 : 3,
+        requiredCount: i < 4 ? 2 : 3,
+        primaryCount: i < 2 ? 1 : 2,
+        maxCount: i < 2 ? 12 : i < 4 ? 10 : 8,
+        minCount: 1,
+        support: ['triangles'],
+        triangleCount: i < 2 ? 1 : 2,
+      });
+    }
+  }
 
-  const introRecipes = [
-    {
-      band: 'intro-node',
-      primary: 'turn',
-      sizes: [[3, 3], [3, 4]],
-      minEdges: 8,
-      cutCount: 0,
-      dotCount: 2,
-      requiredCount: 1,
-      primaryCount: 1,
-      maxCount: 14,
-      minCount: 1,
-      support: ['triangles'],
-      triangleCount: 1,
-    },
-    {
-      band: 'intro-node',
-      primary: 'turn',
-      sizes: [[3, 3], [3, 4], [4, 3]],
-      minEdges: 9,
-      cutCount: 0,
-      dotCount: 2,
-      requiredCount: 2,
-      primaryCount: 2,
-      maxCount: 12,
-      minCount: 1,
-      support: ['triangles', 'cellColors'],
-      triangleCount: 1,
-      colorRegionCount: 2,
-      colorCellsPerRegion: 2,
-    },
-    {
-      band: 'intro-node',
-      primary: 'straight',
-      sizes: [[3, 3], [3, 4]],
-      minEdges: 8,
-      cutCount: 0,
-      dotCount: 2,
-      requiredCount: 1,
-      primaryCount: 1,
-      maxCount: 14,
-      minCount: 1,
-      support: ['triangles'],
-      triangleCount: 1,
-    },
-    {
-      band: 'intro-node',
-      primary: 'straight',
-      sizes: [[3, 3], [3, 4], [4, 3]],
-      minEdges: 9,
-      cutCount: 0,
-      dotCount: 2,
-      requiredCount: 2,
-      primaryCount: 2,
-      maxCount: 12,
-      minCount: 1,
-      support: ['cellColors'],
-      colorRegionCount: 2,
-      colorCellsPerRegion: 2,
-    },
-    {
-      band: 'intro-node',
-      primary: 'horizontal',
-      sizes: [[3, 3], [3, 4]],
-      minEdges: 8,
-      cutCount: 0,
-      dotCount: 2,
-      requiredCount: 1,
-      primaryCount: 1,
-      maxCount: 14,
-      minCount: 1,
-      support: ['triangles'],
-      triangleCount: 1,
-    },
-    {
-      band: 'intro-node',
-      primary: 'horizontal',
-      sizes: [[3, 3], [4, 3], [4, 4]],
-      minEdges: 9,
-      cutCount: 0,
-      dotCount: 2,
-      requiredCount: 2,
-      primaryCount: 2,
-      maxCount: 12,
-      minCount: 1,
-      support: ['stars'],
-      starPairs: 1,
-    },
-    {
-      band: 'intro-node',
-      primary: 'vertical',
-      sizes: [[3, 3], [3, 4]],
-      minEdges: 8,
-      cutCount: 0,
-      dotCount: 2,
-      requiredCount: 1,
-      primaryCount: 1,
-      maxCount: 14,
-      minCount: 1,
-      support: ['triangles'],
-      triangleCount: 1,
-    },
-    {
-      band: 'intro-node',
-      primary: 'vertical',
-      sizes: [[3, 3], [4, 3], [4, 4]],
-      minEdges: 9,
-      cutCount: 0,
-      dotCount: 2,
-      requiredCount: 2,
-      primaryCount: 2,
-      maxCount: 12,
-      minCount: 1,
-      support: ['cellColors'],
-      colorRegionCount: 2,
-      colorCellsPerRegion: 2,
-    },
-    {
+  for (let i = 0; i < 6; i++) {
+    push({
       band: 'intro-corner',
       primary: 'corner',
       sizes: [[3, 4], [4, 3], [4, 4]],
       minEdges: 9,
-      cutCount: 0,
-      dotCount: 1,
-      requiredCount: 1,
-      primaryCount: 1,
-      maxCount: 18,
+      cutCount: i < 4 ? 0 : 1,
+      dotCount: i < 3 ? 1 : 2,
+      requiredCount: i < 3 ? 1 : 2,
+      primaryCount: i < 3 ? 1 : 2,
+      maxCount: i < 2 ? 20 : i < 4 ? 14 : 10,
       minCount: 1,
-      support: ['triangles'],
-      triangleCount: 1,
-    },
-    {
-      band: 'intro-corner',
-      primary: 'corner',
-      sizes: [[3, 4], [4, 3], [4, 4]],
-      minEdges: 10,
-      cutCount: 0,
-      dotCount: 2,
-      requiredCount: 2,
-      primaryCount: 2,
-      maxCount: 12,
-      minCount: 1,
-      support: ['cellColors'],
-      colorRegionCount: 2,
+      support: i >= 4 ? ['cellColors'] : i >= 2 ? ['triangles'] : [],
+      triangleCount: i >= 2 && i < 4 ? 1 : 0,
+      colorRegionCount: i >= 4 ? 2 : 0,
       colorCellsPerRegion: 2,
-    },
-    {
+    });
+  }
+
+  for (let i = 0; i < 6; i++) {
+    push({
       band: 'intro-region-size',
       primary: 'regionSizes',
       sizes: [[3, 3], [3, 4], [4, 4]],
       minEdges: 8,
-      cutCount: 0,
-      dotCount: 1,
-      requiredCount: 0,
-      regionMode: 'single',
-      maxCount: 18,
+      cutCount: i < 4 ? 0 : 1,
+      dotCount: i < 2 ? 1 : 2,
+      requiredCount: i < 2 ? 0 : i < 4 ? 1 : 2,
+      regionMode: i < 4 ? 'single' : 'sum',
+      maxCount: i < 2 ? 18 : i < 4 ? 12 : 10,
       minCount: 1,
       support: [],
-    },
-    {
-      band: 'intro-region-size',
-      primary: 'regionSizes',
-      sizes: [[3, 4], [4, 4]],
-      minEdges: 9,
-      cutCount: 0,
-      dotCount: 1,
-      requiredCount: 1,
-      regionMode: 'sum',
-      maxCount: 12,
+      colorRegionCount: 0,
+      colorCellsPerRegion: 2,
+    });
+  }
+
+  const bridgePrimaries = ['turn', 'straight', 'horizontal', 'vertical', 'corner', 'regionSizes'];
+  const bridgeSupports = [
+    ['triangles'],
+    ['cellColors'],
+    ['stars'],
+    ['triangles', 'cellColors'],
+    ['triangles', 'stars'],
+  ];
+  for (let i = 0; i < 30; i++) {
+    const primary = bridgePrimaries[i % bridgePrimaries.length];
+    push({
+      band: 'bridge',
+      primary,
+      sizes: [[4, 4], [4, 5], [5, 4]],
+      minEdges: 12,
+      cutCount: i % 6 === 0 ? 1 : 0,
+      dotCount: primary === 'regionSizes' ? 1 + (i % 2) : 2 + (i % 3 === 0 ? 1 : 0),
+      requiredCount: 1 + (i % 4 === 0 ? 1 : 0),
+      primaryCount: primary === 'regionSizes' ? 0 : 2 + (i % 2),
+      regionMode: primary === 'regionSizes' ? (i % 2 === 0 ? 'single' : 'sum') : null,
+      maxCount: 16,
       minCount: 1,
-      support: ['cellColors'],
+      support: bridgeSupports[i % bridgeSupports.length],
+      triangleCount: 1 + (i % 3 === 0 ? 1 : 0),
       colorRegionCount: 2,
       colorCellsPerRegion: 2,
-    },
-  ];
-  introRecipes.forEach(push);
-
-  const bridgeTemplates = [
-    { primary: 'turn', support: ['triangles', 'cellColors'] },
-    { primary: 'straight', support: ['cellColors'] },
-    { primary: 'horizontal', support: ['triangles', 'cellColors'], cutCount: 1 },
-    { primary: 'vertical', support: ['triangles', 'cellColors'] },
-    { primary: 'corner', support: ['triangles', 'stars'] },
-    { primary: 'regionSizes', support: ['cellColors'], regionModes: ['single', 'sum', 'mixed'] },
-    { primary: 'turn', support: ['triangles', 'cellColors'] },
-    { primary: 'straight', support: ['triangles', 'stars'] },
-    { primary: 'horizontal', support: ['triangles', 'cellColors'] },
-    { primary: 'vertical', support: ['cellColors', 'stars'] },
-    { primary: 'corner', support: ['cellColors', 'stars'] },
-    { primary: 'regionSizes', support: ['triangles', 'cellColors'], regionModes: ['sum', 'mixed', 'double-region'] },
-  ];
-  const bridgeWaves = [
-    { sizes: [[4, 4], [4, 5], [5, 4]], minEdges: 12, maxCount: 20, baseDots: 1, baseRequired: 1, basePrimary: 2, triangleCount: 1, colorRegionCount: 2, cutEvery: 0 },
-    { sizes: [[4, 4], [4, 5], [5, 4]], minEdges: 13, maxCount: 14, baseDots: 2, baseRequired: 1, basePrimary: 2, triangleCount: 2, colorRegionCount: 2, cutEvery: 4 },
-    { sizes: [[4, 4], [4, 5], [5, 4], [5, 5]], minEdges: 14, maxCount: 12, baseDots: 2, baseRequired: 2, basePrimary: 3, triangleCount: 2, colorRegionCount: 2, cutEvery: 3 },
-  ];
-  bridgeWaves.forEach((wave, waveIndex) => {
-    rotate(bridgeTemplates, waveIndex * 4).forEach((template, index) => {
-      const usesRegionSizes = template.primary === 'regionSizes';
-      push({
-        band: 'bridge',
-        primary: template.primary,
-        sizes: wave.sizes,
-        minEdges: wave.minEdges + (index % 3 === 0 ? 1 : 0),
-        cutCount: template.cutCount ?? (wave.cutEvery > 0 && index % wave.cutEvery === 0 ? 1 : 0),
-        dotCount: usesRegionSizes ? 1 + (waveIndex % 2) : wave.baseDots + (index % 5 === 0 ? 1 : 0),
-        requiredCount: wave.baseRequired + (index % 4 === 1 ? 1 : 0),
-        primaryCount: usesRegionSizes ? 0 : wave.basePrimary - (index % 4 === 2 ? 1 : 0),
-        regionMode: usesRegionSizes ? template.regionModes[waveIndex] : null,
-        maxCount: wave.maxCount,
-        minCount: 1,
-        support: template.support,
-        triangleCount: template.support.includes('triangles') ? wave.triangleCount : 0,
-        colorRegionCount: template.support.includes('cellColors') ? wave.colorRegionCount : 0,
-        colorCellsPerRegion: 2,
-        starPairs: template.support.includes('stars') ? 1 : 0,
-      });
+      starPairs: 1,
     });
-  });
+  }
 
-  const comboTemplates = [
-    { primary: 'turn', secondary: 'horizontal', support: ['triangles', 'cellColors'] },
-    { primary: 'straight', secondary: 'corner', support: ['triangles', 'cellColors'] },
-    { primary: 'horizontal', secondary: 'corner', support: ['triangles', 'stars'] },
-    { primary: 'vertical', secondary: 'turn', support: ['triangles', 'cellColors'] },
-    { primary: 'corner', secondary: 'straight', support: ['cellColors', 'stars'] },
-    { primary: 'regionSizes', secondary: 'horizontal', support: ['triangles', 'cellColors'], regionModes: ['single', 'sum', 'mixed', 'double-region'] },
-    { primary: 'turn', secondary: 'straight', support: ['triangles', 'cellColors'], cutCount: 1 },
-    { primary: 'straight', secondary: 'turn', support: ['triangles', 'cellColors'], primaryCount: 1, secondaryCount: 1, dotCount: 1, requiredCount: 0 },
-    { primary: 'vertical', secondary: 'corner', support: ['triangles', 'cellColors'] },
-    { primary: 'regionSizes', secondary: 'vertical', support: ['stars', 'cellColors'], regionModes: ['sum', 'mixed', 'double-region', 'sum'] },
-    { primary: 'horizontal', secondary: 'turn', support: ['triangles', 'cellColors'] },
-    { primary: 'corner', secondary: 'vertical', support: ['cellColors', 'stars'] },
-    { primary: 'straight', secondary: 'corner', support: ['triangles', 'stars'] },
-    { primary: 'regionSizes', secondary: 'turn', support: ['triangles', 'cellColors'], regionModes: ['single', 'mixed', 'sum', 'double-region'] },
-    { primary: 'horizontal', secondary: 'vertical', support: ['triangles', 'stars'] },
-  ];
-  const comboWaves = [
-    { sizes: [[4, 4], [4, 5], [5, 4], [5, 5]], minEdges: 13, maxCount: 14, baseDots: 1, baseRequired: 0, primaryCount: 2, secondaryCount: 1, triangleCount: 1, colorRegionCount: 2, cutEvery: 0 },
-    { sizes: [[4, 4], [4, 5], [5, 4], [5, 5]], minEdges: 14, maxCount: 12, baseDots: 1, baseRequired: 0, primaryCount: 1, secondaryCount: 1, triangleCount: 1, colorRegionCount: 2, cutEvery: 4 },
-    { sizes: [[4, 5], [5, 4], [5, 5]], minEdges: 15, maxCount: 9, baseDots: 2, baseRequired: 2, primaryCount: 2, secondaryCount: 1, triangleCount: 2, colorRegionCount: 2, cutEvery: 3 },
-    { sizes: [[4, 5], [5, 4], [5, 5]], minEdges: 16, maxCount: 8, baseDots: 2, baseRequired: 2, primaryCount: 2, secondaryCount: 2, triangleCount: 2, colorRegionCount: 3, cutEvery: 3 },
-  ];
-  comboWaves.forEach((wave, waveIndex) => {
-    rotate(comboTemplates, waveIndex * 4).forEach((template, index) => {
-      const primaryIsRegion = template.primary === 'regionSizes';
-      const secondaryIsRegion = template.secondary === 'regionSizes';
-      push({
-        band: 'combo',
-        primary: template.primary,
-        secondary: template.secondary,
-        sizes: wave.sizes,
-        minEdges: wave.minEdges + (index % 4 === 0 ? 1 : 0),
-        cutCount: template.cutCount ?? (wave.cutEvery > 0 && index % wave.cutEvery === 0 ? 1 : 0),
-        dotCount: template.dotCount ?? ((primaryIsRegion || secondaryIsRegion) ? wave.baseDots : wave.baseDots - (index % 5 === 2 ? 1 : 0)),
-        requiredCount: template.requiredCount ?? (wave.baseRequired + (index % 5 === 1 ? 1 : 0)),
-        primaryCount: primaryIsRegion ? 0 : (template.primaryCount ?? wave.primaryCount),
-        secondaryCount: secondaryIsRegion ? 0 : (template.secondaryCount ?? (wave.secondaryCount + (index % 6 === 3 ? 1 : 0))),
-        regionMode: (primaryIsRegion || secondaryIsRegion) ? template.regionModes[waveIndex] : null,
-        maxCount: wave.maxCount,
-        minCount: 1,
-        support: template.support,
-        triangleCount: template.support.includes('triangles') ? wave.triangleCount : 0,
-        colorRegionCount: template.support.includes('cellColors') ? wave.colorRegionCount : 0,
-        colorCellsPerRegion: 2,
-        starPairs: template.support.includes('stars') ? 1 : 0,
-      });
+  const comboPrimaries = ['turn', 'straight', 'horizontal', 'vertical', 'corner', 'regionSizes'];
+  for (let i = 0; i < 54; i++) {
+    const primary = comboPrimaries[i % comboPrimaries.length];
+    const secondary = comboPrimaries[(i + 2) % comboPrimaries.length];
+    const doubleNodeCombo = primary !== 'regionSizes' && secondary !== 'regionSizes';
+    push({
+      band: 'combo',
+      primary,
+      secondary,
+      sizes: [[4, 4], [4, 5], [5, 4], [5, 5]],
+      minEdges: 13,
+      cutCount: i % 2 === 0 ? 1 : 0,
+      dotCount: doubleNodeCombo ? 1 + (i % 4 === 0 ? 1 : 0) : 2 + (i % 4 === 0 ? 1 : 0),
+      requiredCount: doubleNodeCombo ? (i % 3 === 0 ? 1 : 0) : 1 + (i % 3 === 0 ? 1 : 0),
+      primaryCount: primary === 'regionSizes' ? 0 : doubleNodeCombo ? 2 : 2 + (i % 2),
+      secondaryCount: secondary === 'regionSizes' ? 0 : doubleNodeCombo ? 1 : 1 + (i % 4 === 1 ? 1 : 0),
+      regionMode:
+        primary === 'regionSizes'
+          ? (i % 3 === 0 ? 'double-region' : 'mixed')
+          : secondary === 'regionSizes'
+            ? (i % 2 === 0 ? 'single' : 'sum')
+            : null,
+      maxCount: doubleNodeCombo ? 12 : 10,
+      minCount: 1,
+      support: doubleNodeCombo
+        ? i % 3 === 0
+          ? ['triangles', 'cellColors']
+          : i % 3 === 1
+            ? ['triangles', 'stars']
+            : ['cellColors', 'stars']
+        : i % 3 === 0
+          ? ['triangles', 'cellColors']
+          : i % 3 === 1
+            ? ['stars']
+            : ['cellColors'],
+      triangleCount: doubleNodeCombo ? 2 : 1 + (i % 2),
+      colorRegionCount: doubleNodeCombo ? 2 : 2,
+      colorCellsPerRegion: 2,
+      starPairs: 1,
     });
-  });
+  }
 
-  const hardTemplates = [
-    { primary: 'turn', secondary: 'straight', support: ['triangles', 'cellColors'] },
-    { primary: 'straight', secondary: 'corner', support: ['triangles', 'stars'] },
-    { primary: 'horizontal', secondary: 'corner', support: ['cellColors', 'stars'] },
-    { primary: 'vertical', secondary: 'turn', support: ['triangles', 'cellColors'] },
-    { primary: 'corner', secondary: 'straight', support: ['triangles', 'stars'] },
-    { primary: 'regionSizes', secondary: 'horizontal', support: ['triangles', 'cellColors'], regionModes: ['sum', 'mixed', 'double-region'] },
-    { primary: 'turn', secondary: 'vertical', support: ['cellColors', 'stars'] },
-    { primary: 'straight', secondary: 'corner', support: ['triangles', 'cellColors'] },
-    { primary: 'horizontal', secondary: 'turn', support: ['triangles', 'stars'] },
-    { primary: 'regionSizes', secondary: 'vertical', support: ['triangles', 'cellColors'], regionModes: ['mixed', 'double-region', 'sum'] },
-    { primary: 'corner', secondary: 'horizontal', support: ['cellColors', 'stars'] },
-    { primary: 'vertical', secondary: 'horizontal', support: ['triangles', 'cellColors'] },
-    { primary: 'regionSizes', secondary: 'corner', support: ['triangles', 'cellColors'], regionModes: ['sum', 'double-region', 'mixed'] },
-    { primary: 'horizontal', secondary: 'vertical', support: ['triangles', 'cellColors'] },
-  ];
-  const hardWaves = [
-    { sizes: [[4, 4], [4, 5], [5, 4]], minEdges: 15, maxCount: 8, baseDots: 2, baseRequired: 2, primaryCount: 2, secondaryCount: 1, triangleCount: 2, colorRegionCount: 2, cutEvery: 4 },
-    { sizes: [[4, 5], [5, 4], [5, 5]], minEdges: 16, maxCount: 7, baseDots: 2, baseRequired: 2, primaryCount: 2, secondaryCount: 1, triangleCount: 2, colorRegionCount: 3, cutEvery: 3 },
-    { sizes: [[4, 5], [5, 4], [5, 5], [5, 6], [6, 5]], minEdges: 17, maxCount: 6, baseDots: 2, baseRequired: 2, primaryCount: 2, secondaryCount: 1, triangleCount: 2, colorRegionCount: 3, cutEvery: 3 },
-  ];
-  hardWaves.forEach((wave, waveIndex) => {
-    rotate(hardTemplates, waveIndex * 5).forEach((template, index) => {
-      const primaryIsRegion = template.primary === 'regionSizes';
-      const secondaryIsRegion = template.secondary === 'regionSizes';
-      push({
-        band: 'hard',
-        primary: template.primary,
-        secondary: template.secondary,
-        sizes: wave.sizes,
-        minEdges: wave.minEdges + (index % 4 === 0 ? 1 : 0),
-        cutCount: wave.cutEvery > 0 && index % wave.cutEvery === 0 ? 1 : 0,
-        dotCount: wave.baseDots,
-        requiredCount: wave.baseRequired + (index % 4 === 1 ? 1 : 0),
-        primaryCount: primaryIsRegion ? 0 : wave.primaryCount - (index % 5 === 2 ? 1 : 0),
-        secondaryCount: secondaryIsRegion ? 0 : wave.secondaryCount,
-        regionMode: (primaryIsRegion || secondaryIsRegion) ? template.regionModes[waveIndex] : null,
-        maxCount: wave.maxCount,
-        minCount: 1,
-        support: template.support,
-        triangleCount: template.support.includes('triangles') ? wave.triangleCount : 0,
-        colorRegionCount: template.support.includes('cellColors') ? wave.colorRegionCount : 0,
-        colorCellsPerRegion: 2,
-        starPairs: template.support.includes('stars') ? 1 : 0,
-      });
+  for (let i = 0; i < 30; i++) {
+    const primary = comboPrimaries[i % comboPrimaries.length];
+    const secondary = comboPrimaries[(i + 3) % comboPrimaries.length];
+    const usesRegionSizes = primary === 'regionSizes' || secondary === 'regionSizes';
+    const hardDoubleNodeCombo = !usesRegionSizes;
+    push({
+      band: 'hard',
+      primary,
+      secondary,
+      sizes: [[4, 4], [4, 5], [5, 4]],
+      minEdges: 14,
+      cutCount: usesRegionSizes ? (i % 6 === 0 ? 1 : 0) : i % 3 === 0 ? 1 : 0,
+      dotCount: usesRegionSizes ? 2 : 2,
+      requiredCount: usesRegionSizes ? 1 + (i % 4 === 0 ? 1 : 0) : 1 + (i % 3 === 0 ? 1 : 0),
+      primaryCount: primary === 'regionSizes' ? 0 : hardDoubleNodeCombo ? 1 : 2,
+      secondaryCount: secondary === 'regionSizes' ? 0 : 1,
+      regionMode:
+        primary === 'regionSizes'
+          ? (i % 3 === 0 ? 'sum' : 'double-region')
+          : secondary === 'regionSizes'
+            ? (i % 2 === 0 ? 'single' : 'sum')
+            : null,
+      maxCount: usesRegionSizes ? 12 : 10,
+      minCount: 1,
+      support: usesRegionSizes
+        ? ['triangles', 'cellColors']
+        : i % 3 === 0
+          ? ['triangles', 'cellColors']
+          : i % 3 === 1
+            ? ['triangles', 'stars']
+            : ['cellColors', 'stars'],
+      triangleCount: usesRegionSizes ? 2 : 2,
+      colorRegionCount: usesRegionSizes ? 2 : 3,
+      colorCellsPerRegion: 2,
+      starPairs: 1,
     });
-  });
+  }
 
   return recipes;
 }

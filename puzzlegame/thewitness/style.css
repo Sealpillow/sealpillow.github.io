@@ -98,24 +98,21 @@ body.debug-guide-open {
 }
 
 .mobile-scope {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  width: min(42vw, 12rem);
+  order: 1;
+  flex: 0 0 auto;
+  width: min(36vw, 9rem);
   padding: 0.6rem;
   border: 1px solid rgba(215, 221, 227, 0.18);
   border-radius: 14px;
   background: rgba(34, 39, 46, 0.95);
   backdrop-filter: blur(12px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
-  z-index: 30;
   touch-action: none;
   overscroll-behavior: contain;
 }
 
 .mobile-scope.scope-left {
-  left: 1rem;
-  right: auto;
+  order: -1;
 }
 
 .mobile-scope-header {
@@ -171,26 +168,6 @@ body.debug-guide-open {
   margin: 0.5rem 0 0;
   font-size: 0.72rem;
   color: var(--text-muted);
-}
-
-.mobile-scope-reopen {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 29;
-  border-radius: 999px;
-  padding: 0.25rem 0.7rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  background: rgba(34, 39, 46, 0.95);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.24);
-}
-
-.mobile-scope-reopen.scope-left {
-  left: 1rem;
-  right: auto;
 }
 
 .scope-settings-btn,
@@ -782,14 +759,26 @@ body.debug-guide-open {
   line-height: 1.45;
 }
 
+.lower-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
 .nav-panel {
   --nav-columns: 10;
   --nav-panel-width: calc(10 * 2rem + 9 * 0.5rem);
+  order: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  width: 100%;
+  flex: 0 1 auto;
+  width: var(--nav-panel-width);
+  max-width: 100%;
 }
 
 .level-filter {
@@ -938,7 +927,6 @@ button:disabled {
 
 @media (pointer: fine) {
   .mobile-scope,
-  .mobile-scope-reopen,
   .scope-settings-btn,
   .scope-settings-panel {
     display: none;

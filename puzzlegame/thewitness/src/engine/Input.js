@@ -130,6 +130,16 @@ export class InputController {
     return true;
   }
 
+  beginTraceAt(node) {
+    if (!this.puzzle || this.tracing) return false;
+    if (!isValidStartNode(this.grid, this.puzzle, node)) return false;
+
+    this.tracing = true;
+    this.path = [node];
+    this.onChange(this.path);
+    return true;
+  }
+
   handlePointerDown(evt) {
     if (!this.puzzle) return;
     // Belt-and-suspenders alongside the board's `touch-action: none` CSS: on some mobile

@@ -36,11 +36,12 @@ const COLLECTION_LABELS = {
 const svg = document.getElementById('board');
 const mobileScopeEl = document.getElementById('mobile-scope');
 const mobileScopeSvg = document.getElementById('mobile-scope-board');
-const mobileScopeReopenBtn = document.getElementById('mobile-scope-reopen');
 const scopeSettingsBtn = document.getElementById('scope-settings-btn');
 const scopeSettingsPanel = document.getElementById('scope-settings-panel');
 const scopeSideRightBtn = document.getElementById('scope-side-right');
 const scopeSideLeftBtn = document.getElementById('scope-side-left');
+const scopeViewOnBtn = document.getElementById('scope-view-on');
+const scopeViewOffBtn = document.getElementById('scope-view-off');
 const scopeFollowSpeedInput = document.getElementById('scope-follow-speed');
 const scopeFollowSpeedNumberInput = document.getElementById('scope-follow-speed-number');
 const scopeFollowSpeedLabel = document.getElementById('scope-follow-speed-label');
@@ -68,6 +69,7 @@ const DEBUG_GUIDE_OPEN_CLASS = 'debug-guide-open';
 // after the project rename from "Insight" to "The Vision".
 const SCOPE_DOCK_KEY = 'insight.scopeDock';
 const SCOPE_FOLLOW_SPEED_KEY = 'insight.scopeFollowSpeed';
+const SCOPE_VIEW_ENABLED_KEY = 'insight.scopeViewEnabled';
 const SCOPE_INTERACTING_CLASS = 'scope-interacting';
 const SCOPE_FOLLOW_SETTLE_THRESHOLD = 0.25;
 const SCOPE_FOLLOW_SPEED_MIN = 0;
@@ -92,9 +94,9 @@ let debugSolutionVisible = false;
 let debugGuideVisible = false;
 let scopePointerActive = false;
 let scopeLockedViewBox = '';
-let scopeDismissed = false;
 let scopeDock = localStorage.getItem(SCOPE_DOCK_KEY) === 'left' ? 'left' : 'right';
 let scopeFollowSpeed = parseScopeFollowSpeed(localStorage.getItem(SCOPE_FOLLOW_SPEED_KEY));
+let scopeViewEnabled = localStorage.getItem(SCOPE_VIEW_ENABLED_KEY) !== 'off';
 let scopeViewBoxState = null;
 let scopeTargetViewBox = null;
 let scopeFollowFrame = 0;
@@ -314,12 +316,20 @@ function scopeFollowSpeedText() {
   return 'Balanced';
 }
 
+function scopeViewActive() {
+  return mobileScopeEnabled && scopeViewEnabled;
+}
+
 function applyScopeDock() {
   const leftDocked = scopeDock === 'left';
   mobileScopeEl.classList.toggle('scope-left', leftDocked);
-  mobileScopeReopenBtn.classList.toggle('scope-left', leftDocked);
   scopeSideLeftBtn.classList.toggle('active', leftDocked);
   scopeSideRightBtn.classList.toggle('active', !leftDocked);
+}
+
+function applyScopeViewEnabled() {
+  scopeViewOnBtn.classList.toggle('active', scopeViewEnabled);
+  scopeViewOffBtn.classList.toggle('active', !scopeViewEnabled);
 }
 
 function applyScopeFollowSpeed() {
@@ -679,6 +689,14 @@ function setScopeFollowSpeed(nextValue) {
   applyScopeFollowSpeed();
 }
 
+function setScopeViewEnabled(nextEnabled) {
+  scopeViewEnabled = nextEnabled;
+  localStorage.setItem(SCOPE_VIEW_ENABLED_KEY, scopeViewEnabled ? 'on' : 'off');
+  applyScopeViewEnabled();
+  hideMobileScope();
+  syncMobileScope();
+}
+
 function parseViewBox(viewBox) {
   if (!viewBox) return null;
   const [x, y, width, height] = viewBox.split(/\s+/).map(Number);
@@ -779,28 +797,6 @@ function hideMobileScope() {
   scopeLockedViewBox = '';
   stopScopeViewBoxAnimation();
   document.body.classList.remove(SCOPE_INTERACTING_CLASS);
-  syncScopeReopenButton();
-}
-
-function syncScopeReopenButton(path = input?.getPath?.() || []) {
-  const shouldShow =
-    mobileScopeEnabled &&
-    scopeDismissed &&
-    input?.isTracing?.() &&
-    path.length > 0 &&
-    !debugSolutionVisible;
-  mobileScopeReopenBtn.hidden = !shouldShow;
-}
-
-function dismissMobileScope() {
-  scopeDismissed = true;
-  hideMobileScope();
-}
-
-function reopenMobileScope() {
-  if (!mobileScopeEnabled) return;
-  scopeDismissed = false;
-  syncMobileScope();
 }
 
 function scopeViewBoxFor(node) {
@@ -817,23 +813,35 @@ function scopeViewBoxFor(node) {
   return `${x} ${y} ${span} ${span}`;
 }
 
-function syncMobileScope(path = input?.getPath?.() || []) {
-  if (
-    !mobileScopeEnabled ||
-    !scopeRenderer ||
-    !input?.isTracing?.() ||
-    path.length === 0 ||
-    debugSolutionVisible ||
-    scopeDismissed
-  ) {
+function fullBoardViewBox() {
+  return `0 0 ${grid.svgSize} ${grid.svgSize}`;
+}
+
+function showScopeOverview() {
+  if (!scopeViewActive() || !scopeRenderer) {
     hideMobileScope();
+    return;
+  }
+  mobileScopeEl.hidden = false;
+  mobileScopeEl.setAttribute('aria-hidden', 'false');
+  setScopeViewBox(fullBoardViewBox(), { immediate: true });
+  scopeRenderer.drawPath([], 'drawing');
+  scopeRenderer.drawMirrorPath([], 'drawing');
+}
+
+function syncMobileScope(path = input?.getPath?.() || []) {
+  if (!scopeViewActive() || !scopeRenderer || debugSolutionVisible) {
+    hideMobileScope();
+    return;
+  }
+  if (!input?.isTracing?.() || path.length === 0) {
+    showScopeOverview();
     return;
   }
 
   const tip = path[path.length - 1];
   mobileScopeEl.hidden = false;
   mobileScopeEl.setAttribute('aria-hidden', 'false');
-  mobileScopeReopenBtn.hidden = true;
   const targetViewBox = scopeViewBoxFor(tip);
   setScopeViewBox(scopePointerActive && scopeLockedViewBox ? scopeLockedViewBox : targetViewBox, {
     immediate: !scopePointerActive,
@@ -843,19 +851,14 @@ function syncMobileScope(path = input?.getPath?.() || []) {
 }
 
 function handleScopeStep(evt) {
-  if (!mobileScopeEnabled || !input?.isTracing?.() || !grid) return;
+  if (!scopeViewActive() || !input || !grid) return;
   evt.preventDefault();
   const { node, dist } = nearestNodeFor(mobileScopeSvg, grid, evt);
   const grabRadius = grid.cellSize * 0.75;
   if (dist > grabRadius) return;
-  const changed = input.commitNode(node);
+  const changed = input.isTracing() ? input.commitNode(node) : input.beginTraceAt(node);
   if (changed) {
-    const nextPath = input.getPath();
-    if (input.isTracing()) {
-      syncMobileScope(nextPath);
-    } else {
-      hideMobileScope();
-    }
+    syncMobileScope(input.getPath());
   }
 }
 
@@ -883,6 +886,7 @@ async function init() {
   save = loadSave();
   applyScopeDock();
   applyScopeFollowSpeed();
+  applyScopeViewEnabled();
   hideScopeSettings();
   levelSourceSelect.value = DEFAULT_COLLECTION;
   setActiveCollection(DEFAULT_COLLECTION);
@@ -909,8 +913,7 @@ function loadLevel(index) {
   renderer.setPuzzle(puzzle);
   scopeRenderer = new Renderer(mobileScopeSvg, grid);
   scopeRenderer.setPuzzle(puzzle);
-  scopeDismissed = false;
-  hideMobileScope();
+  showScopeOverview();
 
   if (input) input.destroy();
   input = new InputController(svg, grid, {
@@ -944,27 +947,27 @@ function loadLevel(index) {
 function handleRelease(puzzle, path) {
   const result = analyzeSolution(grid, puzzle, path);
   if (result.valid) {
-    hideMobileScope();
     renderer.drawPath(path, 'success');
     renderer.drawMirrorPath(path, 'success');
     input.reset();
+    syncMobileScope();
     markCompleted(save, puzzle.progressKey);
     statusEl.textContent = currentIndex === levels.length - 1 ? 'All levels complete!' : 'Solved!';
     nextBtn.disabled = currentIndex >= levels.length - 1;
     renderPuzzleNav();
   } else if (path.length > 1) {
-    hideMobileScope();
     renderer.drawPath(path, 'fail');
     renderer.drawMirrorPath(path, 'fail');
     renderer.flashFailedSymbols(result.failures, FAIL_FLASH_MS);
     input.reset();
+    syncMobileScope();
     setTimeout(() => {
       renderer.drawPath([]);
       renderer.drawMirrorPath([]);
     }, FAIL_FLASH_MS);
   } else {
-    hideMobileScope();
     input.reset();
+    syncMobileScope();
   }
 }
 
@@ -988,7 +991,6 @@ function hideDebugSolution({ clearStatus = false } = {}) {
   renderer.drawPath([]);
   renderer.drawMirrorPath([]);
   syncMobileScope();
-  syncScopeReopenButton();
   if (clearStatus) {
     statusEl.textContent = '';
   } else if (levels[currentIndex]) {
@@ -1018,6 +1020,7 @@ function toggleDebugSolution() {
 
   debugSolutionVisible = true;
   input.reset();
+  hideMobileScope();
   renderer.clearSymbolFailures();
   renderer.drawPath(solution, 'success');
   renderer.drawMirrorPath(solution, 'success');
@@ -1028,12 +1031,12 @@ function toggleDebugSolution() {
 resetBtn.addEventListener('click', () => {
   if (input && renderer) {
     input.reset();
-    hideMobileScope();
     if (debugSolutionVisible) {
       hideDebugSolution({ clearStatus: true });
     } else {
       renderer.drawPath([]);
       renderer.drawMirrorPath([]);
+      syncMobileScope();
     }
     renderer.clearSymbolFailures();
   }
@@ -1106,14 +1109,10 @@ levelSourceSelect.addEventListener('change', () => {
 });
 
 mobileScopeSvg.addEventListener('pointerdown', (evt) => {
-  if (!mobileScopeEnabled || !input?.isTracing?.()) return;
+  if (!scopeViewActive() || !input) return;
   beginScopePointer(evt);
   handleScopeStep(evt);
 }, { passive: false });
-
-mobileScopeReopenBtn.addEventListener('click', () => {
-  reopenMobileScope();
-});
 
 scopeSettingsBtn.addEventListener('click', () => {
   toggleScopeSettings();
@@ -1125,6 +1124,14 @@ scopeSideRightBtn.addEventListener('click', () => {
 
 scopeSideLeftBtn.addEventListener('click', () => {
   setScopeDock('left');
+});
+
+scopeViewOnBtn.addEventListener('click', () => {
+  setScopeViewEnabled(true);
+});
+
+scopeViewOffBtn.addEventListener('click', () => {
+  setScopeViewEnabled(false);
 });
 
 scopeFollowSpeedInput.addEventListener('input', (evt) => {
@@ -1143,12 +1150,6 @@ document.addEventListener('pointerdown', (evt) => {
   if (!scopeSettingsPanel.hidden && !scopeSettingsPanel.contains(evt.target) && evt.target !== scopeSettingsBtn) {
     hideScopeSettings();
   }
-  if (!mobileScopeEnabled || mobileScopeEl.hidden) return;
-  if (mobileScopeEl.contains(evt.target)) return;
-  if (svg.contains(evt.target)) return;
-  if (evt.target === mobileScopeReopenBtn) return;
-  if (scopeSettingsPanel.contains(evt.target) || evt.target === scopeSettingsBtn) return;
-  dismissMobileScope();
 });
 
 debugGuideBackdropEl?.addEventListener('click', (evt) => {

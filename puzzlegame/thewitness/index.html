@@ -23,28 +23,16 @@
       </svg>
     </div>
 
-    <aside id="mobile-scope" class="mobile-scope" hidden aria-hidden="true">
-      <div class="mobile-scope-header">Thumb Scope</div>
-      <div class="mobile-scope-stage">
-        <svg id="mobile-scope-board" class="mobile-scope-board" viewBox="0 0 480 480">
-          <g class="grid-lines"></g>
-          <g class="symbols"></g>
-          <g class="player-path"></g>
-          <g class="mirror-path"></g>
-          <g class="nodes"></g>
-        </svg>
-        <div class="mobile-scope-reticle" aria-hidden="true"></div>
-      </div>
-      <p id="mobile-scope-hint" class="mobile-scope-hint">Drag or tap here to steer the path. The scope softly follows your path as you move.</p>
-    </aside>
-    <button id="mobile-scope-reopen" class="mobile-scope-reopen" type="button" hidden>
-      Scope
-    </button>
     <button id="scope-settings-btn" class="scope-settings-btn" type="button" aria-expanded="false" aria-label="Scope settings">
       &#9881;
     </button>
     <section id="scope-settings-panel" class="scope-settings-panel" hidden aria-hidden="true" aria-label="Scope settings">
-      <p class="scope-settings-title">Scope Position</p>
+      <p class="scope-settings-title">Scope View</p>
+      <div class="scope-settings-options">
+        <button id="scope-view-on" type="button" data-scope-view="on">On</button>
+        <button id="scope-view-off" type="button" data-scope-view="off">Off</button>
+      </div>
+      <p class="scope-settings-title scope-settings-subtitle">Scope Position</p>
       <div class="scope-settings-options">
         <button id="scope-side-right" type="button" data-scope-side="right">Right Hand</button>
         <button id="scope-side-left" type="button" data-scope-side="left">Left Hand</button>
@@ -118,22 +106,39 @@
       </div>
     </section>
 
-    <section class="nav-panel" aria-label="Level navigation">
-      <div class="level-filter">
-        <label for="level-source">Level Type</label>
-        <select id="level-source">
-          <option value="codex">Codex</option>
-          <option value="claude">Claude</option>
-        </select>
-      </div>
+    <div class="lower-panel">
+      <section class="nav-panel" aria-label="Level navigation">
+        <div class="level-filter">
+          <label for="level-source">Level Type</label>
+          <select id="level-source">
+            <option value="codex">Codex</option>
+            <option value="claude">Claude</option>
+          </select>
+        </div>
 
-      <nav id="puzzle-nav" class="puzzle-nav" aria-label="Level selection"></nav>
-      <div id="puzzle-pager" class="puzzle-pager">
-        <button id="pager-prev" type="button">&lsaquo;</button>
-        <span id="pager-label"></span>
-        <button id="pager-next" type="button">&rsaquo;</button>
-      </div>
-    </section>
+        <nav id="puzzle-nav" class="puzzle-nav" aria-label="Level selection"></nav>
+        <div id="puzzle-pager" class="puzzle-pager">
+          <button id="pager-prev" type="button">&lsaquo;</button>
+          <span id="pager-label"></span>
+          <button id="pager-next" type="button">&rsaquo;</button>
+        </div>
+      </section>
+
+      <aside id="mobile-scope" class="mobile-scope" hidden aria-hidden="true">
+        <div class="mobile-scope-header">Thumb Scope</div>
+        <div class="mobile-scope-stage">
+          <svg id="mobile-scope-board" class="mobile-scope-board" viewBox="0 0 480 480">
+            <g class="grid-lines"></g>
+            <g class="symbols"></g>
+            <g class="player-path"></g>
+            <g class="mirror-path"></g>
+            <g class="nodes"></g>
+          </svg>
+          <div class="mobile-scope-reticle" aria-hidden="true"></div>
+        </div>
+        <p id="mobile-scope-hint" class="mobile-scope-hint">Drag or tap here to steer the path. The scope softly follows your path as you move.</p>
+      </aside>
+    </div>
   </main>
 
   <script type="module" src="main.js"></script>
