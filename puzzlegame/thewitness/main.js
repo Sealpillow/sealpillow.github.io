@@ -36,6 +36,8 @@ const COLLECTION_LABELS = {
 const svg = document.getElementById('board');
 const mobileScopeEl = document.getElementById('mobile-scope');
 const mobileScopeSvg = document.getElementById('mobile-scope-board');
+const mobileScopeInfoBtn = document.getElementById('mobile-scope-info-btn');
+const mobileScopeHintEl = document.getElementById('mobile-scope-hint');
 const scopeSettingsBtn = document.getElementById('scope-settings-btn');
 const scopeSettingsPanel = document.getElementById('scope-settings-panel');
 const scopeSideRightBtn = document.getElementById('scope-side-right');
@@ -75,8 +77,8 @@ const SCOPE_FOLLOW_SETTLE_THRESHOLD = 0.25;
 const SCOPE_FOLLOW_SPEED_MIN = 0;
 const SCOPE_FOLLOW_SPEED_MAX = 100;
 const SCOPE_FOLLOW_SPEED_DEFAULT = 50;
-const SCOPE_FOLLOW_EASE_MIN = 0.08;
-const SCOPE_FOLLOW_EASE_MAX = 0.28;
+const SCOPE_FOLLOW_EASE_MIN = 0.05;
+const SCOPE_FOLLOW_EASE_MAX = 0.15;
 const SCOPE_VIEWBOX_MIN_SPAN = 180;
 const SCOPE_VIEWBOX_MAX_SPAN = 260;
 
@@ -342,6 +344,21 @@ function hideScopeSettings() {
   scopeSettingsPanel.hidden = true;
   scopeSettingsPanel.setAttribute('aria-hidden', 'true');
   scopeSettingsBtn.setAttribute('aria-expanded', 'false');
+}
+
+function hideScopeHint() {
+  mobileScopeHintEl.hidden = true;
+  mobileScopeHintEl.setAttribute('aria-hidden', 'true');
+  mobileScopeInfoBtn.setAttribute('aria-expanded', 'false');
+  mobileScopeInfoBtn.classList.remove('active');
+}
+
+function toggleScopeHint() {
+  const nextHidden = !mobileScopeHintEl.hidden;
+  mobileScopeHintEl.hidden = nextHidden;
+  mobileScopeHintEl.setAttribute('aria-hidden', String(nextHidden));
+  mobileScopeInfoBtn.setAttribute('aria-expanded', String(!nextHidden));
+  mobileScopeInfoBtn.classList.toggle('active', !nextHidden);
 }
 
 function guideSvgEl(tag, attrs = {}) {
@@ -1118,6 +1135,10 @@ scopeSettingsBtn.addEventListener('click', () => {
   toggleScopeSettings();
 });
 
+mobileScopeInfoBtn.addEventListener('click', () => {
+  toggleScopeHint();
+});
+
 scopeSideRightBtn.addEventListener('click', () => {
   setScopeDock('right');
 });
@@ -1149,6 +1170,9 @@ scopeFollowSpeedNumberInput.addEventListener('blur', () => {
 document.addEventListener('pointerdown', (evt) => {
   if (!scopeSettingsPanel.hidden && !scopeSettingsPanel.contains(evt.target) && evt.target !== scopeSettingsBtn) {
     hideScopeSettings();
+  }
+  if (!mobileScopeHintEl.hidden && evt.target !== mobileScopeInfoBtn && !mobileScopeHintEl.contains(evt.target)) {
+    hideScopeHint();
   }
 });
 
