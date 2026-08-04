@@ -5,14 +5,14 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-07-27",
+    "today": "2026-08-04",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 313.3,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": 0.0
+    "price_growth_5yr_pct": 20.0
   },
   "parse_preflight": {
     "columns_detected": [
@@ -26,14 +26,14 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 379,
-    "price_rows": 369,
+    "total_rows": 381,
+    "price_rows": 371,
     "dividend_rows": 10,
-    "zero_volume_rows": 104,
-    "zero_volume_pct": 28.2,
+    "zero_volume_rows": 106,
+    "zero_volume_pct": 28.6,
     "issues_found": [
       "1 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (104/369, 28.2%) \u00e2\u20ac\u201d analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (106/371, 28.6%) \u00e2\u20ac\u201d analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -441,13 +441,13 @@
       "peak_vs_prevdp": 11.2782,
       "rebound": 16.6667,
       "wks_before": 16.8571,
-      "wks_to_peak": null,
+      "wks_to_peak": 4.0,
       "div_yield": 3.0827,
       "s1": 21.5789,
       "s1_floored": false,
       "s2": 11.2782,
       "degen": false,
-      "incomplete": true,
+      "incomplete": false,
       "outlier": false,
       "macro": false,
       "macro_detail": {
@@ -458,24 +458,24 @@
       "volume_entry_ratio": 0.8803,
       "volume_trend": "DECLINING",
       "max_drawdown_pre_exdiv": -18.5714,
-      "recovery_time_days": null,
+      "recovery_time_days": 118,
       "success": true,
       "pattern_stability_score": 57.6,
       "zone_hit": false,
       "exit_analysis": {
-        "opt_exit_px": null,
-        "opt_exit_date": null,
-        "opt_gain_pct": null,
-        "opt_wks_from_low": null,
-        "opt_days_vs_exdiv": null,
-        "opt_exit_before_exdiv": null,
-        "pre_exdiv_exit_date": null,
-        "pre_exdiv_exit_px": null,
-        "pre_exdiv_gain_pct": null,
-        "pre_exdiv_peak_days_before_exdiv": null,
-        "exdiv_date_exit_px": null,
-        "exdiv_date_exit_date": null,
-        "post_exdiv_exit_gain_pct": null
+        "opt_exit_px": 0.148,
+        "opt_exit_date": "2025-12-05",
+        "opt_gain_pct": 29.8246,
+        "opt_wks_from_low": 4.0,
+        "opt_days_vs_exdiv": -90,
+        "opt_exit_before_exdiv": true,
+        "pre_exdiv_exit_date": "2025-12-05",
+        "pre_exdiv_exit_px": 0.148,
+        "pre_exdiv_gain_pct": 29.8246,
+        "pre_exdiv_peak_days_before_exdiv": 90,
+        "exdiv_date_exit_px": 0.123,
+        "exdiv_date_exit_date": "2026-03-06",
+        "post_exdiv_exit_gain_pct": 7.8947
       },
       "zone_miss_pct": 8.83
     }
@@ -634,9 +634,10 @@
           "LATE",
           "FAST",
           "FAST",
-          "FAST"
+          "FAST",
+          "NORMAL"
         ],
-        "next_peak_mode": "FAST",
+        "next_peak_mode": "NORMAL",
         "cal_window": {
           "low_months": [
             2,
@@ -679,21 +680,21 @@
       },
       "risk": {
         "max_drawdown_median": -15.4379,
-        "recovery_time_median": 144.0,
+        "recovery_time_median": 131.0,
         "success_rate": 75.0,
-        "success_rate_all": 85.7
+        "success_rate_all": 75.0
       },
       "exit_profile": {
-        "n_complete_cycles": 7,
-        "pct_opt_before_exdiv": 57.1,
-        "pre_exdiv_peak_window_days_p25": 19.0,
-        "pre_exdiv_peak_window_days_p75": 89.5,
-        "med_days_vs_exdiv": -11.0,
-        "avg_gain_optimal": 24.1868,
-        "avg_gain_pre_exdiv": 17.5907,
-        "avg_gain_post_exdiv_exit": 10.6317,
-        "pre_exdiv_win_rate": 71.4,
-        "post_exdiv_exit_win_rate": 71.4,
+        "n_complete_cycles": 8,
+        "pct_opt_before_exdiv": 62.5,
+        "pre_exdiv_peak_window_days_p25": 23.0,
+        "pre_exdiv_peak_window_days_p75": 91.2,
+        "med_days_vs_exdiv": -46.0,
+        "avg_gain_optimal": 24.8915,
+        "avg_gain_pre_exdiv": 19.1199,
+        "avg_gain_post_exdiv_exit": 10.2896,
+        "pre_exdiv_win_rate": 75.0,
+        "post_exdiv_exit_win_rate": 75.0,
         "exit_mode_verdict": "PRE_EXDIV_PREFERRED",
         "exit_mode_verdict_display": "Pre-Exdiv Peak Exit preferred"
       }
@@ -761,9 +762,9 @@
       "historical_frequencies": {
         "entry_zone_hit_rate": 20.0,
         "exit_target_hit_rate": 87.5,
-        "avg_hold_days": 109.9,
+        "avg_hold_days": 110.9,
         "win_rate": 75.0,
-        "win_rate_all": 85.7,
+        "win_rate_all": 75.0,
         "avg_win_pct": 14.4064,
         "avg_loss_pct": 1.3889
       },
@@ -772,7 +773,7 @@
           "description": "Filled around the middle of the projected entry zone",
           "entry_px": 0.116,
           "exit_px": 0.1289,
-          "expected_hold_days": 144,
+          "expected_hold_days": 131,
           "historical_frequency": "mid-zone fill"
         },
         "downside": {
@@ -786,17 +787,17 @@
           "description": "Filled near the bottom of the projected entry zone",
           "entry_px": 0.1049,
           "exit_px": 0.1289,
-          "expected_hold_days": 73,
+          "expected_hold_days": 92,
           "historical_frequency": "lower fill"
         }
       },
       "risk_metrics": {
         "max_expected_drawdown": -23.3333,
-        "expected_recovery_days": 109.9,
+        "expected_recovery_days": 110.9,
         "liquidity_adequate": false,
         "gap_risk": false,
         "success_rate_historical": 75.0,
-        "success_rate_all_historical": 85.7
+        "success_rate_all_historical": 75.0
       },
       "tail_risk": {
         "worst_drawdown_pct": -23.3333,
@@ -2420,14 +2421,22 @@
     {
       "d": "2026-07-24",
       "c": 0.12
+    },
+    {
+      "d": "2026-07-31",
+      "c": 0.12
+    },
+    {
+      "d": "2026-08-07",
+      "c": 0.12
     }
   ],
   "current_price": 0.12,
   "anchor_price": 0.123,
   "anchor_date": "2026-03-05",
   "data_window_start": "2019-07-05",
-  "data_window_end": "2026-07-24",
-  "years_covered": 7.05,
+  "data_window_end": "2026-08-07",
+  "years_covered": 7.09,
   "series_adequacy": {
     "S1": {
       "n_clean": 8,
