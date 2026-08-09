@@ -93,7 +93,7 @@ export class InputController {
     return this.path.findIndex((n) => n[0] === node[0] && n[1] === node[1]);
   }
 
-  commitNode(node) {
+  commitNode(node, { allowRollback = false } = {}) {
     if (!this.tracing || !this.puzzle) return false;
 
     const last = this.path[this.path.length - 1];
@@ -108,7 +108,10 @@ export class InputController {
       }
     }
 
-    if (this.rollbackToVisitedEnabled) {
+    // A rollback jump (back to any earlier node, not just the immediately-previous one) is
+    // only honored on a deliberate press, never a passive drag-over — otherwise a finger
+    // slipping across an already-drawn stretch mid-drag would silently discard progress.
+    if (this.rollbackToVisitedEnabled && allowRollback) {
       const existingIndex = this.pathIndex(node);
       if (existingIndex >= 0) {
         this.path = this.path.slice(0, existingIndex + 1);
@@ -158,7 +161,7 @@ export class InputController {
       const { node, dist } = this.nearestNode(this.svgPoint(evt));
       const grabRadius = this.grid.cellSize * 0.9;
       if (dist > grabRadius) return;
-      this.commitNode(node);
+      this.commitNode(node, { allowRollback: true });
       return;
     }
 

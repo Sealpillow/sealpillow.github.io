@@ -840,72 +840,6 @@ body.debug-guide-open {
   max-width: 100%;
 }
 
-.level-filter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  width: 100%;
-  max-width: var(--nav-panel-width);
-}
-
-.level-filter label {
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.level-filter select {
-  -webkit-appearance: none;
-  appearance: none;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0)) ,
-    var(--panel);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23d7dde3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-position: right 0.75rem center;
-  background-repeat: no-repeat;
-  background-size: 0.75rem auto;
-  color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 0.45rem 2.25rem 0.45rem 0.75rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
-  min-height: 2.4rem;
-  text-overflow: ellipsis;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 10px 18px rgba(0, 0, 0, 0.12);
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.level-filter select:focus,
-.level-filter select:focus-visible {
-  outline: none;
-  border-color: #667282;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 0 0 2px rgba(103, 122, 146, 0.18),
-    0 10px 18px rgba(0, 0, 0, 0.12);
-}
-
-.level-filter select:hover:not(:disabled) {
-  border-color: #667282;
-  background-color: #2a3139;
-}
-
-.level-filter select option {
-  background: var(--panel);
-  color: var(--text);
-}
-
 button {
   background: var(--panel);
   color: var(--text);
@@ -1060,13 +994,6 @@ body[data-layout='mobile'] .debug-guide-title-row {
   gap: 0.2rem;
 }
 
-body[data-layout='mobile'] .level-filter {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 0.75rem;
-}
-
 body[data-layout='mobile'] .puzzle-pager {
   margin-top: 0.25rem;
 }
@@ -1076,13 +1003,11 @@ body[data-layout='mobile'] .puzzle-pager span {
 }
 
 @media (pointer: coarse) {
-  .level-filter select,
   .nav-dot,
   .puzzle-pager button {
     font-size: 14px;
   }
 
-  .level-filter select,
   .puzzle-pager,
   .puzzle-pager button {
     touch-action: manipulation;

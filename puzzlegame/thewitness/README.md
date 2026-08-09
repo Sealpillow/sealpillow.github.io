@@ -60,15 +60,18 @@ src/
     Regions.js       - shared flood-fill region computation (used by Colored Regions, Stars, Eliminators, Polyominoes)
     Eliminators.js   - the Eliminators mechanic (backtracking pairing search)
     Polyominoes.js   - the Polyominoes/Tetris mechanic (exact-cover tiling search)
+    SolutionCounter.js - brute-force solution counter, shared by scripts/verify-level.mjs and designer/designer.js
   puzzles/
-    levels.json          - original 134-level campaign source
-    claude-levels.json   - Claude collection shown in the level-source dropdown
-    codex-levels.json  - Codex collection shown in the level-source dropdown
+    levels.json        - the standard 300-level collection, the only one the live game loads (generated via scripts/level-generator.mjs)
   save/
     SaveManager.js   - localStorage read/write
 index.html
 style.css
 main.js              - app orchestration: level loading, sequential unlock gating, shared desktop/mobile nav layout mode, debug level jump/reveal/guide tools, and the mobile scope UI
+designer/
+  designer.html        - standalone puzzle designer page (not linked from the game)
+  designer.js          - designer logic: symbol placement, live solve-count, playtest, JSON import/export
+  designer.css         - designer-only layout; reuses ../style.css for board/symbol rendering
 ```
 
 Every mechanic's validation lives as a plain exported function (not a class) across the `engine/*.js` files above - `passesAllDots`, `satisfiesTriangles`, `satisfiesRegions`, `satisfiesStars`, `includesRequiredEdges` (all in `Validator.js`), plus `satisfiesSymmetry`, `satisfiesEliminators`, and `satisfiesPolyominoes` in their own modules. Each returns a plain `true`/`false`; `validateSolution` ANDs every applicable one together.
@@ -89,7 +92,7 @@ Every puzzle collection lives in `src/puzzles/*.json`, one flat array per collec
 }
 ```
 
-The full set of possible fields: `dots`, `blockedEdges`, `requiredEdges`, `triangles`, `cellColors`, `stars`, `eliminators`, `polyominoes`, `regionSizes`, and a `symmetry` string (currently only `"rotational"`). A polyomino entry is `[col, row, shapeName, rotationSteps, rotatable]`; a region-size entry is `[col, row, value]` - see the notes below.
+The full set of possible fields: `dots`, `blockedEdges`, `requiredEdges`, `triangles`, `cellColors`, `stars`, `eliminators`, `polyominoes`, `regionSizes`, and a `symmetry` string (currently only `"rotational"`, and currently unused in the shipped collection - see Mechanics below). A polyomino entry is `[col, row, shapeName, rotationSteps, rotatable]`; a region-size entry is `[col, row, value]` - see the notes below. Two more fields are generator/gameplay bookkeeping rather than mechanics themselves: `solutionPaths` (an array of pre-computed valid paths, so the debug "Show Solution" control never has to search live) and `requiredSolutions` (1-3, levels 201-300 only - see Mechanics > Multi-solution win condition below).
 
 ## Engine internals
 
@@ -111,32 +114,48 @@ The full set of possible fields: `dots`, `blockedEdges`, `requiredEdges`, `trian
 
 **Save shape** (`SaveManager.js`, in `localStorage`):
 ```js
-{ completedPuzzles: [], currentLevelIndex: 0 }
+{
+  completedPuzzles: [],           // puzzle progressKeys ("standard::level_XXX") the player has fully solved
+  currentLevelIndex: 0,           // legacy/fallback pointer, superseded by currentLevelIndexByCollection
+  currentLevelIndexByCollection: {}, // { [collectionKey]: index } - where the player left off per collection
+  migrations: {},                 // one-off migration keys already applied, so they never re-run
+  solutionProgress: {},           // { [progressKey]: [path, ...] } - distinct solved paths found so far,
+                                   // for levels with requiredSolutions > 1 (see Mechanics > Multi-solution below)
+}
 ```
 
 **Rendering** is plain SVG with five groups in a fixed order: `grid-lines`, `symbols`, `player-path`, `mirror-path`, `nodes`.
 
 ## Mechanics
 
-The shared engine currently supports these rule types across the shipped collections (for reference here - the game itself never names them):
+The shared engine currently supports these rule types across the shipped collections (for reference here - the game itself never names them). Each one targets exactly one of four things - a single node, an edge between two nodes, a cell, or the whole puzzle - and that target is what drives its conflict rules: at most one directional constraint per node, at most one of Blocked/Required per edge, and at most one cell-based mechanic per cell (see `level-creation-rulebook.md` Section 7).
 
+**Node-based** (a single grid intersection):
 - **Dots** - the drawn line must pass through every dot.
-- **Blocked Edges** - certain grid lines can never be crossed (shown as a broken red line); the drag input physically stops you from crossing one.
-- **Required Edges** - certain grid lines (highlighted gold) must be part of the final path, not just avoided.
-- **Triangles** - a cell marked with 1-3 triangles requires exactly that many of its four edges to be part of the path.
-- **Colored Regions** - the path must partition the grid so that same-colored cells always end up in one connected region, with no two colors sharing a region. Not limited to two colors - a region just can't mix colors.
-- **Stars** - a star must pair with exactly one other same-colored cell (another star, or a plain colored square) within its region; a region holding a star can't contain anything of a different color.
-- **Eliminators** - cancels exactly one other symbol (a triangle, colored square, star, or another eliminator) in its region; the puzzle doesn't say which one, so it's solved if *any* valid pairing leaves everything else satisfied.
-- **Polyominoes** - a region containing one or more Tetris-style piece icons must be exactly tileable by all of them at once, with no gaps or overlaps. Each piece icon is drawn as one solid block, shown one of two ways: sitting axis-aligned ("straight") means it must fit in exactly that one orientation; tilted at an angle ("slanted") means it may be rotated to any of its valid 90-degree orientations.
 - **Turn Nodes** - if the path visits that node, it must turn there rather than pass straight through.
 - **Straight Nodes** - if the path visits that node, it must pass straight through it, either horizontally or vertically.
 - **Horizontal Nodes** - if the path visits that node, it must pass straight left-to-right through it.
 - **Vertical Nodes** - if the path visits that node, it must pass straight top-to-bottom through it.
 - **Corner Nodes** - if the path visits that node, it must form one specific L-shaped corner orientation there.
+
+**Edge-based** (a grid line between two adjacent nodes):
+- **Blocked Edges** - certain grid lines can never be crossed (shown as a broken red line); the drag input physically stops you from crossing one.
+- **Required Edges** - certain grid lines (highlighted gold) must be part of the final path, not just avoided.
+
+**Cell-based** (a grid square):
+- **Triangles** - a cell marked with 1-3 triangles requires exactly that many of its four edges to be part of the path.
+- **Colored Regions** - the path must partition the grid so that same-colored cells always end up in one connected region, with no two colors sharing a region. Not limited to two colors - a region just can't mix colors.
+- **Stars** - a star must pair with exactly one other same-colored cell (another star, or a plain colored square) within its region; a region holding a star can't contain anything of a different color.
+- **Eliminators** - cancels exactly one other symbol (a triangle, colored square, star, or another eliminator) in its region; the puzzle doesn't say which one, so it's solved if *any* valid pairing leaves everything else satisfied.
+- **Polyominoes** - a region containing one or more Tetris-style piece icons must be exactly tileable by all of them at once, with no gaps or overlaps. Each piece icon is drawn as one solid block, shown one of two ways: sitting axis-aligned ("straight") means it must fit in exactly that one orientation; tilted at an angle ("slanted") means it may be rotated to any of its valid 90-degree orientations.
 - **Region Size Numbers** - each numbered cell adds that many cells to its region's required total. If multiple numbers appear in the same region, add them together; that region must contain exactly that many cells in any shape. Current authoring preference is to keep individual values compact, usually `2-5`, and express larger totals through multiple numbers rather than a single big value.
-- **Symmetry** - a second, mirrored path is drawn automatically alongside yours; both must be valid and the two must never touch. On a Symmetry level, your drawn path may start from either visible start point and may finish on either a listed exit or that exit's mirrored counterpart. The mirror path's nodes/edges also count toward dots/required/triangles/regions, so Symmetry can combine with the other mechanics rather than staying standalone.
+
+**Global** (a puzzle-wide flag, no position of its own):
+- **Symmetry** - a second, mirrored path is drawn automatically alongside yours; both must be valid and the two must never touch. On a Symmetry level, your drawn path may start from either visible start point and may finish on either a listed exit or that exit's mirrored counterpart. The mirror path's nodes/edges also count toward dots/required/triangles/regions, so Symmetry can combine with the other mechanics rather than staying standalone. The engine fully supports this, but no level in the shipped `levels.json` currently uses it - see `level-creation-rulebook.md` Section 8 for why.
 
 Most puzzles have a single exit, but a level can define more than one - either ending is a valid solution, so the player may need to plan for more than one possible finish.
+
+**Multi-solution win condition** (levels 201-300 only): a level can optionally carry a `requiredSolutions` value (1-3). Levels without it (1-200) complete on the first valid path, same as always. A level with `requiredSolutions > 1` instead needs that many DISTINCT valid paths drawn and submitted, one at a time, before it counts as solved - submitting a path that exactly repeats one already found doesn't add progress. Partial progress (`"1/2 solutions found"`, etc.) is shown in the status line and persisted in `solutionProgress` across reloads.
 
 ## Level progression
 
@@ -165,14 +184,12 @@ See `level-creation-rulebook.md` for the mechanic-order rationale and the exact 
 
 ### Collection philosophy
 
-The app supports multiple collections through a level-source dropdown. Those collections do **not** define different mechanic rules; they define different pacing and ordering styles over the same shared rule system.
+The game loads a single standard collection (`src/puzzles/levels.json`) - there is no level-source picker in the UI.
 
-- Both collections use the exact same engine and mechanic rules; only the authored/generated level set and pacing philosophy differ.
 - A new mechanic should usually get only `1-2` pure introduction levels.
 - Difficulty should start scaling earlier instead of waiting for a long late-game ramp.
 - Once a mechanic is introduced, it should begin combining with previously-taught rules quickly to keep the player engaged.
 - Cell-based mechanic icons must never overlap on the same cell.
-- The extended Codex block (`151-300`) is where the newer node-direction family and region-size numbers are introduced, then recombined into harder late-game boards.
 - A level may use the start or finish to frame the route, but most of the route should still be deduction-driven instead of feeling pre-drawn by node and edge constraints.
 
 ### Level design priorities
@@ -217,11 +234,9 @@ New mechanics also get unit-tested against hand-built synthetic puzzles (edge ca
 
 The full reasoning standard, including what the generator is supposed to optimize for, the step-by-step design loop, exact per-tier numeric targets, constraint-design principles, and hard rules, lives in `level-creation-rulebook.md`. That file should be treated as the authoritative design document.
 
-### Current collections
+### Current collection
 
-- `src/puzzles/claude-levels.json` - 120 levels, longer teaching blocks, gentler early ramp.
-- `src/puzzles/codex-levels.json` - 300 levels, shorter intros, earlier combination play, steeper late ramp, and an extended `151-300` band for node-direction and region-size mechanics.
-- `src/puzzles/levels.json` - the older 134-level single-campaign source kept as legacy reference material.
+- `src/puzzles/levels.json` - the standard 300-level collection, the only one the live game loads. As of the 2026-08-08 interleaved-schedule restructure, mechanics are unlocked in small steps spread across levels 1-200 rather than batched into two blocks: levels 1-13 teach the original 8 mechanics; 14-40 drill them; levels 41-42 add a Turn Nodes + Straight Nodes lesson, then 43-69 fold that into ongoing combo levels; levels 70-71 add a Horizontal/Vertical/Corner Nodes lesson, then 72-98 fold those in too; levels 99-101 add a Region Size Numbers lesson (with a hand-authored `requiredEdges`+`regionSizes` insertion at 100), then 102-200 combo all 14 non-symmetry mechanics together through to that phase's finale. Levels 201-300, added the same day (100 levels, extended once from an initial 75), introduce a different kind of variety - a `requiredSolutions` field (1-3) that changes the win condition: instead of completing on the first valid path, these levels need that many DISTINCT valid paths found first (tracked in the save file, see `src/save/SaveManager.js`). Generated via `scripts/level-generator.mjs` (seed `20260805`), with a small number of hand-authored exceptions - see `level-creation-rulebook.md` Section 9 for the generator's exact algorithm. This filename previously held an older, unrelated 134-level legacy campaign source, which this collection replaced.
 
 ## Guiding principles
 
@@ -240,7 +255,6 @@ Some of these are not built at all; others exist only as prototypes. All could w
 
 - Daily puzzle
 - Community level import
-- Level editor
 - Puzzle replay
 - Hint system
 - Accessibility options
@@ -252,7 +266,25 @@ Some of these are not built at all; others exist only as prototypes. All could w
 
 Desktop tracing, debug solution reveal, the debug symbol guide, and the mobile thumb-scope control are all live in the current build, including soft-follow camera movement, adjustable follow speed, left/right-hand placement, dismiss/reopen behavior, tap-to-rewind on visited nodes, and swipe capture that suppresses page scrolling while the scope is being dragged.
 
-The shared engine now covers the original core mechanics plus the newer node-direction family and region-size numbers. No audio, level editor, hint system, or daily puzzle yet - see Possible future additions above.
+The shared engine now covers the original core mechanics plus the newer node-direction family and region-size numbers, and levels 201-300 add a second win condition (multi-solution, see Mechanics above) on top of the original single-solution one. A standalone puzzle designer (`designer/designer.html`/`designer/designer.js`) is also live - see below. No audio, hint system, or daily puzzle yet - see Possible future additions above.
+
+## Puzzle Designer
+
+`designer/designer.html` is a standalone visual authoring tool for the puzzle JSON format described above - open it directly (`/designer/designer.html`, same static server as the game) rather than through any in-game link. It's for building and testing levels by hand; it never touches `localStorage` save data and has no effect on the live game beyond producing/consuming the same JSON files.
+
+**Toolbar** (top): puzzle metadata (`ID`, `Width`, `Height` + `Resize`), a `Load level` dropdown that pulls every level straight out of `levels.json`, and `New` to reset to a blank 4x4 board. The right side is the **solver cluster**, live on every edit:
+- A status line - `N solutions.`, `Unsolvable - 0 valid solutions.`, `Truncated - search budget hit...`, or `200+ solutions (capped).` - from a cheap, redundancy-check-only count (`SolutionCounter.js`), debounced 150ms after each edit.
+- `Limit` - how many distinct solutions `Show Solution` will search for/cycle through, 1-50 (typed values outside that range are clamped and the field corrects itself). This is designer-only state; it has no effect on the game's own debug "Show Sol." control, which keeps its own fixed cap of 3.
+- `Show Solution` - finds and draws one valid path on the board; clicking again cycles to the next distinct one (`Sol. 2/5`, etc.), wrapping back to hidden after the last. If the loaded level already carries a `solutionPaths` field (see Puzzle data format above) and hasn't been edited since loading, it reads that instantly instead of searching live - editing anything (placing/erasing a symbol, moving Start, resizing) invalidates that shortcut and falls back to a live, budget-capped search.
+- A warnings line below (e.g. a triangle with count 4 but no eliminator anywhere, or `regionSizes` combined with `eliminators`) for common design mistakes the validator can't catch structurally.
+
+**Palette** (left): one icon button per mechanic, grouped under Path Points / Directional Nodes / Edges / Cell Symbols / Utility. Click a button to arm that tool, then click a node/edge/cell on the board to place or toggle it there; parameterized tools (triangle count, star/color, corner orientation, polyomino shape/rotation, region-size value) show their options directly below the palette while active. `Erase` removes whatever occupies the clicked node/edge/cell.
+
+**Board** (center): click to place with the active tool. `Play Test` switches the board into the same tracing input the real game uses, so you can draw and submit a path exactly as a player would and see pass/fail feedback (including which symbols failed) without leaving the designer.
+
+**Export / Import** (right, behind a `Panels` toggle on narrow windows): `Export` shows the puzzle's current JSON live and can copy it to the clipboard or download it as a file; `Import` accepts a pasted puzzle JSON object and loads it into the designer, replacing whatever's currently open.
+
+On narrow/mobile widths the whole layout compacts into one screen with no page scrolling: the tool palette becomes a horizontally-scrollable strip, and Export/Import move into a slide-in drawer opened via the `Panels` button (the solver cluster stays in the toolbar at every width).
 
 ## Further reading
 

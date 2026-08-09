@@ -228,7 +228,13 @@ export class Renderer {
     const left = center.x - totalW / 2;
     const top = center.y - totalH / 2;
 
-    const angle = rotatable ? POLYOMINO_SLANT_DEG : rotationSteps * 90;
+    // SVG's rotate() turns clockwise (its y-axis points down), but Polyominoes.rotateShape's
+    // array-based rotation - what the Validator/Solver actually enforce for a fixed piece - turns
+    // counter-clockwise. Negating the angle here keeps the drawn icon's orientation consistent
+    // with the one shape the engine will actually accept; without it, odd `rotationSteps` values
+    // (1 or 3) draw a mirrored-looking rotation for any shape without full rotational symmetry
+    // (tromino-L, tetromino-L, tetromino-T), even though the puzzle logic itself is unaffected.
+    const angle = rotatable ? POLYOMINO_SLANT_DEG : -(rotationSteps * 90);
     const group = svgEl('g', { class: 'polyomino', transform: `rotate(${angle} ${center.x} ${center.y})` });
 
     for (const [c, r] of cells) {

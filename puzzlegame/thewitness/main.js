@@ -1,6 +1,6 @@
 import { Renderer } from './src/engine/Renderer.js';
 import { InputController } from './src/engine/Input.js';
-import { findSolutionPath } from './src/engine/Solver.js';
+import { findSolutionPaths } from './src/engine/Solver.js';
 import { Grid } from './src/engine/Grid.js';
 import { loadPuzzles } from './src/engine/PuzzleLoader.js';
 import { analyzeSolution } from './src/engine/Validator.js';
@@ -9,6 +9,8 @@ import {
   markCompleted,
   getCurrentLevelIndex,
   setCurrentLevelIndex,
+  getFoundSolutions,
+  addFoundSolution,
 } from './src/save/SaveManager.js';
 
 const LAYOUT_CONFIGS = {
@@ -23,15 +25,10 @@ const LAYOUT_CONFIGS = {
     navRows: 2,
   },
 };
-const DEFAULT_COLLECTION = 'codex';
-const COLLECTION_FILES = {
-  claude: './src/puzzles/claude-levels.json',
-  codex: './src/puzzles/codex-levels.json',
-};
-const COLLECTION_LABELS = {
-  claude: 'Claude',
-  codex: 'Codex',
-};
+const LEVELS_FILE = './src/puzzles/levels.json';
+// Used only to namespace saved progress (progressKey/currentLevelIndexByCollection) - there is
+// no user-facing collection picker anymore, just the one standard set of levels.
+const COLLECTION_KEY = 'standard';
 
 const svg = document.getElementById('board');
 const mobileScopeEl = document.getElementById('mobile-scope');
@@ -50,7 +47,6 @@ const scopeFollowSpeedLabel = document.getElementById('scope-follow-speed-label'
 const puzzleTitle = document.getElementById('puzzle-title');
 const navPanelEl = document.querySelector('.nav-panel');
 const puzzleNav = document.getElementById('puzzle-nav');
-const levelSourceSelect = document.getElementById('level-source');
 const pagerPrev = document.getElementById('pager-prev');
 const pagerNext = document.getElementById('pager-next');
 const pagerLabel = document.getElementById('pager-label');
@@ -83,7 +79,6 @@ const SCOPE_VIEWBOX_MIN_SPAN = 180;
 const SCOPE_VIEWBOX_MAX_SPAN = 260;
 
 let navPage = 0;
-let collections = {};
 let levels = [];
 let save = loadSave();
 let currentIndex = 0;
@@ -93,6 +88,7 @@ let scopeRenderer;
 let input;
 const solutionCache = new Map();
 let debugSolutionVisible = false;
+let debugSolutionIndex = 0;
 let debugGuideVisible = false;
 let scopePointerActive = false;
 let scopeLockedViewBox = '';
@@ -197,22 +193,14 @@ const DEBUG_GUIDE_ITEMS = [
     symbol: 'Ivory cream size numbers',
     description: 'Each numbered cell adds that many cells to its region\'s required size. If multiple numbers share one region, add them together; that region must contain exactly that many cells total.',
   },
-  {
-    key: 'symmetry',
-    title: 'Symmetry',
-    symbol: 'Mirror path / twin start-end markers',
-    description: 'Your drawn path creates a second 180-degree mirrored path; both paths must be valid and cannot touch.',
-  },
 ];
 
 syncLayoutMode();
 window.addEventListener('resize', handleViewportChange);
 
-function cloneLevel(level, collectionKey) {
+function cloneLevel(level) {
   const cloned = structuredClone(level);
-  cloned.collectionKey = collectionKey;
-  cloned.progressKey = `${collectionKey}::${level.id}`;
-  if (collectionKey === 'claude') cloned.legacyId = level.id;
+  cloned.progressKey = `${COLLECTION_KEY}::${level.id}`;
   return cloned;
 }
 
@@ -249,37 +237,34 @@ function getNavPageSize() {
   return layout.navRows * layout.navColumns;
 }
 
-async function loadCollections() {
-  const entries = await Promise.all(
-    Object.entries(COLLECTION_FILES).map(async ([collectionKey, file]) => {
-      const collectionLevels = await loadPuzzles(file);
-      return [collectionKey, collectionLevels.map((level) => cloneLevel(level, collectionKey))];
-    })
-  );
-  return Object.fromEntries(entries);
-}
-
-function getCurrentCollectionKey() {
-  return levelSourceSelect.value || DEFAULT_COLLECTION;
-}
-
-function getCollectionLabel(collectionKey) {
-  return COLLECTION_LABELS[collectionKey] || collectionKey;
-}
-
-function setActiveCollection(collectionKey) {
-  levels = collections[collectionKey] || [];
+async function loadLevels() {
+  const rawLevels = await loadPuzzles(LEVELS_FILE);
+  return rawLevels.map((level) => cloneLevel(level));
 }
 
 function isPuzzleCompleted(puzzle) {
-  return (
-    save.completedPuzzles.includes(puzzle.progressKey) ||
-    (puzzle.legacyId && save.completedPuzzles.includes(puzzle.legacyId))
-  );
+  return save.completedPuzzles.includes(puzzle.progressKey);
+}
+
+// Most levels only ever need one valid path (requiredSolutions absent = 1). Levels generated with
+// requiredSolutions > 1 (see scripts/level-generator.mjs) instead need that many DISTINCT valid
+// paths submitted before they count as solved - see handleRelease.
+function requiredSolutionsFor(puzzle) {
+  return puzzle.requiredSolutions || 1;
+}
+
+function foundSolutionCountFor(puzzle) {
+  return getFoundSolutions(save, puzzle.progressKey).length;
 }
 
 function getDefaultStatusText(puzzle) {
-  return isPuzzleCompleted(puzzle) ? 'Solved' : '';
+  if (isPuzzleCompleted(puzzle)) return 'Solved';
+  const required = requiredSolutionsFor(puzzle);
+  if (required > 1) {
+    const found = foundSolutionCountFor(puzzle);
+    if (found > 0) return `${found}/${required} solutions found`;
+  }
+  return '';
 }
 
 function setGuideButtonState({ hidden, disabled, text }) {
@@ -602,18 +587,6 @@ function createGuidePreview(item) {
         transform: 'rotate(-6 36 24)',
       })).textContent = '4';
       break;
-    case 'symmetry':
-      svg.appendChild(guideSvgEl('path', {
-        d: 'M14 31 L14 13 L34 13',
-        class: 'player-line',
-      }));
-      svg.appendChild(guideSvgEl('circle', { cx: 14, cy: 31, r: 7, class: 'start-node' }));
-      svg.appendChild(guideSvgEl('path', {
-        d: 'M58 13 L58 31 L38 31',
-        class: 'mirror-line',
-      }));
-      svg.appendChild(guideSvgEl('circle', { cx: 58, cy: 13, r: 6, class: 'mirror-start-node' }));
-      break;
     default:
       break;
   }
@@ -873,7 +846,10 @@ function handleScopeStep(evt) {
   const { node, dist } = nearestNodeFor(mobileScopeSvg, grid, evt);
   const grabRadius = grid.cellSize * 0.75;
   if (dist > grabRadius) return;
-  const changed = input.isTracing() ? input.commitNode(node) : input.beginTraceAt(node);
+  const allowRollback = evt.type === 'pointerdown';
+  const changed = input.isTracing()
+    ? input.commitNode(node, { allowRollback })
+    : input.beginTraceAt(node);
   if (changed) {
     syncMobileScope(input.getPath());
   }
@@ -899,17 +875,15 @@ function endScopePointer(evt) {
 }
 
 async function init() {
-  collections = await loadCollections();
+  levels = await loadLevels();
   save = loadSave();
   applyScopeDock();
   applyScopeFollowSpeed();
   applyScopeViewEnabled();
   hideScopeSettings();
-  levelSourceSelect.value = DEFAULT_COLLECTION;
-  setActiveCollection(DEFAULT_COLLECTION);
   currentIndex = debugMode
     ? Math.min(Math.max(debugLevel - 1, 0), levels.length - 1)
-    : Math.min(Math.max(getCurrentLevelIndex(save, DEFAULT_COLLECTION), 0), levels.length - 1);
+    : Math.min(Math.max(getCurrentLevelIndex(save, COLLECTION_KEY), 0), levels.length - 1);
   loadLevel(currentIndex);
 }
 
@@ -921,7 +895,7 @@ function loadLevel(index) {
   currentIndex = Math.max(0, Math.min(index, levels.length - 1));
   const puzzle = levels[currentIndex];
   if (!puzzle) {
-    showEmptyCollectionState();
+    showEmptyLevelState();
     return;
   }
 
@@ -948,16 +922,17 @@ function loadLevel(index) {
 
   const alreadySolved = isPuzzleCompleted(puzzle);
   debugSolutionVisible = false;
+  debugSolutionIndex = 0;
   hideDebugGuide();
-  puzzleTitle.textContent = `${getCollectionLabel(getCurrentCollectionKey())} Level ${currentIndex + 1} of ${levels.length}${
+  puzzleTitle.textContent = `Level ${currentIndex + 1} of ${levels.length}${
     debugMode ? ' (debug)' : ''
   }`;
-  statusEl.textContent = alreadySolved ? 'Solved' : '';
+  statusEl.textContent = getDefaultStatusText(puzzle);
   setGuideButtonState({ hidden: !debugMode, disabled: false, text: 'Guide' });
   setSolutionButtonState({ hidden: !debugMode, disabled: false, text: 'Show Sol.' });
   nextBtn.disabled = !alreadySolved || currentIndex >= levels.length - 1;
 
-  setCurrentLevelIndex(save, currentIndex, getCurrentCollectionKey());
+  setCurrentLevelIndex(save, currentIndex, COLLECTION_KEY);
   renderPuzzleNav();
 }
 
@@ -968,9 +943,25 @@ function handleRelease(puzzle, path) {
     renderer.drawMirrorPath(path, 'success');
     input.reset();
     syncMobileScope();
-    markCompleted(save, puzzle.progressKey);
-    statusEl.textContent = currentIndex === levels.length - 1 ? 'All levels complete!' : 'Solved!';
-    nextBtn.disabled = currentIndex >= levels.length - 1;
+
+    const required = requiredSolutionsFor(puzzle);
+    if (required > 1 && !isPuzzleCompleted(puzzle)) {
+      const { isNew } = addFoundSolution(save, puzzle.progressKey, path);
+      const found = foundSolutionCountFor(puzzle);
+      if (found >= required) {
+        markCompleted(save, puzzle.progressKey);
+        statusEl.textContent = currentIndex === levels.length - 1 ? 'All levels complete!' : 'Solved!';
+        nextBtn.disabled = currentIndex >= levels.length - 1;
+      } else if (isNew) {
+        statusEl.textContent = `Solution found! (${found}/${required}) Find another way.`;
+      } else {
+        statusEl.textContent = `Already found that solution (${found}/${required}) - try a different route.`;
+      }
+    } else {
+      markCompleted(save, puzzle.progressKey);
+      statusEl.textContent = currentIndex === levels.length - 1 ? 'All levels complete!' : 'Solved!';
+      nextBtn.disabled = currentIndex >= levels.length - 1;
+    }
     renderPuzzleNav();
   } else if (path.length > 1) {
     renderer.drawPath(path, 'fail');
@@ -988,9 +979,9 @@ function handleRelease(puzzle, path) {
   }
 }
 
-function showEmptyCollectionState() {
-  puzzleTitle.textContent = `${getCollectionLabel(getCurrentCollectionKey())} Levels`;
-  statusEl.textContent = `No levels found in the ${getCollectionLabel(getCurrentCollectionKey())} collection.`;
+function showEmptyLevelState() {
+  puzzleTitle.textContent = 'Levels';
+  statusEl.textContent = 'No levels found.';
   puzzleNav.innerHTML = '';
   pagerLabel.textContent = 'Page 0 of 0';
   pagerPrev.disabled = true;
@@ -1004,6 +995,7 @@ function showEmptyCollectionState() {
 function hideDebugSolution({ clearStatus = false } = {}) {
   if (!renderer) return;
   debugSolutionVisible = false;
+  debugSolutionIndex = 0;
   setSolutionButtonState({ text: 'Show Sol.' });
   renderer.drawPath([]);
   renderer.drawMirrorPath([]);
@@ -1015,34 +1007,76 @@ function hideDebugSolution({ clearStatus = false } = {}) {
   }
 }
 
-function toggleDebugSolution() {
-  if (!debugMode || !levels[currentIndex] || !renderer || !input) return;
-  if (debugSolutionVisible) {
-    hideDebugSolution();
-    return;
-  }
-
-  const puzzle = levels[currentIndex];
-  const cacheKey = puzzle.progressKey || puzzle.id;
-  let solution = solutionCache.get(cacheKey);
-  if (!solution) {
-    solution = findSolutionPath(puzzle);
-    if (solution) solutionCache.set(cacheKey, solution);
-  }
-
-  if (!solution) {
-    statusEl.textContent = 'No solution found (debug)';
-    return;
-  }
-
+function renderDebugSolution(solution, index, total) {
   debugSolutionVisible = true;
+  debugSolutionIndex = index;
   input.reset();
   hideMobileScope();
   renderer.clearSymbolFailures();
   renderer.drawPath(solution, 'success');
   renderer.drawMirrorPath(solution, 'success');
-  setSolutionButtonState({ text: 'Hide Sol.' });
-  statusEl.textContent = 'Solution shown (debug)';
+  setSolutionButtonState({ text: total > 1 ? `Sol. ${index + 1}/${total}` : 'Hide Sol.' });
+  statusEl.textContent = total > 1
+    ? `Solution ${index + 1} of ${total} shown (debug)`
+    : 'Solution shown (debug)';
+}
+
+const DEBUG_SOLUTION_CAP = 3;
+
+function sameSolutionPath(a, b) {
+  return a.length === b.length && a.every(([col, row], i) => col === b[i][0] && row === b[i][1]);
+}
+
+// Generator-produced levels carry their own already-computed solutionPaths (see
+// scripts/level-generator.mjs's collectStoredSolutions) - reading them here means "Show Sol."
+// never runs any search of its own, so there's no delay even on the largest/densest boards or on
+// the very first click. The handful of hand-authored levels (7/9/13/33/106/107) predate that field
+// and fall back to a live, budget-capped search instead - fine given how small those boards are.
+function collectDebugSolutions(puzzle) {
+  if (puzzle.solutionPaths) return puzzle.solutionPaths;
+
+  const solutions = [];
+  const found = findSolutionPaths(puzzle, DEBUG_SOLUTION_CAP, 400000);
+  for (const path of found) {
+    if (solutions.length >= DEBUG_SOLUTION_CAP) break;
+    if (solutions.some((existing) => sameSolutionPath(existing, path))) continue;
+    solutions.push(path);
+  }
+  return solutions;
+}
+
+// Clicking while a solution is already shown cycles to the next one (wrapping back around to
+// hidden after the last) instead of hiding immediately - for the common single-solution case this
+// is unchanged from before (one click shows, a second click hides), since wrapping after just 1
+// solution means the very next click already lands back on "hidden."
+function toggleDebugSolution() {
+  if (!debugMode || !levels[currentIndex] || !renderer || !input) return;
+  const puzzle = levels[currentIndex];
+  const cacheKey = puzzle.progressKey || puzzle.id;
+
+  if (debugSolutionVisible) {
+    const solutions = solutionCache.get(cacheKey) || [];
+    const nextIndex = debugSolutionIndex + 1;
+    if (nextIndex >= solutions.length) {
+      hideDebugSolution();
+      return;
+    }
+    renderDebugSolution(solutions[nextIndex], nextIndex, solutions.length);
+    return;
+  }
+
+  let solutions = solutionCache.get(cacheKey);
+  if (!solutions) {
+    solutions = collectDebugSolutions(puzzle);
+    solutionCache.set(cacheKey, solutions);
+  }
+
+  if (!solutions.length) {
+    statusEl.textContent = 'No solution found (debug)';
+    return;
+  }
+
+  renderDebugSolution(solutions[0], 0, solutions.length);
 }
 
 resetBtn.addEventListener('click', () => {
@@ -1080,7 +1114,7 @@ function renderPuzzleNav() {
 
 function renderPuzzleNavPage(page) {
   if (levels.length === 0) {
-    showEmptyCollectionState();
+    showEmptyLevelState();
     return;
   }
 
@@ -1109,21 +1143,13 @@ function renderPuzzleNavPage(page) {
     puzzleNav.appendChild(btn);
   }
 
-  pagerLabel.textContent = `${getCollectionLabel(getCurrentCollectionKey())} • Page ${navPage + 1} of ${pageCount}`;
+  pagerLabel.textContent = `Page ${navPage + 1} of ${pageCount}`;
   pagerPrev.disabled = navPage === 0;
   pagerNext.disabled = navPage >= pageCount - 1;
 }
 
 pagerPrev.addEventListener('click', () => renderPuzzleNavPage(navPage - 1));
 pagerNext.addEventListener('click', () => renderPuzzleNavPage(navPage + 1));
-levelSourceSelect.addEventListener('change', () => {
-  navPage = 0;
-  setActiveCollection(getCurrentCollectionKey());
-  currentIndex = debugMode
-    ? Math.min(Math.max(debugLevel - 1, 0), levels.length - 1)
-    : Math.min(Math.max(getCurrentLevelIndex(save, getCurrentCollectionKey()), 0), levels.length - 1);
-  loadLevel(currentIndex);
-});
 
 mobileScopeSvg.addEventListener('pointerdown', (evt) => {
   if (!scopeViewActive() || !input) return;
@@ -1209,5 +1235,13 @@ window.addEventListener('pointerup', (evt) => {
 window.addEventListener('pointercancel', (evt) => {
   endScopePointer(evt);
 });
+
+// Debug-only: lets an automated test (or a developer in the console) submit a path exactly as if
+// the player had drawn and released it, without simulating real pointer gestures on the SVG -
+// exercises the actual production handleRelease logic (win condition, save writes), not a
+// reimplementation of it.
+if (debugMode) {
+  window.__debugSubmitPath = (path) => handleRelease(levels[currentIndex], path);
+}
 
 init();

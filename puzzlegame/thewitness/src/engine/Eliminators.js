@@ -28,18 +28,18 @@ function regionSymbolsSatisfied(symbols, grid, traveled) {
     if (touching.length !== s.count) return false;
   }
 
+  // Squares of different colors can never share a region, independent of any stars present
+  // (satisfiesRegions' rule, replicated here since eliminator regions don't fall back to it).
+  const squareColors = new Set(symbols.filter((s) => s.type === 'color').map((s) => s.color));
+  if (squareColors.size > 1) return false;
+
+  // Each star color pairs independently - an unrelated square or star of a DIFFERENT color
+  // doesn't concern this one; that color's own count (if it's also a star) or uniformity (if
+  // it's just a square) is checked on its own terms, not folded into this color's requirement.
   const colorLike = symbols.filter((s) => s.type === 'color' || s.type === 'star');
-  const starColors = new Set(colorLike.filter((s) => s.type === 'star').map((s) => s.color));
-  if (starColors.size > 1) return false;
-  if (starColors.size === 0) {
-    if (new Set(colorLike.map((s) => s.color)).size > 1) return false;
-  } else {
-    const [starColor] = starColors;
-    let matching = 0;
-    for (const s of colorLike) {
-      if (s.color !== starColor) return false;
-      matching++;
-    }
+  const starColors = new Set(symbols.filter((s) => s.type === 'star').map((s) => s.color));
+  for (const starColor of starColors) {
+    const matching = colorLike.filter((s) => s.color === starColor).length;
     if (matching !== 2) return false;
   }
   return true;

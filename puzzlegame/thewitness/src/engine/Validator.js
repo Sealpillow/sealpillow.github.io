@@ -309,8 +309,11 @@ export function satisfiesRegions(grid, puzzle, path) {
   return true;
 }
 
-// A star pairs with exactly one other cell of the same color within its region — either
-// another star or a plain colored square. A region holding a star may contain no other color.
+// A star pairs with exactly one other cell of the same color within its region — either another
+// star or a plain colored square. This is checked per star-color independently: an unrelated
+// cell of a DIFFERENT color in the same region doesn't concern this star at all (that color's own
+// squares-uniformity is satisfiesRegions' job, run alongside this, not this function's). Multiple
+// different star colors can coexist in one region too, as long as each independently pairs to 2.
 export function satisfiesStars(grid, puzzle, path) {
   const stars = puzzle.stars || [];
   if (stars.length === 0) return true;
@@ -318,22 +321,18 @@ export function satisfiesStars(grid, puzzle, path) {
   const colorByCell = new Map((puzzle.cellColors || []).map(([col, row, color]) => [`${col},${row}`, color]));
 
   for (const region of computeRegions(grid, puzzle, path)) {
-    const starColors = new Set(
+    const starColorsInRegion = new Set(
       region.map(([c, r]) => starByCell.get(`${c},${r}`)).filter((color) => color !== undefined)
     );
-    if (starColors.size === 0) continue;
-    if (starColors.size > 1) return false;
-    const [starColor] = starColors;
-
-    let matching = 0;
-    for (const [c, r] of region) {
-      const key = `${c},${r}`;
-      const cellColor = starByCell.has(key) ? starByCell.get(key) : colorByCell.get(key);
-      if (cellColor === undefined) continue;
-      if (cellColor !== starColor) return false;
-      matching++;
+    for (const starColor of starColorsInRegion) {
+      let matching = 0;
+      for (const [c, r] of region) {
+        const key = `${c},${r}`;
+        const cellColor = starByCell.has(key) ? starByCell.get(key) : colorByCell.get(key);
+        if (cellColor === starColor) matching++;
+      }
+      if (matching !== 2) return false;
     }
-    if (matching !== 2) return false;
   }
   return true;
 }
@@ -465,16 +464,11 @@ function findInvalidStars(grid, puzzle, path, regions = computeRegions(grid, puz
     if (stars.length === 0) continue;
 
     const starColors = new Set(stars.map((entry) => entry.color));
-    if (starColors.size > 1) {
-      colorLike.forEach((entry) => invalid.add(entry.key));
-      continue;
-    }
-
-    const [starColor] = [...starColors];
-    const matching = colorLike.filter((entry) => entry.color === starColor).length;
-    const allMatch = colorLike.every((entry) => entry.color === starColor);
-    if (!allMatch || matching !== 2) {
-      colorLike.forEach((entry) => invalid.add(entry.key));
+    for (const starColor of starColors) {
+      const matchingEntries = colorLike.filter((entry) => entry.color === starColor);
+      if (matchingEntries.length !== 2) {
+        matchingEntries.forEach((entry) => invalid.add(entry.key));
+      }
     }
   }
 
