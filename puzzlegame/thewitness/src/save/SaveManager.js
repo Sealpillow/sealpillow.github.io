@@ -1,10 +1,7 @@
 // Keep the legacy save key so existing browser progress survives the rename
 // from "Insight" to "The Vision".
 const SAVE_KEY = 'insight-save-v3';
-const LEGACY_CHATGPT_RENUMBER_RESET_KEY = 'chatgpt-renumber-reset-2026-08-01';
-const CODEX_COLLECTION_RENAME_KEY = 'codex-collection-rename-2026-08-02';
-const STANDARD_COLLECTION_PROMOTION_KEY = 'standard-collection-promotion-2026-08-08';
-const CODEX_COLLECTION_REMOVED_KEY = 'codex-collection-removed-2026-08-08';
+const LEGACY_COLLECTIONS_RESET_KEY = 'legacy-collections-reset-2026-08-10';
 
 function defaultSave() {
   return {
@@ -24,80 +21,20 @@ function applyMigrations(save) {
   const next = { ...defaultSave(), ...save };
   next.migrations = { ...(next.migrations || {}) };
 
-  if (!next.migrations[LEGACY_CHATGPT_RENUMBER_RESET_KEY]) {
-    next.completedPuzzles = (next.completedPuzzles || []).filter(
-      (id) => !id.startsWith('chatgpt::') && !id.startsWith('chatgpt_level_')
-    );
-    next.currentLevelIndexByCollection = {
-      ...(next.currentLevelIndexByCollection || {}),
-      chatgpt: 0,
-    };
-    next.migrations[LEGACY_CHATGPT_RENUMBER_RESET_KEY] = true;
-  }
+  // "standard" (levels.json / level_XXX ids) is the only collection that still exists - every
+  // other prefix is a leftover id scheme from a collection since renamed or removed (chatgpt ->
+  // codex -> removed, claude -> standard). Rather than keep growing a chain of one-time rename
+  // migrations for collections nothing loads anymore, just drop anything that isn't "standard".
+  if (!next.migrations[LEGACY_COLLECTIONS_RESET_KEY]) {
+    next.completedPuzzles = (next.completedPuzzles || []).filter((id) => id.startsWith('standard::'));
 
-  // Preserve completed progress and current index when migrating the collection
-  // name from the old "chatgpt" key/id scheme to the new "codex" one.
-  if (!next.migrations[CODEX_COLLECTION_RENAME_KEY]) {
-    next.completedPuzzles = (next.completedPuzzles || []).map((id) => {
-      if (id.startsWith('chatgpt::')) {
-        return `codex::${id.slice('chatgpt::'.length).replace(/^chatgpt_level_/, 'codex_level_')}`;
-      }
-      if (id.startsWith('chatgpt_level_')) {
-        return id.replace(/^chatgpt_level_/, 'codex_level_');
-      }
-      return id;
-    });
-
-    const byCollection = { ...(next.currentLevelIndexByCollection || {}) };
-    if (Number.isInteger(byCollection.chatgpt) && !Number.isInteger(byCollection.codex)) {
-      byCollection.codex = byCollection.chatgpt;
+    const byCollection = {};
+    if (Number.isInteger(next.currentLevelIndexByCollection?.standard)) {
+      byCollection.standard = next.currentLevelIndexByCollection.standard;
     }
-    delete byCollection.chatgpt;
     next.currentLevelIndexByCollection = byCollection;
 
-    next.migrations[CODEX_COLLECTION_RENAME_KEY] = true;
-  }
-
-  // The "claude" collection (claude-levels.json / claude_level_XXX ids) was promoted to be the
-  // one standard collection (levels.json / level_XXX ids, collection key "standard") - carry
-  // forward progress from both the collection-scoped era ("claude::claude_level_XXX") and the
-  // even older pre-split era (a bare "claude_level_XXX", previously matched via a legacyId
-  // fallback that no longer exists). The "codex" collection's own progress is handled by a
-  // separate migration below, since it was removed outright rather than promoted.
-  if (!next.migrations[STANDARD_COLLECTION_PROMOTION_KEY]) {
-    next.completedPuzzles = (next.completedPuzzles || []).map((id) => {
-      if (id.startsWith('claude::claude_level_')) {
-        return `standard::level_${id.slice('claude::claude_level_'.length)}`;
-      }
-      if (id.startsWith('claude_level_')) {
-        return `standard::${id.replace(/^claude_level_/, 'level_')}`;
-      }
-      return id;
-    });
-
-    const byCollection = { ...(next.currentLevelIndexByCollection || {}) };
-    if (Number.isInteger(byCollection.claude) && !Number.isInteger(byCollection.standard)) {
-      byCollection.standard = byCollection.claude;
-    }
-    delete byCollection.claude;
-    next.currentLevelIndexByCollection = byCollection;
-
-    next.migrations[STANDARD_COLLECTION_PROMOTION_KEY] = true;
-  }
-
-  // The "codex" collection was removed outright (codex-levels.json deleted, no longer loadable
-  // anywhere, including the designer) rather than renamed or promoted - purge its now-meaningless
-  // progress instead of letting it accumulate forever as dead data, mirroring how the old
-  // "chatgpt" collection's progress was reset above when it was cut over to "codex".
-  if (!next.migrations[CODEX_COLLECTION_REMOVED_KEY]) {
-    next.completedPuzzles = (next.completedPuzzles || []).filter(
-      (id) => !id.startsWith('codex::') && !id.startsWith('codex_level_')
-    );
-    const byCollection = { ...(next.currentLevelIndexByCollection || {}) };
-    delete byCollection.codex;
-    next.currentLevelIndexByCollection = byCollection;
-
-    next.migrations[CODEX_COLLECTION_REMOVED_KEY] = true;
+    next.migrations[LEGACY_COLLECTIONS_RESET_KEY] = true;
   }
 
   return next;
