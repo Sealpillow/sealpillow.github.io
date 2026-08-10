@@ -168,7 +168,7 @@ export function createNumberTraceController({ onSolve, setStatus }) {
     startBtn.className = 'memory-start';
     startBtn.addEventListener('click', beginRound);
 
-    header.append(info, startBtn);
+    header.append(info);
 
     boardEl = document.createElement('div');
     boardEl.className = 'trace-grid';
@@ -192,7 +192,7 @@ export function createNumberTraceController({ onSolve, setStatus }) {
     note.className = 'puzzle-note';
     note.textContent = 'Watch the numbered layout, then trace the hidden positions in order.';
 
-    shell.append(header, boardEl, note);
+    shell.append(header, note, boardEl, startBtn);
     host.appendChild(shell);
     updateRoundSummary();
     updateUI(false);

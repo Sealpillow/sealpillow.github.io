@@ -138,7 +138,7 @@ export function createMemorySequenceController({ onSolve, setStatus }) {
     info.className = 'memory-info';
     info.append(roundLabel, phaseLabel);
 
-    header.append(info, startBtn);
+    header.append(info);
 
     boardEl = document.createElement('div');
     boardEl.className = 'memory-grid';
@@ -162,7 +162,7 @@ export function createMemorySequenceController({ onSolve, setStatus }) {
     note.className = 'puzzle-note';
     note.textContent = 'Each round must be repeated exactly from the beginning.';
 
-    shell.append(header, boardEl, note);
+    shell.append(header, note, boardEl, startBtn);
     host.appendChild(shell);
     updateRoundLabel();
     updatePhaseLabel('Ready');

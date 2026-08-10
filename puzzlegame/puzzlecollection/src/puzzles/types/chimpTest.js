@@ -160,7 +160,7 @@ export function createChimpTestController({ onSolve, setStatus }) {
     startBtn.className = 'memory-start';
     startBtn.addEventListener('click', beginRound);
 
-    header.append(info, startBtn);
+    header.append(info);
 
     boardEl = document.createElement('div');
     boardEl.className = 'chimp-grid';
@@ -184,7 +184,7 @@ export function createChimpTestController({ onSolve, setStatus }) {
     note.className = 'puzzle-note';
     note.textContent = 'Click 1 while the board is visible. The rest hide after that first correct tap.';
 
-    shell.append(header, boardEl, note);
+    shell.append(header, note, boardEl, startBtn);
     host.appendChild(shell);
     updateRoundSummary();
     updateUI();
