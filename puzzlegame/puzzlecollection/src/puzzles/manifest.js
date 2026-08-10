@@ -1,5 +1,5 @@
 const LEVELS_PER_TYPE = 50;
-const MAX_MEMORY_PADS = 9;
+const MAX_MEMORY_PADS = 25;
 
 function mulberry32(seed) {
   let t = seed >>> 0;
@@ -312,8 +312,8 @@ function buildChimpTestData({ seed, cols, rows, targetCount, roundCount = 1 }) {
 }
 
 export function createCustomMemoryPuzzle({ cols, rows, roundCount }) {
-  const safeCols = clamp(cols, 2, 3);
-  const safeRows = clamp(rows, 2, 3);
+  const safeCols = clamp(cols, 2, 5);
+  const safeRows = clamp(rows, 2, 5);
   const safePadCount = clamp(safeCols * safeRows, 4, MAX_MEMORY_PADS);
   const safeRoundCount = clamp(roundCount, 2, 6);
   const columns = safeCols;
@@ -411,8 +411,8 @@ function buildChimpTestPuzzle(index) {
 }
 
 export function createCustomChimpPuzzle({ cols, rows, targetCount, roundCount }) {
-  const safeCols = clamp(cols, 3, 6);
-  const safeRows = clamp(rows, 3, 6);
+  const safeCols = clamp(cols, 3, 5);
+  const safeRows = clamp(rows, 3, 5);
   const safeCount = clamp(targetCount, 4, Math.min(safeCols * safeRows, 12));
   const safeRoundCount = clamp(roundCount, 1, 6);
   const seed = Date.now() % 1000000000;
@@ -434,8 +434,8 @@ export function createCustomChimpPuzzle({ cols, rows, targetCount, roundCount })
 }
 
 export function createCustomTogglePuzzle({ cols, rows }) {
-  const safeCols = clamp(cols, 3, 4);
-  const safeRows = clamp(rows, 2, 4);
+  const safeCols = clamp(cols, 3, 5);
+  const safeRows = clamp(rows, 2, 5);
   const seed = Date.now() % 1000000000;
   const size = safeCols * safeRows;
 
@@ -455,7 +455,7 @@ export function createCustomTogglePuzzle({ cols, rows }) {
 }
 
 export function createCustomRotationPuzzle({ cols, rows }) {
-  const safeCols = clamp(cols, 4, 7);
+  const safeCols = clamp(cols, 4, 5);
   const safeRows = clamp(rows, 3, 5);
   const seed = Date.now() % 1000000000;
 
@@ -588,8 +588,8 @@ function buildMirrorData({ seed, cols, rows, blockerBudget }) {
 }
 
 export function createCustomMirrorPuzzle({ cols, rows }) {
-  const safeCols = clamp(cols, 5, 7);
-  const safeRows = clamp(rows, 5, 7);
+  const safeCols = clamp(cols, 5, 5);
+  const safeRows = clamp(rows, 5, 5);
   const seed = Date.now() % 1000000000;
   const blockerBudget = Math.max(
     (safeCols >= 7 || safeRows >= 7) ? 5 : (safeCols >= 6 || safeRows >= 6) ? 4 : 3,
