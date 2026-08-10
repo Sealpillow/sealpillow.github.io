@@ -102,11 +102,15 @@ const mobileScopeEnabled = window.matchMedia?.('(pointer: coarse)').matches ?? f
 const touchLayoutCapable =
   (navigator.maxTouchPoints ?? 0) > 0 || 'ontouchstart' in window;
 
-// Testing backdoor: index.html?level=37 jumps straight to level 37 and unlocks
-// free navigation between all levels for the session, without touching real save progress.
-const debugLevelParam = new URLSearchParams(window.location.search).get('level');
+// Testing backdoor:
+// - index.html?debug=1 enables debug mode and starts at level 1
+// - index.html?level=37 jumps straight to level 37 and also enables debug mode
+// Neither path touches real save progress.
+const searchParams = new URLSearchParams(window.location.search);
+const debugFlag = searchParams.get('debug');
+const debugLevelParam = searchParams.get('level');
 const debugLevel = debugLevelParam !== null ? parseInt(debugLevelParam, 10) : null;
-const debugMode = Number.isInteger(debugLevel);
+const debugMode = debugFlag === '1' || Number.isInteger(debugLevel);
 const GUIDE_SVG_NS = 'http://www.w3.org/2000/svg';
 const DEBUG_GUIDE_ITEMS = [
   {
@@ -882,7 +886,7 @@ async function init() {
   applyScopeViewEnabled();
   hideScopeSettings();
   currentIndex = debugMode
-    ? Math.min(Math.max(debugLevel - 1, 0), levels.length - 1)
+    ? Math.min(Math.max((Number.isInteger(debugLevel) ? debugLevel : 1) - 1, 0), levels.length - 1)
     : Math.min(Math.max(getCurrentLevelIndex(save, COLLECTION_KEY), 0), levels.length - 1);
   loadLevel(currentIndex);
 }

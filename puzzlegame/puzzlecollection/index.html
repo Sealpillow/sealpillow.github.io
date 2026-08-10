@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Puzzle Collection</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <p class="eyebrow">Puzzle Collection</p>
+      <h1>Puzzle Collection</h1>
+      <p id="level-subtitle" class="level-subtitle"></p>
+      <p id="puzzle-hint" class="hint"></p>
+    </header>
+
+    <section id="game-screen" class="game-screen">
+      <div class="hero-panel">
+        <div class="hero-copy">
+          <p id="puzzle-type" class="puzzle-type"></p>
+          <p id="puzzle-status" class="puzzle-status"></p>
+        </div>
+        <div class="controls">
+          <button id="browse-btn" type="button">Puzzle Select</button>
+          <button id="custom-puzzle-hero-btn" type="button" hidden>Custom Puzzle</button>
+        </div>
+      </div>
+
+      <section id="selection-screen" class="selection-screen" hidden>
+        <div class="selection-panel">
+        <div class="selection-header">
+          <div>
+            <p class="selection-kicker">Choose a Cabinet</p>
+            <h2 id="selection-title" class="selection-title">Puzzle Types</h2>
+            <p id="selection-copy" class="selection-copy">Pick a puzzle family to see its levels.</p>
+          </div>
+        </div>
+        <div id="type-grid" class="type-grid"></div>
+        <div id="type-pager" class="selection-pager">
+          <button id="type-pager-prev" type="button" aria-label="Previous puzzle types">&lsaquo;</button>
+          <span id="type-pager-label" class="pager-label"></span>
+          <button id="type-pager-next" type="button" aria-label="Next puzzle types">&rsaquo;</button>
+        </div>
+        </div>
+      </section>
+
+      <div id="board-wrap" class="board-wrap">
+        <div id="board-container" class="board-container"></div>
+      </div>
+
+      <div class="lower-panel">
+        <div class="lower-panel-actions">
+          <button id="lower-restart-btn" type="button">Reset</button>
+          <button id="lower-next-btn" type="button">Next Level</button>
+        </div>
+        <nav id="puzzle-nav" class="puzzle-nav" aria-label="Puzzle selection"></nav>
+        <div id="puzzle-pager" class="puzzle-pager">
+          <button id="pager-prev" type="button" aria-label="Previous puzzles">&lsaquo;</button>
+          <span id="pager-label" class="pager-label"></span>
+          <button id="pager-next" type="button" aria-label="Next puzzles">&rsaquo;</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="custom-toggle-overlay" class="overlay" hidden aria-hidden="true">
+      <div class="overlay-panel custom-puzzle-modal">
+        <h2>Custom Toggle Switches</h2>
+        <p class="overlay-copy">Choose the board dimensions for a one-off switch network.</p>
+        <div class="custom-puzzle-fields">
+          <label class="custom-memory-field">
+            <span>Width</span>
+            <select id="custom-toggle-cols">
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Height</span>
+            <select id="custom-toggle-rows">
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+            </select>
+          </label>
+        </div>
+        <div class="overlay-actions">
+          <button id="custom-toggle-cancel-btn" type="button">Cancel</button>
+          <button id="custom-toggle-launch-btn" type="button">Start Custom Puzzle</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="custom-rotation-overlay" class="overlay" hidden aria-hidden="true">
+      <div class="overlay-panel custom-puzzle-modal">
+        <h2>Custom Rotation Path</h2>
+        <p class="overlay-copy">Choose the grid dimensions for a one-off path lock.</p>
+        <div class="custom-puzzle-fields">
+          <label class="custom-memory-field">
+            <span>Width</span>
+            <select id="custom-rotation-cols">
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Height</span>
+            <select id="custom-rotation-rows">
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+              <option value="5">5</option>
+            </select>
+          </label>
+        </div>
+        <div class="overlay-actions">
+          <button id="custom-rotation-cancel-btn" type="button">Cancel</button>
+          <button id="custom-rotation-launch-btn" type="button">Start Custom Puzzle</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="custom-memory-overlay" class="overlay" hidden aria-hidden="true">
+      <div class="overlay-panel custom-puzzle-modal">
+        <h2>Custom Memory Sequence</h2>
+        <p class="overlay-copy">Choose the board dimensions and number of rounds for a one-off memory challenge.</p>
+        <div class="custom-puzzle-fields">
+          <label class="custom-memory-field">
+            <span>Width</span>
+            <select id="custom-memory-cols">
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Height</span>
+            <select id="custom-memory-rows">
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Rounds</span>
+            <select id="custom-memory-rounds">
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </label>
+        </div>
+        <div class="overlay-actions">
+          <button id="custom-memory-cancel-btn" type="button">Cancel</button>
+          <button id="custom-memory-launch-btn" type="button">Start Custom Puzzle</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="custom-mirror-overlay" class="overlay" hidden aria-hidden="true">
+      <div class="overlay-panel custom-puzzle-modal">
+        <h2>Custom Mirror Reflection</h2>
+        <p class="overlay-copy">Choose the board dimensions for a one-off beam puzzle.</p>
+        <div class="custom-puzzle-fields">
+          <label class="custom-memory-field">
+            <span>Width</span>
+            <select id="custom-mirror-cols">
+              <option value="5">5</option>
+              <option value="6" selected>6</option>
+              <option value="7">7</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Height</span>
+            <select id="custom-mirror-rows">
+              <option value="5">5</option>
+              <option value="6" selected>6</option>
+              <option value="7">7</option>
+            </select>
+          </label>
+        </div>
+        <div class="overlay-actions">
+          <button id="custom-mirror-cancel-btn" type="button">Cancel</button>
+          <button id="custom-mirror-launch-btn" type="button">Start Custom Puzzle</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="custom-trace-overlay" class="overlay" hidden aria-hidden="true">
+      <div class="overlay-panel custom-puzzle-modal">
+        <h2>Custom Number Trace</h2>
+        <p class="overlay-copy">Show numbered positions briefly, then trace them back in ascending order from memory.</p>
+        <div class="custom-puzzle-fields">
+          <label class="custom-memory-field">
+            <span>Width</span>
+            <select id="custom-trace-cols">
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+              <option value="5">5</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Height</span>
+            <select id="custom-trace-rows">
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+              <option value="5">5</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Trace Count</span>
+            <select id="custom-trace-count">
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Preview Time</span>
+            <select id="custom-trace-preview">
+              <option value="2200">2.2 s</option>
+              <option value="1600" selected>1.6 s</option>
+              <option value="1000">1.0 s</option>
+              <option value="700">0.7 s</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Rounds</span>
+            <select id="custom-trace-rounds">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </label>
+        </div>
+        <div class="overlay-actions">
+          <button id="custom-trace-cancel-btn" type="button">Cancel</button>
+          <button id="custom-trace-launch-btn" type="button">Start Custom Puzzle</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="custom-chimp-overlay" class="overlay" hidden aria-hidden="true">
+      <div class="overlay-panel custom-puzzle-modal">
+        <h2>Custom Chimpanzee Test</h2>
+        <p class="overlay-copy">Memorize the number layout, click 1, then finish the rest after they disappear.</p>
+        <div class="custom-puzzle-fields">
+          <label class="custom-memory-field">
+            <span>Width</span>
+            <select id="custom-chimp-cols">
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Height</span>
+            <select id="custom-chimp-rows">
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Number Count</span>
+            <select id="custom-chimp-count">
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8" selected>8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+            </select>
+          </label>
+          <label class="custom-memory-field">
+            <span>Rounds</span>
+            <select id="custom-chimp-rounds">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </label>
+        </div>
+        <div class="overlay-actions">
+          <button id="custom-chimp-cancel-btn" type="button">Cancel</button>
+          <button id="custom-chimp-launch-btn" type="button">Start Custom Puzzle</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

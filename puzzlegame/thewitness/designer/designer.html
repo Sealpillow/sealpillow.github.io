@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Vision - Puzzle Designer</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="designer.css" />
+</head>
+<body>
+  <div class="designer-app">
+    <header class="designer-header">
+      <h1>Puzzle Designer</h1>
+      <a class="designer-back-link" href="../index.html">&larr; Back to game</a>
+    </header>
+
+    <section class="designer-toolbar">
+      <label class="toolbar-field">
+        <span>ID</span>
+        <input id="puzzle-id" type="text" value="custom_level" />
+      </label>
+      <label class="toolbar-field">
+        <span>Width</span>
+        <input id="puzzle-width" type="number" min="1" max="8" value="4" />
+      </label>
+      <label class="toolbar-field">
+        <span>Height</span>
+        <input id="puzzle-height" type="number" min="1" max="8" value="4" />
+      </label>
+      <button id="resize-btn" type="button">Resize</button>
+      <label class="toolbar-field">
+        <span>Load level</span>
+        <select id="load-existing-select">
+          <option value="">Existing levels&hellip;</option>
+        </select>
+      </label>
+      <button id="new-puzzle-btn" type="button">New</button>
+
+      <div class="toolbar-solver">
+        <p id="solver-status" class="solver-status">&mdash;</p>
+        <label class="toolbar-field">
+          <span>Limit</span>
+          <input id="solution-limit" type="number" min="1" max="50" value="20" />
+        </label>
+        <button id="show-solution-btn" type="button">Show Solution</button>
+      </div>
+
+      <ul id="warnings-list" class="warnings-list"></ul>
+    </section>
+
+    <div class="designer-main">
+      <aside class="designer-palette">
+        <div class="palette-groups">
+          <div class="palette-group-block">
+            <h2>Path Points</h2>
+            <div class="palette-group" data-group="point">
+              <button type="button" class="palette-btn" data-tool="start"><span class="palette-btn-content"><span class="palette-icon palette-icon-start" aria-hidden="true"></span><span class="palette-label">Start</span></span></button>
+              <button type="button" class="palette-btn" data-tool="exits"><span class="palette-btn-content"><span class="palette-icon palette-icon-exit" aria-hidden="true"></span><span class="palette-label">Exit</span></span></button>
+              <button type="button" class="palette-btn" data-tool="dots"><span class="palette-btn-content"><span class="palette-icon palette-icon-dot" aria-hidden="true"></span><span class="palette-label">Dot</span></span></button>
+            </div>
+          </div>
+
+          <div class="palette-group-block">
+            <h2>Directional Nodes</h2>
+            <div class="palette-group" data-group="directional">
+              <button type="button" class="palette-btn" data-tool="turnNodes"><span class="palette-btn-content"><span class="palette-icon palette-icon-turn" aria-hidden="true"><span class="palette-icon-turn-arc palette-icon-turn-arc-ul"></span><span class="palette-icon-turn-arc palette-icon-turn-arc-ur"></span><span class="palette-icon-turn-arc palette-icon-turn-arc-dl"></span><span class="palette-icon-turn-arc palette-icon-turn-arc-dr"></span><span class="palette-icon-turn-center"></span></span><span class="palette-label">Turn</span></span></button>
+              <button type="button" class="palette-btn" data-tool="straightNodes"><span class="palette-btn-content"><span class="palette-icon palette-icon-straight" aria-hidden="true"></span><span class="palette-label">Straight</span></span></button>
+              <button type="button" class="palette-btn" data-tool="horizontalNodes"><span class="palette-btn-content"><span class="palette-icon palette-icon-horizontal" aria-hidden="true"></span><span class="palette-label">Horizontal</span></span></button>
+              <button type="button" class="palette-btn" data-tool="verticalNodes"><span class="palette-btn-content"><span class="palette-icon palette-icon-vertical" aria-hidden="true"></span><span class="palette-label">Vertical</span></span></button>
+              <button type="button" class="palette-btn" data-tool="cornerNodes"><span class="palette-btn-content"><span class="palette-icon palette-icon-corner" aria-hidden="true"></span><span class="palette-label">Corner</span></span></button>
+            </div>
+          </div>
+
+          <div class="palette-group-block">
+            <h2>Edges</h2>
+            <div class="palette-group" data-group="edge">
+              <button type="button" class="palette-btn" data-tool="blockedEdges"><span class="palette-btn-content"><span class="palette-icon palette-icon-blocked" aria-hidden="true"></span><span class="palette-label">Blocked</span></span></button>
+              <button type="button" class="palette-btn" data-tool="requiredEdges"><span class="palette-btn-content"><span class="palette-icon palette-icon-required" aria-hidden="true"></span><span class="palette-label">Required</span></span></button>
+            </div>
+          </div>
+
+          <div class="palette-group-block">
+            <h2>Cell Symbols</h2>
+            <div class="palette-group" data-group="cell">
+              <button type="button" class="palette-btn" data-tool="triangles"><span class="palette-btn-content"><span class="palette-icon palette-icon-triangle" aria-hidden="true"></span><span class="palette-label">Triangle</span></span></button>
+              <button type="button" class="palette-btn" data-tool="cellColors"><span class="palette-btn-content"><span class="palette-icon palette-icon-colors" aria-hidden="true"><span class="palette-chip palette-chip-black"></span><span class="palette-chip palette-chip-white"></span><span class="palette-chip palette-chip-blue"></span></span><span class="palette-label">Color</span></span></button>
+              <button type="button" class="palette-btn" data-tool="stars"><span class="palette-btn-content"><span class="palette-icon palette-icon-star" aria-hidden="true">★</span><span class="palette-label">Star</span></span></button>
+              <button type="button" class="palette-btn" data-tool="eliminators"><span class="palette-btn-content"><span class="palette-icon palette-icon-eliminator" aria-hidden="true"><span class="palette-icon-eliminator-ring"></span><span class="palette-icon-eliminator-slash palette-icon-eliminator-slash-a"></span><span class="palette-icon-eliminator-slash palette-icon-eliminator-slash-b"></span></span><span class="palette-label">Eliminator</span></span></button>
+              <button type="button" class="palette-btn" data-tool="polyominoes"><span class="palette-btn-content"><span class="palette-icon palette-icon-poly" aria-hidden="true"><span class="palette-poly-cell"></span><span class="palette-poly-cell"></span><span class="palette-poly-cell"></span></span><span class="palette-label">Polyomino</span></span></button>
+              <button type="button" class="palette-btn" data-tool="regionSizes"><span class="palette-btn-content"><span class="palette-icon palette-icon-region" aria-hidden="true">3</span><span class="palette-label">Region Size</span></span></button>
+            </div>
+          </div>
+
+          <div class="palette-group-block">
+            <h2>Utility</h2>
+            <div class="palette-group" data-group="utility">
+              <button type="button" class="palette-btn palette-btn-erase" data-tool="erase"><span class="palette-btn-content"><span class="palette-icon palette-icon-erase" aria-hidden="true">✕</span><span class="palette-label">Erase</span></span></button>
+            </div>
+          </div>
+        </div>
+
+        <div id="tool-options" class="tool-options" hidden></div>
+      </aside>
+
+      <div class="designer-board-column">
+        <div class="designer-board-toolbar">
+          <button id="playtest-toggle" type="button">Play Test</button>
+          <button id="reset-path-btn" type="button" hidden>Reset Path</button>
+          <button id="sidebar-toggle-btn" type="button" class="sidebar-toggle-btn" aria-expanded="false" aria-controls="designer-sidebar">Panels</button>
+          <span id="active-tool-label" class="active-tool-label"></span>
+        </div>
+        <p id="designer-toast" class="designer-toast" aria-live="polite"></p>
+        <div class="board-wrap">
+          <svg id="board" class="board" viewBox="0 0 480 480">
+            <g class="grid-lines"></g>
+            <g class="symbols"></g>
+            <g class="player-path"></g>
+            <g class="mirror-path"></g>
+            <g class="nodes"></g>
+          </svg>
+        </div>
+        <p id="playtest-status" class="playtest-status" aria-live="polite"></p>
+      </div>
+
+      <div id="sidebar-backdrop" class="sidebar-backdrop" hidden></div>
+      <aside class="designer-sidebar" id="designer-sidebar">
+        <section class="sidebar-panel">
+          <h2>Export</h2>
+          <textarea id="export-json" class="json-textarea" readonly rows="8"></textarea>
+          <div class="sidebar-actions">
+            <button id="copy-json-btn" type="button">Copy JSON</button>
+            <button id="download-json-btn" type="button">Download</button>
+          </div>
+        </section>
+
+        <section class="sidebar-panel">
+          <h2>Import</h2>
+          <textarea id="import-json" class="json-textarea" rows="5" placeholder="Paste a puzzle JSON object here"></textarea>
+          <div class="sidebar-actions">
+            <button id="load-json-btn" type="button">Load JSON</button>
+          </div>
+          <p id="import-error" class="import-error" aria-live="polite"></p>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script type="module" src="designer.js"></script>
+</body>
+</html>
