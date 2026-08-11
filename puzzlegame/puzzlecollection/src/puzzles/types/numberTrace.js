@@ -1,8 +1,9 @@
-export function createNumberTraceController({ onSolve, setStatus }) {
+export function createNumberTraceController({ onSolve, onMiss, setStatus }) {
   let host = null;
   let puzzle = null;
   let solved = false;
   let paused = false;
+  let failed = false;
   let previewing = false;
   let inputIndex = 0;
   let roundIndex = 0;
@@ -89,6 +90,7 @@ export function createNumberTraceController({ onSolve, setStatus }) {
   function beginRound() {
     if (solved || paused || previewing) return;
     clearRevealTimer();
+    failed = false;
     inputIndex = 0;
     previewing = true;
     startBtn.disabled = true;
@@ -100,13 +102,20 @@ export function createNumberTraceController({ onSolve, setStatus }) {
   }
 
   function handleCell(x, y) {
-    if (solved || paused || previewing) return;
+    if (solved || paused || previewing || failed) return;
     const key = `${x},${y}`;
     const expected = lookup.get(key);
     const target = inputIndex + 1;
     if (expected !== target) {
+      if (puzzle.customMeta?.regenerateOnMiss && onMiss?.()) return;
+      failed = true;
+      previewing = false;
+      inputIndex = 0;
+      startBtn.disabled = false;
       updatePhase('Miss');
-      setStatus(`Need ${target} next.`);
+      updateUI(true);
+      updateBoardState();
+      setStatus(`Need ${target} next. Pattern shown.`);
       return;
     }
 
@@ -203,6 +212,7 @@ export function createNumberTraceController({ onSolve, setStatus }) {
     clearRevealTimer();
     solved = false;
     paused = false;
+    failed = false;
     previewing = false;
     inputIndex = 0;
     roundIndex = 0;

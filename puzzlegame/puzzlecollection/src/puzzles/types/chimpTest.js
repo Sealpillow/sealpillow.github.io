@@ -1,4 +1,4 @@
-export function createChimpTestController({ onSolve, setStatus }) {
+export function createChimpTestController({ onSolve, onMiss, setStatus }) {
   let host = null;
   let puzzle = null;
   let solved = false;
@@ -89,9 +89,15 @@ export function createChimpTestController({ onSolve, setStatus }) {
     const value = lookup.get(key);
     const target = inputIndex + 1;
     if (value !== target) {
+      if (puzzle.customMeta?.regenerateOnMiss && onMiss?.()) return;
       failed = true;
+      revealMode = true;
+      inputIndex = 0;
+      startBtn.disabled = false;
       updatePhase('Miss');
-      setStatus(`Need ${target} next.`);
+      updateUI();
+      updateBoardState();
+      setStatus(`Need ${target} next. Numbers shown.`);
       return;
     }
 

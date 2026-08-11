@@ -75,6 +75,7 @@ const customRotationRowsEl = document.getElementById('custom-rotation-rows');
 const customMemoryColsEl = document.getElementById('custom-memory-cols');
 const customMemoryRowsEl = document.getElementById('custom-memory-rows');
 const customMemoryRoundsEl = document.getElementById('custom-memory-rounds');
+const customMemoryRegenerateOnMissEl = document.getElementById('custom-memory-regenerate-on-miss');
 const customMirrorColsEl = document.getElementById('custom-mirror-cols');
 const customMirrorRowsEl = document.getElementById('custom-mirror-rows');
 const customTraceColsEl = document.getElementById('custom-trace-cols');
@@ -82,10 +83,12 @@ const customTraceRowsEl = document.getElementById('custom-trace-rows');
 const customTraceCountEl = document.getElementById('custom-trace-count');
 const customTracePreviewEl = document.getElementById('custom-trace-preview');
 const customTraceRoundsEl = document.getElementById('custom-trace-rounds');
+const customTraceRegenerateOnMissEl = document.getElementById('custom-trace-regenerate-on-miss');
 const customChimpColsEl = document.getElementById('custom-chimp-cols');
 const customChimpRowsEl = document.getElementById('custom-chimp-rows');
 const customChimpCountEl = document.getElementById('custom-chimp-count');
 const customChimpRoundsEl = document.getElementById('custom-chimp-rounds');
+const customChimpRegenerateOnMissEl = document.getElementById('custom-chimp-regenerate-on-miss');
 const customToggleCancelBtn = document.getElementById('custom-toggle-cancel-btn');
 const customToggleLaunchBtn = document.getElementById('custom-toggle-launch-btn');
 const customRotationCancelBtn = document.getElementById('custom-rotation-cancel-btn');
@@ -449,6 +452,7 @@ function mountPuzzle(entry) {
   boardContainer.replaceChildren();
   controller = createPuzzleController(entry.puzzle.type, {
     onSolve: onSolved,
+    onMiss: onPuzzleMiss,
     setStatus,
   });
   controller.mount(boardContainer, entry.puzzle);
@@ -459,9 +463,63 @@ function mountCustomPuzzle(puzzle) {
   boardContainer.replaceChildren();
   controller = createPuzzleController(puzzle.type, {
     onSolve: onSolved,
+    onMiss: onPuzzleMiss,
     setStatus,
   });
   controller.mount(boardContainer, puzzle);
+}
+
+function createCustomPuzzleFromConfig(type, settings) {
+  switch (type) {
+    case 'toggle-switches':
+      return createCustomTogglePuzzle(settings);
+    case 'rotation-path':
+      return createCustomRotationPuzzle(settings);
+    case 'memory-sequence':
+      return createCustomMemoryPuzzle(settings);
+    case 'mirror-reflection':
+      return createCustomMirrorPuzzle(settings);
+    case 'number-trace':
+      return createCustomNumberTracePuzzle(settings);
+    case 'chimp-test':
+      return createCustomChimpPuzzle(settings);
+    default:
+      return null;
+  }
+}
+
+function decorateCustomPuzzle(puzzle, type, settings, regenerateOnMiss = false) {
+  if (!puzzle) return null;
+  puzzle.customMeta = {
+    type,
+    settings: { ...settings },
+    regenerateOnMiss,
+  };
+  return puzzle;
+}
+
+function regenerateCurrentCustomPuzzle() {
+  const meta = customPuzzle?.customMeta;
+  if (!meta) return false;
+  const nextPuzzle = decorateCustomPuzzle(
+    createCustomPuzzleFromConfig(meta.type, meta.settings),
+    meta.type,
+    meta.settings,
+    meta.regenerateOnMiss,
+  );
+  if (!nextPuzzle) return false;
+  customPuzzle = nextPuzzle;
+  currentGlobalIndex = -1;
+  currentType = nextPuzzle.type;
+  mountCustomPuzzle(nextPuzzle);
+  syncPuzzleUi();
+  setStatus('Missed it. New custom board loaded.');
+  return true;
+}
+
+function onPuzzleMiss() {
+  if (!customPuzzle?.customMeta?.regenerateOnMiss) return false;
+  return regenerateCurrentCustomPuzzle();
 }
 
 function openPuzzle(globalIndex) {
@@ -478,41 +536,92 @@ function openPuzzle(globalIndex) {
 function buildCustomPuzzleForCurrentType() {
   switch (currentType) {
     case 'toggle-switches':
-      return createCustomTogglePuzzle({
-        cols: parseInt(customToggleColsEl.value, 10),
-        rows: parseInt(customToggleRowsEl.value, 10),
-      });
+      return decorateCustomPuzzle(
+        createCustomPuzzleFromConfig(currentType, {
+          cols: parseInt(customToggleColsEl.value, 10),
+          rows: parseInt(customToggleRowsEl.value, 10),
+        }),
+        currentType,
+        {
+          cols: parseInt(customToggleColsEl.value, 10),
+          rows: parseInt(customToggleRowsEl.value, 10),
+        },
+      );
     case 'rotation-path':
-      return createCustomRotationPuzzle({
-        cols: parseInt(customRotationColsEl.value, 10),
-        rows: parseInt(customRotationRowsEl.value, 10),
-      });
+      return decorateCustomPuzzle(
+        createCustomPuzzleFromConfig(currentType, {
+          cols: parseInt(customRotationColsEl.value, 10),
+          rows: parseInt(customRotationRowsEl.value, 10),
+        }),
+        currentType,
+        {
+          cols: parseInt(customRotationColsEl.value, 10),
+          rows: parseInt(customRotationRowsEl.value, 10),
+        },
+      );
     case 'memory-sequence':
-      return createCustomMemoryPuzzle({
-        cols: parseInt(customMemoryColsEl.value, 10),
-        rows: parseInt(customMemoryRowsEl.value, 10),
-        roundCount: parseInt(customMemoryRoundsEl.value, 10),
-      });
+      return decorateCustomPuzzle(
+        createCustomPuzzleFromConfig(currentType, {
+          cols: parseInt(customMemoryColsEl.value, 10),
+          rows: parseInt(customMemoryRowsEl.value, 10),
+          roundCount: parseInt(customMemoryRoundsEl.value, 10),
+        }),
+        currentType,
+        {
+          cols: parseInt(customMemoryColsEl.value, 10),
+          rows: parseInt(customMemoryRowsEl.value, 10),
+          roundCount: parseInt(customMemoryRoundsEl.value, 10),
+        },
+        customMemoryRegenerateOnMissEl.checked,
+      );
     case 'mirror-reflection':
-      return createCustomMirrorPuzzle({
-        cols: parseInt(customMirrorColsEl.value, 10),
-        rows: parseInt(customMirrorRowsEl.value, 10),
-      });
+      return decorateCustomPuzzle(
+        createCustomPuzzleFromConfig(currentType, {
+          cols: parseInt(customMirrorColsEl.value, 10),
+          rows: parseInt(customMirrorRowsEl.value, 10),
+        }),
+        currentType,
+        {
+          cols: parseInt(customMirrorColsEl.value, 10),
+          rows: parseInt(customMirrorRowsEl.value, 10),
+        },
+      );
     case 'number-trace':
-      return createCustomNumberTracePuzzle({
-        cols: parseInt(customTraceColsEl.value, 10),
-        rows: parseInt(customTraceRowsEl.value, 10),
-        targetCount: parseInt(customTraceCountEl.value, 10),
-        previewMs: parseInt(customTracePreviewEl.value, 10),
-        roundCount: parseInt(customTraceRoundsEl.value, 10),
-      });
+      return decorateCustomPuzzle(
+        createCustomPuzzleFromConfig(currentType, {
+          cols: parseInt(customTraceColsEl.value, 10),
+          rows: parseInt(customTraceRowsEl.value, 10),
+          targetCount: parseInt(customTraceCountEl.value, 10),
+          previewMs: parseInt(customTracePreviewEl.value, 10),
+          roundCount: parseInt(customTraceRoundsEl.value, 10),
+        }),
+        currentType,
+        {
+          cols: parseInt(customTraceColsEl.value, 10),
+          rows: parseInt(customTraceRowsEl.value, 10),
+          targetCount: parseInt(customTraceCountEl.value, 10),
+          previewMs: parseInt(customTracePreviewEl.value, 10),
+          roundCount: parseInt(customTraceRoundsEl.value, 10),
+        },
+        customTraceRegenerateOnMissEl.checked,
+      );
     case 'chimp-test':
-      return createCustomChimpPuzzle({
-        cols: parseInt(customChimpColsEl.value, 10),
-        rows: parseInt(customChimpRowsEl.value, 10),
-        targetCount: parseInt(customChimpCountEl.value, 10),
-        roundCount: parseInt(customChimpRoundsEl.value, 10),
-      });
+      return decorateCustomPuzzle(
+        createCustomPuzzleFromConfig(currentType, {
+          cols: parseInt(customChimpColsEl.value, 10),
+          rows: parseInt(customChimpRowsEl.value, 10),
+          targetCount: parseInt(customChimpCountEl.value, 10),
+          roundCount: parseInt(customChimpRoundsEl.value, 10),
+        }),
+        currentType,
+        {
+          cols: parseInt(customChimpColsEl.value, 10),
+          rows: parseInt(customChimpRowsEl.value, 10),
+          targetCount: parseInt(customChimpCountEl.value, 10),
+          roundCount: parseInt(customChimpRoundsEl.value, 10),
+        },
+        customChimpRegenerateOnMissEl.checked,
+      );
     default:
       return null;
   }

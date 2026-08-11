@@ -1,4 +1,4 @@
-export function createMemorySequenceController({ onSolve, setStatus }) {
+export function createMemorySequenceController({ onSolve, onMiss, setStatus }) {
   const MEMORY_THEME_COLOR = '#67a8ff';
   let host = null;
   let puzzle = null;
@@ -51,15 +51,9 @@ export function createMemorySequenceController({ onSolve, setStatus }) {
     startBtn.disabled = disabled;
   }
 
-  function beginRound() {
-    if (solved || paused) return;
+  function playSequence(sequence, onComplete) {
     clearPlaybackTimers();
-    canInput = false;
     showingSequence = true;
-    inputIndex = 0;
-    const sequence = puzzle.data.rounds[roundIndex];
-    setStatus('Watch closely.');
-    updatePhaseLabel('Watch');
     updateBoardState();
     setButtonsDisabled(true);
 
@@ -72,12 +66,25 @@ export function createMemorySequenceController({ onSolve, setStatus }) {
     playbackTimers.push(setTimeout(() => {
       if (paused) return;
       showingSequence = false;
-      canInput = true;
-      updatePhaseLabel('Repeat');
       updateBoardState();
       setButtonsDisabled(false);
-      setStatus('Repeat the sequence.');
+      onComplete?.();
     }, 520 * sequence.length + 260));
+  }
+
+  function beginRound() {
+    if (solved || paused) return;
+    canInput = false;
+    inputIndex = 0;
+    const sequence = puzzle.data.rounds[roundIndex];
+    setStatus('Watch closely.');
+    updatePhaseLabel('Watch');
+    playSequence(sequence, () => {
+      if (paused) return;
+      canInput = true;
+      updatePhaseLabel('Repeat');
+      setStatus('Repeat the sequence.');
+    });
   }
 
   function handleInput(index) {
@@ -86,10 +93,17 @@ export function createMemorySequenceController({ onSolve, setStatus }) {
 
     const expected = puzzle.data.rounds[roundIndex][inputIndex];
     if (index !== expected) {
+      if (puzzle.customMeta?.regenerateOnMiss && onMiss?.()) return;
       canInput = false;
       updatePhaseLabel('Miss');
-      updateBoardState();
-      setStatus('Missed it. Restart the round.');
+      setStatus('Missed it. Pattern replayed.');
+      inputIndex = 0;
+      playSequence(puzzle.data.rounds[roundIndex], () => {
+        if (paused) return;
+        canInput = false;
+        updatePhaseLabel('Miss');
+        setStatus('Missed it. Start again.');
+      });
       return;
     }
 
