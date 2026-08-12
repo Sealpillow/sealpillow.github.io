@@ -170,13 +170,13 @@ const DEBUG_GUIDE_ITEMS = [
   {
     key: 'cellColors',
     title: 'Colored Regions',
-    symbol: 'Black, white, or blue square chips',
+    symbol: 'White, gold, or blue square chips',
     description: 'The path must divide the board so each region keeps colors separated rather than mixing them together.',
   },
   {
     key: 'stars',
     title: 'Stars',
-    symbol: 'White, black, or blue stars',
+    symbol: 'White, gold, or blue stars',
     description: 'Each star must share a region with exactly one matching same-colored partner and no extra colors mixed into that region.',
   },
   {
@@ -500,7 +500,7 @@ function createGuidePreview(item) {
         width: 14,
         height: 14,
         rx: 2,
-        class: 'region-chip region-black',
+        class: 'region-chip region-white',
       }));
       svg.appendChild(guideSvgEl('rect', {
         x: 29,
@@ -508,7 +508,7 @@ function createGuidePreview(item) {
         width: 14,
         height: 14,
         rx: 2,
-        class: 'region-chip region-white',
+        class: 'region-chip region-gold',
       }));
       svg.appendChild(guideSvgEl('rect', {
         x: 48,
@@ -526,7 +526,7 @@ function createGuidePreview(item) {
       }));
       svg.appendChild(guideSvgEl('polygon', {
         points: guideStarPoints(36, 22, 8, 3.4),
-        class: 'star star-black',
+        class: 'star star-gold',
       }));
       svg.appendChild(guideSvgEl('polygon', {
         points: guideStarPoints(54, 22, 8, 3.4),

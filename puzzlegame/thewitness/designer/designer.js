@@ -7,7 +7,7 @@ import { findSolutionPaths } from '../src/engine/Solver.js';
 import { POLYOMINO_SHAPES } from '../src/engine/Polyominoes.js';
 import { loadPuzzles } from '../src/engine/PuzzleLoader.js';
 
-const COLORS = ['black', 'white', 'blue'];
+const COLORS = ['gold', 'white', 'blue'];
 const CORNER_ORIENTATIONS = ['ur', 'ul', 'dr', 'dl'];
 const POLYOMINO_SHAPE_NAMES = Object.keys(POLYOMINO_SHAPES);
 const DIRECTIONAL_FIELDS = ['turnNodes', 'straightNodes', 'horizontalNodes', 'verticalNodes', 'cornerNodes'];
@@ -106,7 +106,7 @@ let renderer = new Renderer(svg, grid);
 let activeTool = 'start';
 let toolParams = {
   count: 2,
-  color: 'black',
+  color: 'gold',
   orientation: 'ur',
   shape: POLYOMINO_SHAPE_NAMES[0],
   rotationSteps: 0,
@@ -125,6 +125,21 @@ let existingLevelsById = new Map();
 function clampInt(value, min, max) {
   if (Number.isNaN(value)) return min;
   return Math.max(min, Math.min(max, value));
+}
+
+function normalizeColorName(color) {
+  return color === 'black' ? 'gold' : color;
+}
+
+function normalizePuzzleColors(data) {
+  const normalized = structuredClone(data);
+  if (normalized.cellColors) {
+    normalized.cellColors = normalized.cellColors.map(([col, row, color]) => [col, row, normalizeColorName(color)]);
+  }
+  if (normalized.stars) {
+    normalized.stars = normalized.stars.map(([col, row, color]) => [col, row, normalizeColorName(color)]);
+  }
+  return normalized;
 }
 
 function nodeEq(a, b) {
@@ -794,7 +809,7 @@ function setActiveTool(tool) {
 function loadPuzzleIntoDesigner(data) {
   stopPlaytest();
   puzzleDirty = false;
-  puzzle = structuredClone(data);
+  puzzle = normalizePuzzleColors(data);
   puzzle.width = puzzle.width ?? 4;
   puzzle.height = puzzle.height ?? 4;
   puzzle.start = puzzle.start ?? [0, 0];

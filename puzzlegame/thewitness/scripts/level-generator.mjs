@@ -71,7 +71,7 @@ function finalizeMultiSolutionLevel(puzzle) {
 export const NODE_MECHANICS = ['dots', 'turnNodes', 'straightNodes', 'horizontalNodes', 'verticalNodes', 'cornerNodes'];
 export const EDGE_MECHANICS = ['blockedEdges', 'requiredEdges'];
 export const CELL_MECHANICS = ['triangles', 'cellColors', 'stars', 'eliminators', 'polyominoes', 'regionSizes'];
-export const COLORS = ['black', 'white', 'blue'];
+export const COLORS = ['gold', 'white', 'blue'];
 
 const SHAPE_LOOKUP = buildShapeLookup();
 
