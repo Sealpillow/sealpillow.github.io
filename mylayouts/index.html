@@ -717,6 +717,7 @@
   <button class="pill" data-filter="link">Link / CTA</button>
   <button class="pill" data-filter="redirects">Redirects</button>
   <button class="pill" data-filter="special">Special</button>
+  <button class="pill" data-filter="embed">Embed</button>
   <span class="count-badge" id="count-badge">-- items</span>
   <div class="view-toggle">
     <button class="view-btn active" data-view="grid" title="Grid view">
@@ -863,6 +864,7 @@ const layouts = [
   { file:"web-center/WebCenterTitleDescText.html", name:"Center - Title + Desc Text", platform:"web", tags:["centered","text"], layout:"Centered", mobile:"Centered", desc:"Centered title and description text block." },
   { file:"web-center/WebCenterTitleDescTextWithLink.html", name:"Center - Title + Desc Text (With Link)", platform:"web", tags:["centered","text","link"], layout:"Centered", mobile:"Centered", desc:"Centered title and description text block with a CTA link.", essential:true },
   { file:"web-center/WebCenterTitleMetaRow.html", name:"Center - Title + Meta Row", platform:"web", tags:["centered","text"], layout:"Centered", mobile:"Centered", desc:"Centered title with a metadata row below." },
+  { file:"web-center/WebCenterQuoteWithBodyText.html", name:"Center - Quote with Body Text", platform:"web", tags:["centered","text","editorial"], layout:"Centered", mobile:"Centered", desc:"Large Baskerville quote block with a left-aligned body paragraph below." },
   // WEB FLEXI
   { file:"web-flexi/WebFlexiLargeImgLeftTextProductRight-v1.html", name:"Flexi - Large Img Left, Text+Product Right (v1)", platform:"web", tags:["flexi","product","text","image"], layout:"Flexi", mobile:"--", desc:"Flexible layout: large image left, text and product listing right. v1." },
   { file:"web-flexi/WebFlexiTextProductLeftLargeImgRight-v1.html", name:"Flexi - Text+Product Left, Large Img Right (v1)", platform:"web", tags:["flexi","product","text","image"], layout:"Flexi", mobile:"--", desc:"Flexible layout: text and product listing left, large image right. v1." },
@@ -870,6 +872,8 @@ const layouts = [
   { file:"web-flexi/WebFlexi2to1ImgLeftLargeMobileHalfStack.html", name:"Flexi 2:1 - Img Left Large (Mobile Half Stack)", platform:"web", tags:["flexi","image"], layout:"Flexi 2:1", mobile:"Half stack", desc:"Flexible 2:1 ratio with large image left. Half-stacks on mobile." },
   { file:"web-flexi/WebFlexi6040SliderTextAlternatingMobileStack.html", name:"Flexi 60/40 - Slider+Text Alternating", platform:"web", tags:["flexi","slider","text","image"], layout:"Flexi 60/40", mobile:"Mobile stack", desc:"Alternating 60/40 flexible layout with slider and text. Stacks on mobile." },
   { file:"web-flexi/WebFlexiEditorialStaggeredDuo.html", name:"Flexi Editorial - Staggered Duo", platform:"web", tags:["editorial","flexi","image","text"], layout:"Flexi", mobile:"Mobile stack", desc:"Copy paragraph alongside two staggered images — portrait lower-left, landscape upper-right. Asymmetric vertical offset. Stacks on mobile." },
+  { file:"web-flexi/WebFlexiNarrowImageRightTextLeft.html", name:"Flexi Narrow - Img Right, Text Left", platform:"web", tags:["flexi","text","image","link"], layout:"Flexi 1:2", mobile:"Mobile stack", desc:"Asymmetric 1:2 layout: narrow image right, wider text left. Stacks on mobile." },
+  { file:"web-flexi/WebFlexiNarrowImageRightTextLeftMobileCaption.html", name:"Flexi Narrow - Img Right, Text Left (Mobile Caption)", platform:"web", tags:["flexi","text","image","link"], layout:"Flexi 1:2", mobile:"Mobile stack", desc:"Asymmetric 1:2 layout with narrow image right, text left, and a mobile-only caption below the image." },
   // WEB GRID
   { file:"web-grid/WebCollageGridHeroMidLargeSmallImg-v2.html", name:"Collage Grid - Hero Mid, Large + Small Img (v2)", platform:"web", tags:["collage","grid","image"], layout:"Collage Grid", mobile:"--", desc:"Collage grid with mid-hero image, large and small supporting images. v2." },
   { file:"web-grid/WebCollageGridHeroStaggeredLargeImg-v3.html", name:"Collage Grid - Hero Staggered Large Img (v3)", platform:"web", tags:["collage","grid","image"], layout:"Collage Grid", mobile:"--", desc:"Staggered collage grid with large hero image treatment. v3." },
@@ -888,6 +892,7 @@ const layouts = [
   { file:"web-grid/ThreeColEditorialTileGrid.html", name:"Three-Col Editorial Tile Grid", platform:"web", tags:["grid","3-col","product","video","hover","link","image"], layout:"Grid 3-Col", mobile:"Mobile stack", desc:"Three editorial tiles with image or video content and hover-activated underline links.", essential:true },
   { file:"web-grid/WebThreeColImageGridMobileStack.html", name:"Three-Col Image Grid - Mobile Stack", platform:"web", tags:["3-col","grid","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Three-column image grid. Stacks on mobile." },
   { file:"web-grid/WebTitleThreeColMobileStackWithLink.html", name:"Title + Three-Col - Mobile Stack (With Link)", platform:"web", tags:["3-col","text","link","image"], layout:"Three Column", mobile:"Mobile stack", desc:"Title header above three columns with links. Stacks on mobile." },
+  { file:"web-grid/WebGridTopHalfLeftFullRight.html", name:"Grid - Top-Half Left, Full Right", platform:"web", tags:["grid","2-col","image","link"], layout:"Grid 2-Col", mobile:"Mobile stack", desc:"Two-column CSS grid: left column shows only the top-half image, right column shows a full-height image. Stacks on mobile." },
   // WEB IMAGE
 { file:"web-image/WebHangingFloatingCaption.html", name:"Hanging / Floating Caption", platform:"web", tags:["editorial","text","image"], layout:"Caption", mobile:"Mobile stack", desc:"Short caption offset outside the image boundary into the negative space." },
   { file:"web-image/WebImageLeftLargeRightSmallSpaceBtwMobileStack.html", name:"Img Left Large, Right Small (Space Between) - Mobile Stack", platform:"web", tags:["asymmetric","image"], layout:"Asymmetric Split", mobile:"Mobile stack", desc:"Larger image left, smaller right, with spacing between. Stacks on mobile." },
@@ -901,6 +906,9 @@ const layouts = [
   { file:"web-image/WebTopDownMobileTopDownDiffSize.html", name:"Top-Down - Mobile Top-Down, Different Sizes", platform:"web", tags:["stacked","image"], layout:"Top Down", mobile:"Top-down (diff size)", desc:"Vertically stacked layout adapting to different image sizes on mobile." },
   { file:"web-image/WebEditorialShiftedStack.html", name:"Editorial Shifted Stack", platform:"web", tags:["editorial","stacked","image","text"], layout:"Staggered", mobile:"Mobile stack", desc:"Vertical editorial stack: landscape image top-left, copy text, portrait image bottom-right. Each block offset for asymmetric rhythm. Stacks on mobile." },
   { file:"web-image/WebEditorialShiftedStackV2.html", name:"Editorial Shifted Stack V2", platform:"web", tags:["editorial","stacked","image"], layout:"Staggered", mobile:"Mobile stack", desc:"Three-image shifted stack without copy: landscape top-left, portrait mid-right, landscape bottom-center. Stacks on mobile." },
+  { file:"web-image/WebStaggeredDuoLeftRight.html", name:"Staggered Duo - Left + Right", platform:"web", tags:["editorial","image","staggered"], layout:"Staggered", mobile:"Mobile stack", desc:"Two linked images side-by-side: smaller landscape left, larger portrait right pushed down 90px for a staggered rhythm. Stacks on mobile." },
+  { file:"web-image/WebImageInsetLeft.html", name:"Image Inset - Left Aligned", platform:"web", tags:["image","editorial"], layout:"Inset", mobile:"Full width", desc:"Single linked image at 67% width, left-anchored with optional offset caption. Expands to full-width on mobile." },
+  { file:"web-image/WebImageInsetLeftDuo.html", name:"Image Inset - Left Aligned Duo", platform:"web", tags:["image","editorial"], layout:"Inset", mobile:"Full width", desc:"Two equal linked images side-by-side within a 67% left-anchored block with a shared caption. Expands to full-width on mobile." },
   // WEB TEXT
   { file:"web-text/AsymmetricTwoColArticleLayout.html", name:"Asymmetric Two-Col Article Layout", platform:"web", tags:["text","editorial","2-col","asymmetric","slider","image"], layout:"Editorial 2-Col", mobile:"Carousel slider", desc:"Asymmetric two-column editorial with one large featured article and stacked supporting stories; converts to a carousel on mobile.", essential:true },
   { file:"web-text/WebChapterSectionDivider.html", name:"Chapter / Section Divider", platform:"web", tags:["editorial","text"], layout:"Editorial", mobile:"Full width", desc:"Full-width text-only break with a large chapter number, short label and thin rule." },
@@ -955,8 +963,8 @@ const layouts = [
   { file:"special/AnnouncementBar.html", name:"Announcement Bar", platform:"special", tags:["banner","interactive"], layout:"Banner", mobile:"Full width", desc:"Slim dismissible top banner for shipping promotions or campaign messages.", essential:true },
   { file:"special/BackToTopButton.html", name:"Back To Top Button", platform:"special", tags:["interactive","scroll","navigation"], layout:"Navigation", mobile:"Full width", desc:"Fixed bottom-right button that fades in after scrolling 300px and smooth-scrolls the page back to the top."},
   { file:"special/CountdownTimer.html", name:"Countdown Timer", platform:"special", tags:["interactive"], layout:"Timer", mobile:"Full width", desc:"Days / hours / minutes / seconds countdown to a target date. JS-driven." },
-  { file:"special/EmbedImagePLP.html", name:"Embed Image - PLP", platform:"special", tags:["embed","image"], layout:"Embed", mobile:"Full width", desc:"Image embedded within a PLP block." },
-  { file:"special/EmbedVideoPLP-mp4.html", name:"Embed Video - PLP (MP4)", platform:"special", tags:["embed","video"], layout:"Embed", mobile:"Full width", desc:"MP4 video embedded within a PLP block." },
+  { file:"special/PLP-ImageBannerTile.html", name:"PLP - Image Banner Tile", platform:"special", tags:["image","banner"], layout:"Banner Tile", mobile:"Full width", desc:"Image banner tile for embedding within a PLP grid slot. Uses SFCC banner_tile classes." },
+  { file:"special/PLP-VideoBannerTile-mp4.html", name:"PLP - Video Banner Tile (MP4)", platform:"special", tags:["video","banner"], layout:"Banner Tile", mobile:"Full width", desc:"MP4 video banner tile for embedding within a PLP grid slot. Uses SFCC banner_tile classes." },
   { file:"special/homepage-sale-banner.html", name:"Homepage Sale Banner", platform:"special", tags:["banner"], layout:"Banner", mobile:"Full width", desc:"Sale banner for the homepage." },
   { file:"special/MarqueeTicker.html", name:"Marquee Ticker", platform:"special", tags:["scroll"], layout:"Ticker", mobile:"Full width", desc:"Infinitely looping CSS marquee strip for announcements or brand messaging.", essential:true },
   { file:"special/multivideocontrol-base.html", name:"Multi Video Control - Base", platform:"special", tags:["video"], layout:"Video Control", mobile:"Full width", desc:"Base multi-video control component." },
@@ -984,7 +992,16 @@ const layouts = [
   { file:"special/timeline.html", name:"Timeline", platform:"special", tags:["text","timeline"], layout:"Timeline", mobile:"Full width", desc:"Vertical timeline layout." },
   { file:"special/header-sticky-content-fades.html", name:"Sticky Year Nav - Content Fades", platform:"special", tags:["scroll","sticky","navigation","interactive","timeline"], layout:"Sticky", mobile:"Full width", desc:"Vertical scrollable page with a draggable year nav bar that locks as a sticky header once scrolled past. Content sections fade in on scroll. Data-driven via JS array." },
   { file:"special/timeline-progressbar.html", name:"Timeline Horizontal - Progress Bar", platform:"special", tags:["timeline","scroll","interactive","horizontal"], layout:"Timeline", mobile:"Full width", desc:"Horizontal drag-to-scroll timeline with styled tag-card entries and a tape-measure progress bar at the bottom. Click ticks to jump. Cards fade in on scroll." },
-  { file:"special/timeline-simple.html", name:"Timeline Horizontal - Simple", platform:"special", tags:["timeline","scroll","interactive","horizontal"], layout:"Timeline", mobile:"Full width", desc:"Clean horizontal drag-to-scroll timeline with numbered entries and a thin progress line at the bottom. No external dependencies." }
+  { file:"special/timeline-simple.html", name:"Timeline Horizontal - Simple", platform:"special", tags:["timeline","scroll","interactive","horizontal"], layout:"Timeline", mobile:"Full width", desc:"Clean horizontal drag-to-scroll timeline with numbered entries and a thin progress line at the bottom. No external dependencies." },
+  { file:"special/ScrollZoomGrowPanHero.html", name:"Scroll Zoom Grow + Pan Hero", platform:"special", tags:["scroll","image"], layout:"Scroll Effect", mobile:"Full width", desc:"JS-driven hero: image grows from a small centred crop to full-width (grow phase), then pans upward to reveal a tall portrait (pan phase). Nav and copy overlay fade in during the pan." },
+  { file:"special/CursorGIFTrail.html", name:"Cursor GIF Trail", platform:"special", tags:["interactive"], layout:"Cursor Effect", mobile:"Full width", desc:"Native cursor replaced by a trailing ribbon of GIF icons with decreasing opacity and scale. Each element chases the previous via lerp for a flowing tail." },
+  { file:"special/CursorGIFFollower.html", name:"Cursor GIF Follower", platform:"special", tags:["interactive"], layout:"Cursor Effect", mobile:"Full width", desc:"Native cursor replaced by a single GIF icon that follows the mouse directly with no lag." },
+  // EMBED
+  { file:"embed/EmbedYouTube.html", name:"Embed - YouTube", platform:"web", tags:["video","embed"], layout:"Embed", mobile:"Full width", desc:"Responsive 16:9 YouTube iframe at 80% width on desktop, full-width on mobile. Separate wrappers per breakpoint." },
+  { file:"embed/EmbedVimeo.html", name:"Embed - Vimeo", platform:"web", tags:["video","embed"], layout:"Embed", mobile:"Full width", desc:"Responsive 16:9 Vimeo iframe at 80% width on desktop, full-width on mobile. Desktop and mobile can reference different Vimeo video sources." },
+  { file:"embed/EmbedYouTubeWithText.html", name:"Embed - YouTube with Text", platform:"web", tags:["video","embed","text"], layout:"Embed", mobile:"Full width", desc:"Lead-in caption paragraph above a responsive 16:9 YouTube embed." },
+  { file:"embed/EmbedVimeoWithText.html", name:"Embed - Vimeo with Text", platform:"web", tags:["video","embed","text"], layout:"Embed", mobile:"Full width", desc:"Lead-in caption paragraph above a responsive 16:9 Vimeo embed. Desktop and mobile can use different Vimeo sources." },
+  { file:"embed/EmbedVimeoCustomControls.html", name:"Embed - Vimeo Custom Controls", platform:"web", tags:["video","embed","interactive"], layout:"Embed", mobile:"Full width", desc:"Vimeo embed with custom overlay controls: play/pause, scrubbing progress bar, and mute/unmute. Controls appear on hover via the Vimeo Player API." }
 ];
 
 // Prefix all file paths with BASE so iframe src resolves correctly from this page's location
@@ -1516,6 +1533,7 @@ function itemMatchesFilter(item, f) {
   if (f==='product')   return item.tags.includes('product');
   if (f==='link')      return item.tags.includes('link');
   if (f==='redirects') return item.platform==='redirects';
+  if (f==='embed')     return item.tags.includes('embed');
   return false;
 }
 
