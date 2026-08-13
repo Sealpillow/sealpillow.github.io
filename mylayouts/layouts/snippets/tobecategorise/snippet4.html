@@ -1,0 +1,89 @@
+<!--
+  03-split-section-v5-2
+  Two-column image grid: left column has a single top image (grid row 1
+  of 2, second row unused here), right column is one large full-height image.
+-->
+<style>
+
+/* Split Section V5 */
+.split-section-v5-2 {
+  display: grid;
+  grid-template-columns: 0.5fr 0.5fr;
+}
+
+/* Split Section V5 > A */
+.split-section-v5-2 a {
+  display: block;
+}
+
+/* Split Section V5 > Split Right > Img */
+.split-section-v5-2 .split-right picture,
+.split-section-v5-2 .split-right img {
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Split Section V5 > Split Left */
+.split-section-v5-2 .split-left {
+  display: grid;
+  grid-template-rows: 0.5fr 0.5fr;
+}
+
+/* Split Section V5 > Left Top > Img */
+.split-section-v5-2 .split-left picture,
+.split-section-v5-2 .left-top img {
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Split Section V5 > Left Top */
+.split-section-v5-2 .left-top {
+  display: block;
+  margin-right: auto;
+  width: 100%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Split Section V5 */
+  .split-section-v5-2 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Split Section V5 > Split Left */
+  .split-section-v5-2 .split-left {
+    grid-template-rows: auto auto;
+  }
+}
+
+</style>
+
+<div class="split-section-v5-2">
+
+    <!-- LEFT COLUMN -->
+    <div class="split-left">
+
+        <!-- TOP SMALL IMAGE -->
+        <div class="left-top">
+          <picture>
+              <source srcset="images/thejournal/2026/aug26/in-dialogue-with-ana-kras/dialogue-ana-kras-b1.jpg?$staticlink$" media="(min-width: 768px)">
+              <img src="images/thejournal/2026/aug26/in-dialogue-with-ana-kras/dialogue-ana-kras-b1.jpg?$staticlink$" alt="">
+          </picture>
+        </div>
+
+    </div>
+
+    <!-- RIGHT LARGE IMAGE -->
+    <div class="split-right">
+      <picture>
+          <source srcset="images/thejournal/2026/aug26/in-dialogue-with-ana-kras/dialogue-ana-kras-b2.jpg?$staticlink$" media="(min-width: 768px)">
+          <img src="images/thejournal/2026/aug26/in-dialogue-with-ana-kras/dialogue-ana-kras-b2.jpg?$staticlink$" alt="">
+      </picture>
+
+    </div>
+
+</div>

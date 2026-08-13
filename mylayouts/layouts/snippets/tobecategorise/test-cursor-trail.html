@@ -1,0 +1,57 @@
+
+<style>
+  body {
+    margin: 0;
+    cursor: none;
+  }
+  .cursor-trail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    pointer-events: none;
+    z-index: 9999;
+    background: url('../../media/cursor.gif') no-repeat center/contain;
+  }
+</style>
+
+<script>
+  const TRAIL_COUNT = 8;
+  const trails = [];
+
+  for (let i = 0; i < TRAIL_COUNT; i++) {
+    const el = document.createElement('div');
+    el.className = 'cursor-trail';
+    el.style.opacity = (1 - i / TRAIL_COUNT).toFixed(2);
+    el.style.transform = `scale(${(1 - i / (TRAIL_COUNT * 1.5)).toFixed(2)})`;
+    document.body.appendChild(el);
+    trails.push({ el, x: 0, y: 0 });
+  }
+
+  let mouseX = 0;
+  let mouseY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  function animate() {
+    let targetX = mouseX;
+    let targetY = mouseY;
+
+    trails.forEach((trail) => {
+      trail.x += (targetX - trail.x) * 0.3;
+      trail.y += (targetY - trail.y) * 0.3;
+      trail.el.style.left = `${trail.x - 16}px`;
+      trail.el.style.top = `${trail.y - 16}px`;
+      targetX = trail.x;
+      targetY = trail.y;
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>

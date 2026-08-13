@@ -1,0 +1,95 @@
+
+<style>
+
+/* Img Right Text Left */
+.img-right-text-left {
+  align-items: center;
+  display: flex;
+  margin: 0 0 100px;
+}
+
+/* Img Right Text Left > Image Block > Img */
+.img-right-text-left .image-block img {
+  display:block;
+  height:auto;
+  width:100%;
+}
+
+/* Img Right Text Left > Image Block */
+.img-right-text-left .image-block {
+  flex: 1;
+  margin-right: 5%;
+}
+
+/* Img Right Text Left > Text Block */
+.img-right-text-left .text-block {
+  flex: 2;
+}
+
+.img-right-text-left .inner-text {
+    width: 50%;
+    margin: 0 auto;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Img Right Text Left */
+  .img-right-text-left {
+    flex-direction: column;
+    margin: 0 0 50px;
+  }
+
+  /* Img Right Text Left > Image Block */
+  .img-right-text-left .image-block {
+    order: 2;
+    margin: 10%;
+  }
+
+  /* Img Right Text Left > Text Block */
+  .img-right-text-left .text-block {
+    order: 1;
+  }
+  .img-right-text-left .inner-text {
+    width: 80%;
+  }
+}
+
+</style>
+
+<!-- USAGE EXAMPLE B: title + body, with a mobile-only caption under the image -->
+<section class="img-right-text-left" style="align-items:center;">
+
+    <!-- TEXT BLOCK (LEFT) -->
+    <div class="text-block" >
+        <div class="inner-text">
+
+            <!-- title -->
+            <p class="mb-0 p-0 col-md-12"
+                style="font-family:proxima-nova; font-size:20px; text-align:left; line-height:33px; font-weight:500;">
+                Classic Silhouette
+            </p>
+            <br>
+            <!-- body -->
+            <p class="mb-0"
+                style="font-family:proxima-nova; font-size:16px; text-align:left; line-height:normal; font-weight:400;">
+                Subtle-shine calf leather meets signature platform soles.
+                Elevate everyday wear with understated style by pairing it with tailored
+                pants or with denim jeans.
+            </p>
+
+        </div>
+    </div>
+
+    <!-- IMAGE BLOCK (RIGHT) -->
+    <div class="image-block">
+        <a class="js-shop-the-collection" data-pid="PM1-56380021_BLACK" href="$url('Product-Show','pid','PM1-56380021_BLACK')$">
+            <picture>
+                <source srcset="images/thejournal/2026/aug26/classic-redefined/tw-hybrix-g1.jpg?$staticlink$" media="(min-width: 768px)">
+                <img src="images/thejournal/2026/aug26/classic-redefined/tw-hybrix-g1.jpg?$staticlink$" alt="Shoes on white background" >
+            </picture>
+        </a>
+        <p class="d-block d-md-none" style="font-family: proxima-nova; font-size: 12px; padding-top: 12px;">Hybrix Leather Penny Loafers</p>
+    </div>
+
+</section>
+

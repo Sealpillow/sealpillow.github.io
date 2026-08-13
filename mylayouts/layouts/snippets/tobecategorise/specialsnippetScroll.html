@@ -1,0 +1,352 @@
+<!-- ============ scroll-zoom-hero ============ -->
+<!-- Pinned scroll section, two phases:
+     1) GROW  — title shrinks/fades, image scales up from small,
+                anchored at the TOP (grows downward only, top edge fixed)
+                until it reaches full width.
+     2) PAN   — once full width, the (now tall) image pans upward to
+                reveal the rest of it, like scrolling through a tall photo.
+     Portrait-safe: no cropping, full image is always eventually shown.
+     Pin is JS-driven (absolute -> fixed -> absolute) instead of CSS
+     `position: sticky`, so it isn't broken by an ancestor's overflow
+     or transform. Vanilla JS, no external libs. -->
+
+<section class="scroll-zoom-hero js-vertical-slider" id="scrollZoomHero">
+
+  <p class="scroll-zoom-hero__title">Title<br/>Goes Here</p>
+
+  <div class="scroll-zoom-hero__intro">
+    <p>Issue No. 1<br />Some Subtitle Here</p>
+  </div>
+
+  <div class="scroll-zoom-hero__pin">
+
+    <nav class="scroll-zoom-hero__nav">
+      <div class="scroll-zoom-hero__nav-group">
+        <span>Menu</span>
+      </div>
+      <div class="scroll-zoom-hero__nav-group">
+        <span>Bag · 0</span>
+      </div>
+    </nav>
+
+    <div class="scroll-zoom-hero__image-wrap">
+      <img
+        class="scroll-zoom-hero__image"
+        src="images/testfile/CAMPAIGN-2-SPRING-2026-20.jpg?$staticlink$"
+        alt=""
+      />
+    </div>
+
+    <div class="scroll-zoom-hero__copy">
+      <p class="scroll-zoom-hero__copy-eyebrow">About</p>
+      <p class="scroll-zoom-hero__copy-body">
+        Your description paragraph goes here. Replace this with the real
+        copy — it fades in over the image as the pan phase finishes.
+      </p>
+      <a class="scroll-zoom-hero__copy-link" href="#">Explore →</a>
+    </div>
+
+  </div>
+</section>
+
+<section class="next-section">
+    <h2>Next Section</h2>
+</section>
+
+<style>
+
+  body,
+    html {
+  color: black;
+  height:auto;
+  margin: 0;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+/* Folder Header */
+.folder-header {
+  display: none;
+  visibility: hidden;
+}
+
+/* Folder_Post > Folder Container > Container */
+.folder_post .folder-container .container {
+  display: none;
+}
+
+/* Page > Parallax */
+.page.parallax {
+  padding-top: 0px !important;
+}
+
+  .scroll-zoom-hero {
+    position: relative;
+    /* height is set by JS once the image's real aspect ratio is known,
+       so the pan distance always matches the actual image height */
+  }
+
+  .scroll-zoom-hero__pin {
+    /* position is set dynamically in JS (absolute/fixed/absolute)
+       instead of relying on CSS `position: sticky`, since sticky breaks
+       if any ancestor has overflow/transform set on it. `absolute` here
+       is just the pre-JS fallback. */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg, #f4f2ee);
+  }
+
+  .scroll-zoom-hero__nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 32px;
+    opacity: var(--nav-opacity, 0);
+    transform: translateY(calc((1 - var(--nav-opacity, 0)) * -12px));
+  }
+
+  .scroll-zoom-hero__nav-group {
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .scroll-zoom-hero__title {
+    position: fixed;   /* independent of the pin — persists after it releases */
+    top: 50%;
+    left: 50%;
+    z-index: 5;
+    margin: 0;
+    text-align: center;
+    white-space: nowrap;
+    color:white;
+    font-size: 35px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    pointer-events: none;
+    transform:
+      translate(-50%, -50%)
+      translateY(var(--title-shift, 0px))
+      scale(var(--title-scale, 1));
+  }
+
+  .scroll-zoom-hero__intro {
+    position: fixed;
+    z-index: 4;
+    top: 10%;
+    left: 20%;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    opacity: var(--intro-opacity, 1);
+    pointer-events: none;
+  }
+
+  .scroll-zoom-hero__intro p {
+    margin: 0;
+  }
+
+  .scroll-zoom-hero__image-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;   /* top-anchored, not centered */
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .scroll-zoom-hero__image {
+    width: 100%;
+    height: auto;              /* keeps natural aspect ratio at full width */
+    display: block;
+    transform-origin: top center; /* grows downward, top edge stays put */
+    transform:
+      translateY(var(--image-pan, 0px))
+      scale(var(--image-scale, 0.28));
+  }
+
+  .scroll-zoom-hero__copy {
+    position: absolute;
+    z-index: 3;
+    right: 6%;
+    bottom: 12%;
+    max-width: 380px;
+    color: #fff;
+    opacity: var(--copy-opacity, 0);
+    transform: translateY(calc((1 - var(--copy-opacity, 0)) * 24px));
+  }
+
+  .scroll-zoom-hero__copy-eyebrow {
+    margin: 0 0 12px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .scroll-zoom-hero__copy-body {
+    margin: 0 0 16px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .scroll-zoom-hero__copy-link {
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: inherit;
+  }
+  .next-section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #111;
+    color: white;
+    font-size: 50px;
+}
+</style>
+
+<script>
+  (function () {
+    var wrapper = document.getElementById('scrollZoomHero');
+    var pin = wrapper.querySelector('.scroll-zoom-hero__pin');
+    var title = wrapper.querySelector('.scroll-zoom-hero__title');
+    var intro = wrapper.querySelector('.scroll-zoom-hero__intro');
+    var img = wrapper.querySelector('.scroll-zoom-hero__image');
+    var ticking = false;
+
+    // tweakable: how much scroll distance the "grow" phase takes, in vh units
+    var GROW_VH_MULTIPLIER = 1.1;
+
+    // tweakable: starting scale of the image (must end at 1 = full width —
+    // see imageScale formula below, which always resolves to 1 regardless
+    // of this value)
+    var START_SCALE = 0.68;
+
+    var growDistance = 0;
+    var panDistance = 0;
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function easeOutQuad(t) {
+      return 1 - (1 - t) * (1 - t);
+    }
+
+    function recalcLayout() {
+      var vh = window.innerHeight;
+
+      growDistance = vh * GROW_VH_MULTIPLIER;
+
+      // measure the image's actual layout height directly (width: 100%,
+      // height: auto, so this is the true full-size height). offsetHeight
+      // is used rather than getBoundingClientRect() because the latter
+      // includes the current CSS transform (scale/translateY), which would
+      // report a shrunk height while mid-animation.
+      var displayedHeight = img.offsetHeight;
+      panDistance = Math.max(0, displayedHeight - vh);
+
+      wrapper.style.height = (vh + growDistance + panDistance) + 'px';
+      update();
+    }
+
+    function update() {
+      ticking = false;
+
+      var rect = wrapper.getBoundingClientRect();
+      var totalDistance = growDistance + panDistance;
+
+      // --- pin position: manually switch absolute -> fixed -> absolute
+      //     instead of relying on CSS `position: sticky`, which breaks if
+      //     any ancestor has overflow/transform/filter set on it ---
+      if (rect.top > 0) {
+        // haven't reached the section yet
+        pin.style.position = 'absolute';
+        pin.style.top = '0px';
+      } else if (rect.top <= -totalDistance) {
+        // scrolled past the pinned range — release at the bottom of wrapper
+        pin.style.position = 'absolute';
+        pin.style.top = totalDistance + 'px';
+      } else {
+        // actively within the pinned range — lock to viewport
+        pin.style.position = 'fixed';
+        pin.style.top = '0px';
+      }
+
+      var scrolled = clamp(-rect.top, 0, totalDistance);
+
+      // --- phase 1: grow (top-anchored) ---
+      var growProgress = clamp(scrolled / growDistance, 0, 1);
+      var growEased = easeOutQuad(growProgress);
+
+      // always resolves to exactly 1 (full width) when growEased === 1,
+      // regardless of START_SCALE — this is what was broken before
+      var imageScale = START_SCALE + growEased * (1 - START_SCALE);
+      var titleScale = 1 - growEased * 0.55; // ends at scale(0.45)
+
+      // shift is computed from the actual viewport height so the title's
+      // resting position ends up a fixed distance from the top regardless
+      // of screen size, instead of a flat px value
+      var vh = window.innerHeight;
+      var TITLE_TOP_REST_PX = 100; // how far from the top the title settles
+      var maxShift = -(vh / 2 - TITLE_TOP_REST_PX);
+      var titleShift = growEased * maxShift;
+
+      // fades out early in the grow phase — fully gone by 40% progress
+      var introOpacity = clamp(1 - growProgress / 0.4, 0, 1);
+
+      // --- phase 2: pan (only once grow phase is complete) ---
+      var panProgress = panDistance > 0
+        ? clamp((scrolled - growDistance) / panDistance, 0, 1)
+        : 0;
+      var imagePan = -panProgress * panDistance;
+
+      // nav + copy overlay both fade in as the pan phase begins
+      var navOpacity = clamp(growProgress >= 1 ? panProgress / 0.3 : 0, 0, 1);
+      var copyOpacity = clamp(growProgress >= 1 ? (panProgress - 0.15) / 0.35 : 0, 0, 1);
+
+      pin.style.setProperty('--image-scale', imageScale.toFixed(4));
+      pin.style.setProperty('--image-pan', imagePan.toFixed(1) + 'px');
+      title.style.setProperty('--title-scale', titleScale.toFixed(4));
+      title.style.setProperty('--title-shift', titleShift.toFixed(1) + 'px');
+      wrapper.style.setProperty('--intro-opacity', introOpacity.toFixed(3));
+      pin.style.setProperty('--nav-opacity', navOpacity.toFixed(3));
+      pin.style.setProperty('--copy-opacity', copyOpacity.toFixed(3));
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    }
+
+    function onImageReady() {
+      recalcLayout();
+    }
+
+    if (img.complete) {
+      onImageReady();
+    } else {
+      img.addEventListener('load', onImageReady);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', recalcLayout);
+  })();
+</script>

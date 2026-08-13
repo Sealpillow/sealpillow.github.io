@@ -1,0 +1,61 @@
+<!--
+  03-img-shift-left
+  Inset image (67% width on desktop, full-width on mobile) with an
+  optional caption underneath. Used twice — second usage example omits
+  the caption.
+-->
+<style>
+
+.img-shift-left {
+    width: 67%;
+    margin: 100px 0px 50px;
+}
+
+.img-shift-left__link {
+    display: block;
+}
+
+.img-shift-left__img {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+}
+
+.img-shift-left__caption {
+    margin: 12px 0 0;
+    font-family: proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    left: 50%;
+    position: relative;
+    color: #1a1a1a;
+}
+
+@media (max-width: 767px){
+    .img-shift-left {
+        width: 100%;
+        margin: 50px 0px 50px;
+    }
+}
+
+</style>
+
+<!-- USAGE EXAMPLE A: with caption -->
+<section class="img-shift-left">
+    <a class="js-shop-the-collection" data-pid="PM1-56380050_BLACK" href="$url('Product-Show','pid','PM1-56380050_BLACK')$">
+        <picture>
+            <source srcset="images/thejournal/2026/aug26/classic-redefined/tw-hybrix-c1.jpg?$staticlink$" media="(min-width: 768px)">
+            <img class="img-shift-left__img" src="images/thejournal/2026/aug26/classic-redefined/tw-hybrix-c1.jpg?$staticlink$" alt="Model seated on a brick wall wearing the Hybrix Leather Derby Shoes, next to a product shot of the shoes on a wooden surface" >
+        </picture>
+    </a>
+    <p class="img-shift-left__caption">Hybrix Leather Derby Shoes</p>
+</section>
+
+<!-- USAGE EXAMPLE B: without caption -->
+<section class="img-shift-left">
+    <a class="js-shop-the-collection" data-pid="PM1-56380050_BLACK" href="$url('Product-Show','pid','PM1-56380050_BLACK')$">
+        <picture>
+            <source srcset="images/thejournal/2026/aug26/classic-redefined/tw-hybrix-i1.jpg?$staticlink$" media="(min-width: 768px)">
+            <img class="img-shift-left__img" src="images/thejournal/2026/aug26/classic-redefined/tw-hybrix-i1.jpg?$staticlink$" alt="Model seated on a brick wall wearing the Hybrix Leather Derby Shoes, next to a product shot of the shoes on a wooden surface" >
+        </picture>
+    </a>
+</section>

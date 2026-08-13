@@ -1,0 +1,96 @@
+
+<style>
+
+/* Img Right Text Left */
+.img-right-text-left {
+  align-items: center;
+  display: flex;
+  margin: 0 0 100px;
+}
+
+/* Img Right Text Left > Image Block > Img */
+.img-right-text-left .image-block img {
+  display:block;
+  height:auto;
+  width:100%;
+}
+
+/* Img Right Text Left > Image Block */
+.img-right-text-left .image-block {
+  flex: 1;
+  order: 2;
+  margin-right: 5%;
+}
+
+/* Img Right Text Left > Text Block */
+.img-right-text-left .text-block {
+  flex: 2;
+  order: 1;
+}
+
+.img-right-text-left .inner-text {
+    width: 50%;
+    margin: 0 auto;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Img Right Text Left */
+  .img-right-text-left {
+    flex-direction: column;
+    margin: 0 0 50px;
+  }
+
+  /* Img Right Text Left > Image Block */
+  .img-right-text-left .image-block {
+    order: 2;
+    margin: 10%;
+  }
+
+  /* Img Right Text Left > Text Block */
+  .img-right-text-left .text-block {
+    order: 1;
+  }
+  .img-right-text-left .inner-text {
+    width: 80%;
+  }
+}
+
+</style>
+
+<!-- USAGE EXAMPLE A: title + body -->
+<section class="img-right-text-left" style="align-items:center;">
+
+    <!-- TEXT BLOCK (LEFT) -->
+    <div class="text-block" >
+        <div class="inner-text">
+
+            <!-- title -->
+            <p class="mb-0 p-0 col-md-12"
+                style="font-family:proxima-nova; font-size:20px; text-align:left; line-height:33px; font-weight:500;">
+                Urban Smart Casual
+            </p>
+            <br>
+            <!-- body -->
+            <p class="mb-0"
+                style="font-family:proxima-nova; font-size:16px; text-align:left; line-height:normal; font-weight:400; ">
+                Reinterpreting classic lace-ups with chunky platform soles.
+                Sleek leather lines preserve formal elegance,
+                while elevated proportions add a bold edge for any occasion.
+            </p>
+
+        </div>
+    </div>
+
+    <!-- IMAGE BLOCK (RIGHT) -->
+    <div class="image-block">
+        <a class="js-shop-the-collection" data-pid="PW2-75210182_BROWN" href="$url('Product-Show','pid','PW2-75210182_BROWN')$">
+            <picture>
+                <source srcset="images/thejournal/2026/aug26/classic-redefined/tw-hybrix-d1.jpg?$staticlink$" media="(min-width: 768px)">
+                <img src="images/thejournal/2026/aug26/classic-redefined/tw-hybrix-d1.jpg?$staticlink$" alt="Shoes on white background" >
+            </picture>
+        </a>
+    </div>
+
+</section>
+

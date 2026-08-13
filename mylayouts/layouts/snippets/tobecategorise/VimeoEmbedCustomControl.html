@@ -1,0 +1,260 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://player.vimeo.com/api/player.js"></script>
+<style>
+
+.video-media-container {
+    width: 80%;
+    margin: 0 auto;
+    position: relative;   /* add this */
+}
+.iframe-wrapper iframe {
+    filter: grayscale(0);
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  .video-media-container {
+    width: 100%;
+  }
+}
+
+/* Controls */
+.controls {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.video-media-container:hover .controls {
+  opacity: 1;
+}
+
+/* Controls */
+.controls {
+  align-items: center;
+  bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  left: 50%;
+  padding: 1rem;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 75%;
+}
+
+/* Controls > Button */
+.controls button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Controls > Button > Img */
+.controls button img {
+  display: block;
+}
+
+/* Icon Play > Icon Pause */
+.icon-play, .icon-pause {
+  height: 24px;
+  width: 12px;
+}
+
+/* Icon Mute > Icon Unmute */
+.icon-mute, .icon-unmute {
+  height: 12px;
+  width: 12px;
+}
+
+/* Controls > Mute */
+.controls .mute {
+  transform: translateY(-1.5px);
+}
+
+/* Icon Pause */
+.icon-pause {
+  display: none;
+}
+
+/* Play > Is Playing > Icon Play */
+.play.is-playing .icon-play {
+  display: none;
+}
+
+/* Play > Is Playing > Icon Pause */
+.play.is-playing .icon-pause {
+  display: inline;
+}
+
+/* Play > Is Paused > Icon Play */
+.play.is-paused .icon-play {
+  display: inline;
+}
+
+/* Play > Is Paused > Icon Pause */
+.play.is-paused .icon-pause {
+  display: none;
+}
+
+/* Timeline */
+.timeline {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+
+/* Progressbar */
+.progressBar {
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  height: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Progressfill */
+.progressFill {
+  background: white;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  width: 100%;
+  will-change: transform;
+}
+
+/* Seek */
+.seek {
+  cursor: pointer;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+}
+</style>
+
+<div class="video-media-container">
+  <!-- Desktop Video -->
+  <div class="iframe-wrapper d-none d-md-block" style="padding:56.2% 0 0 0;position:relative;">
+    <iframe
+      src="https://player.vimeo.com/video/1216359775?h=2c9ec2fc44&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&controls=0&loop=1"
+      frameborder="0"
+      allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      style="position:absolute;top:0;left:0;width:100%;height:100%;"
+      title="MasterFilm_16x9">
+    </iframe>
+  </div>
+
+  <!-- Mobile Video -->
+  <div class="iframe-wrapper d-block d-md-none" style="padding:56% 0 0 0;position:relative;">
+    <iframe
+      src="https://player.vimeo.com/video/1216031514?h=71e9590ebc&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1&controls=0"
+      frameborder="0"
+      allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      style="position:absolute;top:0;left:0;width:100%;height:100%;"
+      title="dialogue-ana-kras-video_mobile">
+    </iframe>
+  </div>
+  <div class="controls">
+    <button class="play is-playing">
+      <img class="icon-play" src="images/media-assets/play-white.svg?$staticlink$">
+      <img class="icon-pause" src="images/media-assets/pause-white.svg?$staticlink$">
+    </button>
+
+    <div class="timeline">
+      <div class="progressBar">
+        <div class="progressFill"></div>
+      </div>
+      <input class="seek" type="range" value="0" min="0" step="0.01">
+    </div>
+
+    <button class="mute">
+      <img class="icon-mute" src="images/media-assets/mute.png?$staticlink$">
+      <img class="icon-unmute" src="images/media-assets/unmute.png?$staticlink$" style="display:none;">
+    </button>
+  </div>
+
+</div>
+
+
+
+<script>
+
+function initVideoControls(scope = document) {
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+    // Pick whichever iframe is currently visible for this breakpoint
+    const wrappers = container.querySelectorAll('.iframe-wrapper');
+    const activeWrapper = Array.from(wrappers).find(w => w.offsetParent !== null) || wrappers[0];
+    if (!activeWrapper) return;
+
+    const iframe = activeWrapper.querySelector('iframe');
+    if (!iframe) return;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+    const iconMute = container.querySelector('.icon-mute');
+    const iconUnmute = container.querySelector('.icon-unmute');
+
+    if (!playBtn || !muteBtn || !seek || !progressFill) return;
+
+    const player = new Vimeo.Player(iframe);
+    let isMuted = true; // matches muted=1 in the embed URL
+    let duration = 0;
+
+    player.setVolume(0.2).catch(() => {});
+    player.getDuration().then(d => { duration = d; }).catch(() => {});
+
+    // Clone buttons to strip any stale listeners on re-init
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newMuteBtn = muteBtn.cloneNode(true);
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+
+    const freshPlayBtn = container.querySelector('.play');
+    const freshMuteBtn = container.querySelector('.mute');
+    const freshIconMute = container.querySelector('.icon-mute');
+    const freshIconUnmute = container.querySelector('.icon-unmute');
+
+    freshPlayBtn.addEventListener('click', () => {
+      player.getPaused().then(paused => {
+        if (paused) {
+          player.play();
+          freshPlayBtn.classList.add('is-playing');
+          freshPlayBtn.classList.remove('is-paused');
+        } else {
+          player.pause();
+          freshPlayBtn.classList.add('is-paused');
+          freshPlayBtn.classList.remove('is-playing');
+        }
+      });
+    });
+
+    freshMuteBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      player.setMuted(isMuted);
+      freshIconMute.style.display = isMuted ? 'block' : 'none';
+      freshIconUnmute.style.display = isMuted ? 'none' : 'block';
+    });
+
+    player.on('timeupdate', data => {
+      progressFill.style.transform = `scaleX(${data.percent})`;
+      seek.value = data.percent * 100;
+      if (data.duration) duration = data.duration;
+    });
+
+    seek.addEventListener('input', () => {
+      const percent = seek.value / 100;
+      if (duration) {
+        player.setCurrentTime(percent * duration);
+      }
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
