@@ -5,14 +5,14 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "ANNUAL",
     "frequency_display": "Annual",
     "adaptive_window_days": 182,
     "mean_interval_days": 395.8,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -43.0
+    "price_growth_5yr_pct": -42.6
   },
   "parse_preflight": {
     "columns_detected": [
@@ -32,7 +32,7 @@
     "zero_volume_rows": 0,
     "zero_volume_pct": 0.0,
     "issues_found": [
-      "3 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date"
+      "3 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date"
     ],
     "halted": false
   },
@@ -45,7 +45,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 May ex-div",
+      "label": "Series 1 — May ex-div",
       "sub": "Annual",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -839,13 +839,13 @@
       "est_low_date_cluster2_to": "2027-04-03",
       "est_low_date_cluster1_sd_wks": 0.81,
       "est_low_date_cluster2_sd_wks": 5.98,
-      "est_low_date_note": "Bimodal - two timing clusters: early dip Dec 9 (21.6wk before) or late dip Mar 11 \u2013 Apr 3 (best: Mar 23) (6.8wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Dec 9 \u00b7 Cluster 2: Mar 11 \u2013 Apr 3 (best: Mar 23)",
+      "est_low_date_note": "Bimodal - two timing clusters: early dip Dec 9 (21.6wk before) or late dip Mar 11 – Apr 3 (best: Mar 23) (6.8wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: Dec 9 · Cluster 2: Mar 11 – Apr 3 (best: Mar 23)",
       "est_watch_window_primary_note": "Primary cluster: Late (3 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 2.6245,
-      "entry_status": "INSIDE",
-      "entry_status_display": "Inside",
+      "current_price_vs_zone": -2.4226,
+      "entry_status": "BELOW",
+      "entry_status_display": "Below",
       "timing_rating": "BIMODAL",
       "timing_rating_display": "Bimodal",
       "cluster_dominance": {
@@ -926,8 +926,23 @@
         "pct_cycles_outside_zone_clean": 85.7,
         "pct_cycles_outside_zone_full": 80.0,
         "fragility_warning": true,
-        "median_miss_pct": 13.84
-      }
+        "median_miss_pct": 13.84,
+        "fragility_percentile_band": "BELOW_MEDIAN",
+        "fragility_percentile_band_display": "Below median"
+      },
+      "final_verdict": "Too Risky",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Tail risk is too severe for a live setup.",
+      "potential_score": 78.3,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Dividend frequency is not one of the preferred cycle structures",
+        "Tail risk is severe"
+      ],
+      "structural_health_flags": [
+        "PRICE_DECLINE"
+      ],
+      "structural_health_override_applied": false
     }
   },
   "annual_payouts": [
@@ -1241,18 +1256,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 0.295
-    },
-    {
-      "d": "2016-08-12",
-      "c": 0.29
-    },
-    {
-      "d": "2016-08-19",
-      "c": 0.295
-    },
     {
       "d": "2016-08-26",
       "c": 0.29
@@ -3331,14 +3334,26 @@
     },
     {
       "d": "2026-08-07",
-      "c": 0.305
+      "c": 0.295
+    },
+    {
+      "d": "2026-08-14",
+      "c": 0.295
+    },
+    {
+      "d": "2026-08-21",
+      "c": 0.28
+    },
+    {
+      "d": "2026-08-28",
+      "c": 0.29
     }
   ],
-  "current_price": 0.305,
+  "current_price": 0.29,
   "anchor_price": 0.34,
   "anchor_date": "2026-05-08",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {

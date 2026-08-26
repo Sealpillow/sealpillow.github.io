@@ -5,14 +5,14 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "QUARTERLY",
     "frequency_display": "Quarterly",
     "adaptive_window_days": 91,
     "mean_interval_days": 102.6,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -87.3
+    "price_growth_5yr_pct": -87.1
   },
   "parse_preflight": {
     "columns_detected": [
@@ -32,7 +32,7 @@
     "zero_volume_rows": 0,
     "zero_volume_pct": 0.0,
     "issues_found": [
-      "2 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date"
+      "2 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date"
     ],
     "halted": false
   },
@@ -45,7 +45,7 @@
   "series_meta": [
     {
       "id": "Q1",
-      "label": "Quarter 1 (Jan\u2013Mar)",
+      "label": "Quarter 1 (Jan–Mar)",
       "sub": "Quarterly",
       "color": "#a78bfa",
       "bg": "rgba(167,139,250,0.1)",
@@ -53,7 +53,7 @@
     },
     {
       "id": "Q2",
-      "label": "Quarter 2 (Apr\u2013Jun)",
+      "label": "Quarter 2 (Apr–Jun)",
       "sub": "Quarterly",
       "color": "#22d3c8",
       "bg": "rgba(34,211,200,0.1)",
@@ -61,7 +61,7 @@
     },
     {
       "id": "Q3",
-      "label": "Quarter 3 (Jul\u2013Sep)",
+      "label": "Quarter 3 (Jul–Sep)",
       "sub": "Quarterly",
       "color": "#4f8ef7",
       "bg": "rgba(79,142,247,0.1)",
@@ -69,7 +69,7 @@
     },
     {
       "id": "Q4",
-      "label": "Quarter 4 (Oct\u2013Dec)",
+      "label": "Quarter 4 (Oct–Dec)",
       "sub": "Quarterly",
       "color": "#e8a838",
       "bg": "rgba(232,168,56,0.1)",
@@ -102,11 +102,11 @@
       "outlier": false,
       "macro": false,
       "macro_detail": {
-        "market_index_return": -0.1888,
-        "stock_excess_return": 2.8188
+        "market_index_return": null,
+        "stock_excess_return": 4.0132
       },
       "volume_avg_30d": 18516351.0,
-      "volume_entry_ratio": 1.0027,
+      "volume_entry_ratio": 0.9831,
       "volume_trend": "STABLE",
       "max_drawdown_pre_exdiv": -2.63,
       "recovery_time_days": 75,
@@ -2110,8 +2110,23 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": 1.14
-      }
+        "median_miss_pct": 1.14,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative.",
+      "potential_score": 58.8,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Win rate is below the minimum structural threshold"
+      ],
+      "structural_health_flags": [
+        "FRAGILE_ZONE",
+        "PRICE_DECLINE"
+      ],
+      "structural_health_override_applied": true
     },
     "Q2": {
       "proj_exdiv_date": "2027-05-08",
@@ -2135,8 +2150,8 @@
       "est_low_date_cluster2_to": "2027-04-21",
       "est_low_date_cluster1_sd_wks": 0.0,
       "est_low_date_cluster2_sd_wks": 3.5,
-      "est_low_date_note": "Bimodal - two timing clusters: early dip Jan 30 \u2013 Feb 19 (best: Feb 9) (12.6wk before) or late dip Apr 21 (2.4wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Jan 30 \u2013 Feb 19 (best: Feb 9) \u00b7 Cluster 2: Apr 21",
+      "est_low_date_note": "Bimodal - two timing clusters: early dip Jan 30 – Feb 19 (best: Feb 9) (12.6wk before) or late dip Apr 21 (2.4wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: Jan 30 – Feb 19 (best: Feb 9) · Cluster 2: Apr 21",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
       "current_price_vs_zone": -65.2174,
@@ -2222,11 +2237,26 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": 7.39
-      }
+        "median_miss_pct": 7.39,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative.",
+      "potential_score": 91.1,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative"
+      ],
+      "structural_health_flags": [
+        "FRAGILE_ZONE",
+        "PRICE_DECLINE"
+      ],
+      "structural_health_override_applied": true
     },
     "Q3": {
-      "proj_exdiv_date": "2026-08-19",
+      "proj_exdiv_date": "2027-08-20",
       "anchor": 0.026,
       "anchor_source": "previous_exdiv_prev_dp",
       "zone_bot": 0.0233,
@@ -2239,16 +2269,16 @@
       "est_low_date": null,
       "est_low_date_from": null,
       "est_low_date_to": null,
-      "est_low_date_cluster1": "2026-05-21",
-      "est_low_date_cluster1_from": "2026-05-17",
-      "est_low_date_cluster1_to": "2026-05-25",
-      "est_low_date_cluster2": "2026-08-09",
-      "est_low_date_cluster2_from": "2026-08-09",
-      "est_low_date_cluster2_to": "2026-08-09",
+      "est_low_date_cluster1": "2027-05-22",
+      "est_low_date_cluster1_from": "2027-05-18",
+      "est_low_date_cluster1_to": "2027-05-26",
+      "est_low_date_cluster2": "2027-08-10",
+      "est_low_date_cluster2_from": "2027-08-10",
+      "est_low_date_cluster2_to": "2027-08-10",
       "est_low_date_cluster1_sd_wks": 0.0,
       "est_low_date_cluster2_sd_wks": 5.14,
-      "est_low_date_note": "Bimodal - two timing clusters: early dip May 17 \u2013 May 25 (best: May 21) (12.9wk before) or late dip Aug 9 (1.4wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: May 17 \u2013 May 25 (best: May 21) \u00b7 Cluster 2: Aug 9",
+      "est_low_date_note": "Bimodal - two timing clusters: early dip May 18 – May 26 (best: May 22) (12.9wk before) or late dip Aug 10 (1.4wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: May 18 – May 26 (best: May 22) · Cluster 2: Aug 10",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
       "current_price_vs_zone": -65.6652,
@@ -2334,8 +2364,20 @@
         "pct_cycles_outside_zone_clean": 0.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": false,
-        "median_miss_pct": null
-      }
+        "median_miss_pct": null,
+        "fragility_percentile_band": "TOP_25",
+        "fragility_percentile_band_display": "Top 25%"
+      },
+      "final_verdict": "Wait",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "Price is well below the zone and may have overshot the expected entry area.",
+      "potential_score": 69.7,
+      "potential_eligible": true,
+      "potential_ineligible_reasons": [],
+      "structural_health_flags": [
+        "PRICE_DECLINE"
+      ],
+      "structural_health_override_applied": false
     },
     "Q4": {
       "proj_exdiv_date": "2026-11-19",
@@ -2359,8 +2401,8 @@
       "est_low_date_cluster2_to": "2026-11-08",
       "est_low_date_cluster1_sd_wks": 0.0,
       "est_low_date_cluster2_sd_wks": 3.24,
-      "est_low_date_note": "Bimodal - two timing clusters: early dip Aug 21 (12.9wk before) or late dip Oct 21 \u2013 Nov 8 (best: Oct 30) (2.9wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Aug 21 \u00b7 Cluster 2: Oct 21 \u2013 Nov 8 (best: Oct 30)",
+      "est_low_date_note": "Bimodal - two timing clusters: early dip Aug 21 (12.9wk before) or late dip Oct 21 – Nov 8 (best: Oct 30) (2.9wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: Aug 21 · Cluster 2: Oct 21 – Nov 8 (best: Oct 30)",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
       "current_price_vs_zone": -65.9574,
@@ -2446,8 +2488,23 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": 12.58
-      }
+        "median_miss_pct": 12.58,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative.",
+      "potential_score": 83.4,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative"
+      ],
+      "structural_health_flags": [
+        "FRAGILE_ZONE",
+        "PRICE_DECLINE"
+      ],
+      "structural_health_override_applied": true
     }
   },
   "annual_payouts": [
@@ -2998,18 +3055,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 0.3295
-    },
-    {
-      "d": "2016-08-12",
-      "c": 0.3295
-    },
-    {
-      "d": "2016-08-19",
-      "c": 0.3384
-    },
     {
       "d": "2016-08-26",
       "c": 0.3339
@@ -5089,13 +5134,25 @@
     {
       "d": "2026-08-07",
       "c": 0.008
+    },
+    {
+      "d": "2026-08-14",
+      "c": 0.008
+    },
+    {
+      "d": "2026-08-21",
+      "c": 0.007
+    },
+    {
+      "d": "2026-08-28",
+      "c": 0.008
     }
   ],
   "current_price": 0.008,
   "anchor_price": 0.026,
   "anchor_date": "2023-03-03",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "Q1": {

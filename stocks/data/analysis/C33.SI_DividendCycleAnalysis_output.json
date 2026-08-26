@@ -5,14 +5,14 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "ANNUAL",
     "frequency_display": "Annual",
     "adaptive_window_days": 182,
     "mean_interval_days": 359.4,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": 17.8
+    "price_growth_5yr_pct": 2.1
   },
   "parse_preflight": {
     "columns_detected": [
@@ -32,7 +32,7 @@
     "zero_volume_rows": 0,
     "zero_volume_pct": 0.0,
     "issues_found": [
-      "2 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date"
+      "2 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date"
     ],
     "halted": false
   },
@@ -45,7 +45,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 Nov/Mar ex-div",
+      "label": "Series 1 — Nov/Mar ex-div",
       "sub": "Annual",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -79,10 +79,10 @@
       "macro": false,
       "macro_detail": {
         "market_index_return": null,
-        "stock_excess_return": 1.9608
+        "stock_excess_return": -1.8868
       },
       "volume_avg_30d": 307362.0,
-      "volume_entry_ratio": 0.818,
+      "volume_entry_ratio": 0.8618,
       "volume_trend": "INCREASING",
       "max_drawdown_pre_exdiv": -5.6604,
       "recovery_time_days": 47,
@@ -732,7 +732,7 @@
       },
       "liquidity": {
         "avg_volume_30d": 987101.0,
-        "volume_ratio_median": 0.818,
+        "volume_ratio_median": 0.8618,
         "adequacy_pct": 100.0
       },
       "risk": {
@@ -781,11 +781,11 @@
       "est_low_date_cluster2_to": "2026-06-23",
       "est_low_date_cluster1_sd_wks": 1.52,
       "est_low_date_cluster2_sd_wks": 4.38,
-      "est_low_date_note": "Bimodal - two timing clusters: early dip Mar 21 \u2013 Apr 12 (best: Apr 1) (22.6wk before) or late dip Jun 18 \u2013 Jun 23 (best: Jun 20) (11.1wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Mar 21 \u2013 Apr 12 (best: Apr 1) \u00b7 Cluster 2: Jun 18 \u2013 Jun 23 (best: Jun 20)",
+      "est_low_date_note": "Bimodal - two timing clusters: early dip Mar 21 – Apr 12 (best: Apr 1) (22.6wk before) or late dip Jun 18 – Jun 23 (best: Jun 20) (11.1wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: Mar 21 – Apr 12 (best: Apr 1) · Cluster 2: Jun 18 – Jun 23 (best: Jun 20)",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 62.7764,
+      "current_price_vs_zone": 50.4914,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "BIMODAL",
@@ -868,8 +868,20 @@
         "pct_cycles_outside_zone_clean": 50.0,
         "pct_cycles_outside_zone_full": 66.7,
         "fragility_warning": true,
-        "median_miss_pct": 8.69
-      }
+        "median_miss_pct": 8.69,
+        "fragility_percentile_band": "TOP_25",
+        "fragility_percentile_band_display": "Top 25%"
+      },
+      "final_verdict": "Wait",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "Price is too far above the entry zone right now.",
+      "potential_score": 76.5,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Dividend frequency is not one of the preferred cycle structures"
+      ],
+      "structural_health_flags": [],
+      "structural_health_override_applied": false
     }
   },
   "annual_payouts": [
@@ -1276,18 +1288,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 0.255
-    },
-    {
-      "d": "2016-08-12",
-      "c": 0.255
-    },
-    {
-      "d": "2016-08-19",
-      "c": 0.26
-    },
     {
       "d": "2016-08-26",
       "c": 0.265
@@ -3366,14 +3366,26 @@
     },
     {
       "d": "2026-08-07",
+      "c": 0.245
+    },
+    {
+      "d": "2026-08-14",
       "c": 0.265
+    },
+    {
+      "d": "2026-08-21",
+      "c": 0.25
+    },
+    {
+      "d": "2026-08-28",
+      "c": 0.245
     }
   ],
-  "current_price": 0.265,
+  "current_price": 0.245,
   "anchor_price": 0.22,
   "anchor_date": "2025-10-31",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {

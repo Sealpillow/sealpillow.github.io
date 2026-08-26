@@ -5,14 +5,14 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "SEMI-ANNUAL",
     "frequency_display": "Semi-Annual",
     "adaptive_window_days": 152,
     "mean_interval_days": 182.3,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -14.5
+    "price_growth_5yr_pct": -17.2
   },
   "parse_preflight": {
     "columns_detected": [
@@ -32,7 +32,7 @@
     "zero_volume_rows": 0,
     "zero_volume_pct": 0.0,
     "issues_found": [
-      "2 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date"
+      "2 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date"
     ],
     "halted": false
   },
@@ -41,7 +41,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 Feb ex-div",
+      "label": "Series 1 — Feb ex-div",
       "sub": "Semi-Annual",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -49,7 +49,7 @@
     },
     {
       "id": "S2",
-      "label": "Series 2 \u2014 Aug/Jul ex-div",
+      "label": "Series 2 — Aug/Jul ex-div",
       "sub": "Semi-Annual",
       "color": "#10b981",
       "bg": "rgba(16,185,129,0.1)",
@@ -1631,7 +1631,7 @@
       "est_watch_window_note": null,
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": 23.3495,
+      "current_price_vs_zone": 25.0869,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "UNRELIABLE",
@@ -1705,8 +1705,20 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 70.0,
         "fragility_warning": true,
-        "median_miss_pct": 7.43
-      }
+        "median_miss_pct": 7.43,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Wait",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "Price is too far above the entry zone right now.",
+      "potential_score": 77.3,
+      "potential_eligible": true,
+      "potential_ineligible_reasons": [],
+      "structural_health_flags": [
+        "FRAGILE_ZONE"
+      ],
+      "structural_health_override_applied": false
     },
     "S2": {
       "proj_exdiv_date": "2027-07-29",
@@ -1734,9 +1746,9 @@
       "est_watch_window_note": null,
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": 8.4632,
-      "entry_status": "INSIDE",
-      "entry_status_display": "Inside",
+      "current_price_vs_zone": 9.9908,
+      "entry_status": "ABOVE",
+      "entry_status_display": "Above",
       "timing_rating": "UNRELIABLE",
       "timing_rating_display": "Unreliable",
       "cluster_dominance": null,
@@ -1808,7 +1820,24 @@
         "pct_cycles_outside_zone_clean": 28.6,
         "pct_cycles_outside_zone_full": 90.0,
         "fragility_warning": false,
-        "median_miss_pct": 19.38
+        "median_miss_pct": 19.38,
+        "fragility_percentile_band": "TOP_25",
+        "fragility_percentile_band_display": "Top 25%"
+      },
+      "final_verdict": "Too Risky",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Tail risk is too severe for a live setup.",
+      "potential_score": 69.3,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Tail risk is severe"
+      ],
+      "structural_health_flags": [],
+      "structural_health_override_applied": false,
+      "cluster_track_record": {
+        "c1_wins": 0,
+        "c2_wins": 1,
+        "resolved_count": 1
       }
     }
   },
@@ -2134,18 +2163,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 0.6116
-    },
-    {
-      "d": "2016-08-12",
-      "c": 0.5852
-    },
-    {
-      "d": "2016-08-19",
-      "c": 0.5896
-    },
     {
       "d": "2016-08-26",
       "c": 0.594
@@ -4224,14 +4241,26 @@
     },
     {
       "d": "2026-08-07",
-      "c": 0.355
+      "c": 0.35
+    },
+    {
+      "d": "2026-08-14",
+      "c": 0.35
+    },
+    {
+      "d": "2026-08-21",
+      "c": 0.36
+    },
+    {
+      "d": "2026-08-28",
+      "c": 0.36
     }
   ],
-  "current_price": 0.355,
+  "current_price": 0.36,
   "anchor_price": 0.355,
   "anchor_date": "2026-07-29",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {

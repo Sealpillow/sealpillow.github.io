@@ -5,11 +5,11 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "SEMI-ANNUAL",
     "frequency_display": "Semi-Annual",
     "adaptive_window_days": 152,
-    "mean_interval_days": 183.9,
+    "mean_interval_days": 182.8,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
     "price_growth_5yr_pct": null
@@ -26,9 +26,9 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 253,
-    "price_rows": 244,
-    "dividend_rows": 9,
+    "total_rows": 257,
+    "price_rows": 247,
+    "dividend_rows": 10,
     "zero_volume_rows": 0,
     "zero_volume_pct": 0.0,
     "issues_found": [],
@@ -39,7 +39,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 Feb ex-div",
+      "label": "Series 1 — Feb ex-div",
       "sub": "Semi-Annual",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -47,7 +47,7 @@
     },
     {
       "id": "S2",
-      "label": "Series 2 \u2014 Aug/Jul ex-div",
+      "label": "Series 2 — Aug/Jul ex-div",
       "sub": "Semi-Annual",
       "color": "#10b981",
       "bg": "rgba(16,185,129,0.1)",
@@ -401,7 +401,7 @@
       "max_drawdown_pre_exdiv": -19.2982,
       "recovery_time_days": 110,
       "success": true,
-      "pattern_stability_score": 83.44,
+      "pattern_stability_score": 98.97,
       "zone_hit": true,
       "exit_analysis": {
         "opt_exit_px": 0.55,
@@ -472,6 +472,59 @@
         "post_exdiv_exit_gain_pct": 13.0435
       },
       "zone_miss_pct": 5.29
+    },
+    {
+      "id": "S2_2026",
+      "series": "S2",
+      "exdiv_date": "2026-08-05",
+      "div_amt": 0.018,
+      "prev_dp": 0.49,
+      "low_px": 0.485,
+      "low_date": "2026-03-13",
+      "peak_px": 0.52,
+      "peak_date": "2026-04-17",
+      "low_vs_prevdp": -1.0204,
+      "exdiv_vs_prevdp": 0.0,
+      "peak_vs_prevdp": 6.1224,
+      "rebound": 1.0309,
+      "wks_before": 20.7143,
+      "wks_to_peak": null,
+      "div_yield": 3.6735,
+      "s1": 360.0,
+      "s1_floored": false,
+      "s2": 6.1224,
+      "degen": false,
+      "incomplete": true,
+      "outlier": false,
+      "macro": false,
+      "macro_detail": {
+        "market_index_return": 17.5358,
+        "stock_excess_return": -17.5358
+      },
+      "volume_avg_30d": 14633801.0,
+      "volume_entry_ratio": 0.9061,
+      "volume_trend": "INCREASING",
+      "max_drawdown_pre_exdiv": -6.7308,
+      "recovery_time_days": null,
+      "success": false,
+      "pattern_stability_score": 31.52,
+      "zone_hit": false,
+      "exit_analysis": {
+        "opt_exit_px": null,
+        "opt_exit_date": null,
+        "opt_gain_pct": null,
+        "opt_wks_from_low": null,
+        "opt_days_vs_exdiv": null,
+        "opt_exit_before_exdiv": null,
+        "pre_exdiv_exit_date": null,
+        "pre_exdiv_exit_px": null,
+        "pre_exdiv_gain_pct": null,
+        "pre_exdiv_peak_days_before_exdiv": null,
+        "exdiv_date_exit_px": null,
+        "exdiv_date_exit_date": null,
+        "post_exdiv_exit_gain_pct": null
+      },
+      "zone_miss_pct": 9.61
     }
   ],
   "ss_series": {
@@ -670,78 +723,80 @@
       "window_days": 152,
       "full": {
         "wks_before": {
-          "avg": 11.5357,
-          "med": 11.2143,
-          "std": 5.8931,
+          "avg": 13.3714,
+          "med": 15.7143,
+          "std": 6.4236,
           "min": 4.8571,
-          "max": 18.8571,
+          "max": 20.7143,
           "vals": [
             4.8571,
             18.8571,
             6.7143,
-            15.7143
+            15.7143,
+            20.7143
           ],
-          "cv": 51.09
+          "cv": 48.04
         },
         "low_vs_prevdp": {
-          "avg": -13.0097,
-          "med": -13.9059,
-          "std": 5.5106,
+          "avg": -10.6118,
+          "med": -13.7931,
+          "std": 6.8769,
           "min": -19.802,
-          "max": -4.4248
+          "max": -1.0204
         },
         "peak_vs_prevdp": {
-          "avg": 16.0102,
-          "med": 12.0827,
-          "std": 10.2886,
-          "min": 6.5421,
+          "avg": 14.0326,
+          "med": 10.8911,
+          "std": 10.0164,
+          "min": 6.1224,
           "max": 33.3333
         },
         "s2": {
-          "avg": 16.0102,
-          "med": 12.0827,
-          "std": 10.2886,
-          "min": 6.5421,
+          "avg": 14.0326,
+          "med": 10.8911,
+          "std": 10.0164,
+          "min": 6.1224,
           "max": 33.3333
         }
       },
       "clean": {
-        "n_clean": 4,
-        "n_effective": 4,
-        "autocorr_rho": -0.5076,
+        "n_clean": 5,
+        "n_effective": 5,
+        "autocorr_rho": -0.3442,
         "wks_before": {
-          "avg": 11.5357,
-          "med": 11.2143,
-          "std": 5.8931,
+          "avg": 13.3714,
+          "med": 15.7143,
+          "std": 6.4236,
           "min": 4.8571,
-          "max": 18.8571,
+          "max": 20.7143,
           "vals": [
             4.8571,
             18.8571,
             6.7143,
-            15.7143
+            15.7143,
+            20.7143
           ],
-          "cv": 51.09
+          "cv": 48.04
         },
         "low_vs_prevdp": {
-          "avg": -13.0097,
-          "med": -13.9059,
-          "std": 5.5106,
+          "avg": -10.6118,
+          "med": -13.7931,
+          "std": 6.8769,
           "min": -19.802,
-          "max": -4.4248
+          "max": -1.0204
         },
         "peak_vs_prevdp": {
-          "avg": 16.0102,
-          "med": 12.0827,
-          "std": 10.2886,
-          "min": 6.5421,
+          "avg": 14.0326,
+          "med": 10.8911,
+          "std": 10.0164,
+          "min": 6.1224,
           "max": 33.3333
         },
         "s2": {
-          "avg": 16.0102,
-          "med": 12.0827,
-          "std": 10.2886,
-          "min": 6.5421,
+          "avg": 14.0326,
+          "med": 10.8911,
+          "std": 10.0164,
+          "min": 6.1224,
           "max": 33.3333
         }
       },
@@ -750,50 +805,52 @@
           4.8571,
           18.8571,
           6.7143,
-          15.7143
+          15.7143,
+          20.7143
         ],
         "ids": [
           "2022-08-04",
           "2023-08-03",
           "2024-07-31",
-          "2025-07-30"
+          "2025-07-30",
+          "2026-08-05"
         ],
-        "spread": 14.0,
-        "cv": 51.09,
-        "dip_depth_cv": 42.36,
-        "avg": 11.5357,
-        "med": 11.2143,
-        "std": 5.8931,
+        "spread": 15.8572,
+        "cv": 48.04,
+        "dip_depth_cv": 64.8,
+        "avg": 13.3714,
+        "med": 15.7143,
+        "std": 6.4236,
         "min": 4.8571,
-        "max": 18.8571,
+        "max": 20.7143,
         "rating": "BIMODAL",
         "rating_display": "Bimodal",
-        "verdict": "cv=51.09% spread=14.0wk",
+        "verdict": "cv=48.04% spread=15.8572wk",
         "trade_implication": "price_zone_only",
         "color": "yellow",
-        "price_zone_consistent": true,
+        "price_zone_consistent": false,
         "entry_timing_reliable": false,
         "bimodal_clust1_med_wks": 6.7143,
-        "bimodal_clust2_med_wks": 18.8571,
+        "bimodal_clust2_med_wks": 19.7857,
         "bimodal_clust1_sd_wks": 4.7414,
-        "bimodal_clust2_sd_wks": 0.0,
+        "bimodal_clust2_sd_wks": 0.9286,
         "bimodal_primary_cluster": "LATE",
         "bimodal_cluster_recent_counts": {
           "early": 1,
           "late": 2
         },
         "bimodal_clust1_count": 3,
-        "bimodal_clust2_count": 1,
+        "bimodal_clust2_count": 2,
         "bimodal_clust1_avg_dip": -10.75,
-        "bimodal_clust2_avg_dip": -19.8,
+        "bimodal_clust2_avg_dip": -10.41,
         "epoch_recent": {
           "ids": [
-            "2023-08-03",
             "2024-07-31",
-            "2025-07-30"
+            "2025-07-30",
+            "2026-08-05"
           ],
-          "cv": 37.39,
-          "spread": 12.1428,
+          "cv": 40.28,
+          "spread": 14.0,
           "verdict": "not approaching RELIABLE"
         },
         "peak_sequence": [
@@ -808,39 +865,40 @@
             7,
             3,
             6,
-            4
+            4,
+            3
           ],
           "modal_months": [
             3,
-            6,
             7
           ],
           "cal_window_label": "Mar-Jul window",
-          "cal_spread_days": 99,
-          "cal_doy_cv": 31.16,
+          "cal_spread_days": 110,
+          "cal_doy_cv": 36.6,
           "cal_window_rating": "CALENDAR_MODERATE",
           "cal_window_rating_display": "Moderate spread",
-          "n": 4
+          "n": 5
         }
       },
       "stability": {
         "scores": [
-          83.44
+          98.97,
+          31.52
         ],
         "stability_trend_slope": 0.0,
         "stability_trend_verdict": "INSUFFICIENT_DATA",
         "stability_trend_verdict_display": "Insufficient data",
-        "stability_recent_avg": 83.44
+        "stability_recent_avg": 65.25
       },
       "liquidity": {
-        "avg_volume_30d": 18752278.0,
-        "volume_ratio_median": 0.8655,
+        "avg_volume_30d": 17928583.0,
+        "volume_ratio_median": 0.9054,
         "adequacy_pct": 100.0
       },
       "risk": {
-        "max_drawdown_median": -23.1626,
+        "max_drawdown_median": -19.2982,
         "recovery_time_median": 78.5,
-        "success_rate": 100.0,
+        "success_rate": 80.0,
         "success_rate_all": 100.0
       },
       "exit_profile": {
@@ -861,17 +919,6 @@
   },
   "cgc_ranking": [
     {
-      "series_id": "S2",
-      "score": 62.08,
-      "median_s2": 12.0827,
-      "median_rebound": 16.1521,
-      "win_rate": 100.0,
-      "median_low_vs_prevdp": -13.9059,
-      "n_clean": 4,
-      "rank": 1,
-      "verdict": ""
-    },
-    {
       "series_id": "S1",
       "score": 57.8,
       "median_s2": 7.7953,
@@ -879,6 +926,17 @@
       "win_rate": 100.0,
       "median_low_vs_prevdp": -17.0096,
       "n_clean": 4,
+      "rank": 1,
+      "verdict": ""
+    },
+    {
+      "series_id": "S2",
+      "score": 50.89,
+      "median_s2": 10.8911,
+      "median_rebound": 16.0,
+      "win_rate": 80.0,
+      "median_low_vs_prevdp": -13.7931,
+      "n_clean": 5,
       "rank": 2,
       "verdict": ""
     }
@@ -886,15 +944,15 @@
   "proj_series": {
     "S1": {
       "proj_exdiv_date": "2027-02-12",
-      "anchor": 0.52,
+      "anchor": 0.49,
       "anchor_source": "previous_exdiv_prev_dp",
-      "zone_bot": 0.3887,
-      "zone_top": 0.4467,
+      "zone_bot": 0.3655,
+      "zone_top": 0.42,
       "zone_degradation_adjusted": false,
       "zone_degradation_widen_pct": 0.0,
-      "est_low_px": 0.4166,
-      "est_exdiv_px": 0.502,
-      "est_peak_px": 0.5411,
+      "est_low_px": 0.3917,
+      "est_exdiv_px": 0.472,
+      "est_peak_px": 0.5088,
       "est_low_date": null,
       "est_low_date_from": null,
       "est_low_date_to": null,
@@ -906,11 +964,11 @@
       "est_low_date_cluster2_to": "2027-01-31",
       "est_low_date_cluster1_sd_wks": 1.43,
       "est_low_date_cluster2_sd_wks": 6.07,
-      "est_low_date_note": "Bimodal - two timing clusters: early dip Oct 20 \u2013 Nov 11 (best: Oct 31) (14.9wk before) or late dip Jan 31 (1.7wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Oct 20 \u2013 Nov 11 (best: Oct 31) \u00b7 Cluster 2: Jan 31",
+      "est_low_date_note": "Bimodal - two timing clusters: early dip Oct 20 – Nov 11 (best: Oct 31) (14.9wk before) or late dip Jan 31 (1.7wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: Oct 20 – Nov 11 (best: Oct 31) · Cluster 2: Jan 31",
       "est_watch_window_primary_note": "Primary cluster: Early (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 26.0612,
+      "current_price_vs_zone": 38.1669,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "BIMODAL",
@@ -925,9 +983,9 @@
         "cluster1_avg_dip": -17.01,
         "cluster2_avg_dip": -14.44
       },
-      "sample_size": "THIN",
-      "sample_size_display": "Thin",
-      "price_zone_consistent": true,
+      "sample_size": "MODERATE",
+      "sample_size_display": "Moderate",
+      "price_zone_consistent": false,
       "entry_timing_reliable": false,
       "stability_verdict": "INSUFFICIENT_DATA",
       "stability_verdict_display": "Insufficient data",
@@ -938,8 +996,8 @@
       "div_trend_display": "Stable",
       "div_amt_lo": 0.0171,
       "div_amt_hi": 0.0189,
-      "div_yield_lo": 3.8281,
-      "div_yield_hi": 4.8624,
+      "div_yield_lo": 4.0714,
+      "div_yield_hi": 5.171,
       "anchor_extreme_flag": "NORMAL",
       "historical_frequencies": {
         "entry_zone_hit_rate": 0.0,
@@ -953,22 +1011,22 @@
       "scenarios": {
         "base": {
           "description": "Filled around the middle of the projected entry zone",
-          "entry_px": 0.4177,
-          "exit_px": 0.502,
+          "entry_px": 0.3927,
+          "exit_px": 0.472,
           "expected_hold_days": 100,
           "historical_frequency": "mid-zone fill"
         },
         "downside": {
           "description": "Filled near the top of the projected entry zone",
-          "entry_px": 0.4467,
-          "exit_px": 0.502,
+          "entry_px": 0.42,
+          "exit_px": 0.472,
           "expected_hold_days": 109,
           "historical_frequency": "higher fill"
         },
         "upside": {
           "description": "Filled near the bottom of the projected entry zone",
-          "entry_px": 0.3887,
-          "exit_px": 0.502,
+          "entry_px": 0.3655,
+          "exit_px": 0.472,
           "expected_hold_days": 76,
           "historical_frequency": "lower fill"
         }
@@ -993,94 +1051,106 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": 5.29
-      }
+        "median_miss_pct": 5.29,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Wait",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "Price is too far above the entry zone right now.",
+      "potential_score": 79.6,
+      "potential_eligible": true,
+      "potential_ineligible_reasons": [],
+      "structural_health_flags": [
+        "FRAGILE_ZONE"
+      ],
+      "structural_health_override_applied": false
     },
     "S2": {
-      "proj_exdiv_date": "2027-07-28",
-      "anchor": 0.52,
+      "proj_exdiv_date": "2027-08-06",
+      "anchor": 0.49,
       "anchor_source": "previous_exdiv_prev_dp",
-      "zone_bot": 0.4292,
-      "zone_top": 0.4368,
+      "zone_bot": 0.4015,
+      "zone_top": 0.4537,
       "zone_degradation_adjusted": false,
       "zone_degradation_widen_pct": 0.0,
-      "est_low_px": 0.4322,
-      "est_exdiv_px": 0.502,
-      "est_peak_px": 0.5627,
+      "est_low_px": 0.4069,
+      "est_exdiv_px": 0.472,
+      "est_peak_px": 0.5234,
       "est_low_date": null,
       "est_low_date_from": null,
       "est_low_date_to": null,
-      "est_low_date_cluster1": "2027-03-29",
-      "est_low_date_cluster1_from": "2027-03-18",
-      "est_low_date_cluster1_to": "2027-04-09",
-      "est_low_date_cluster2": "2027-06-18",
-      "est_low_date_cluster2_from": "2027-06-11",
-      "est_low_date_cluster2_to": "2027-06-24",
-      "est_low_date_cluster1_sd_wks": 0.0,
+      "est_low_date_cluster1": "2027-03-27",
+      "est_low_date_cluster1_from": null,
+      "est_low_date_cluster1_to": null,
+      "est_low_date_cluster2": "2027-06-27",
+      "est_low_date_cluster2_from": "2027-06-20",
+      "est_low_date_cluster2_to": "2027-07-03",
+      "est_low_date_cluster1_sd_wks": 0.93,
       "est_low_date_cluster2_sd_wks": 4.74,
-      "est_low_date_note": "Bimodal - two timing clusters: early dip Mar 18 \u2013 Apr 9 (best: Mar 29) (17.3wk before) or late dip Jun 11 \u2013 Jun 24 (best: Jun 18) (5.8wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Mar 18 \u2013 Apr 9 (best: Mar 29) \u00b7 Cluster 2: Jun 11 \u2013 Jun 24 (best: Jun 18)",
+      "est_low_date_note": "Bimodal - two timing clusters: early dip Mar 27 (18.9wk before) or late dip Jun 20 – Jul 3 (best: Jun 27) (5.8wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: Mar 27 · Cluster 2: Jun 20 – Jul 3 (best: Jun 27)",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 14.1659,
+      "current_price_vs_zone": 25.7783,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "BIMODAL",
       "timing_rating_display": "Bimodal",
       "cluster_dominance": {
-        "cluster1_count": 1,
+        "cluster1_count": 2,
         "cluster2_count": 3,
-        "total": 4,
+        "total": 5,
         "dominant": 2,
-        "dominant_pct": 75,
+        "dominant_pct": 60,
         "recent_primary": 2,
-        "cluster1_avg_dip": -19.8,
+        "cluster1_avg_dip": -10.41,
         "cluster2_avg_dip": -10.75
       },
-      "sample_size": "THIN",
-      "sample_size_display": "Thin",
-      "price_zone_consistent": true,
+      "sample_size": "MODERATE",
+      "sample_size_display": "Moderate",
+      "price_zone_consistent": false,
       "entry_timing_reliable": false,
       "stability_verdict": "INSUFFICIENT_DATA",
       "stability_verdict_display": "Insufficient data",
-      "med_div_amt": 0.0186,
+      "med_div_amt": 0.018,
       "div_amt_announced": false,
       "div_amt_note": "Projected from the last 4 clean same-series payments",
       "div_trend": "STABLE",
       "div_trend_display": "Stable",
-      "div_amt_lo": 0.0177,
-      "div_amt_hi": 0.0195,
-      "div_yield_lo": 4.0522,
-      "div_yield_hi": 4.5433,
+      "div_amt_lo": 0.0171,
+      "div_amt_hi": 0.0189,
+      "div_yield_lo": 3.769,
+      "div_yield_hi": 4.7073,
       "anchor_extreme_flag": "NORMAL",
       "historical_frequencies": {
-        "entry_zone_hit_rate": 100.0,
+        "entry_zone_hit_rate": 50.0,
         "exit_target_hit_rate": 100.0,
         "avg_hold_days": 80.8,
-        "win_rate": 100.0,
+        "win_rate": 80.0,
         "win_rate_all": 100.0,
         "avg_win_pct": 15.4063,
-        "avg_loss_pct": 0.0
+        "avg_loss_pct": 1.0204
       },
       "scenarios": {
         "base": {
           "description": "Filled around the middle of the projected entry zone",
-          "entry_px": 0.433,
-          "exit_px": 0.502,
+          "entry_px": 0.4276,
+          "exit_px": 0.472,
           "expected_hold_days": 78,
           "historical_frequency": "mid-zone fill"
         },
         "downside": {
           "description": "Filled near the top of the projected entry zone",
-          "entry_px": 0.4368,
-          "exit_px": 0.502,
+          "entry_px": 0.4537,
+          "exit_px": 0.472,
           "expected_hold_days": 116,
           "historical_frequency": "higher fill"
         },
         "upside": {
           "description": "Filled near the bottom of the projected entry zone",
-          "entry_px": 0.4292,
-          "exit_px": 0.502,
+          "entry_px": 0.4015,
+          "exit_px": 0.472,
           "expected_hold_days": 44,
           "historical_frequency": "lower fill"
         }
@@ -1090,22 +1160,37 @@
         "expected_recovery_days": 80.8,
         "liquidity_adequate": true,
         "gap_risk": false,
-        "success_rate_historical": 100.0,
+        "success_rate_historical": 80.0,
         "success_rate_all_historical": 100.0
       },
       "tail_risk": {
         "worst_drawdown_pct": -19.802,
-        "worst_tail_avg": -15.8713,
-        "tail_vs_zone_gap": -5.2917,
+        "worst_tail_avg": -10.6118,
+        "tail_vs_zone_gap": -4.858,
         "tail_warning": "True",
-        "tail_level": "HIGH",
-        "tail_level_display": "High"
+        "tail_level": "CAUTION",
+        "tail_level_display": "Caution"
       },
       "zone_fragility": {
-        "pct_cycles_outside_zone_clean": 0.0,
-        "pct_cycles_outside_zone_full": 100.0,
-        "fragility_warning": false,
-        "median_miss_pct": null
+        "pct_cycles_outside_zone_clean": 50.0,
+        "pct_cycles_outside_zone_full": 80.0,
+        "fragility_warning": true,
+        "median_miss_pct": 9.61,
+        "fragility_percentile_band": "TOP_25",
+        "fragility_percentile_band_display": "Top 25%"
+      },
+      "final_verdict": "Wait",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "Price is too far above the entry zone right now.",
+      "potential_score": 79.6,
+      "potential_eligible": true,
+      "potential_ineligible_reasons": [],
+      "structural_health_flags": [],
+      "structural_health_override_applied": false,
+      "cluster_track_record": {
+        "c1_wins": 1,
+        "c2_wins": 0,
+        "resolved_count": 1
       }
     }
   },
@@ -1155,10 +1240,11 @@
     },
     {
       "yr": 2026,
-      "count": 1,
-      "total": 0.018,
+      "count": 2,
+      "total": 0.036,
       "series": [
-        "S1"
+        "S1",
+        "S2"
       ],
       "partial": true,
       "note": ""
@@ -1218,6 +1304,13 @@
       "id": "S1_2026",
       "series": "S1",
       "date": "2026-02-11",
+      "amount": 0.018,
+      "note": "Dividend"
+    },
+    {
+      "id": "S2_2026",
+      "series": "S2",
+      "date": "2026-08-05",
       "amount": 0.018,
       "note": "Dividend"
     }
@@ -2197,26 +2290,38 @@
     },
     {
       "d": "2026-08-07",
-      "c": 0.49
+      "c": 0.475
+    },
+    {
+      "d": "2026-08-14",
+      "c": 0.515
+    },
+    {
+      "d": "2026-08-21",
+      "c": 0.51
+    },
+    {
+      "d": "2026-08-28",
+      "c": 0.505
     }
   ],
-  "current_price": 0.49,
-  "anchor_price": 0.52,
-  "anchor_date": "2026-02-11",
+  "current_price": 0.505,
+  "anchor_price": 0.475,
+  "anchor_date": "2026-08-05",
   "data_window_start": "2021-12-10",
-  "data_window_end": "2026-08-07",
-  "years_covered": 4.66,
+  "data_window_end": "2026-08-28",
+  "years_covered": 4.71,
   "series_adequacy": {
     "S1": {
       "n_clean": 4,
       "n_effective": 3.19,
-      "sample_size": "THIN",
+      "sample_size": "MODERATE",
       "can_project": true
     },
     "S2": {
-      "n_clean": 4,
-      "n_effective": 4,
-      "sample_size": "THIN",
+      "n_clean": 5,
+      "n_effective": 5,
+      "sample_size": "MODERATE",
       "can_project": true
     }
   },

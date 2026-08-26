@@ -399,8 +399,8 @@ input[type=file]{display:none}
 .rev-move-btn:hover{background:var(--sf);color:var(--tx);border-color:#4f8ef7}
 .rev-card:hover{background:var(--sf)}
 #revSearch{width:220px;max-width:100%}
-#cmpSearch{width:100%;box-sizing:border-box;padding:6px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--sf2);color:var(--tx);font-size:12px;margin-bottom:12px}
-#cmpSearch:focus{outline:none;border-color:#4f8ef7;box-shadow:0 0 0 3px rgba(79,142,247,.14)}
+#cmpSearch,#groupedPotentialSearch,#groupedUpcomingSearch{width:100%;box-sizing:border-box;padding:6px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--sf2);color:var(--tx);font-size:12px;margin-bottom:12px}
+#cmpSearch:focus,#groupedPotentialSearch:focus,#groupedUpcomingSearch:focus{outline:none;border-color:#4f8ef7;box-shadow:0 0 0 3px rgba(79,142,247,.14)}
 /* REVIEW HELP MODAL */
 .rev-help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
 .rev-help-modal{background:var(--bg);border:1px solid var(--bd);border-radius:12px;max-width:580px;width:100%;max-height:82vh;overflow-y:auto;padding:24px 28px 28px;position:relative;box-shadow:0 12px 48px rgba(0,0,0,.55);scrollbar-width:thin;scrollbar-color:#3f6090 transparent}
@@ -1223,7 +1223,22 @@ function getPriceVsZone(stock) {
   };
 }
 
+// Prefers the server-computed value (main/analyze-stock.py's compute_potential_score,
+// applied to `stock.raw.proj_series[stock.nextCycle]`) so both this file and
+// prediction-log.html read one number instead of each deriving it independently --
+// the two JS copies had already drifted out of sync once before this wrapper existed.
+// Falls through to the original client-side formula (renamed *Legacy below) only for
+// a stock whose JSON predates this field -- delete the Legacy body and this fallback
+// once every file in data/analysis/manifest.json has been regenerated via analyze-batch.py.
 function scorePotentialStock(stock, config) {
+  const proj = stock.nextCycle && stock.raw?.proj_series?.[stock.nextCycle];
+  if (proj && proj.potential_score != null) {
+    return { potentialScore: proj.potential_score, scoreParts: {} };
+  }
+  return scorePotentialStockLegacy(stock, config);
+}
+
+function scorePotentialStockLegacy(stock, config) {
   const weights = config.potentialWeights;
   const scoreParts = {
     winRate: scoreWinRate(stock.winRateNext),
@@ -1350,7 +1365,16 @@ function explainUpcomingStock(stock, scores, config) {
   };
 }
 
+// LEGACY FALLBACK note applies here too -- see scorePotentialStock above.
 function isPotentialStock(stock, config) {
+  const proj = stock.nextCycle && stock.raw?.proj_series?.[stock.nextCycle];
+  if (proj && proj.potential_eligible != null) {
+    return { eligible: proj.potential_eligible, reasons: proj.potential_ineligible_reasons || [] };
+  }
+  return isPotentialStockLegacy(stock, config);
+}
+
+function isPotentialStockLegacy(stock, config) {
   const reasons = [];
 
   if (stock.frequency === "IRREGULAR" && !config.allowIrregularFrequency) {
@@ -1529,7 +1553,16 @@ function buildMetricsSummary(stock) {
   };
 }
 
+// LEGACY FALLBACK note applies here too -- see scorePotentialStock above.
 function getFinalVerdict(stock) {
+  const proj = stock.nextCycle && stock.raw?.proj_series?.[stock.nextCycle];
+  if (proj && proj.final_verdict) {
+    return { label: proj.final_verdict, tone: proj.final_verdict_tone, reason: proj.final_verdict_reason };
+  }
+  return getFinalVerdictLegacy(stock);
+}
+
+function getFinalVerdictLegacy(stock) {
   const entryStatus = stock.entryStatus || "UNKNOWN";
   const timing = stock.timingNext || "UNKNOWN";
   const tail = stock.tailRiskLevel || "UNKNOWN";
@@ -2046,6 +2079,7 @@ overviewMode:"overview", // "overview" | "grouped" | "compare" | "planner"
   registrySelectedMasterTickers:[],
   registryMasterPage:1,
   stockDescriptions:{},
+  stockFinancials:{},
   planner:{},
   plannerActiveKey:null,
   cmpSortKey:"none",
@@ -2054,6 +2088,9 @@ overviewMode:"overview", // "overview" | "grouped" | "compare" | "planner"
   cmpFilterEntryStatus:"all",
   groupedUpcomingSort:"smart",
   groupedPotentialSort:"potential",
+  groupedPotentialSearch:"",
+  groupedUpcomingSearch:"",
+  groupedSubTab:"potential",
   groupedPotentialFilterFrequency:"all",
   groupedPotentialFilterTiming:"all",
   groupedPotentialFilterTail:"all",
@@ -2078,6 +2115,8 @@ const BACKEND_CONFIG = {
   masterStocksUrl:"/api/master-stocks",
   stockDescriptionsUrl:"/api/stock-descriptions",
   stockDescriptionsStaticUrl:"./data/stock_descriptions.json",
+  stockFinancialsUrl:"/api/stock-financials",
+  stockFinancialsStaticUrl:"./data/stock_financials.json",
 };
 let backendHealthPromise=null;
 let backendAvailable=false;
@@ -2089,6 +2128,12 @@ function n(v,d=2){const x=Number(v);return Number.isFinite(x)?x.toFixed(d):"-"}
 function pct(v,d=1){const x=Number(v);return Number.isFinite(x)?`${x>=0?"+":""}${x.toFixed(d)}%`:"-"}
 function pctRaw(v,d=1){const x=Number(v);return Number.isFinite(x)?`${x.toFixed(d)}%`:"-"}
 function ccy(v,c=""){return(v===null||v===undefined)?"-":`${c?c+" ":""}${n(v,4)}`}
+function compactCcy(v,c=""){
+  if(v==null||!Number.isFinite(Number(v)))return"-";
+  const abs=Math.abs(v);
+  const fmt=abs>=1e9?`${(v/1e9).toFixed(2)}B`:abs>=1e6?`${(v/1e6).toFixed(1)}M`:abs>=1e3?`${(v/1e3).toFixed(0)}K`:String(Math.round(v));
+  return`${c?c+" ":""}${fmt}`;
+}
 function dt(v){if(!v)return"-";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString("en-GB",{year:"numeric",month:"short",day:"numeric"})}
 function dtShort(v){if(!v)return"-";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString("en-GB",{month:"short",day:"numeric"})}
 function dtClusterRange(from,center,to,sdWks){if(!center)return"-";if(!from||!to||from===to){if(sdWks!=null&&sdWks>0){return`${dtShort(center)} <span class="date-wide" title="Timing spread too wide to show a date range (SD: ${sdWks.toFixed(1)}wk) — date shown is the best estimate.">±${sdWks.toFixed(1)}wk</span>`;}return dtShort(center);}return`${dtShort(from)} – ${dtShort(to)}<br><span class="date-best">best: ${dtShort(center)}</span>`}
@@ -2231,13 +2276,46 @@ function renderHeroDataset(data){
 }
 
 /* -- TAB 0: SERIES ------------------------------------------------------- */
+function debtEquityTone(pct){
+  if(pct==null)return"";
+  if(pct<60)return"good";
+  if(pct<=120)return"warn";
+  return"bad";
+}
+function dividendCoverageTone(x){
+  if(x==null)return"";
+  if(x>=1.3)return"good";
+  if(x>=1.0)return"warn";
+  return"bad";
+}
+
+// Stock-level (not per-series) financial-health summary, shown once above the
+// series grid -- unlike 5yr price growth, which is small enough to repeat per
+// series card, a multi-line financial block isn't worth duplicating per series.
+function renderFinancialSummary(ticker,currency){
+  const fin=financialsFor(ticker);
+  if(!fin)return"";
+  const health=fin.health;
+  return`<div class="panel" style="margin-bottom:14px">
+    <h2>Financial Health</h2>
+    <p class="small muted" style="margin:0 0 10px">As of ${dt(fin.as_of)} · from the company's balance sheet &amp; cash flow statements (annual cadence, not live) · see the Financials tab for multi-year history</p>
+    ${health?`<div class="section-note" style="margin:0 0 12px">${verdictPill(health.label,health.tone)} ${esc(health.reason)}</div>`:""}
+    <div class="series-kv">
+      <div>${tipLabel("Debt / Equity","Total debt divided by stockholders' equity — how much debt is used per dollar of the company's own capital. Below 60% is considered low leverage (green), 60–120% moderate (amber), above 120% high (red) for this portfolio; higher isn't automatically bad, but it means more of the balance sheet depends on lenders rather than shareholders. Computed from raw balance-sheet line items, not Yahoo's own pre-packaged ratio (confirmed unreliable — missing on large caps, and inconsistent with the raw statement data on at least one tested ticker).")}</div><div class="${debtEquityTone(fin.debt_to_equity_pct)}">${fin.debt_to_equity_pct!=null?`${n(fin.debt_to_equity_pct,1)}%`:"-"}</div>
+      <div>${tipLabel("Net debt","Total debt minus cash and cash equivalents. Negative means the company holds more cash than debt — a net cash position, effectively a buffer. Positive means debt exceeds cash, which is normal for most businesses. Not colour-graded here: the same dollar figure is trivial for a large company and heavy for a small one — the debt/equity ratio above already accounts for size, this is just the raw balance.")}</div><div>${compactCcy(fin.net_debt,currency)}</div>
+      <div>${tipLabel("Dividend coverage (FCF)","Free cash flow divided by cash dividends paid — how many times over the dividend was funded by cash the business actually generated. 1.3x or more is comfortable (green), 1.0–1.3x is thin (amber), below 1x means the company paid out more than it generated that period — funded from cash reserves or debt, not earnings (red). This is the clearest dividend-sustainability signal available from statement data.")}</div><div class="${dividendCoverageTone(fin.dividend_fcf_coverage)}">${fin.dividend_fcf_coverage!=null?`${n(fin.dividend_fcf_coverage,2)}x`:"-"}</div>
+      <div>${tipLabel("Current ratio","Current assets divided by current liabilities. Shown for context only — not colour-graded. REITs/Trusts structurally run below 1 here (financed by refinancing, not working capital), so a naive low-ratio warning would misfire on most healthy REITs in this portfolio.")}</div><div>${fin.current_ratio!=null?n(fin.current_ratio,2):"-"}</div>
+    </div>
+  </div>`;
+}
+
 function panelSeries(data){
   const m=data.meta||{},meta=data.series_meta||[];
   if(!meta.length)return`<div class="empty">No series metadata found.</div>`;
   const gridStyle=meta.length<=4
     ? `style="grid-template-columns:repeat(${meta.length},minmax(0,1fr))"`
     : "";
-  return`<div class="series-grid" ${gridStyle}>${meta.map(s=>renderSeriesCard(s,data,m)).join("")}</div>`
+  return renderFinancialSummary(m.ticker,m.currency)+`<div class="series-grid" ${gridStyle}>${meta.map(s=>renderSeriesCard(s,data,m)).join("")}</div>`
 }
 
 function renderExitProfile(ep){
@@ -2295,7 +2373,7 @@ function renderSeriesCard(s,data,m){
   // risk flags
   const hasTailWarn=toBool(proj.tail_risk?.tail_warning);
   const hasFragWarn=toBool(proj.zone_fragility?.fragility_warning);
-  const fragSeverity=fragilitySeverity(proj.historical_frequencies?.entry_zone_hit_rate);
+  const fragSeverity=resolveFragilitySeverity(proj);
   const anchorSourceLabel = proj.anchor_source === "previous_exdiv_prev_dp"
     ? "Most Recent Ex-Div Anchor"
     : proj.anchor_source === "special_exdiv_prev_dp"
@@ -2439,7 +2517,7 @@ function panelProjections(data){
         ${rows.map(([id,p])=>{
           const days=daysFrom(p.proj_exdiv_date);
           const isReferenceOnly=primaryUpcomingId && id!==primaryUpcomingId;
-          const fragSev=fragilitySeverity(p.historical_frequencies?.entry_zone_hit_rate);
+          const fragSev=resolveFragilitySeverity(p);
           return`<tr>
             <td><strong>${esc(id)}</strong>${isReferenceOnly?`<div class="small muted">Reference only</div>`:""}</td>
             <td>${dt(p.proj_exdiv_date)}</td>
@@ -3714,6 +3792,48 @@ function renderPriceChart(data){
 }
 
 /* -- TAB 7: GLOSSARY ----------------------------------------------------- */
+function panelFinancials(data){
+  const m=data.meta||{};
+  const fin=financialsFor(m.ticker);
+  if(!fin){
+    return`<div class="panel"><h2>Financials</h2><div class="empty">No financial statement data loaded yet for this stock. Run <code>extract-financials.py</code> to fetch it (a separate, occasional script — financial statements change quarterly/annually, not weekly, so this isn't part of the normal price-refresh pipeline).</div></div>`;
+  }
+  const history=Array.isArray(fin.history)&&fin.history.length?fin.history:[fin];
+  const rows=history.map(h=>`<tr>
+    <td>${dt(h.as_of)}</td>
+    <td>${h.health?verdictPill(h.health.label,h.health.tone):"-"}</td>
+    <td class="num">${compactCcy(h.total_debt,m.currency)}</td>
+    <td class="num">${compactCcy(h.total_equity,m.currency)}</td>
+    <td class="num ${debtEquityTone(h.debt_to_equity_pct)}">${h.debt_to_equity_pct!=null?`${n(h.debt_to_equity_pct,1)}%`:"-"}</td>
+    <td class="num">${compactCcy(h.net_debt,m.currency)}</td>
+    <td class="num">${compactCcy(h.free_cash_flow,m.currency)}</td>
+    <td class="num">${compactCcy(h.cash_dividends_paid,m.currency)}</td>
+    <td class="num ${dividendCoverageTone(h.dividend_fcf_coverage)}">${h.dividend_fcf_coverage!=null?`${n(h.dividend_fcf_coverage,2)}x`:"-"}</td>
+    <td class="num">${h.current_ratio!=null?n(h.current_ratio,2):"-"}</td>
+  </tr>`).join("");
+  return`<div class="panel">
+    <h2>Financials</h2>
+    <p class="small muted" style="margin:0 0 12px">Raw balance-sheet and cash-flow line items from the company's filed financial statements, computed here directly rather than using Yahoo Finance's own pre-packaged ratios — confirmed unreliable during testing (missing on large-cap tickers, and inconsistent with the raw statement data on at least one tested ticker). Annual cadence, not live, and not yet factored into Current Verdict, Potential Score, or the structural health override — informational only for now.</p>
+    <div class="cmp-table-wrap drag-scroll">
+      <table>
+        <thead><tr>
+          <th>Period</th>
+          <th>${tipLabel("Health","Rule-based read combining leverage and dividend coverage for that period. Current ratio isn't part of this read — see its own note below.")}</th>
+          <th class="num">${tipLabel("Total Debt","All interest-bearing debt from the balance sheet.")}</th>
+          <th class="num">${tipLabel("Equity","Stockholders' equity from the balance sheet.")}</th>
+          <th class="num">${tipLabel("Debt / Equity","Total debt divided by equity for that period. Below 60% = low leverage (green), 60–120% = moderate (amber), above 120% = high (red).")}</th>
+          <th class="num">${tipLabel("Net Debt","Total debt minus cash and cash equivalents. Negative = net cash position (more cash than debt, a buffer). Positive = debt exceeds cash, normal for most businesses. Not colour-graded — the debt/equity column already accounts for company size, this is just the raw balance.")}</th>
+          <th class="num">${tipLabel("Free Cash Flow","Cash generated after operating and capital expenditure needs, from the cash flow statement.")}</th>
+          <th class="num">${tipLabel("Dividends Paid","Cash actually paid out to shareholders that period, from the cash flow statement.")}</th>
+          <th class="num">${tipLabel("FCF Coverage","Free cash flow divided by dividends paid. 1.3x+ = comfortable (green), 1.0–1.3x = thin (amber), below 1x = funded from cash reserves or debt, not earnings (red).")}</th>
+          <th class="num">${tipLabel("Current Ratio","Current assets divided by current liabilities. Not colour-graded — REITs/Trusts structurally run below 1 here.")}</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
 function panelGlossary(){
   const terms=[
     ["Entry Zone","Projected price range where historical dips tend to occur. Dip percentiles from the target series' recent clean cycles (winsorized at the 5th and 95th percentiles) are applied to the ex-dividend adjusted anchor — the anchor price minus the dividend paid at that ex-div event, which is where the stock mechanically resets on ex-div date."],
@@ -3731,24 +3851,25 @@ function panelGlossary(){
     ["Zone Hit","Whether the price entered the entry zone during that cycle using the same walk-forward zone construction logic. Low zone-hit rate means the zone was easy to miss in practice, not just that it was mathematically too tight."],
 ["CGC Score","Composite score ranking series by historical edge. It blends win rate and median S2 (peak return above entry) roughly 50/50. Higher = better historical edge for that series."],
 ["3% hurdle","The live model still treats a cycle as a success only when the rebound from the low back to the PrevDP anchor is more than 3%. This same hurdle feeds win rate and exit win rates. Treat it as a practical minimum trade hurdle, not a stock-specific spread model."],
-    ["Potential Score","Weighted stock-level overview score used to rank the grouped cards. It blends win rate, clean cycles, years of data, frequency, timing, tail risk, dividend trend, and zone width. Current weights are 28, 18, 10, 10, 14, 10, 5, and 5 respectively. The labels appear at these thresholds: Strong Potential >= 75, Watchlist >= 60, and Borderline >= 50. The raw score can still show on weak samples, but those shortlist labels are now gated when `n_effective` is below 3."],
+    ["Potential Score","Weighted stock-level overview score used to rank the grouped cards. It blends win rate, clean cycles, years of data, frequency, timing, tail risk, dividend trend, and zone width. Current weights are 28, 18, 10, 10, 14, 10, 5, and 5 respectively. The labels appear at these thresholds: Strong Potential >= 75, Watchlist >= 60, and Borderline >= 50. The raw score can still show on weak samples, but those shortlist labels are now gated when `n_effective` is below 3. Eligibility for Potential/Watchlist at all is a separate check (win rate, clean cycles, years of data, allowed frequency, tail risk not Severe, plus the structural health override — see Structurally Weak) — the score number can compute even for an ineligible stock, but it won't appear in the Potential or Upcoming lists."],
     ["Asset Type Badge","Small label shown only for non-stock instruments in the live views, such as ETF, REIT, Trust, or Index. It is there to add quick context without cluttering ordinary stock cards. The badge is descriptive only and does not change the scoring or verdict logic by itself."],
     ["Sector","Lightweight stock metadata loaded from the master stock list, such as Financials, Consumer Staples, or Real Estate. It is shown quietly in selected views to help scanning and comparison, but it does not affect scoring, verdicts, or planner calculations."],
     ["Market Index","Benchmark reference instrument used for market context, such as ^STI. In the current setup the true benchmark row is treated separately from normal stocks and is not meant to be interpreted as a regular dividend setup candidate."],
     ["Edit Stock List","Flask-backed stock registry manager used to choose which names are tracked. The master stock picker can now be filtered by stock type and by sector, while Include in analysis and Use as market index control whether a row becomes a live analysis target or the benchmark context row."],
     ["Zone Outcome Map","Scatter view used to test how the low-zone idea is behaving. Current-cycle mode appears when the nearest next projected series already has an estimated low window start in the past. Recent completed cycles mode uses recent completed cycles from the same series. The x-axis shows where the low landed relative to the zone: 0 = zone bottom, 1 = zone top, below 0 = pushed under the zone, above 1 = stayed above it. The y-axis compares actual cycle strength with the model's expected gain."],
     ["Tail Risk Warning","Means price has sometimes fallen well below the expected buy zone in bad historical cycles. Even if you enter inside the zone, downside can still be larger than the zone suggests. The level now uses a tail-stress average of the worst 5 cycles when available, otherwise the worst 3, otherwise the single worst cycle. Current level guide: Low means contained downside. Moderate means the tail-stress average is about 6%+ down or the single worst cycle is about 12%+ down. Caution means more than 3% below zone bottom or a tail-stress average about 10%+ down. High means at least 5% below zone bottom plus a tail-stress average about 9%+ down. Severe means at least 8% below zone bottom plus a tail-stress average about 12%+ down."],
-["Current Verdict","Action-oriented summary of what to do now. It is separate from Potential Score. The live logic checks price vs zone first, then timing and tail risk, then whether the next cycle is near. Treat the verdict as a guideline, not a hard block: you may still act with your own judgment, sizing, and caution."],
+["Current Verdict","Action-oriented summary of what to do now. It is separate from Potential Score. Tail risk Severe and the structural health override (see Structurally Weak) are checked first and win outright; otherwise the logic checks price vs zone, then timing and tail risk, then whether the next cycle is near. Treat the verdict as a guideline, not a hard block: you may still act with your own judgment, sizing, and caution."],
 ["Actionable Now","Current price is inside the entry zone, or only slightly below it within about 0.5% of zone bottom, while tail risk is not High or Severe and timing is not Unreliable. The slight-below path is intentionally stricter: it only stays fully actionable when tail risk is Low or Moderate. A Caution tail profile can still remain actionable inside the zone, but not once price has already slipped slightly below it."],
-["Small Trades Advised","Current price is inside the zone, or only slightly below it, but either tail risk is High or timing is Unreliable. Slight-below cases with a Caution tail profile also land here by design, because the setup may already be starting to overshoot the projected floor. The setup is live, but exposure should be lighter than normal."],
+["Small Trades Advised","Current price is inside the zone, or only slightly below it, but either tail risk is High or timing is Unreliable. Slight-below cases with a Caution tail profile also land here by design, because the setup may already be starting to overshoot the projected floor. Also shown when a single structural health flag (see Structurally Weak) softened what would otherwise be an Actionable Now reading — the reason text on the card names which flag applied. The setup is live, but exposure should be lighter than normal."],
 ["Watch Closely","Current price is above the zone but within about 3% of zone_top, and the next ex-div is within 90 days, so the setup may become actionable soon."],
 ["Wait","Price is above the zone and either too far away (>3% from zone_top) or the next ex-div is more than 90 days out. Also used when price is materially below the zone and likely past the expected entry area."],
 ["Watch Only","The next ex-div is within 90 days but price is not yet in position — not inside the zone, not near the top, not slightly below."],
 ["On Radar","Fallback status for structurally interesting stocks that are not yet close enough to action."],
     ["Too Risky","Triggered when tail risk is Severe. The broader pattern may still exist, but downside is too harsh for a live setup."],
+    ["Structurally Weak","Triggered when 2 or more of these are true at once: pattern stability is Degrading, the zone's hit rate is in the bottom 25% of the full tracked universe, or 5yr price growth is -30% or worse. Checked right after tail risk Severe, before price position, so it overrides an otherwise-clean setup — the pattern itself is what's breaking down, not today's price. Also removes the stock from Potential/Watchlist entirely, not just the verdict. A single one of these flags instead softens an Actionable Now reading down to Small Trades Advised without changing eligibility — see that entry's reason text for which flag applied."],
     ["Trade Planner","Planning view for the nearest next cycle only. It turns the projected setup into milestone timelines for watch, dip, exit, and ex-div. Official ex-div date, official dividend amount, and planned entry price can be overridden without changing the historical ratings."],
     ["Updated schedule and plan","Planner section that shows what changes after overrides are applied. It updates after any planner override is set. Official ex-div date changes the live milestone dates and days-away counts. Official dividend amount updates dividend and yield-related planner outputs. Planned entry price updates the planned entry, expected gain, and related execution metrics. It does not change the historical ratings such as timing, tail risk, fragility, or exit-mode verdict."],
-    ["Zone Fragility","Percent of clean cycles where price never entered the entry zone. Graded relative to whatever's currently loaded (bottom 25% / below median / near median / top 25%) rather than a fixed cutoff — a flat 30%-missed threshold turned out to trip on nearly every tracked series, so it stopped being able to tell a relatively fragile setup from a relatively sound one."],
+    ["Zone Fragility","Percent of clean cycles where price never entered the entry zone. Graded in percentile bands (bottom 25% / below median / near median / top 25%) rather than a fixed cutoff — a flat 30%-missed threshold turned out to trip on nearly every tracked series, so it stopped being able to tell a relatively fragile setup from a relatively sound one. Ranked against the full analyzed universe from the last pipeline run when that's available (same number every session); falls back to ranking against whatever's currently loaded in this browser tab otherwise. A bottom-25% reading is also one of the three structural health flags — see Structurally Weak."],
     ["Stability Trend","Direction of pattern stability scores across recent cycles. Improving appears when slope > 5 and recent average score > 70. Degrading appears when slope < -5 and recent average score < 60. Otherwise the trend is Stable."],
     ["Exit Mode","Historical summary of which bounded exit path looked stronger. Pre-Exdiv Peak Exit preferred means average pre-exdiv gain is at least 95% of average ex-div-date gain when ex-div-date gain is positive. Ex-Div Date Exit preferred means average optimal gain is more than 105% of average ex-div-date gain and fewer than 40% of optimal exits happened before ex-div."],
     ["S2 (peak return)","Peak price vs PrevDP expressed as a percentage. Measures the upside captured above the dividend entry price, not just vs the dip."],
@@ -3777,6 +3898,19 @@ function activeStockList(){return stockList().filter(s=>s.data?.meta?.active!==f
 // sound one. This computes standing against whatever's currently loaded
 // instead of a fixed number, so the signal discriminates again. Returns null
 // when too few stocks are loaded for a percentile comparison to mean anything.
+// Prefers analyze-batch.py's precomputed fragility_percentile_band (ranked against
+// the FULL analyzed universe, deterministic across sessions) over the live
+// fragilitySeverity() below (ranked only against whatever's currently loaded in this
+// browser tab, so it can shift as stocks are toggled active/inactive). Falls back to
+// the live computation when a stock's JSON predates the field.
+function resolveFragilitySeverity(proj){
+  const band=proj?.zone_fragility?.fragility_percentile_band;
+  if(band){
+    const tone=band==="BOTTOM_25"?"bad":band==="BELOW_MEDIAN"?"warn":band==="TOP_25"?"good":"";
+    return{tone,label:proj.zone_fragility.fragility_percentile_band_display,detail:"vs full tracked universe"};
+  }
+  return fragilitySeverity(proj?.historical_frequencies?.entry_zone_hit_rate);
+}
 function fragilitySeverity(hitRate){
   if(hitRate==null)return null;
   const allRates=activeStockList().flatMap(s=>Object.values(s.data?.proj_series||{})
@@ -4159,6 +4293,7 @@ function executionStateFromVerdict(metrics,plan){
   if(verdict==="Watch Closely" || verdict==="Watch Only") return {label:"Watch", tone:"warn"};
   if(verdict==="On Radar") return {label:"Early", tone:"muted"};
   if(verdict==="Too Risky") return {label:"Too risky", tone:"bad"};
+  if(verdict==="Structurally Weak") return {label:"Structurally weak", tone:"bad"};
   if((plan?.overrideStatus||"").toLowerCase().includes("reference")) return {label:"Reference only", tone:"muted"};
   if(verdict==="Wait") return {label:"Wait", tone:"warn"};
   return {label:"Review", tone:"muted"};
@@ -4667,6 +4802,7 @@ async function staticAutoLoad(){
     const [res]=await Promise.all([
       fetch(`${BACKEND_CONFIG.staticJsonBase}/manifest.json`,{cache:"no-store"}),
       BACKEND_CONFIG.stockDescriptionsStaticUrl?fetchStockDescriptions():Promise.resolve(),
+      BACKEND_CONFIG.stockFinancialsStaticUrl?fetchStockFinancials():Promise.resolve(),
     ]);
     if(!res.ok){if(status)status.textContent="No stock data found";return;}
     const payload=await res.json();
@@ -4833,7 +4969,7 @@ async function initBackendMode(){
   syncBackendButtons();
   if(backendAvailable){
     try{
-      await Promise.all([fetchMasterStocks(),fetchStockDescriptions()]);
+      await Promise.all([fetchMasterStocks(),fetchStockDescriptions(),fetchStockFinancials()]);
     }catch(_){}
   }
   renderApp();
@@ -5256,14 +5392,36 @@ async function fetchStockDescriptions(){
   const url=BACKEND_CONFIG.stockDescriptionsStaticUrl||BACKEND_CONFIG.stockDescriptionsUrl;
   try{
     const res=await fetch(url,{cache:"no-store"});
+    if(!res.ok){console.warn(`stock descriptions: ${url} returned ${res.status}`);return;}
     const payload=await res.json().catch(()=>null);
-    if(!payload||typeof payload!=="object"||Array.isArray(payload))return;
+    if(!payload||typeof payload!=="object"||Array.isArray(payload)){console.warn(`stock descriptions: ${url} returned an unexpected payload shape`);return;}
     if(payload.ok===true&&payload.descriptions&&typeof payload.descriptions==="object"){
       state.stockDescriptions=payload.descriptions;
     }else if(payload.ok===undefined){
       state.stockDescriptions=payload;
     }
-  }catch(_){}
+  }catch(err){console.warn(`stock descriptions: failed to load ${url}`,err);}
+}
+
+async function fetchStockFinancials(){
+  const url=BACKEND_CONFIG.stockFinancialsStaticUrl||BACKEND_CONFIG.stockFinancialsUrl;
+  try{
+    const res=await fetch(url,{cache:"no-store"});
+    if(!res.ok){console.warn(`stock financials: ${url} returned ${res.status}`);return;}
+    const payload=await res.json().catch(()=>null);
+    if(!payload||typeof payload!=="object"||Array.isArray(payload)){console.warn(`stock financials: ${url} returned an unexpected payload shape`);return;}
+    if(payload.ok===true&&payload.financials&&typeof payload.financials==="object"){
+      state.stockFinancials=payload.financials;
+    }else if(payload.ok===undefined){
+      state.stockFinancials=payload;
+    }
+  }catch(err){console.warn(`stock financials: failed to load ${url}`,err);}
+}
+
+// Shared "no data yet" lookup used by both the Series & Risk summary and the
+// Financials tab, so the empty-state logic lives in one place.
+function financialsFor(ticker){
+  return (state.stockFinancials||{})[ticker||""]||null;
 }
 
 async function fetchMasterStocks(){
@@ -5936,6 +6094,7 @@ function renderGroupedStockCard(item,type){
       ${groupedMetric("Next Cycle",metrics.nextCycle?esc(metrics.nextCycle):"-")}
       ${groupedDualMetric("Current Price",currentPrice,"Zone",zone)}
       ${groupedMetric("Est. Ex-Div Px",metrics.estExDivPx!=null?ccy(metrics.estExDivPx,currency):"-")}
+      ${groupedMetric("Est. Yield",metrics.yieldRange&&metrics.yieldRange.length===2?`${pctRaw(metrics.yieldRange[0],2)} - ${pctRaw(metrics.yieldRange[1],2)}`:"-")}
       ${groupedMetric("Entry",metrics.entryStatus?`<span class="${tagClass(metrics.entryStatus)}">${esc(metrics.entryStatusDisplay||"-")}</span>`:"-")}
       ${groupedMetric("Timing",metrics.timingNext?`<span class="${tagClass(metrics.timingNext)}">${esc(metrics.timingDisplay||"-")}</span>`:"-")}
       ${groupedMetric("Tail Risk",metrics.tailRiskLevel?`<span class="${tagClass(metrics.tailRiskLevel)}">${esc(metrics.tailRiskDisplay||"-")}</span>`:"-")}
@@ -6028,7 +6187,8 @@ function renderGroupedControls(type){
   ];
 
   if(type==="potential"){
-    return `<div class="stock-selector" style="margin:8px 0 12px">`
+    return `<input id="groupedPotentialSearch" type="text" placeholder="Search by ticker or name…" autocomplete="off" value="${esc(state.groupedPotentialSearch||'')}">`
+      + `<div class="stock-selector" style="margin:8px 0 12px">`
       + groupedSelect("groupedPotentialSort","Sort by",state.groupedPotentialSort||"potential",[
           {value:"potential",label:"Potential Score"},
           {value:"gain",label:"Possible Gain"},
@@ -6065,7 +6225,8 @@ function renderGroupedControls(type){
   }
 
   if(type==="upcoming"){
-    return `<div class="stock-selector" style="margin:8px 0 12px">`
+    return `<input id="groupedUpcomingSearch" type="text" placeholder="Search by ticker or name…" autocomplete="off" value="${esc(state.groupedUpcomingSearch||'')}">`
+      + `<div class="stock-selector" style="margin:8px 0 12px">`
       + groupedSelect("groupedUpcomingSort","Sort by",state.groupedUpcomingSort||"smart",[
           {value:"smart",label:"Watch Priority"},
           {value:"days",label:"Days to Ex-Div"},
@@ -6118,23 +6279,31 @@ function panelGroupedSection(title,subtitle,items,type){
   if(!filtered||!filtered.length)return `<div class="panel"><h2>${title}</h2><p class="small muted" style="margin:0 0 12px">${subtitle}</p>${controls}<p class="small muted" style="margin:0">No stocks currently match these filters.</p></div>`;
   const sorted=sortGroupedItems(filtered,type);
   const countLine=filtered.length<items.length?`<p class="small muted" style="margin:0 0 10px">Showing ${filtered.length} of ${items.length}</p>`:"";
-  return `<div class="panel"><h2>${title}</h2><p class="small muted" style="margin:0 0 12px">${subtitle}</p>${controls}${countLine}<div class="mini-grid">${sorted.map(item=>renderGroupedStockCard(item,type)).join("")}</div></div>`
+  return `<div class="panel"><h2>${title}</h2><p class="small muted" style="margin:0 0 12px">${subtitle}</p>${controls}${countLine}<div class="mini-grid" id="groupedGrid-${type}">${sorted.map(item=>renderGroupedStockCard(item,type)).join("")}</div></div>`
 }
 
 function panelGroupedStocks(){
   const grouped=groupedStockData();
   if(!grouped)return"";
-  return `<div class="section-note" style="margin-bottom:12px">Current Verdict is a guideline for prioritising attention, not a hard block. You may still act with your own judgment, sizing, and caution.</div>` + panelGroupedSection(
-    "Potential Stocks",
-    "Stocks that passed the structural screen: win rate >= 50%, clean cycles >= 3, years of data >= 2, allowed dividend frequency, with timing and tail risk reflected in ranking.",
-    grouped.potentialStocks,
-    "potential"
-  )+panelGroupedSection(
-    "Upcoming Stocks to Watch",
-    "Potential stocks included here if the next ex-dividend date is within 90 days or the current price is inside or close to the entry zone.",
-    grouped.upcomingStocks,
-    "upcoming"
-  )
+  const subTab=state.groupedSubTab==="upcoming"?"upcoming":"potential";
+  const subTabs=`<div class="tabs" style="margin-bottom:12px">
+    <button class="tab ${subTab==="potential"?"active":""}" id="groupedSubTabPotential">Potential Stocks (${grouped.potentialStocks.length})</button>
+    <button class="tab ${subTab==="upcoming"?"active":""}" id="groupedSubTabUpcoming">Upcoming Stocks to Watch (${grouped.upcomingStocks.length})</button>
+  </div>`;
+  const body=subTab==="upcoming"
+    ? panelGroupedSection(
+        "Upcoming Stocks to Watch",
+        "Potential stocks included here if the next ex-dividend date is within 90 days or the current price is inside or close to the entry zone.",
+        grouped.upcomingStocks,
+        "upcoming"
+      )
+    : panelGroupedSection(
+        "Potential Stocks",
+        "Stocks that passed the structural screen: win rate >= 50%, clean cycles >= 3, years of data >= 2, allowed dividend frequency, with timing and tail risk reflected in ranking.",
+        grouped.potentialStocks,
+        "potential"
+      );
+  return `<div class="section-note" style="margin-bottom:12px">Current Verdict is a guideline for prioritising attention, not a hard block. You may still act with your own judgment, sizing, and caution.</div>${subTabs}${body}`;
 }
 /* ?? REVIEW REMOVE HELPERS ???????????????????????????????????????????? */
 function revConfirmRemove(btn){
@@ -6214,11 +6383,21 @@ function panelReview(){
       growth5yr:data.meta?.price_growth_5yr_pct,
       frequency:data.meta?.frequency,
       frequencyDisplay:data.meta?.frequency_display,
+      structHealthOverride:proj?.structural_health_override_applied===true,
+      structHealthFlags:proj?.structural_health_flags||[],
     };
   });
 
   // Auto-assign with edge-case handling
   const autoAssign=r=>{
+    // Structural health override (2+ of: degrading pattern, zone fragility in the
+    // bottom 25% of the tracked universe, severe 5yr decline) always wins -- a
+    // stock this system has flagged is not showing pattern breakdown through its
+    // own price position today, so the ordinary KEEP/WATCH gates below (which
+    // only look at zoneHit/stability individually) would otherwise still route
+    // it to "watch" even though the same stock's Verdict/Score elsewhere already
+    // read "Structurally Weak" and got pulled from Potential entirely.
+    if(r.structHealthOverride) return"remove";
     // KEEP — eligible, zone well-reachable (>15%), pattern not degrading
     if(r.eligible&&r.zoneHit>15&&r.stability!=="DEGRADING") return"keep";
     // WATCH-A — eligible, good execution (>15%), but degrading pattern
@@ -6291,6 +6470,11 @@ function panelReview(){
         return`Doesn't pass the structural screen but ${n(r.growth5yr,0)}% 5yr growth indicates a healthy business. Monitor for a cycle pattern to develop.${overrideSuffix}`;
       return`Edge case — doesn't fit cleanly into Keep or Remove. Review manually.${overrideSuffix}`;
     }else{
+      if(r.structHealthOverride){
+        const flagText={DEGRADING:"pattern stability is degrading",FRAGILE_ZONE:"zone fragility is in the bottom 25% of the tracked universe",PRICE_DECLINE:"5yr price growth is severely negative"};
+        const flags=(r.structHealthFlags||[]).map(f=>flagText[f]||f).join("; ");
+        return`Structural health override — ${flags||"multiple structural health flags"}. Current price position doesn't change this.${overrideSuffix}`;
+      }
       if(r.zoneHit===0&&!r.eligible){
         const extra=r.potReasons[0]?` Also: ${r.potReasons[0].toLowerCase()}.`:"";
         return`Zone hit rate is 0% — entry zone has never been reached in practice.${extra}${overrideSuffix}`;
@@ -6903,6 +7087,7 @@ function renderDrillView(stockEntry){
     {name:"Strategy",        fn:()=>panelStrategy(data)},
     {name:"Cycle Log",       fn:()=>panelCycles(data)},
     {name:"Dividends",       fn:()=>panelDividends(data)},
+    {name:"Financials",      fn:()=>panelFinancials(data)},
     {name:"Price History",   fn:()=>panelPriceHTML()},
     {name:"Glossary",        fn:()=>panelGlossary()},
   ];
@@ -7471,6 +7656,22 @@ function renderOverviewView(){
       const idx=th.dataset.colIndex;
       th.style.display=show?"":"none";
       document.querySelectorAll(`[data-col-index="${idx}"]`).forEach(el=>el.style.display=show?"":"none");
+    });
+  });
+  document.getElementById("groupedSubTabPotential")?.addEventListener("click",()=>{state.groupedSubTab="potential";renderApp()});
+  document.getElementById("groupedSubTabUpcoming")?.addEventListener("click",()=>{state.groupedSubTab="upcoming";renderApp()});
+  document.getElementById("groupedPotentialSearch")?.addEventListener("input",e=>{
+    state.groupedPotentialSearch=e.target.value;
+    const q=e.target.value.trim().toLowerCase();
+    document.querySelectorAll("#groupedGrid-potential .grouped-stock-card").forEach(card=>{
+      card.style.display=(!q||card.textContent.toLowerCase().includes(q))?"":"none";
+    });
+  });
+  document.getElementById("groupedUpcomingSearch")?.addEventListener("input",e=>{
+    state.groupedUpcomingSearch=e.target.value;
+    const q=e.target.value.trim().toLowerCase();
+    document.querySelectorAll("#groupedGrid-upcoming .grouped-stock-card").forEach(card=>{
+      card.style.display=(!q||card.textContent.toLowerCase().includes(q))?"":"none";
     });
   });
   bindStateSelect("groupedPotentialSort","groupedPotentialSort");

@@ -5,14 +5,14 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 304.5,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -9.1
+    "price_growth_5yr_pct": -15.1
   },
   "parse_preflight": {
     "columns_detected": [
@@ -29,11 +29,11 @@
     "total_rows": 550,
     "price_rows": 523,
     "dividend_rows": 27,
-    "zero_volume_rows": 38,
-    "zero_volume_pct": 7.3,
+    "zero_volume_rows": 36,
+    "zero_volume_pct": 6.9,
     "issues_found": [
-      "3 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (38/523, 7.3%) \u00e2\u20ac\u201d analysis continues, but thin trading may reduce reliability"
+      "3 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date",
+      "Zero-volume rows exceed 5% (36/523, 6.9%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -50,7 +50,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 May/Sep ex-div",
+      "label": "Series 1 — May/Sep ex-div",
       "sub": "Irregular",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -772,9 +772,9 @@
       "est_watch_window_note": null,
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": 3.0928,
-      "entry_status": "ABOVE",
-      "entry_status_display": "Above",
+      "current_price_vs_zone": -7.2165,
+      "entry_status": "BELOW",
+      "entry_status_display": "Below",
       "timing_rating": "UNRELIABLE",
       "timing_rating_display": "Unreliable",
       "cluster_dominance": null,
@@ -846,8 +846,22 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": 8.97
-      }
+        "median_miss_pct": 8.97,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Wait",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "Price is well below the zone and may have overshot the expected entry area.",
+      "potential_score": 69.0,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Dividend frequency is not one of the preferred cycle structures"
+      ],
+      "structural_health_flags": [
+        "FRAGILE_ZONE"
+      ],
+      "structural_health_override_applied": false
     }
   },
   "annual_payouts": [
@@ -1230,18 +1244,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 0.3033
-    },
-    {
-      "d": "2016-08-12",
-      "c": 0.3233
-    },
-    {
-      "d": "2016-08-19",
-      "c": 0.3233
-    },
     {
       "d": "2016-08-26",
       "c": 0.2867
@@ -3320,14 +3322,26 @@
     },
     {
       "d": "2026-08-07",
-      "c": 0.25
+      "c": 0.23
+    },
+    {
+      "d": "2026-08-14",
+      "c": 0.23
+    },
+    {
+      "d": "2026-08-21",
+      "c": 0.225
+    },
+    {
+      "d": "2026-08-28",
+      "c": 0.225
     }
   ],
-  "current_price": 0.25,
+  "current_price": 0.225,
   "anchor_price": 0.265,
   "anchor_date": "2026-05-12",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {

@@ -5,14 +5,14 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 419.2,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": 41.3
+    "price_growth_5yr_pct": 37.7
   },
   "parse_preflight": {
     "columns_detected": [
@@ -32,8 +32,8 @@
     "zero_volume_rows": 147,
     "zero_volume_pct": 28.1,
     "issues_found": [
-      "1 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (147/523, 28.1%) \u00e2\u20ac\u201d analysis continues, but thin trading may reduce reliability"
+      "1 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date",
+      "Zero-volume rows exceed 5% (147/523, 28.1%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -50,7 +50,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 Jul/Aug ex-div",
+      "label": "Series 1 — Jul/Aug ex-div",
       "sub": "Irregular",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -451,8 +451,8 @@
       "outlier": false,
       "macro": false,
       "macro_detail": {
-        "market_index_return": 16.1126,
-        "stock_excess_return": -5.4498
+        "market_index_return": 17.5358,
+        "stock_excess_return": -6.873
       },
       "volume_avg_30d": 16756.0,
       "volume_entry_ratio": 0.4606,
@@ -725,10 +725,10 @@
       "est_low_date_cluster1_sd_wks": 4.31,
       "est_low_date_cluster2_sd_wks": 3.5,
       "est_low_date_note": "Bimodal - two timing clusters: early dip Apr 29 (13.6wk before) or late dip Jun 12 (7.2wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Apr 29 \u00b7 Cluster 2: Jun 12",
+      "est_watch_window_note": "Cluster 1: Apr 29 · Cluster 2: Jun 12",
       "est_watch_window_primary_note": "Primary cluster: Early (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 54.4479,
+      "current_price_vs_zone": 53.2382,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "BIMODAL",
@@ -811,7 +811,24 @@
         "pct_cycles_outside_zone_clean": 80.0,
         "pct_cycles_outside_zone_full": 75.0,
         "fragility_warning": true,
-        "median_miss_pct": 11.07
+        "median_miss_pct": 11.07,
+        "fragility_percentile_band": "NEAR_MEDIAN",
+        "fragility_percentile_band_display": "Near median"
+      },
+      "final_verdict": "Wait",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "Price is too far above the entry zone right now.",
+      "potential_score": 74.6,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Dividend frequency is not one of the preferred cycle structures"
+      ],
+      "structural_health_flags": [],
+      "structural_health_override_applied": false,
+      "cluster_track_record": {
+        "c1_wins": 0,
+        "c2_wins": 2,
+        "resolved_count": 2
       }
     }
   },
@@ -1167,18 +1184,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 0.71
-    },
-    {
-      "d": "2016-08-12",
-      "c": 0.705
-    },
-    {
-      "d": "2016-08-19",
-      "c": 0.705
-    },
     {
       "d": "2016-08-26",
       "c": 0.78
@@ -3257,14 +3262,26 @@
     },
     {
       "d": "2026-08-07",
+      "c": 3.87
+    },
+    {
+      "d": "2026-08-14",
       "c": 3.83
+    },
+    {
+      "d": "2026-08-21",
+      "c": 3.84
+    },
+    {
+      "d": "2026-08-28",
+      "c": 3.8
     }
   ],
-  "current_price": 3.83,
-  "anchor_price": 3.83,
+  "current_price": 3.8,
+  "anchor_price": 3.87,
   "anchor_date": "2026-08-04",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {

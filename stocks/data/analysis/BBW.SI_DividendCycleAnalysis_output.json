@@ -5,14 +5,14 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 499.9,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": 198.5
+    "price_growth_5yr_pct": 163.1
   },
   "parse_preflight": {
     "columns_detected": [
@@ -29,11 +29,11 @@
     "total_rows": 546,
     "price_rows": 523,
     "dividend_rows": 23,
-    "zero_volume_rows": 152,
-    "zero_volume_pct": 29.1,
+    "zero_volume_rows": 150,
+    "zero_volume_pct": 28.7,
     "issues_found": [
-      "3 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (152/523, 29.1%) \u00e2\u20ac\u201d analysis continues, but thin trading may reduce reliability"
+      "3 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date",
+      "Zero-volume rows exceed 5% (150/523, 28.7%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -50,7 +50,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 Aug/Oct ex-div",
+      "label": "Series 1 — Aug/Oct ex-div",
       "sub": "Irregular",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -727,10 +727,10 @@
       "est_low_date_cluster1_sd_wks": 0.0,
       "est_low_date_cluster2_sd_wks": 4.84,
       "est_low_date_note": "Bimodal - two timing clusters: early dip Nov 14 (21.6wk before) or late dip Feb 4 (9.9wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Nov 14 \u00b7 Cluster 2: Feb 4",
+      "est_watch_window_note": "Cluster 1: Nov 14 · Cluster 2: Feb 4",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 5.0062,
+      "current_price_vs_zone": 6.1442,
       "entry_status": "INSIDE",
       "entry_status_display": "Inside",
       "timing_rating": "BIMODAL",
@@ -813,15 +813,31 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 87.5,
         "fragility_warning": true,
-        "median_miss_pct": 31.97
-      }
+        "median_miss_pct": 31.97,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: pattern stability has been degrading in recent cycles; the projected zone is in the bottom 25% of the tracked universe for reliability.",
+      "potential_score": 68.6,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Dividend frequency is not one of the preferred cycle structures",
+        "Tail risk is severe"
+      ],
+      "structural_health_flags": [
+        "DEGRADING",
+        "FRAGILE_ZONE"
+      ],
+      "structural_health_override_applied": true
     }
   },
   "annual_payouts": [
     {
       "yr": 2005,
       "count": 1,
-      "total": 0.0752,
+      "total": 0.0745,
       "series": [
         "S1"
       ],
@@ -831,7 +847,7 @@
     {
       "yr": 2006,
       "count": 1,
-      "total": 0.0801,
+      "total": 0.0793,
       "series": [
         "S1"
       ],
@@ -841,7 +857,7 @@
     {
       "yr": 2007,
       "count": 1,
-      "total": 0.0582,
+      "total": 0.0576,
       "series": [
         "S1"
       ],
@@ -851,7 +867,7 @@
     {
       "yr": 2008,
       "count": 1,
-      "total": 0.0392,
+      "total": 0.0389,
       "series": [
         "S1"
       ],
@@ -861,7 +877,7 @@
     {
       "yr": 2010,
       "count": 1,
-      "total": 0.0567,
+      "total": 0.0562,
       "series": [
         "S1"
       ],
@@ -871,7 +887,7 @@
     {
       "yr": 2012,
       "count": 1,
-      "total": 0.0569,
+      "total": 0.0563,
       "series": [
         "S1"
       ],
@@ -881,7 +897,7 @@
     {
       "yr": 2013,
       "count": 1,
-      "total": 0.1698,
+      "total": 0.1681,
       "series": [
         "S1"
       ],
@@ -891,7 +907,7 @@
     {
       "yr": 2014,
       "count": 1,
-      "total": 0.1016,
+      "total": 0.1005,
       "series": [
         "S1"
       ],
@@ -974,56 +990,56 @@
       "id": "S1_2005",
       "series": "S1",
       "date": "2005-08-03",
-      "amount": 0.0752,
+      "amount": 0.0745,
       "note": "Dividend"
     },
     {
       "id": "S1_2006",
       "series": "S1",
       "date": "2006-08-15",
-      "amount": 0.0801,
+      "amount": 0.0793,
       "note": "Dividend"
     },
     {
       "id": "S1_2007",
       "series": "S1",
       "date": "2007-08-02",
-      "amount": 0.0582,
+      "amount": 0.0576,
       "note": "Dividend"
     },
     {
       "id": "S1_2008",
       "series": "S1",
       "date": "2008-08-05",
-      "amount": 0.0392,
+      "amount": 0.0389,
       "note": "Dividend"
     },
     {
       "id": "S1_2010",
       "series": "S1",
       "date": "2010-08-05",
-      "amount": 0.0567,
+      "amount": 0.0562,
       "note": "Dividend"
     },
     {
       "id": "S1_2012",
       "series": "S1",
       "date": "2012-07-23",
-      "amount": 0.0569,
+      "amount": 0.0563,
       "note": "Dividend"
     },
     {
       "id": "S1_2013",
       "series": "S1",
       "date": "2013-11-21",
-      "amount": 0.1698,
+      "amount": 0.1681,
       "note": "Dividend"
     },
     {
       "id": "S1_2014",
       "series": "S1",
       "date": "2014-09-10",
-      "amount": 0.1016,
+      "amount": 0.1005,
       "note": "Dividend"
     },
     {
@@ -1084,18 +1100,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 0.46
-    },
-    {
-      "d": "2016-08-12",
-      "c": 0.46
-    },
-    {
-      "d": "2016-08-19",
-      "c": 0.46
-    },
     {
       "d": "2016-08-26",
       "c": 0.4
@@ -3174,14 +3178,26 @@
     },
     {
       "d": "2026-08-07",
-      "c": 10.15
+      "c": 10.1
+    },
+    {
+      "d": "2026-08-14",
+      "c": 10.5
+    },
+    {
+      "d": "2026-08-21",
+      "c": 10.35
+    },
+    {
+      "d": "2026-08-28",
+      "c": 10.26
     }
   ],
-  "current_price": 10.15,
+  "current_price": 10.26,
   "anchor_price": 11.2,
   "anchor_date": "2026-02-12",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {
@@ -3194,28 +3210,28 @@
   "anomalies_excluded": [
     {
       "date": "2009-08-04",
-      "amount": 0.0043,
-      "reason": "stub amount (0.0043 < 40% of baseline 0.0667)"
+      "amount": 0.0042,
+      "reason": "stub amount (0.0042 < 40% of baseline 0.0660)"
     },
     {
       "date": "2011-08-08",
-      "amount": 0.0186,
-      "reason": "stub amount (0.0186 < 40% of baseline 0.0575)"
+      "amount": 0.0185,
+      "reason": "stub amount (0.0185 < 40% of baseline 0.0569)"
     },
     {
       "date": "2015-07-22",
       "amount": 0.02,
-      "reason": "stub amount (0.0200 < 40% of baseline 0.0568)"
+      "reason": "stub amount (0.0200 < 40% of baseline 0.0563)"
     },
     {
       "date": "2018-08-16",
       "amount": 0.0109,
-      "reason": "stub amount (0.0109 < 40% of baseline 0.0568)"
+      "reason": "stub amount (0.0109 < 40% of baseline 0.0563)"
     },
     {
       "date": "2022-10-17",
       "amount": 0.29,
-      "reason": "special/bumper amount (0.2900 > 2.5x baseline 0.0752)"
+      "reason": "special/bumper amount (0.2900 > 2.5x baseline 0.0745)"
     },
     {
       "date": "2024-10-04",

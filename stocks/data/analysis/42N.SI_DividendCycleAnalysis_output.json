@@ -5,14 +5,14 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 314.5,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -57.4
+    "price_growth_5yr_pct": -55.6
   },
   "parse_preflight": {
     "columns_detected": [
@@ -29,10 +29,10 @@
     "total_rows": 526,
     "price_rows": 523,
     "dividend_rows": 3,
-    "zero_volume_rows": 85,
-    "zero_volume_pct": 16.3,
+    "zero_volume_rows": 84,
+    "zero_volume_pct": 16.1,
     "issues_found": [
-      "Zero-volume rows exceed 5% (85/523, 16.3%) \u00e2\u20ac\u201d analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (84/523, 16.1%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -51,7 +51,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 Nov/Feb ex-div",
+      "label": "Series 1 — Nov/Feb ex-div",
       "sub": "Irregular",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -85,10 +85,10 @@
       "macro": false,
       "macro_detail": {
         "market_index_return": null,
-        "stock_excess_return": 6.962
+        "stock_excess_return": 9.7403
       },
       "volume_avg_30d": 1561800.0,
-      "volume_entry_ratio": 0.7017,
+      "volume_entry_ratio": 0.8547,
       "volume_trend": "INCREASING",
       "max_drawdown_pre_exdiv": -10.303,
       "recovery_time_days": 53,
@@ -257,7 +257,7 @@
       },
       "liquidity": {
         "avg_volume_30d": 1561800.0,
-        "volume_ratio_median": 0.7017,
+        "volume_ratio_median": 0.8547,
         "adequacy_pct": 100.0
       },
       "risk": {
@@ -310,7 +310,7 @@
       "est_watch_window_note": null,
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": -81.9193,
+      "current_price_vs_zone": -83.3102,
       "entry_status": "BELOW",
       "entry_status_display": "Below",
       "timing_rating": "RELIABLE",
@@ -384,8 +384,24 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": null
-      }
+        "median_miss_pct": null,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative.",
+      "potential_score": 69.0,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Dividend frequency is not one of the preferred cycle structures",
+        "Clean cycle sample is below the minimum threshold"
+      ],
+      "structural_health_flags": [
+        "FRAGILE_ZONE",
+        "PRICE_DECLINE"
+      ],
+      "structural_health_override_applied": true
     }
   },
   "annual_payouts": [
@@ -434,18 +450,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 0.158
-    },
-    {
-      "d": "2016-08-12",
-      "c": 0.16
-    },
-    {
-      "d": "2016-08-19",
-      "c": 0.158
-    },
     {
       "d": "2016-08-26",
       "c": 0.154
@@ -2524,14 +2528,26 @@
     },
     {
       "d": "2026-08-07",
+      "c": 0.027
+    },
+    {
+      "d": "2026-08-14",
       "c": 0.026
+    },
+    {
+      "d": "2026-08-21",
+      "c": 0.024
+    },
+    {
+      "d": "2026-08-28",
+      "c": 0.024
     }
   ],
-  "current_price": 0.026,
+  "current_price": 0.024,
   "anchor_price": 0.16,
   "anchor_date": "2016-11-08",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {

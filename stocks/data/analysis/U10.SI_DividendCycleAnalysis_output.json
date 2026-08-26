@@ -5,14 +5,14 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 304.4,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": 152.4
+    "price_growth_5yr_pct": 156.3
   },
   "parse_preflight": {
     "columns_detected": [
@@ -32,7 +32,7 @@
     "zero_volume_rows": 0,
     "zero_volume_pct": 0.0,
     "issues_found": [
-      "2 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date"
+      "2 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date"
     ],
     "halted": false
   },
@@ -47,7 +47,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 May/Aug ex-div",
+      "label": "Series 1 — May/Aug ex-div",
       "sub": "Irregular",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -834,11 +834,11 @@
       "est_low_date_cluster2_to": "2027-02-12",
       "est_low_date_cluster1_sd_wks": 0.75,
       "est_low_date_cluster2_sd_wks": 5.31,
-      "est_low_date_note": "Bimodal - two timing clusters: early dip Nov 14 \u2013 Nov 29 (best: Nov 22) (19.6wk before) or late dip Feb 12 (7.9wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Nov 14 \u2013 Nov 29 (best: Nov 22) \u00b7 Cluster 2: Feb 12",
+      "est_low_date_note": "Bimodal - two timing clusters: early dip Nov 14 – Nov 29 (best: Nov 22) (19.6wk before) or late dip Feb 12 (7.9wk before). Set limit order in zone and monitor across the full window.",
+      "est_watch_window_note": "Cluster 1: Nov 14 – Nov 29 (best: Nov 22) · Cluster 2: Feb 12",
       "est_watch_window_primary_note": "Primary cluster: Early (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 23.3024,
+      "current_price_vs_zone": 20.6219,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "BIMODAL",
@@ -921,8 +921,21 @@
         "pct_cycles_outside_zone_clean": 66.7,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": 13.49
-      }
+        "median_miss_pct": 13.49,
+        "fragility_percentile_band": "TOP_25",
+        "fragility_percentile_band_display": "Top 25%"
+      },
+      "final_verdict": "Too Risky",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Tail risk is too severe for a live setup.",
+      "potential_score": 70.5,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Dividend frequency is not one of the preferred cycle structures",
+        "Tail risk is severe"
+      ],
+      "structural_health_flags": [],
+      "structural_health_override_applied": false
     }
   },
   "annual_payouts": [
@@ -1414,18 +1427,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 1.305
-    },
-    {
-      "d": "2016-08-12",
-      "c": 1.31
-    },
-    {
-      "d": "2016-08-19",
-      "c": 1.3
-    },
     {
       "d": "2016-08-26",
       "c": 1.305
@@ -3505,13 +3506,25 @@
     {
       "d": "2026-08-07",
       "c": 4.14
+    },
+    {
+      "d": "2026-08-14",
+      "c": 4.35
+    },
+    {
+      "d": "2026-08-21",
+      "c": 4.16
+    },
+    {
+      "d": "2026-08-28",
+      "c": 4.05
     }
   ],
-  "current_price": 4.14,
+  "current_price": 4.05,
   "anchor_price": 4.2,
   "anchor_date": "2026-05-07",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {

@@ -127,6 +127,56 @@ button{cursor:pointer;font:inherit}
 .timing-stat-value{font-family:var(--mono);font-weight:600}
 .timing-note{font-size:10px;color:var(--mu2);margin-top:6px;line-height:1.5}
 
+/* analytics */
+.analytics-section{margin-bottom:20px}
+.analytics-head{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.analytics-head h2{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--tx)}
+.analytics-head p{font-size:11px;color:var(--mu);max-width:760px}
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.analytics-grid.analytics-grid-wide{grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
+.analytics-card{
+  background:var(--sf);border:1px solid var(--bd);border-radius:var(--radius);
+  padding:14px 16px;
+}
+.analytics-card.analytics-card-wide{grid-column:1/-1}
+.analytics-card h3{
+  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--mu);margin-bottom:10px;
+}
+.analytics-list{display:flex;flex-direction:column;gap:8px}
+.analytics-row{
+  display:flex;flex-direction:column;gap:6px;align-items:stretch;
+  padding:8px 0;border-top:1px solid rgba(255,255,255,.05);
+}
+.analytics-row:first-child{border-top:none;padding-top:0}
+.analytics-name{font-size:12px;font-weight:600;color:var(--tx);line-height:1.4}
+.analytics-sub{font-size:10px;color:var(--mu);line-height:1.5;margin-top:2px}
+.analytics-metric{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--tx);text-align:right;white-space:nowrap}
+.analytics-empty{font-size:11px;color:var(--mu);line-height:1.6}
+.analytics-badges{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start}
+.analytics-badge{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;padding:2px 6px;border-radius:999px;background:var(--sf2);color:var(--tx);
+}
+.analytics-badge.good{background:rgba(34,197,94,.18);color:#4ade80}
+.analytics-badge.warn{background:rgba(245,158,11,.18);color:#fbbf24}
+.analytics-badge.bad{background:rgba(239,68,68,.18);color:#f87171}
+.analytics-badge.info{background:rgba(79,142,247,.18);color:#7fb3ff}
+.analytics-table-wrap{overflow:auto;border:1px solid var(--bd);border-radius:10px}
+.analytics-table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
+.analytics-table th,.analytics-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
+.analytics-table th{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--mu);background:var(--sf2)}
+.analytics-table td.num,.analytics-table th.num{text-align:right;font-family:var(--mono)}
+.analytics-table tr:last-child td{border-bottom:none}
+.analytics-caption{font-size:10px;color:var(--mu);margin-top:8px;line-height:1.5}
+@media (max-width: 1200px){
+  .analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .analytics-grid.analytics-grid-wide{grid-template-columns:1fr}
+}
+@media (max-width: 760px){
+  .analytics-grid{grid-template-columns:1fr}
+}
+
 /* ── TABLE ──────────────────────────────────────────────── */
 .table-outer{
   background:var(--sf);border:1px solid var(--bd);border-radius:var(--radius);
@@ -149,6 +199,32 @@ thead th.sortable{cursor:pointer;user-select:none}
 thead th.sortable:hover{color:var(--tx)}
 thead th .sort-arrow{display:inline-block;margin-left:4px;opacity:.4;font-size:9px}
 thead th.sorted .sort-arrow{opacity:1;color:var(--ac)}
+.th-wrap{display:inline-flex;align-items:center;gap:6px}
+.th-help{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;border-radius:999px;border:1px solid var(--bd);
+  color:var(--mu);font-size:10px;font-weight:700;line-height:1;background:var(--sf);
+  cursor:help;vertical-align:middle;
+}
+.th-help:hover,.th-help:focus-visible{color:var(--tx);border-color:var(--ac);outline:none}
+.th-help::after{
+  content:attr(data-tip);
+  position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);
+  min-width:220px;max-width:320px;padding:8px 10px;border-radius:8px;
+  background:var(--sf);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.28);
+  color:var(--tx);font-size:11px;font-weight:500;line-height:1.45;letter-spacing:normal;
+  text-transform:none;white-space:normal;text-align:left;pointer-events:none;
+  opacity:0;visibility:hidden;z-index:20;
+}
+.th-help::before{
+  content:"";
+  position:absolute;left:50%;top:calc(100% + 3px);transform:translateX(-50%) rotate(45deg);
+  width:8px;height:8px;background:var(--sf);border-left:1px solid var(--bd);border-top:1px solid var(--bd);
+  opacity:0;visibility:hidden;z-index:21;
+}
+.th-help:hover::after,.th-help:hover::before,.th-help:focus-visible::after,.th-help:focus-visible::before{
+  opacity:1;visibility:visible;
+}
 tbody tr{border-bottom:1px solid var(--bd);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--sf2)}
@@ -342,8 +418,50 @@ thead th.sortable{cursor:pointer}
     </div>
   </div>
 
+  <div class="kpi-row" id="kpiFairRow" style="margin-top:-8px">
+    <div class="kpi">
+      <span class="kpi-label">Ex-Unreliable Hit</span>
+      <span class="kpi-value" id="kpiCoreHitRate">—</span>
+      <span class="kpi-sub" id="kpiCoreHitSub">reliable + bimodal only</span>
+    </div>
+  </div>
+
   <!-- TIMING BREAKDOWN -->
   <div class="timing-breakdown" id="timingBreakdown"></div>
+
+  <!-- GROUPED ANALYTICS -->
+  <section class="analytics-section">
+    <div class="analytics-head">
+      <div>
+        <h2>Desk Lens</h2>
+        <p>This section treats the log like a quantitative trader's review sheet: rank the upcoming setups with the best validated edge, separate secondary watchlist names from low-edge names, and surface the next places worth doing real work.</p>
+      </div>
+    </div>
+    <div class="analytics-grid">
+      <div class="analytics-card">
+        <h3>Top 5 Candidates</h3>
+        <div class="analytics-list" id="topPicks"></div>
+      </div>
+      <div class="analytics-card">
+        <h3>Secondary Watchlist</h3>
+        <div class="analytics-list" id="watchList"></div>
+      </div>
+      <div class="analytics-card">
+        <h3>Low-Edge / Avoid</h3>
+        <div class="analytics-list" id="avoidList"></div>
+      </div>
+      <div class="analytics-card">
+        <h3>Desk Notes</h3>
+        <div class="analytics-list" id="insightNotes"></div>
+      </div>
+    </div>
+    <div class="analytics-grid analytics-grid-wide" style="margin-top:12px">
+      <div class="analytics-card analytics-card-wide">
+        <h3>Edge Ranking</h3>
+        <div id="trustBoard"></div>
+      </div>
+    </div>
+  </section>
 
   <!-- FILTER BAR -->
   <div class="filter-bar">
@@ -380,20 +498,20 @@ thead th.sortable{cursor:pointer}
       <table id="mainTable">
         <thead>
           <tr>
-            <th class="sortable" data-col="ticker" title="Ticker symbol">Stock <span class="sort-arrow">↕</span></th>
-            <th class="sortable" data-col="series_id" title="Which dividend series this estimate belongs to (S1/S2, Q1–Q4, etc.)">Series <span class="sort-arrow">↕</span></th>
-            <th class="sortable" data-col="proj_exdiv_date" title="Model's projected next ex-dividend date for this series, based on historical payment intervals">Proj Ex-Div <span class="sort-arrow">↕</span></th>
-            <th class="sortable" data-col="actual_exdiv_date" title="Actual ex-dividend date once the cycle completes">Actual Ex-Div <span class="sort-arrow">↕</span></th>
-            <th class="sortable num" data-col="exdiv_date_error_days" title="Actual minus projected ex-div date in days. Negative = occurred earlier than forecast">Ex-Div Error <span class="sort-arrow">↕</span></th>
-            <th title="RELIABLE = one tight timing cluster. BIMODAL = two distinct timing windows. UNRELIABLE = timing too scattered to use as a date guide">Timing</th>
-            <th title="Model's estimated dip date(s). RELIABLE: one window. BIMODAL: two cluster windows (C1 = early/farther from ex-div, C2 = late/closer). UNRELIABLE: no date estimate">Est Low Date(s)</th>
-            <th class="sortable" data-col="actual_low_date" title="Observed cycle low price and date once the cycle resolves">Actual Low <span class="sort-arrow">↕</span></th>
-            <th class="sortable num" data-col="date_error_days" title="Actual low date minus nearest estimated low date, in days. Negative = actual dip came earlier. BIMODAL uses the nearer cluster center — errors not directly comparable to RELIABLE">Date Error <span class="sort-arrow">↕</span></th>
-            <th class="num" title="BIMODAL only — which cluster the actual low was closest to: C1 = early (farther from ex-div), C2 = late (closer to ex-div)">Cluster</th>
-            <th class="num" title="(Actual low price − estimated low price) / estimated low price × 100. Negative = stock dipped deeper than forecast">Price Error</th>
-            <th title="Whether price traded into the projected entry zone: Zone Hit = inside zone, Miss Above = dip was too shallow, Miss Below = dip overshot the zone">Zone Outcome</th>
-            <th class="sortable" data-col="first_seen" title="Date this specific estimate was first recorded by the pipeline">First Seen <span class="sort-arrow">↕</span></th>
-            <th class="sortable" data-col="last_seen" title="Date this estimate was last seen unchanged. A shift greater than 7 days between runs creates a new row instead">Last Seen <span class="sort-arrow">↕</span></th>
+            <th class="sortable" data-col="ticker"><span class="th-wrap">Stock <span class="th-help" tabindex="0" data-tip="Ticker symbol and stock name.">?</span> <span class="sort-arrow">↕</span></span></th>
+            <th class="sortable" data-col="series_id"><span class="th-wrap">Series <span class="th-help" tabindex="0" data-tip="Which dividend series this estimate belongs to, such as S1/S2 or Q1–Q4.">?</span> <span class="sort-arrow">↕</span></span></th>
+            <th class="sortable" data-col="proj_exdiv_date"><span class="th-wrap">Proj Ex-Div <span class="th-help" tabindex="0" data-tip="The model’s projected next ex-dividend date for this series, based on historical payment intervals.">?</span> <span class="sort-arrow">↕</span></span></th>
+            <th class="sortable" data-col="actual_exdiv_date"><span class="th-wrap">Actual Ex-Div <span class="th-help" tabindex="0" data-tip="The actual ex-dividend date after the cycle has completed.">?</span> <span class="sort-arrow">↕</span></span></th>
+            <th class="sortable num" data-col="exdiv_date_error_days"><span class="th-wrap">Ex-Div Error <span class="th-help" tabindex="0" data-tip="Actual ex-dividend date minus projected ex-dividend date, in days. Negative means ex-div happened earlier than forecast.">?</span> <span class="sort-arrow">↕</span></span></th>
+            <th><span class="th-wrap">Timing <span class="th-help" tabindex="0" data-tip="RELIABLE means one tight timing cluster. BIMODAL means two distinct timing windows. UNRELIABLE means timing is too scattered to trust as a date guide.">?</span></span></th>
+            <th><span class="th-wrap">Est Low Date(s) <span class="th-help" tabindex="0" data-tip="The model’s estimated dip date window. RELIABLE shows one window. BIMODAL shows two cluster windows: C1 is earlier, C2 is later. UNRELIABLE has no date estimate.">?</span></span></th>
+            <th class="sortable" data-col="actual_low_date"><span class="th-wrap">Actual Low <span class="th-help" tabindex="0" data-tip="The observed cycle low date and low price once the cycle resolves.">?</span> <span class="sort-arrow">↕</span></span></th>
+            <th class="sortable num" data-col="date_error_days"><span class="th-wrap">Date Error <span class="th-help" tabindex="0" data-tip="Actual low date minus the nearest estimated low date, in days. Negative means the dip came earlier. For BIMODAL rows this uses whichever cluster center was closer, so do not compare directly against RELIABLE rows.">?</span> <span class="sort-arrow">↕</span></span></th>
+            <th class="num"><span class="th-wrap">Cluster <span class="th-help" tabindex="0" data-tip="BIMODAL only. Shows whether the actual low was closer to C1, the earlier window, or C2, the later window.">?</span></span></th>
+            <th class="num"><span class="th-wrap">Price Error <span class="th-help" tabindex="0" data-tip="(Actual low price minus estimated low price) divided by estimated low price, in percent. Negative means price dipped deeper than forecast.">?</span></span></th>
+            <th><span class="th-wrap">Zone Outcome <span class="th-help" tabindex="0" data-tip="Whether price entered the projected entry zone: Zone Hit means inside the zone, Miss Above means too shallow, Miss Below means it overshot lower than the zone.">?</span></span></th>
+            <th class="sortable" data-col="first_seen"><span class="th-wrap">First Seen <span class="th-help" tabindex="0" data-tip="The first date this specific estimate was recorded by the pipeline.">?</span> <span class="sort-arrow">↕</span></span></th>
+            <th class="sortable" data-col="last_seen"><span class="th-wrap">Last Seen <span class="th-help" tabindex="0" data-tip="The last date this estimate was still seen unchanged. A bigger model shift creates a new row instead of overwriting the old one.">?</span> <span class="sort-arrow">↕</span></span></th>
           </tr>
         </thead>
         <tbody id="tableBody">
@@ -662,6 +780,16 @@ function rowClass(rec){
 /* ── SORT STATE ──────────────────────────────────────────── */
 let sortCol="proj_exdiv_date", sortAsc=true;
 let tickerNameMap={};
+let setupMetaMap={};
+// Potential-score eligibility gates and weights used to live here too, mirroring
+// dashboard.html's CONFIG -- now read as precomputed fields from each stock's JSON
+// instead (main/analyze-stock.py's compute_potential_score), so only the monitoring
+// window (which has no server-side equivalent -- it's this file's own "how soon is
+// the next setup" framing) still needs a local config.
+const LIVE_POTENTIAL_CONFIG = {
+  monitoringDaysMin: 0,
+  monitoringDaysMax: 90,
+};
 
 function sortRows(rows){
   return [...rows].sort((a,b)=>{
@@ -691,6 +819,7 @@ function renderTable(){
 
   document.getElementById("countBadge").textContent=
     rows.length===allRows.length?`${rows.length} records`:`${rows.length} of ${allRows.length}`;
+  renderDecisionLens(rows);
 
   // Update sort header indicators
   document.querySelectorAll("thead th.sortable").forEach(th=>{
@@ -757,11 +886,335 @@ function medianAbs(arr){
   return s[Math.floor(s.length/2)];
 }
 
+function mean(arr){
+  return arr.length?arr.reduce((sum,v)=>sum+v,0)/arr.length:null;
+}
+
+function fmtDays(v){
+  return v==null?"—":`${Math.round(v)}d`;
+}
+
+function dayDiff(later, earlier){
+  if(!later || !earlier) return null;
+  const a=new Date(`${later}T00:00:00`);
+  const b=new Date(`${earlier}T00:00:00`);
+  const ms=a-b;
+  if(Number.isNaN(ms)) return null;
+  return Math.round(ms/86400000);
+}
+
+function groupBy(rows,keyFn){
+  const map=new Map();
+  rows.forEach(row=>{
+    const key=keyFn(row);
+    if(!map.has(key)) map.set(key,[]);
+    map.get(key).push(row);
+  });
+  return map;
+}
+
+/* Mirrors dashboard.html's getPriceVsZone(): distance is measured from
+   zone_top when above (not zone_bot, which Python's current_price_vs_zone
+   uses) and from zone_bot when below, so the near/slight thresholds below
+   line up with the same rule dashboard.html's getFinalVerdict() applies. */
+function getPriceVsZoneDistance(currentPrice,zoneBot,zoneTop){
+  if(currentPrice==null||zoneBot==null||zoneTop==null||zoneBot<=0||zoneTop<=0){
+    return{relation:"UNKNOWN",distancePct:null,insideZone:false};
+  }
+  if(currentPrice>=zoneBot&&currentPrice<=zoneTop){
+    return{relation:"INSIDE",distancePct:0,insideZone:true};
+  }
+  if(currentPrice>zoneTop){
+    return{relation:"ABOVE",distancePct:((currentPrice-zoneTop)/zoneTop)*100,insideZone:false};
+  }
+  return{relation:"BELOW",distancePct:((zoneBot-currentPrice)/zoneBot)*100,insideZone:false};
+}
+
+function renderDecisionLens(rows){
+  const setHtml=(id,html)=>{
+    const el=document.getElementById(id);
+    if(el) el.innerHTML=html || `<div class="analytics-empty">No data yet.</div>`;
+  };
+  const thTip=(label,tip,cls="")=>`<th${cls?` class="${cls}"`:""}><span class="th-wrap">${label}<span class="th-help" tabindex="0" data-tip="${esc(tip)}">?</span></span></th>`;
+  if(!rows.length){
+    ["topPicks","watchList","avoidList","insightNotes","trustBoard"].forEach(id=>setHtml(id,""));
+    return;
+  }
+
+  const TODAY_ISO=new Date().toISOString().slice(0,10);
+  const byTicker=groupBy(rows, r=>r.ticker);
+  const tickerStats=[...byTicker.entries()].map(([ticker,tRows])=>{
+    const resolved=tRows.filter(r=>r.cycle_resolved);
+    const coreResolved=resolved.filter(r=>r.timing_rating!=="UNRELIABLE");
+    const future=tRows
+      .filter(r=>!r.cycle_resolved && r.proj_exdiv_date && r.proj_exdiv_date>=TODAY_ISO)
+      .sort((a,b)=>a.proj_exdiv_date.localeCompare(b.proj_exdiv_date));
+    const nextSetup=future[0] || null;
+    const uniqueCycles=new Set(tRows.map(r=>`${r.series_id}|${r.proj_exdiv_date}`)).size;
+    return {
+      ticker,
+      name:tickerNameMap[ticker]||"",
+      resolvedCount: resolved.length,
+      hitRate: resolved.length ? resolved.filter(r=>r.zone_outcome==="ZONE_HIT").length / resolved.length : null,
+      coreHitRate: coreResolved.length ? coreResolved.filter(r=>r.zone_outcome==="ZONE_HIT").length / coreResolved.length : null,
+      medDate: medianAbs(resolved.filter(r=>r.date_error_days!=null).map(r=>r.date_error_days)),
+      meanBias: mean(resolved.filter(r=>r.price_error_pct!=null).map(r=>r.price_error_pct)),
+      revisionsPerCycle: uniqueCycles ? tRows.length / uniqueCycles : null,
+      nextSetup,
+    };
+  });
+
+  const candidates=tickerStats
+    .filter(s=>s.nextSetup)
+    .map(s=>{
+      const timing=s.nextSetup.timing_rating || "";
+      const daysAway=dayDiff(s.nextSetup.proj_exdiv_date, TODAY_ISO);
+      const setupKey=`${s.ticker}|${s.nextSetup.series_id}|${s.nextSetup.proj_exdiv_date}`;
+      const setupMeta=setupMetaMap[setupKey] || {};
+      const baseGainPct=
+        setupMeta.baseEntryPx!=null && setupMeta.baseExitPx!=null && setupMeta.baseEntryPx>0
+          ? ((setupMeta.baseExitPx - setupMeta.baseEntryPx) / setupMeta.baseEntryPx) * 100
+          : (setupMeta.estLowPx!=null && setupMeta.estPeakPx!=null && setupMeta.estLowPx>0
+              ? ((setupMeta.estPeakPx - setupMeta.estLowPx) / setupMeta.estLowPx) * 100
+              : null);
+      const downsideGainPct=
+        setupMeta.downsideEntryPx!=null && setupMeta.downsideExitPx!=null && setupMeta.downsideEntryPx>0
+          ? ((setupMeta.downsideExitPx - setupMeta.downsideEntryPx) / setupMeta.downsideEntryPx) * 100
+          : null;
+      const exitHitRate=setupMeta.exitTargetHitRate;
+      const stabilityVerdict=setupMeta.stabilityVerdict || "";
+      const tailLevel=setupMeta.tailLevel || "";
+      const fragilityClean=setupMeta.fragilityClean;
+      const fragilityFull=setupMeta.fragilityFull;
+      const currentPriceVsZone=setupMeta.currentPriceVsZone;
+      const entryStatus=setupMeta.entryStatus || "";
+      // final_verdict / potential_score / potential_eligible are computed once,
+      // server-side (main/analyze-stock.py's compute_final_verdict/compute_potential_score,
+      // plus analyze-batch.py's cross-stock structural health override), and read
+      // here directly instead of re-derived -- this file's own copy of that ladder
+      // had already drifted out of sync with dashboard.html's version once before.
+      // A stock whose JSON predates these fields simply reads as absent/blank below
+      // rather than falling back to a second guess at the same logic.
+      const potentialEligible = setupMeta.potentialEligible ?? false;
+      const potentialScore = setupMeta.potentialScore;
+      const structuralHealthOverride = setupMeta.structuralHealthOverride === true;
+      const zoneDist = getPriceVsZoneDistance(setupMeta.currentPrice, setupMeta.zoneBot, setupMeta.zoneTop);
+      const zoneDistancePct = zoneDist.distancePct!=null ? Math.abs(zoneDist.distancePct) : null;
+      const insideZone = entryStatus === "INSIDE" || zoneDist.insideZone === true;
+      const nearAboveZone = entryStatus === "ABOVE" && zoneDistancePct != null && zoneDistancePct <= 3 && daysAway != null && daysAway <= 90;
+      const inMonitoringWindow = daysAway != null && daysAway >= LIVE_POTENTIAL_CONFIG.monitoringDaysMin && daysAway <= LIVE_POTENTIAL_CONFIG.monitoringDaysMax;
+      const watchCandidate = insideZone || nearAboveZone || inMonitoringWindow;
+      const finalVerdictLabel = setupMeta.finalVerdict;
+      let score=0;
+      score += (s.coreHitRate ?? s.hitRate ?? 0) * 28;
+      score += (s.hitRate ?? 0) * 15;
+      score += timing==="RELIABLE" ? 15 : timing==="BIMODAL" ? 8 : -10;
+      score += s.resolvedCount>=6 ? 12 : s.resolvedCount>=4 ? 6 : s.resolvedCount>=2 ? -2 : -12;
+      score += s.medDate==null ? 0 : (s.medDate<=7 ? 10 : s.medDate<=14 ? 6 : s.medDate<=21 ? 2 : -6);
+      score += s.meanBias==null ? 0 : (Math.abs(s.meanBias)<=2 ? 8 : Math.abs(s.meanBias)<=5 ? 3 : -5);
+      score += s.revisionsPerCycle==null ? 0 : (s.revisionsPerCycle<=1.1 ? 6 : s.revisionsPerCycle<=1.5 ? 2 : -5);
+      score += baseGainPct==null ? 0 : (baseGainPct>=10 ? 14 : baseGainPct>=7 ? 9 : baseGainPct>=5 ? 4 : baseGainPct>=3 ? -2 : -10);
+      score += downsideGainPct==null ? 0 : (downsideGainPct>=5 ? 6 : downsideGainPct>=3 ? 2 : downsideGainPct>=1 ? -2 : -7);
+      score += exitHitRate==null ? 0 : (exitHitRate>=80 ? 4 : exitHitRate>=60 ? 1 : -4);
+      score += stabilityVerdict==="IMPROVING" ? 4 : stabilityVerdict==="STABLE" ? 1 : stabilityVerdict==="DEGRADING" ? -10 : stabilityVerdict==="INSUFFICIENT_DATA" ? -6 : 0;
+      score += tailLevel==="MODERATE" ? -2 : tailLevel==="CAUTION" ? -5 : tailLevel==="HIGH" ? -10 : tailLevel==="SEVERE" ? -16 : 0;
+      score += fragilityClean==null ? 0 : (fragilityClean<=30 ? 4 : fragilityClean<=50 ? 0 : fragilityClean<=65 ? -6 : -12);
+      score += fragilityFull==null ? 0 : (fragilityFull<=50 ? 2 : fragilityFull<=75 ? -2 : -8);
+      score += currentPriceVsZone==null ? 0 : (currentPriceVsZone<=5 ? 4 : currentPriceVsZone<=12 ? 1 : currentPriceVsZone<=20 ? -2 : -6);
+      score += entryStatus==="INSIDE" ? 4 : entryStatus==="ABOVE" ? 0 : entryStatus==="BELOW" ? -5 : 0;
+      score += daysAway==null ? 0 : (daysAway<=120 ? 5 : daysAway<=240 ? 2 : -2);
+      const validationRaw = Math.max(0, Math.min(100,
+        ((s.coreHitRate ?? s.hitRate ?? 0) * 45) +
+        (s.resolvedCount>=6 ? 18 : s.resolvedCount>=4 ? 10 : s.resolvedCount>=2 ? 4 : 0) +
+        (s.medDate==null ? 4 : (s.medDate<=7 ? 16 : s.medDate<=14 ? 10 : s.medDate<=21 ? 5 : 0)) +
+        (s.meanBias==null ? 4 : (Math.abs(s.meanBias)<=2 ? 12 : Math.abs(s.meanBias)<=5 ? 6 : 0)) +
+        (s.revisionsPerCycle==null ? 4 : (s.revisionsPerCycle<=1.1 ? 9 : s.revisionsPerCycle<=1.5 ? 5 : 0))
+      ));
+      const validationConfidence =
+        s.resolvedCount>=5 ? 1 :
+        s.resolvedCount===4 ? 0.85 :
+        s.resolvedCount===3 ? 0.65 :
+        s.resolvedCount===2 ? 0.45 :
+        s.resolvedCount===1 ? 0.2 : 0;
+      const validationScore = validationRaw * validationConfidence;
+      const livePriority = insideZone ? 0 : nearAboveZone ? 1 : inMonitoringWindow ? 2 : 3;
+      const verdictBoost =
+        finalVerdictLabel==="Actionable Now" ? 10 :
+        finalVerdictLabel==="Watch Closely" ? 5 :
+        finalVerdictLabel==="Small Trades Advised" ? 1 :
+        finalVerdictLabel==="Watch Only" ? 0 :
+        finalVerdictLabel==="On Radar" ? -2 : -8;
+      const mergedScore = (potentialScore * 0.72) + (validationScore * 0.18) + (score * 0.10) + verdictBoost + (watchCandidate ? 4 : -8);
+      const rate=(s.coreHitRate ?? s.hitRate ?? 0);
+      const reasons=[];
+      const caution=[];
+
+      if(potentialEligible) reasons.push(`dashboard potential score is ${Math.round(potentialScore)}`);
+      else caution.push("does not fully clear the dashboard potential gate");
+
+      if(finalVerdictLabel==="Actionable Now") reasons.push("dashboard verdict says the setup is actionable now");
+      else if(finalVerdictLabel==="Watch Closely") reasons.push("dashboard verdict says price is close enough to watch closely");
+      else if(finalVerdictLabel==="Small Trades Advised") caution.push("dashboard verdict allows only smaller sizing");
+      else if(finalVerdictLabel==="Wait") caution.push("dashboard verdict says wait for a better live entry");
+      else if(finalVerdictLabel==="Structurally Weak") caution.push("dashboard flags this as structurally weak — pattern health, not just today's price, is the concern");
+      else if(finalVerdictLabel==="Too Risky") caution.push("dashboard verdict says tail risk is too severe for a live setup");
+
+      if(validationConfidence >= 0.6 && rate >= 0.8) reasons.push(`validated hit rate is very strong at ${Math.round(rate*100)}%`);
+      else if(validationConfidence >= 0.6 && rate >= 0.6) reasons.push(`validated hit rate is respectable at ${Math.round(rate*100)}%`);
+      else if(validationConfidence > 0 && rate >= 0.6) caution.push(`validated hit rate looks good, but it is based on only ${s.resolvedCount} resolved case${s.resolvedCount===1?"":"s"}`);
+      else if(s.resolvedCount===0) caution.push("there is no resolved validation history yet, so the ranking leans mostly on dashboard potential");
+      else reasons.push(`validated hit rate is only moderate at ${Math.round(rate*100)}%`);
+
+      if(s.resolvedCount < 4) caution.push(`validated sample is still small with only ${s.resolvedCount} resolved cases`);
+
+      if(timing==="RELIABLE") reasons.push("timing pattern is reliable rather than scattered");
+      else if(timing==="BIMODAL") reasons.push("timing is bimodal, but still structured enough to monitor");
+      else caution.push("timing is unreliable, so this needs extra confirmation from price action");
+
+      if(baseGainPct!=null){
+        if(baseGainPct>=8) reasons.push(`projected base-case gain is attractive at about ${pctFmt(baseGainPct)}`);
+        else if(baseGainPct>=5) reasons.push(`projected base-case gain is decent at about ${pctFmt(baseGainPct)}`);
+        else caution.push(`projected base-case gain is thin at only about ${pctFmt(baseGainPct)}`);
+      }
+
+      if(downsideGainPct!=null && downsideGainPct < 2){
+        caution.push(`if filled near the top of the zone, expected gain compresses to about ${pctFmt(downsideGainPct)}`);
+      }
+
+      if(stabilityVerdict==="IMPROVING") reasons.push("current setup stability is improving");
+      else if(stabilityVerdict==="DEGRADING") caution.push("current setup is degrading versus its own history");
+
+      if(s.medDate!=null){
+        if(s.medDate<=7) reasons.push(`historical timing error is tight at about ${fmtDays(s.medDate)}`);
+        else if(s.medDate<=14) reasons.push(`historical timing error is acceptable at about ${fmtDays(s.medDate)}`);
+        else caution.push(`historical timing error is loose at about ${fmtDays(s.medDate)}`);
+      }
+
+      if(s.meanBias!=null){
+        if(Math.abs(s.meanBias)<=2) reasons.push(`price bias is controlled at ${pctFmt(s.meanBias)}`);
+        else if(s.meanBias < -5) caution.push(`model has tended to underestimate dip depth by ${pctFmt(Math.abs(s.meanBias))}`);
+        else if(s.meanBias > 5) caution.push(`model has tended to expect deeper dips than what actually happened`);
+      }
+
+      if(s.revisionsPerCycle!=null){
+        if(s.revisionsPerCycle<=1.1) reasons.push("forecast history has been stable with very little revision");
+        else if(s.revisionsPerCycle>1.5) caution.push("forecast has shifted often from run to run");
+      }
+
+      if(daysAway!=null){
+        if(daysAway<=120) reasons.push(`the next setup is relatively near at ${daysAway} days away`);
+        else if(daysAway>240) caution.push(`the next setup is still far out at ${daysAway} days away`);
+      }
+
+      if(exitHitRate!=null && exitHitRate < 60){
+        caution.push(`historical exit-target follow-through is only ${Math.round(exitHitRate)}%`);
+      }
+      if(tailLevel==="HIGH" || tailLevel==="SEVERE"){
+        caution.push(`tail-risk profile is ${tailLevel.toLowerCase()}`);
+      }
+      if(fragilityClean!=null && fragilityClean > 60){
+        caution.push(`the projected zone has been fragile historically, with ${Math.round(fragilityClean)}% of clean cycles missing it`);
+      }
+      if(currentPriceVsZone!=null && currentPriceVsZone > 15){
+        caution.push(`current price is still materially above the zone at about ${pctFmt(currentPriceVsZone)}`);
+      }
+
+      const reasonSummary=`Why it surfaced: ${reasons.slice(0,3).join(" · ")}${caution.length?` | Main caution: ${caution[0]}`:""}`;
+      return {...s, timing, daysAway, score, mergedScore, livePriority, watchCandidate, potentialEligible, potentialScore, structuralHealthOverride, validationScore, finalVerdictLabel, reasons, caution, reasonSummary, baseGainPct, downsideGainPct, exitHitRate, stabilityVerdict, tailLevel, fragilityClean, fragilityFull, currentPriceVsZone, entryStatus};
+    })
+    .sort((a,b)=>{
+      if(a.livePriority !== b.livePriority) return a.livePriority - b.livePriority;
+      if(a.watchCandidate !== b.watchCandidate) return a.watchCandidate ? -1 : 1;
+      return (b.mergedScore ?? b.score) - (a.mergedScore ?? a.score);
+    });
+
+  const topPicks=candidates
+    .filter(s=>s.potentialEligible && s.watchCandidate && s.finalVerdictLabel!=="Too Risky" && s.finalVerdictLabel!=="Wait" && s.finalVerdictLabel!=="Structurally Weak")
+    .slice(0,5);
+  const topSet=new Set(topPicks.map(s=>s.ticker));
+  const watchList=candidates.filter(s=>!topSet.has(s.ticker) && !s.structuralHealthOverride && (s.potentialEligible || s.watchCandidate)).slice(0,5);
+  const avoidList=candidates.filter(s=>s.structuralHealthOverride || s.timing==="UNRELIABLE" || (s.coreHitRate ?? s.hitRate ?? 0) < 0.5 || (s.meanBias ?? 0) < -5).slice(0,5);
+
+  function listHtml(list, emptyText){
+    if(!list.length) return `<div class="analytics-empty">${emptyText}</div>`;
+    return list.map((s,idx)=>`<div class="analytics-row">
+      <div>
+        <div class="analytics-name">${idx+1}. ${esc(s.ticker)}${s.name?` · ${esc(s.name)}`:""}</div>
+        <div class="analytics-sub">${esc(s.nextSetup.series_id)} · ex-div ${dtShort(s.nextSetup.proj_exdiv_date) || "—"}${s.daysAway!=null?` · ${s.daysAway}d away`:""}</div>
+        <div class="analytics-sub" style="margin-top:4px">${esc(s.reasonSummary)}</div>
+      </div>
+      <div class="analytics-badges">
+        ${s.potentialScore!=null?`<span class="analytics-badge ${s.potentialScore>=75?"good":s.potentialScore>=60?"warn":"bad"}">${Math.round(s.potentialScore)} potential</span>`:""}
+        ${s.coreHitRate!=null?`<span class="analytics-badge ${(s.coreHitRate)>=0.7?"good":(s.coreHitRate)>=0.5?"warn":"bad"}">${Math.round(s.coreHitRate*100)}% validated hit rate</span>`:""}
+        ${s.baseGainPct!=null?`<span class="analytics-badge ${s.baseGainPct>=8?"good":s.baseGainPct>=5?"warn":"bad"}">${pctFmt(s.baseGainPct)} base gain</span>`:""}
+        <span class="analytics-badge ${s.finalVerdictLabel==="Actionable Now"?"good":s.finalVerdictLabel==="Watch Closely"?"warn":s.finalVerdictLabel==="Small Trades Advised"?"warn":"bad"}">${esc(s.finalVerdictLabel)}</span>
+      </div>
+    </div>`).join("");
+  }
+
+  setHtml("topPicks", listHtml(topPicks, "No upcoming setups currently clear the dashboard potential plus validation shortlist."));
+  setHtml("watchList", listHtml(watchList, "No secondary watchlist names in the current filtered set."));
+  setHtml("avoidList", listHtml(avoidList, "No clear deprioritized names in the current filtered set."));
+
+  const reliableUpcoming=candidates.filter(s=>s.timing==="RELIABLE").length;
+  const bimodalUpcoming=candidates.filter(s=>s.timing==="BIMODAL").length;
+  const unreliableUpcoming=candidates.filter(s=>s.timing==="UNRELIABLE").length;
+  const strongCore=candidates.filter(s=>(s.coreHitRate ?? s.hitRate ?? 0) >= 0.6).length;
+  const notesHtml=[
+    ["What this board means","These are not automatic buys. Think of them as the next names with the strongest validated edge to investigate first."],
+    ["Best use of this page",`Start with the ${topPicks.length} names in Top 5 Candidates, then cross-check current price versus zone in the main dashboard before committing capital.`],
+    ["Current mix",`Upcoming setups in this filtered view: ${reliableUpcoming} reliable, ${bimodalUpcoming} bimodal, ${unreliableUpcoming} unreliable · ${strongCore} have at least a 60% validated hit rate.`],
+  ].map(([title,body])=>`<div class="analytics-row"><div><div class="analytics-name">${title}</div><div class="analytics-sub">${body}</div></div></div>`).join("");
+  setHtml("insightNotes", notesHtml);
+
+  const boardRows=candidates.slice(0,12);
+  const boardHtml=boardRows.length?`<div class="analytics-table-wrap">
+    <table class="analytics-table">
+      <thead>
+        <tr>
+          ${thTip("Rank","Higher rows are the stronger upcoming candidates after combining hit quality, timing trust, stability, bias, and revision churn.")}
+          ${thTip("Ticker","Ticker symbol and stock name for the candidate.")}
+          ${thTip("Score","Internal ranking score for triage. Higher is better, but it is a prioritization aid rather than a buy signal.","num")}
+          ${thTip("Timing","Current setup’s timing class: RELIABLE, BIMODAL, or UNRELIABLE.")}
+          ${thTip("Validated Hit Rate","Zone hit rate using only the stronger timing sample, excluding UNRELIABLE rows where possible.","num")}
+          ${thTip("Med Date","Median absolute date error, in days, across resolved validated rows. Lower means tighter timing.","num")}
+          ${thTip("Bias","Average price error. Negative means the model tended to underestimate how deep the dip would go.","num")}
+          ${thTip("Rev/Cycle","Average number of forecast revisions logged per cycle. Lower means the setup was more stable through time.","num")}
+          ${thTip("Next Setup","The next unresolved ex-dividend setup currently being tracked for this stock.")}
+          ${thTip("Read","Plain-English review status. Priority Review means strongest candidate in the current set, Watchlist means worth monitoring, and Lower Priority means weaker or less trusted right now.")}
+        </tr>
+      </thead>
+      <tbody>
+        ${boardRows.map((s,idx)=>{
+          const read=topSet.has(s.ticker) ? "Priority Review" : watchList.some(w=>w.ticker===s.ticker) ? "Watchlist" : "Lower Priority";
+          return `<tr>
+            <td class="num">${idx+1}</td>
+            <td><strong>${esc(s.ticker)}</strong>${s.name?`<br><span class="analytics-sub">${esc(s.name)}</span>`:""}</td>
+            <td class="num">${Math.round(s.score)}</td>
+            <td>${esc(s.timing)}</td>
+            <td class="num">${s.coreHitRate!=null?`${Math.round(s.coreHitRate*100)}%`:"—"}</td>
+            <td class="num">${fmtDays(s.medDate)}</td>
+            <td class="num">${s.meanBias!=null?pctFmt(s.meanBias):"—"}</td>
+            <td class="num">${s.revisionsPerCycle!=null?s.revisionsPerCycle.toFixed(2):"—"}</td>
+            <td>${esc(s.nextSetup.series_id)} · ${dtShort(s.nextSetup.proj_exdiv_date) || "—"}</td>
+            <td>${read}</td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+  </div>
+  <div class="analytics-caption">This edge ranking is not a buy list. It rewards stronger walk-forward hit history, tighter timing, lower churn, and less negative price bias, while penalizing unreliable timing and unstable names. Use it to decide where to focus attention first.</div>` : `<div class="analytics-empty">No upcoming unresolved setups in the current filtered view.</div>`;
+  setHtml("trustBoard", boardHtml);
+}
+
 function renderKPIs(rows){
   const total=rows.length;
   const resolved=rows.filter(r=>r.cycle_resolved);
   const hits=resolved.filter(r=>r.zone_outcome==="ZONE_HIT");
   const hitRate=resolved.length?Math.round(hits.length/resolved.length*100):null;
+  const coreResolved=resolved.filter(r=>r.timing_rating!=="UNRELIABLE");
+  const coreHits=coreResolved.filter(r=>r.zone_outcome==="ZONE_HIT");
+  const coreHitRate=coreResolved.length?Math.round(coreHits.length/coreResolved.length*100):null;
 
   const errors=resolved.filter(r=>r.date_error_days!=null)
     .map(r=>Math.abs(r.date_error_days)).sort((a,b)=>a-b);
@@ -776,6 +1229,12 @@ function renderKPIs(rows){
   hrEl.className="kpi-value"+(hitRate==null?"":(hitRate>=70?" good":hitRate>=50?" warn":" bad"));
   document.getElementById("kpiHitSub").textContent=
     resolved.length?`${hits.length} / ${resolved.length} cycles`:"no resolved cycles yet";
+
+  const coreEl=document.getElementById("kpiCoreHitRate");
+  coreEl.textContent=coreHitRate!=null?coreHitRate+"%":"—";
+  coreEl.className="kpi-value"+(coreHitRate==null?"":(coreHitRate>=70?" good":coreHitRate>=50?" warn":" bad"));
+  document.getElementById("kpiCoreHitSub").textContent=
+    coreResolved.length?`${coreHits.length} / ${coreResolved.length} resolved · excludes unreliable`:"no reliable/bimodal resolved rows";
 
   const deEl=document.getElementById("kpiDateErr");
   deEl.textContent=medErr!=null?medErr+"d":"—";
@@ -854,19 +1313,67 @@ function parseCSV(text){
   });
 }
 
+/* ── BACKEND / STATIC DUAL MODE ──────────────────────────────
+   Mirrors dashboard.html's BACKEND_CONFIG pattern: staticJsonBase/
+   staticPredictlogBase stay null in the main/ source and get patched to
+   real relative paths by deploy.ps1 for the stocks/ static build. When
+   neither a static base nor a reachable Flask backend is present, this
+   falls back to the original "../data/..." relative fetches, so opening
+   this file directly through any plain static server (main/ and data/
+   as siblings) still works exactly as before. */
+const BACKEND_CONFIG = {
+  enabled: ["http:","https:"].includes(window.location.protocol),
+  staticJsonBase: "./data/analysis",
+  staticPredictlogBase: "./data/predictlog",
+  healthUrl: "/api/health",
+  jsonFilesUrl: "/api/json-files",
+  predictlogUrl: "/api/predictlog",
+};
+
+async function backendIsAvailable(){
+  if(BACKEND_CONFIG.staticJsonBase) return false;
+  if(!BACKEND_CONFIG.enabled) return false;
+  try{
+    const res=await fetch(BACKEND_CONFIG.healthUrl,{cache:"no-store"});
+    return res.ok;
+  }catch{
+    return false;
+  }
+}
+
 /* ── LOAD DATA ───────────────────────────────────────────── */
 async function loadData(){
   const tbody=document.getElementById("tableBody");
   try{
-    // 1. Discover tickers from manifest
-    const mRes=await fetch("./data/analysis/manifest.json");
-    if(!mRes.ok) throw new Error(`manifest.json: HTTP ${mRes.status}`);
-    const manifest=await mRes.json();
-    const files=manifest.files||[];
-    const tickers=files
-      .filter(f=>f.endsWith("_DividendCycleAnalysis_output.json"))
-      .map(f=>f.replace("_DividendCycleAnalysis_output.json",""))
-      .sort();
+    const useBackend=await backendIsAvailable();
+    const jsonBase=BACKEND_CONFIG.staticJsonBase||"../data/analysis";
+    const predictlogBase=BACKEND_CONFIG.staticPredictlogBase||"../data/predictlog";
+    const fetchStockJson=t=>useBackend
+      ? fetch(`${BACKEND_CONFIG.jsonFilesUrl}/${encodeURIComponent(t+"_DividendCycleAnalysis_output.json")}`,{cache:"no-store"})
+      : fetch(`${jsonBase}/${t}_DividendCycleAnalysis_output.json`);
+    const fetchPredictlogCsv=t=>useBackend
+      ? fetch(`${BACKEND_CONFIG.predictlogUrl}/${encodeURIComponent(t+"_prediction_log.csv")}`,{cache:"no-store"})
+      : fetch(`${predictlogBase}/${t}_prediction_log.csv`);
+
+    // 1. Discover tickers from the manifest (static) or the backend's file listing
+    let tickers;
+    if(useBackend){
+      const lRes=await fetch(BACKEND_CONFIG.jsonFilesUrl,{cache:"no-store"});
+      if(!lRes.ok) throw new Error(`json-files: HTTP ${lRes.status}`);
+      const listing=await lRes.json();
+      tickers=(listing.files||[])
+        .filter(f=>f.endsWith("_DividendCycleAnalysis_output.json"))
+        .map(f=>f.replace("_DividendCycleAnalysis_output.json",""))
+        .sort();
+    }else{
+      const mRes=await fetch(`${jsonBase}/manifest.json`);
+      if(!mRes.ok) throw new Error(`manifest.json: HTTP ${mRes.status}`);
+      const manifest=await mRes.json();
+      tickers=(manifest.files||[])
+        .filter(f=>f.endsWith("_DividendCycleAnalysis_output.json"))
+        .map(f=>f.replace("_DividendCycleAnalysis_output.json",""))
+        .sort();
+    }
 
     if(!tickers.length){
       tbody.innerHTML=`<tr><td colspan="14"><div class="state-msg">
@@ -878,17 +1385,65 @@ async function loadData(){
     // 2. Fetch stock names + per-stock CSVs in parallel
     const [nameResults,results]=await Promise.all([
       Promise.allSettled(
-        tickers.map(t=>fetch(`./data/analysis/${t}_DividendCycleAnalysis_output.json`)
+        tickers.map(t=>fetchStockJson(t)
           .then(r=>r.ok?r.json():Promise.reject())
-          .then(d=>({ticker:t,name:d?.meta?.stock_name||""})))
+          .then(d=>({ticker:t,data:d})))
       ),
       Promise.allSettled(
-        tickers.map(t=>fetch(`./data/predictlog/${t}_prediction_log.csv`)
+        tickers.map(t=>fetchPredictlogCsv(t)
           .then(r=>r.ok?r.text():Promise.reject(new Error(`HTTP ${r.status}`)))
           .then(parseCSV))
       )
     ]);
-    nameResults.forEach(r=>{if(r.status==="fulfilled")tickerNameMap[r.value.ticker]=r.value.name;});
+    nameResults.forEach(r=>{
+      if(r.status!=="fulfilled") return;
+      const ticker=r.value.ticker;
+      const data=r.value.data||{};
+      tickerNameMap[ticker]=data?.meta?.stock_name||"";
+      const projSeries=data?.proj_series||{};
+      const ssSeries=data?.ss_series||{};
+      const seriesAdequacy=data?.series_adequacy||{};
+      const cleanCycles=Object.values(ssSeries).reduce((sum,seriesBlob)=>sum + Number(seriesBlob?.clean?.n_clean || 0), 0);
+      Object.entries(projSeries).forEach(([seriesId,proj])=>{
+        const key=`${ticker}|${seriesId}|${proj?.proj_exdiv_date||""}`;
+        setupMetaMap[key]={
+          estLowPx: proj?.est_low_px ?? null,
+          estPeakPx: proj?.est_peak_px ?? null,
+          estExdivPx: proj?.est_exdiv_px ?? null,
+          baseEntryPx: proj?.scenarios?.base?.entry_px ?? null,
+          baseExitPx: proj?.scenarios?.base?.exit_px ?? null,
+          downsideEntryPx: proj?.scenarios?.downside?.entry_px ?? null,
+          downsideExitPx: proj?.scenarios?.downside?.exit_px ?? null,
+          exitTargetHitRate: proj?.historical_frequencies?.exit_target_hit_rate ?? null,
+          stabilityVerdict: proj?.stability_verdict ?? null,
+          tailLevel: proj?.tail_risk?.tail_level ?? null,
+          fragilityClean: proj?.zone_fragility?.pct_cycles_outside_zone_clean ?? null,
+          fragilityFull: proj?.zone_fragility?.pct_cycles_outside_zone_full ?? null,
+          fragilityWarning: proj?.zone_fragility?.fragility_warning ?? null,
+          entryStatus: proj?.entry_status ?? null,
+          currentPriceVsZone: proj?.current_price_vs_zone ?? null,
+          zoneBot: proj?.zone_bot ?? null,
+          zoneTop: proj?.zone_top ?? null,
+          currentPrice: data?.current_price ?? null,
+          finalVerdict: proj?.final_verdict ?? null,
+          finalVerdictTone: proj?.final_verdict_tone ?? null,
+          potentialScore: proj?.potential_score ?? null,
+          potentialEligible: proj?.potential_eligible ?? null,
+          potentialIneligibleReasons: proj?.potential_ineligible_reasons ?? null,
+          structuralHealthOverride: proj?.structural_health_override_applied ?? null,
+          frequency: data?.meta?.frequency ?? null,
+          yearsData: data?.years_covered ?? null,
+          cleanCycles,
+          winRateNext: proj?.historical_frequencies?.win_rate ?? null,
+          nEffective: seriesAdequacy?.[seriesId]?.n_effective ?? null,
+          sampleAdequacy: seriesAdequacy?.[seriesId]?.sample_size ?? null,
+          divTrend: proj?.div_trend ?? null,
+          zoneWidthPct: (proj?.zone_bot != null && proj?.zone_top != null && ((proj.zone_bot + proj.zone_top) / 2) > 0)
+            ? (((proj.zone_top - proj.zone_bot) / ((proj.zone_bot + proj.zone_top) / 2)) * 100)
+            : null,
+        };
+      });
+    });
 
     const allData=results.flatMap((r,i)=>{
       if(r.status==="fulfilled") return r.value;
@@ -969,3 +1524,4 @@ loadData();
 </script>
 </body>
 </html>
+

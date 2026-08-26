@@ -5,14 +5,14 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 405.0,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -71.1
+    "price_growth_5yr_pct": -73.9
   },
   "parse_preflight": {
     "columns_detected": [
@@ -29,10 +29,10 @@
     "total_rows": 526,
     "price_rows": 523,
     "dividend_rows": 3,
-    "zero_volume_rows": 132,
-    "zero_volume_pct": 25.2,
+    "zero_volume_rows": 131,
+    "zero_volume_pct": 25.0,
     "issues_found": [
-      "Zero-volume rows exceed 5% (132/523, 25.2%) \u00e2\u20ac\u201d analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (131/523, 25.0%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -53,7 +53,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 Apr/Jun ex-div",
+      "label": "Series 1 — Apr/Jun ex-div",
       "sub": "Irregular",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -372,7 +372,7 @@
       "est_watch_window_note": "Bimodal - monitor zone",
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": -48.8372,
+      "current_price_vs_zone": -53.4884,
       "entry_status": "BELOW",
       "entry_status_display": "Below",
       "timing_rating": "BIMODAL",
@@ -455,8 +455,24 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": null
-      }
+        "median_miss_pct": null,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative.",
+      "potential_score": 63.5,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Dividend frequency is not one of the preferred cycle structures",
+        "Clean cycle sample is below the minimum threshold"
+      ],
+      "structural_health_flags": [
+        "FRAGILE_ZONE",
+        "PRICE_DECLINE"
+      ],
+      "structural_health_override_applied": true
     }
   },
   "annual_payouts": [
@@ -498,18 +514,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 0.235
-    },
-    {
-      "d": "2016-08-12",
-      "c": 0.235
-    },
-    {
-      "d": "2016-08-19",
-      "c": 0.235
-    },
     {
       "d": "2016-08-26",
       "c": 0.235
@@ -2589,13 +2593,25 @@
     {
       "d": "2026-08-07",
       "c": 0.033
+    },
+    {
+      "d": "2026-08-14",
+      "c": 0.033
+    },
+    {
+      "d": "2026-08-21",
+      "c": 0.03
+    },
+    {
+      "d": "2026-08-28",
+      "c": 0.03
     }
   ],
-  "current_price": 0.033,
+  "current_price": 0.03,
   "anchor_price": 0.165,
   "anchor_date": "2020-06-08",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {

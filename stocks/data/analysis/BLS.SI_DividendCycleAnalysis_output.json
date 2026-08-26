@@ -5,14 +5,14 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 474.9,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -14.4
+    "price_growth_5yr_pct": -18.0
   },
   "parse_preflight": {
     "columns_detected": [
@@ -45,7 +45,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 May ex-div",
+      "label": "Series 1 — May ex-div",
       "sub": "Irregular",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -783,7 +783,7 @@
       "est_watch_window_note": null,
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": 13.6525,
+      "current_price_vs_zone": 12.9422,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "UNRELIABLE",
@@ -857,15 +857,27 @@
         "pct_cycles_outside_zone_clean": 50.0,
         "pct_cycles_outside_zone_full": 88.9,
         "fragility_warning": true,
-        "median_miss_pct": 10.97
-      }
+        "median_miss_pct": 10.97,
+        "fragility_percentile_band": "TOP_25",
+        "fragility_percentile_band_display": "Top 25%"
+      },
+      "final_verdict": "Wait",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "Price is too far above the entry zone right now.",
+      "potential_score": 66.4,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Dividend frequency is not one of the preferred cycle structures"
+      ],
+      "structural_health_flags": [],
+      "structural_health_override_applied": false
     }
   },
   "annual_payouts": [
     {
       "yr": 2000,
       "count": 1,
-      "total": 0.2335,
+      "total": 0.2311,
       "series": [
         "S1"
       ],
@@ -875,7 +887,7 @@
     {
       "yr": 2001,
       "count": 1,
-      "total": 0.2335,
+      "total": 0.2311,
       "series": [
         "S1"
       ],
@@ -885,7 +897,7 @@
     {
       "yr": 2002,
       "count": 1,
-      "total": 0.0744,
+      "total": 0.0736,
       "series": [
         "S1"
       ],
@@ -895,7 +907,7 @@
     {
       "yr": 2007,
       "count": 1,
-      "total": 0.0936,
+      "total": 0.0927,
       "series": [
         "S1"
       ],
@@ -905,7 +917,7 @@
     {
       "yr": 2008,
       "count": 1,
-      "total": 0.1283,
+      "total": 0.127,
       "series": [
         "S1"
       ],
@@ -915,7 +927,7 @@
     {
       "yr": 2010,
       "count": 1,
-      "total": 0.0975,
+      "total": 0.0965,
       "series": [
         "S1"
       ],
@@ -925,7 +937,7 @@
     {
       "yr": 2011,
       "count": 1,
-      "total": 0.1859,
+      "total": 0.1872,
       "series": [
         "S1"
       ],
@@ -1078,49 +1090,49 @@
       "id": "S1_2000",
       "series": "S1",
       "date": "2000-05-24",
-      "amount": 0.2335,
+      "amount": 0.2311,
       "note": "Dividend"
     },
     {
       "id": "S1_2001",
       "series": "S1",
       "date": "2001-06-01",
-      "amount": 0.2335,
+      "amount": 0.2311,
       "note": "Dividend"
     },
     {
       "id": "S1_2002",
       "series": "S1",
       "date": "2002-06-04",
-      "amount": 0.0744,
+      "amount": 0.0736,
       "note": "Dividend"
     },
     {
       "id": "S1_2007",
       "series": "S1",
       "date": "2007-05-18",
-      "amount": 0.0936,
+      "amount": 0.0927,
       "note": "Dividend"
     },
     {
       "id": "S1_2008",
       "series": "S1",
       "date": "2008-05-02",
-      "amount": 0.1283,
+      "amount": 0.127,
       "note": "Dividend"
     },
     {
       "id": "S1_2010",
       "series": "S1",
       "date": "2010-04-29",
-      "amount": 0.0975,
+      "amount": 0.0965,
       "note": "Dividend"
     },
     {
       "id": "S1_2011",
       "series": "S1",
       "date": "2011-05-06",
-      "amount": 0.1859,
+      "amount": 0.1872,
       "note": "Dividend"
     },
     {
@@ -1223,18 +1235,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-05",
-      "c": 1.39
-    },
-    {
-      "d": "2016-08-12",
-      "c": 1.4
-    },
-    {
-      "d": "2016-08-19",
-      "c": 1.37
-    },
     {
       "d": "2016-08-26",
       "c": 1.375
@@ -3313,14 +3313,26 @@
     },
     {
       "d": "2026-08-07",
+      "c": 1.61
+    },
+    {
+      "d": "2026-08-14",
       "c": 1.6
+    },
+    {
+      "d": "2026-08-21",
+      "c": 1.57
+    },
+    {
+      "d": "2026-08-28",
+      "c": 1.59
     }
   ],
-  "current_price": 1.6,
+  "current_price": 1.59,
   "anchor_price": 1.57,
   "anchor_date": "2026-05-26",
-  "data_window_start": "2016-08-05",
-  "data_window_end": "2026-08-07",
+  "data_window_start": "2016-08-26",
+  "data_window_end": "2026-08-28",
   "years_covered": 10.0,
   "series_adequacy": {
     "S1": {

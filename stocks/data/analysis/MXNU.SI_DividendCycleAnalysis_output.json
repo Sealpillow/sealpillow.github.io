@@ -5,14 +5,14 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-04",
+    "today": "2026-08-26",
     "frequency": "SEMI-ANNUAL",
     "frequency_display": "Semi-Annual",
     "adaptive_window_days": 152,
     "mean_interval_days": 179.5,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -53.0
+    "price_growth_5yr_pct": -53.4
   },
   "parse_preflight": {
     "columns_detected": [
@@ -26,13 +26,13 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 355,
-    "price_rows": 340,
+    "total_rows": 358,
+    "price_rows": 343,
     "dividend_rows": 15,
     "zero_volume_rows": 0,
     "zero_volume_pct": 0.0,
     "issues_found": [
-      "1 rows share same date as dividend rows \u00e2\u20ac\u201d verified safe: each pair is one price row + one dividend row on same ex-div date"
+      "1 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date"
     ],
     "halted": false
   },
@@ -41,7 +41,7 @@
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 \u2014 Feb ex-div",
+      "label": "Series 1 — Feb ex-div",
       "sub": "Semi-Annual",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
@@ -49,7 +49,7 @@
     },
     {
       "id": "S2",
-      "label": "Series 2 \u2014 Aug/Jun ex-div",
+      "label": "Series 2 — Aug/Jun ex-div",
       "sub": "Semi-Annual",
       "color": "#10b981",
       "bg": "rgba(16,185,129,0.1)",
@@ -1202,7 +1202,7 @@
       "est_watch_window_note": null,
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": 8.5458,
+      "current_price_vs_zone": 6.8229,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "UNRELIABLE",
@@ -1276,8 +1276,23 @@
         "pct_cycles_outside_zone_clean": 100.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": 21.23
-      }
+        "median_miss_pct": 21.23,
+        "fragility_percentile_band": "BOTTOM_25",
+        "fragility_percentile_band_display": "Bottom 25%"
+      },
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative.",
+      "potential_score": 78.6,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative"
+      ],
+      "structural_health_flags": [
+        "FRAGILE_ZONE",
+        "PRICE_DECLINE"
+      ],
+      "structural_health_override_applied": true
     },
     "S2": {
       "proj_exdiv_date": "2027-06-17",
@@ -1302,10 +1317,10 @@
       "est_low_date_cluster1_sd_wks": 1.15,
       "est_low_date_cluster2_sd_wks": 4.56,
       "est_low_date_note": "Bimodal - two timing clusters: early dip Feb 13 (17.7wk before) or late dip May 23 (3.6wk before). Set limit order in zone and monitor across the full window.",
-      "est_watch_window_note": "Cluster 1: Feb 13 \u00b7 Cluster 2: May 23",
+      "est_watch_window_note": "Cluster 1: Feb 13 · Cluster 2: May 23",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 14.0065,
+      "current_price_vs_zone": 12.1969,
       "entry_status": "INSIDE",
       "entry_status_display": "Inside",
       "timing_rating": "BIMODAL",
@@ -1388,8 +1403,20 @@
         "pct_cycles_outside_zone_clean": 50.0,
         "pct_cycles_outside_zone_full": 100.0,
         "fragility_warning": true,
-        "median_miss_pct": 18.98
-      }
+        "median_miss_pct": 18.98,
+        "fragility_percentile_band": "TOP_25",
+        "fragility_percentile_band_display": "Top 25%"
+      },
+      "final_verdict": "Small Trades Advised",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "The setup is live, but risk or timing lowers confidence.",
+      "potential_score": 77.2,
+      "potential_eligible": true,
+      "potential_ineligible_reasons": [],
+      "structural_health_flags": [
+        "PRICE_DECLINE"
+      ],
+      "structural_health_override_applied": false
     }
   },
   "annual_payouts": [
@@ -2923,14 +2950,26 @@
     {
       "d": "2026-08-07",
       "c": 0.315
+    },
+    {
+      "d": "2026-08-14",
+      "c": 0.315
+    },
+    {
+      "d": "2026-08-21",
+      "c": 0.31
+    },
+    {
+      "d": "2026-08-28",
+      "c": 0.31
     }
   ],
-  "current_price": 0.315,
+  "current_price": 0.31,
   "anchor_price": 0.315,
   "anchor_date": "2026-06-23",
   "data_window_start": "2020-02-07",
-  "data_window_end": "2026-08-07",
-  "years_covered": 6.5,
+  "data_window_end": "2026-08-28",
+  "years_covered": 6.55,
   "series_adequacy": {
     "S1": {
       "n_clean": 5,
