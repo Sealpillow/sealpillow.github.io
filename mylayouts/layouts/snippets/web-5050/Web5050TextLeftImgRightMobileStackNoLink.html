@@ -1,0 +1,81 @@
+<style>
+.text-img-split {
+  align-items: center;
+  display: flex;
+}
+
+.text-img-split .image-block img {
+  display: block;
+  height: auto;
+  width: 100%;
+  padding: 35%;
+}
+
+.text-img-split .image-block {
+  flex: 1;
+  order: 2;
+}
+
+.text-img-split .text-block {
+  flex: 1;
+  order: 1;
+  color: black;
+}
+
+.text-img-split .inner-text {
+  padding-left: 20%;
+  width: 100%;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  .text-img-split {
+    flex-direction: column;
+  }
+
+  .text-img-split .image-block {
+    order: 1;
+    flex: 0.7;
+  }
+
+  .text-img-split .text-block {
+    order: 2;
+  }
+
+  .text-img-split .inner-text {
+    width: 90%;
+    padding: 0;
+    margin: 0 auto;
+  }
+
+  .text-img-split .image-block img {
+    padding: 30% 30% 20% 30%;
+  }
+}
+</style>
+
+<!-- Desktop: text left / image right. Mobile: image stacks on top, text
+     below. Swap the body copy and image. -->
+<section class="text-img-split" style="height: 100%;">
+
+    <!-- TEXT BLOCK (LEFT) -->
+    <div class="text-block">
+        <div class="inner-text">
+            <p class="mb-0" style="font-family:proxima-nova; font-size:16px; text-align:left; font-weight:400; line-height:normal;">
+              Twenty years of PEDRO is a story of design in evolution.
+              From the foundations we first built to the expressions that continue
+              to shape us today, each chapter has been defined by a curiosity to
+              explore what comes next.
+            </p>
+        </div>
+    </div>
+
+    <!-- IMAGE BLOCK (RIGHT) -->
+    <div class="image-block">
+      <picture>
+          <source srcset="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on.png?$staticlink$" media="(min-width: 768px)" loading="lazy">
+          <img src="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on.png?$staticlink$" alt="Shoes on white background" loading="lazy">
+      </picture>
+    </div>
+
+</section>

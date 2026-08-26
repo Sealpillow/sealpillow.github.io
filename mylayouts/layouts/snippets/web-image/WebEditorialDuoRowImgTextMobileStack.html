@@ -1,0 +1,120 @@
+<style>
+.editorial-duo {
+    width: 100%;
+}
+
+.editorial-duo__row {
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+/* Left column: shared width across both rows so the second row's image
+   lines up under the content-col, not the media-col */
+.editorial-duo__media-col {
+    flex: 0 0 50%;
+    box-sizing: border-box;
+    padding: 0 10% 0 5%;
+}
+
+.editorial-duo__content-col {
+    flex: 0 0 50%;
+    box-sizing: border-box;
+    padding: 0 5% 0 10%;
+    margin-top: auto;
+}
+
+.editorial-duo__text {
+    font-family: proxima-nova, sans-serif;
+    font-size: 16px;
+    margin: 0;
+    color: #363134;
+}
+
+.editorial-duo__second-media {
+    width: 100%;
+    padding-top: 50px;
+}
+
+.editorial-duo__img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ---------- Mobile: simple full-width stack ---------- */
+@media (max-width: 767px) {
+    .editorial-duo__row {
+        flex-direction: column;
+    }
+
+    .editorial-duo__media-col,
+    .editorial-duo__content-col {
+        flex: 1 1 100%;
+        max-width: 100%;
+        padding: 0 20px;
+    }
+    .editorial-duo__second-media {
+        width: 80%;
+        margin: 0 auto;
+        padding: 0px;
+    }
+
+    /* First row: text before its image */
+    .editorial-duo__row:not(.editorial-duo__row--second) .editorial-duo__content-col {
+        order: -1;
+    }
+
+    .editorial-duo__row:not(.editorial-duo__row--second) .editorial-duo__media-col {
+        margin: 50px 0;
+    }
+
+    /* Second row: media-col is empty on desktop only, hide it on mobile */
+    .editorial-duo__row--second .editorial-duo__media-col {
+        display: none;
+    }
+}
+</style>
+
+<!-- Two-row editorial block: row 1 pairs an image with a text paragraph
+     side by side; row 2 reuses the same column widths but puts a full-width
+     "second media" image under the content column (with an empty media-col
+     spacer on desktop, hidden on mobile so the columns still line up). On
+     mobile, text moves above its image and rows simply stack. Swap
+     data-pid/href, images and copy. -->
+<section class="editorial-duo">
+
+    <div class="editorial-duo__row">
+
+        <div class="editorial-duo__media-col">
+            <a class="js-shop-the-collection" data-pid="PM2-26320262-2_BLU.CA" href="$url('Product-Show','pid','PM2-26320262-2_BLU.CA')$">
+                <img src="images/thejournal/2026/aug26/axxis-pattern-in-motion/axxis-e1.jpg?$staticlink$" alt="Editorial artwork" class="editorial-duo__img">
+            </a>
+        </div>
+
+        <div class="editorial-duo__content-col">
+            <p class="editorial-duo__text">
+                Drawing on the idea of continuity, the pattern extends ad infinitum across each silhouette.
+                Shifting through different forms, scales, proportions and placements,
+                it takes on new expressions while retaining a recognisable visual character.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="editorial-duo__row editorial-duo__row--second">
+
+        <div class="editorial-duo__media-col"></div>
+
+        <div class="editorial-duo__content-col">
+            <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA,PM2-26320262-2_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$">
+                <div class="editorial-duo__second-media">
+                    <img src="images/thejournal/2026/aug26/axxis-pattern-in-motion/axxis-f1.jpg?$staticlink$" alt="Second image" class="editorial-duo__img">
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+</section>

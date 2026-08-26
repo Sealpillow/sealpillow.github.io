@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+
+
+<style>
+  /* ----------------------------------------------------
+  GLOBAL RESET & BASE
+  ---------------------------------------------------- */
+  body,
+  html {
+    color: black;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    
+    /*  intentionally REMOVED.
+      overflow-x: hidden; Any overflow value other than "visible" on html/body disables
+      position: sticky for every descendant on iOS Safari (desktop
+      browsers are more forgiving, which is why this only broke on
+      mobile). If horizontal scroll containment is needed for some
+      other component elsewhere on the page, apply overflow-x: hidden
+      to that component's own wrapper instead — never to html/body. */
+  }
+
+/* Folder Header */
+.folder-header {
+  display: none;
+  visibility: hidden;
+}
+.folder_post-content {
+  margin-bottom: 0px;
+}
+/* Folder_Post > Folder Container > Container */
+.folder_post .folder-container .container {
+  display: none;
+}
+
+/* Page > Parallax */
+.page.parallax {
+  padding-top: 0px !important;
+}
+
+/* Default (video panel active) */
+.folder_post-container,
+.page_footer{
+    display:none;     /* original display: block; */
+}
+
+
+  /* ---------------------------------------------------- */
+
+  .img-wrap {
+    display: block;
+    max-width: 100%;
+    position: relative;
+  }
+
+  .img-wrap img {
+    display: block;
+    height: 100vh;
+    object-fit: cover;
+    width: 100%;
+  }
+    @media (max-width: 768px) {
+    .img-wrap img { 
+      height: 90vh;
+    }
+  }
+/* Img Wrap > Caption */
+.img-wrap .caption {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  z-index: 2;
+  text-align: left;
+  color: black;
+}
+
+.img-wrap .caption .caption-label {
+  font-family: proxima-nova;
+  font-size: 12px;
+  margin: 0 0 4px;
+  color: white;
+}
+
+.img-wrap .caption .caption-title {
+  display: inline-block;
+  position: relative;
+  font-family: proxima-nova;
+  font-size: 25px;
+  margin: 0;
+  color: white;
+  text-decoration: none;
+  padding-bottom: 2px;
+  line-height: 28px;
+}
+
+.img-wrap .caption .caption-cta {
+  display: inline-block;
+  position: relative;
+  font-family: proxima-nova;
+  font-size: 14px;
+  color: white;
+  text-decoration: none;
+  padding-bottom: 2px;
+  line-height: 20px;
+}
+
+.img-wrap .caption .caption-cta::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0px;
+  width: 100%;
+  height: 1.5px;
+  background: white;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.img-wrap .caption .caption-cta:hover::after {
+  transform: scaleX(1);
+}
+
+@media (max-width: 768px) {
+  .img-wrap .caption {
+    top: 47%;
+    left: 6%;
+  }
+  .img-wrap .caption .caption-label {
+    font-size: 12px;
+  }
+  .img-wrap .caption .caption-title {
+    font-size: 24px;
+    margin-bottom: 18px;
+  }
+
+}
+  .video-media-container {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* Native <video> equivalent of the old .iframe-wrapper iframe box */
+  .video-wrapper video {
+    filter: grayscale(0);
+    display: block;
+    object-fit: cover;
+    width: 100%;
+    height: 100vh;
+  }
+  @media (max-width: 768px) {
+  .video-wrapper video {
+      height: 90vh;
+    }
+  }
+  .iframe-wrapper iframe {
+    filter: grayscale(0);
+  }
+
+  @media (max-width: 768px) {
+    .video-media-container {
+      width: 100%;
+    }
+  }
+
+  .controls {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .controls {
+    align-items: center;
+    bottom: 6%;
+    display: flex;
+    gap: 1rem;
+    left: 38.5%;
+    padding: 1rem;
+    position: absolute;
+    transform: translateX(-50%);
+    width: 75%;
+  }
+
+  .controls button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+    outline: none; /* removes the focus ring */
+  }
+
+  .controls button img {
+    display: block;
+  }
+
+  .icon-play, .icon-pause {
+    height: 24px;
+    width: 36px;
+  }
+
+  .icon-mute, .icon-unmute {
+    height: 30px;
+    width: 30px;
+  }
+
+  .controls .mute {
+    transform: translateY(-1.5px);
+  }
+
+  .icon-pause {
+    display: none;
+  }
+
+  .play.is-playing .icon-play {
+    display: none;
+  }
+
+  .play.is-playing .icon-pause {
+    display: inline;
+  }
+
+  .play.is-paused .icon-play {
+    display: inline;
+  }
+
+  .play.is-paused .icon-pause {
+    display: none;
+  }
+
+  .timeline {
+    align-items: center;
+    display: flex;
+    flex: 1;
+    position: relative;
+  }
+
+  .progressBar {
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    height: 4px;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .progressFill {
+    background: white;
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: left;
+    width: 100%;
+    will-change: transform;
+  }
+
+  .seek {
+    cursor: pointer;
+    inset: 0;
+    opacity: 0;
+    position: absolute;
+  }
+
+  /* Each section is full viewport height and sticks to the top of the
+    viewport. Because they are stacked in normal flow, the next section's
+    sticky element naturally scrolls up and covers the previous one.
+    Increasing z-index per section means later sections stack above
+    earlier ones as they arrive. */
+  .stack__section {
+    position: sticky;
+    top: 0;
+    /* 100svh (small viewport height) avoids the height jump some mobile
+      browsers cause with 100vh as the address bar shows/hides.
+      Falls back to 100vh for browsers that don't support svh. */
+    height: 100vh;
+    height: 100svh;
+    width: 100%;
+    display: flex;
+    text-align: center;
+    color: #fff;
+  }
+
+  .stack__section--1 {z-index: 1; }
+  .stack__section--2 {background: white; z-index: 2;}
+  .stack__section--3 {z-index: 3; }
+  .stack__section--4 {z-index: 4; }
+
+  .stack__content {
+    width: 100%;
+    margin: 0 auto;
+    height: 100%;
+  }
+
+  .stack__label {
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 16px;
+  }
+
+  .stack__title {
+    font-size: clamp(32px, 6vw, 64px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .stack__text {
+    font-size: 18px;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  /* spacer at the end so the last section can fully release its sticky
+    position before hitting the bottom of the document */
+  .stack__end {
+    height: 100vh;  /*or however long you want section 4 to remain pinned */
+  }
+
+  /* Img Right Text Left */
+.img-right-text-left {
+  align-items: center;
+  display: flex;
+}
+
+/* Img Right Text Left > Image Block > Img */
+.img-right-text-left .image-block img {
+  display:block;
+  height:auto;
+  width: 100%;
+  padding: 35%;
+}
+
+/* Img Right Text Left > Image Block */
+.img-right-text-left .image-block {
+  flex: 1;
+  order: 2;
+}
+
+/* Img Right Text Left > Text Block */
+.img-right-text-left .text-block {
+  flex: 1;
+  order: 1;
+  color: black;
+}
+
+/* Mobile — max-width: 767px */
+@media (max-width: 767px) {
+  /* Img Right Text Left */
+  .img-right-text-left {
+    flex-direction: column;
+  }
+
+  /* Img Right Text Left > Image Block */
+  .img-right-text-left .image-block {
+    order: 1;
+    flex: 0.7;
+  }
+
+  /* Img Right Text Left > Text Block */
+  .img-right-text-left .text-block {
+    order: 2;
+  }
+}
+
+/* Img Right Text Left > Text Block > Inner Text */
+.img-right-text-left .inner-text {
+  padding-left: 20%;
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .img-right-text-left .inner-text {
+    width: 90%;
+    padding: 0;
+    margin: 0 auto;
+  }
+  .img-right-text-left .image-block img {
+    padding: 30% 30% 20% 30%;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+
+<section class="stack__section stack__section--1  js-vertical-slider">
+  <div class="stack__content">
+    <div class="video-wrapper">
+      <div class="video-media-container">
+        <!-- Desktop -->
+        <video class="video d-md-block d-none" playsinline autoplay muted loop preload="none">
+          <source src="images/pedro-20-years-on/20-years-on-a1.mp4?$staticlink$" type="video/mp4">
+        </video>
+
+        <!-- Mobile -->
+        <video class="video d-block d-md-none" playsinline autoplay muted loop preload="none">
+          <source src="images/pedro-20-years-on/20-years-on-a1_mobile.mp4?$staticlink$" type="video/mp4">
+        </video>
+
+        <!-- Controls -->
+        <div class="controls">
+          <button class="mute">
+            <img class="icon-mute" src="images/media-assets/mute-black.png?$staticlink$" alt="">
+            <img class="icon-unmute" src="images/media-assets/unmute-black.png?$staticlink$" alt="" style="display:none;">
+          </button>
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<section class="stack__section stack__section--2">
+  <div class="stack__content">
+    <section class="img-right-text-left" style="height: 100%;">
+
+        <!-- TEXT BLOCK (LEFT) -->
+        <div class="text-block" >
+            <div class="inner-text">
+
+                <!-- body -->
+                <p class="mb-0" style="font-family:proxima-nova; font-size:16px; text-align:left; font-weight:400; line-height:normal;">
+                  Twenty years of PEDRO is a story of design in evolution. 
+                  From the foundations we first built to the expressions that continue 
+                  to shape us today, each chapter has been defined by a curiosity to 
+                  explore what comes next.​ As we enter our third decade, 
+                  we look forward with the same curiosity. New expressions of style, 
+                  considered design and effortless essentials continue to shape our creative language,
+                  evolving alongside the people who wear them.​
+                </p>
+
+            </div>
+        </div>
+
+        <!-- IMAGE BLOCK (RIGHT) -->
+        <div class="image-block">
+          <picture>
+              <source  srcset="images/pedro-20-years-on/20-years-on.png?$staticlink$" media="(min-width: 768px)" loading="lazy">
+              <img src="images/pedro-20-years-on/20-years-on.png?$staticlink$" alt="Shoes on white background" loading="lazy">
+          </picture>
+        </div>
+
+    </section>
+  </div>
+</section>
+
+<section class="stack__section stack__section--3  js-vertical-slider">
+  <div class="stack__content">
+    <div class="img-wrap">
+      <picture>
+            <img class="d-md-block d-none" src="images/pedro-20-years-on/20-years-on-c1.webp?$staticlink$" loading="lazy"/>
+            <img class="d-block d-md-none" src="images/pedro-20-years-on/20-years-on-c1_mobile.webp?$staticlink$" loading="lazy"/>
+      </picture>
+      <div class="caption">
+        <p class="caption-label">Chapter I</p>
+        <p class="mb-0 caption-title">
+          AXXIS
+        </p>
+        <p class="mb-0">
+          <a class="caption-cta" href="$url('Page-Show', 'cid','axxis-pattern-in-motion')$">Discover the collection</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<div class="stack__end"></div>
+
+<script>
+function initVideoControls(scope = document) {
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+    // Videos live directly inside .video-media-container (one per
+    // desktop/mobile breakpoint via d-none/d-block). Pick whichever
+    // one is actually visible.
+    const videos = container.querySelectorAll('video');
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    if (!video) return;
+
+    video.volume = 0.2;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+
+    // Each control is wired up independently — a section may only have
+    // a subset (e.g. mute-only, no play/seek/progress).
+    if (playBtn) {
+      const freshPlayBtn = playBtn.cloneNode(true);
+      playBtn.parentNode.replaceChild(freshPlayBtn, playBtn);
+
+      freshPlayBtn.addEventListener('click', () => {
+        if (video.paused) {
+          video.play();
+          freshPlayBtn.classList.add('is-playing');
+          freshPlayBtn.classList.remove('is-paused');
+        } else {
+          video.pause();
+          freshPlayBtn.classList.add('is-paused');
+          freshPlayBtn.classList.remove('is-playing');
+        }
+      });
+    }
+
+    if (muteBtn) {
+      const freshMuteBtn = muteBtn.cloneNode(true);
+      muteBtn.parentNode.replaceChild(freshMuteBtn, muteBtn);
+
+      const freshIconMute = freshMuteBtn.querySelector('.icon-mute');
+      const freshIconUnmute = freshMuteBtn.querySelector('.icon-unmute');
+
+      freshMuteBtn.addEventListener('click', () => {
+        video.muted = !video.muted;
+        if (freshIconMute) freshIconMute.style.display = video.muted ? 'block' : 'none';
+        if (freshIconUnmute) freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+      });
+    }
+
+    if (seek && progressFill) {
+      video.addEventListener('timeupdate', () => {
+        if (!video.duration) return;
+        const percent = video.currentTime / video.duration;
+        progressFill.style.transform = `scaleX(${percent})`;
+        seek.value = percent * 100;
+      });
+
+      seek.addEventListener('input', () => {
+        const percent = seek.value / 100;
+        if (video.duration) {
+          video.currentTime = percent * video.duration;
+        }
+      });
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
+
+
+<!-- force transparent header -->
+<script>
+(function () {
+  var header = document.querySelector('.page_header');
+  if (!header) return;
+
+  function forceThemeLight() {
+    if (!header.classList.contains('theme_light')) {
+      header.classList.add('theme_light');
+    }
+  }
+
+  // Apply immediately on load
+  forceThemeLight();
+
+  // Re-apply any time the class attribute changes (e.g. their scroll
+  // handler adding/removing js-is-sticky--change and stripping theme_light
+  // along with it)
+  var observer = new MutationObserver(forceThemeLight);
+  observer.observe(header, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+
+
+<div class="cursor-follower"></div>
+
+<script>
+(function () {
+  // Only activate on devices that actually have a mouse/fine pointer
+  if (!window.matchMedia('(min-width: 1023px) and (pointer: fine)').matches) {
+    return;
+  }
+
+  const follower = document.querySelector('.cursor-follower');
+  if (!follower) return;
+
+  document.addEventListener('mousemove', (e) => {
+    follower.style.left = `${e.clientX - 16}px`;
+    follower.style.top = `${e.clientY - 16}px`;
+  });
+})();
+</script>
+
+</body>
+
+</html>
+

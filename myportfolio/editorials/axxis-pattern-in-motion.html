@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+
+<style>
+
+/* ----------------------------------------------------
+GLOBAL RESET & BASE
+---------------------------------------------------- */
+body,
+html {
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+    /*background-color: #e8e8e8;*/
+    height:auto; /* make the pedro banner visible at the top when scrolling*/
+}
+.page.parallax {
+    padding-top: 0px !important;
+}
+
+
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+
+/* Img Wrap */
+.img-wrap {
+    display: block;
+    max-width: 100%;
+    position: relative;
+}
+
+/* Img Wrap > Img */
+.img-wrap img {
+    display: block;
+    height: auto;
+    object-fit: cover;
+    width: 100%;
+}
+
+.duo-5050 {
+display: flex;
+padding: 0px 5%;
+}
+
+.duo-5050__col {
+width: 50%;
+}
+
+.duo-5050__heading {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 500;
+    color:#363134;
+    font-family:aktiv-grotesk-extended;
+}
+
+.duo-5050__text {
+    margin: 0;
+    font-size: 25px;
+    line-height: 25px;
+    color:#363134;
+    font-family:aktiv-grotesk-extended;
+}
+
+@media (max-width: 767px) {
+.duo-5050 {
+    display: flex;
+    padding: 0;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.duo-5050__col {
+    width: 100%;
+}
+
+}
+
+.description_body {
+    font-family: proxima-nova;
+    width: 90%;
+    font-size: 20px;
+    margin: 0 auto;
+    text-align: left;
+    color:#363134;
+}
+
+
+@media (max-width: 767px) {
+    .description_body {
+        width: 80%;
+        text-align: left;
+    }
+}
+
+/* Flexi Col Image */
+.flexi-col-image {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 50px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+/* Flexi Col Image Right > A > Flexi Col Image Left */
+.flexi-col-image-right a,
+.flexi-col-image-left a {
+display: block;
+width: 100%;
+}
+
+/* Flexi Col Image Right */
+.flexi-col-image-right {
+margin-left: auto;
+width: 70%;
+margin-top: 30%;
+}
+
+
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+/* Flexi Col Image */
+.flexi-col-image {
+    display: block;
+    width: 100%;
+}
+.flexi-col-image-right{
+    width: 80%;
+    margin: 75px auto;
+}
+}
+
+.flexi-col-image2 {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+.flexi-col-image-right2 a,
+.flexi-col-image-left2 a {
+    display: block;
+    width: 100%;
+}
+.flexi-col-image-right2 {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .flexi-col-image2  {
+        display: grid;
+        grid-template-rows: 0.5fr 0.5fr;
+        grid-template-columns: none;
+    }
+    .flexi-col-image-left2 {
+        order: 1;
+        width: 60%;
+        margin-left:auto;
+    }
+    .flexi-col-image-right2 {
+        width: 100%;
+        order: 2;
+    }
+
+
+}
+
+.editorial-duo {
+width: 100%;
+}
+
+.editorial-duo__row {
+margin: 0 auto;
+display: flex;
+flex-wrap: wrap;
+align-items: flex-start;
+}
+
+/* Left column: shared width across both rows so the second
+    row's image lines up under the content-col, not the media-col */
+.editorial-duo__media-col {
+flex: 0 0 50%;
+box-sizing: border-box;
+padding: 0 10% 0 5%;
+}
+
+.editorial-duo__content-col {
+flex: 0 0 50%;
+box-sizing: border-box;
+padding: 0 5% 0 10%;
+    margin-top: auto;
+}
+
+.editorial-duo__text {
+    font-family: proxima-nova, sans-serif;
+    font-size: 16px;
+    margin: 0;
+    color:#363134;
+}
+
+.editorial-duo__second-media {
+width: 100%;
+padding-top: 50px;
+}
+
+.editorial-duo__img {
+display: block;
+width: 100%;
+height: auto;
+}
+
+/* ---------- Mobile: simple full-width stack ---------- */
+@media (max-width: 767px) {
+.editorial-duo__row {
+    flex-direction: column;
+}
+
+.editorial-duo__media-col,
+.editorial-duo__content-col {
+    flex: 1 1 100%;
+    max-width: 100%;
+    padding: 0 20px;
+}
+.editorial-duo__second-media{
+    width: 80%;
+    margin: 0 auto;
+    padding: 0px;
+}
+
+/* First row: text before its image */
+.editorial-duo__row:not(.editorial-duo__row--second) .editorial-duo__content-col {
+    order: -1;
+}
+
+.editorial-duo__row:not(.editorial-duo__row--second) .editorial-duo__media-col {
+    margin: 50px 0;
+}
+
+/* Second row: media-col is empty on desktop only, hide it on mobile */
+.editorial-duo__row--second .editorial-duo__media-col {
+    display: none;
+}
+
+}
+/* End-of-article CTA link */
+.dialogue-cta {
+    margin-bottom: 100px;
+}
+
+.dialogue-cta__text {
+    font-size: 16px;
+    margin: 30px auto 0;
+    text-align: center;
+    width: 60%;
+    color:#363134;
+}
+</style>
+</head>
+
+<body>
+
+
+<div class="img-wrap js-vertical-slider" style="margin-bottom: 50px;">
+    <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$"> 
+            <picture>
+            <img class="d-md-block d-none" src="images/axxis-pattern-in-motion/axxis-a1.webp?$staticlink$"/>
+            <img class="d-block d-md-none" src="images/axxis-pattern-in-motion/axxis-placeholder-a1_mobile.webp?$staticlink$"/>
+        </picture>
+    </a>
+</div>
+
+<section class="duo-5050">
+<div class="duo-5050__col">
+    <p class="duo-5050__heading">AXXIS​</p>
+</div>
+
+<div class="duo-5050__col">
+    <p class="duo-5050__text d-md-block d-none">A Pattern in Motion​</p>
+    <p class="duo-5050__text d-block d-md-none">A Pattern<br>in Motion​</p>
+</div>
+</section>
+
+<!-- desktop -->
+<section class="d-md-block d-none"style="margin: 100px 0px 50px;">
+    <p class="description_body">
+        Created to commemorate PEDRO’s twentieth anniversary, AXXIS translates two decades of design into a distinctive visual language.<br>
+        A geometric print unfolds through continuous repetition, bringing a sense of cohesion to the collection.​
+    </p>
+</section>
+
+<!-- mobiel -->
+<section class="d-block d-md-none" style="margin: 100px 0px 50px;">
+    <p class="description_body">
+        Created to commemorate PEDRO’s twentieth anniversary, AXXIS translates two decades of design into a distinctive visual language.
+        A geometric print unfolds through continuous repetition, bringing a sense of cohesion to the collection.​
+    </p>
+</section>
+
+
+<!-- DESKTOP: Flexi col — image 15 (item 10) left full + image 16 (item 11) right narrowed -->
+<div class="flexi-col-image">
+    <!-- Left: image 15, item 10 -->
+    <div class="flexi-col-image-left">
+        <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA,PM2-26320262-2_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$">
+        <picture>
+            <source srcset="images/axxis-pattern-in-motion/axxis-b1.webp?$staticlink$" media="(min-width: 768px)">
+            <img src="images/axxis-pattern-in-motion/axxis-b1.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; height: 100%; object-fit: cover;">
+        </picture>
+        </a>
+    </div>
+
+    <!-- Right: image 16, item 11 -->
+    <div class="flexi-col-image-right">
+        <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$">
+            <picture>
+                <source srcset="images/axxis-pattern-in-motion/axxis-c1.webp?$staticlink$" media="(min-width: 768px)">
+                <img src="images/axxis-pattern-in-motion/axxis-c1.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>
+    </div>
+</div>
+
+<div class="img-wrap js-vertical-slider d-md-block d-none" style="margin: 50px auto;">
+    <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$"> 
+        <picture>
+            <img class="d-md-block d-none" src="images/axxis-pattern-in-motion/axxis-d1.webp?$staticlink$"/>
+        </picture>
+    </a>
+</div>
+
+<div class="flexi-col-image2 d-md-none d-block" style="width: 100%; margin-bottom: 50px;" >
+    <!-- Left side: one smaller image-->
+    <div class="flexi-col-image-left2">
+        <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$">
+            <picture>
+                <source srcset="images/axxis-pattern-in-motion/axxis-placeholder-d1_mobile.webp?$staticlink$" media="(min-width: 768px)">
+                <img src="images/axxis-pattern-in-motion/axxis-placeholder-d1_mobile.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>    
+        </a>  
+    </div>
+
+    <!-- Right side: One large image -->
+    <div class="flexi-col-image-right2" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$">
+            <picture>
+                <source srcset="images/axxis-pattern-in-motion/axxis-placeholder-d2_mobile.webp?$staticlink$" media="(min-width: 768px)">
+                <img src="images/axxis-pattern-in-motion/axxis-placeholder-d2_mobile.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>    
+    </div>
+</div>
+
+
+<section class="editorial-duo">
+
+<div class="editorial-duo__row">
+
+<div class="editorial-duo__media-col">
+    <a class="js-shop-the-collection" data-pid="PM2-26320262-2_BLU.CA" href="$url('Product-Show','pid','PM2-26320262-2_BLU.CA​​​')$"> 
+        <img src="images/axxis-pattern-in-motion/axxis-e1.webp?$staticlink$" alt="Editorial artwork" class="editorial-duo__img">
+    </a>
+</div>
+
+<div class="editorial-duo__content-col">
+    <p class="editorial-duo__text">
+        Drawing on the idea of continuity, the pattern extends ad infinitum across each silhouette. 
+        Shifting through different forms, scales, proportions and placements, 
+        it takes on new expressions while retaining a recognisable visual character.
+    </p>
+</div>
+
+</div>
+
+<div class="editorial-duo__row editorial-duo__row--second">
+
+<div class="editorial-duo__media-col"></div>
+
+<div class="editorial-duo__content-col">
+    <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA,PM2-26320262-2_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$"> 
+        <div class="editorial-duo__second-media">
+            <img src="images/axxis-pattern-in-motion/axxis-f1.webp?$staticlink$" alt="Second image" class="editorial-duo__img">
+        </div>
+    </a>
+</div>
+
+</div>
+
+
+
+<div class="img-wrap js-vertical-slider d-md-block d-none" style="margin: 50px auto;">
+    <a class="js-shop-the-collection" data-pid="PM2-26320262-2_BLU.CA" href="$url('Product-Show','pid','PM2-26320262-2_BLU.CA')$"> 
+        <picture>
+            <img class="d-md-block d-none" src="images/axxis-pattern-in-motion/axxis-g1.webp?$staticlink$"/>
+        </picture>
+    </a>
+</div>
+
+<div class="dialogue-cta">
+    <a href="$url('Page-Show', 'cid', 'pedro-20-years-on')$">
+        <div class="dialogue-cta__text">
+            Back
+        </div>
+    </a>
+</div>
+
+<!-- Shared snippets (add as separate components in Page Designer):
+     force-black-icons-trans-header.html, cursor-follower.html -->
+
+</body>
+
+</html>

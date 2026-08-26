@@ -1,0 +1,60 @@
+<style>
+.flexi-col-image2 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+}
+.flexi-col-image-right2 a,
+.flexi-col-image-left2 a {
+    display: block;
+    width: 100%;
+}
+.flexi-col-image-left2 {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .flexi-col-image2 {
+        display: grid;
+        grid-template-rows: 0.5fr 0.5fr;
+        grid-template-columns: none;
+    }
+    .flexi-col-image-right2 {
+        order: 1;
+        width: 60%;
+        margin-right: auto;
+    }
+    .flexi-col-image-left2 {
+        width: 100%;
+        order: 2;
+    }
+}
+</style>
+
+<!-- Mobile-only alternate layout: a smaller image stacked above a full-width
+     larger image, mirrored left/right from WebFlexiColImageSmallLeftLargeRightReorder.html
+     — larger image on the left (desktop), smaller image on the right.
+     In the source page this markup is wrapped in "d-md-none d-block" and
+     paired with a single full-bleed image (see WebFullWidthShoppableImage.html,
+     wrapped in "d-md-block d-none") shown in its place on desktop.
+     Swap data-pid/href and images. -->
+<div class="flexi-col-image2" style="width: 100%; margin-bottom: 50px;">
+    <!-- Left side: larger image -->
+    <div class="flexi-col-image-left2" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$">
+            <picture>
+                <source srcset="images/thejournal/2026/aug26/axxis-pattern-in-motion/axxis-placeholder-d2_mobile.jpg?$staticlink$" media="(min-width: 768px)">
+                <img src="images/thejournal/2026/aug26/axxis-pattern-in-motion/axxis-placeholder-d2_mobile.jpg?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>
+    </div>
+
+    <!-- Right side: smaller image -->
+    <div class="flexi-col-image-right2">
+        <a class="js-shop-the-collection" data-pid="PW2-46390028-1_BLU.CA" href="$url('Product-Show','pid','PW2-46390028-1_BLU.CA')$">
+            <picture>
+                <source srcset="images/thejournal/2026/aug26/axxis-pattern-in-motion/axxis-placeholder-d1_mobile.jpg?$staticlink$" media="(min-width: 768px)">
+                <img src="images/thejournal/2026/aug26/axxis-pattern-in-motion/axxis-placeholder-d1_mobile.jpg?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>
+    </div>
+</div>

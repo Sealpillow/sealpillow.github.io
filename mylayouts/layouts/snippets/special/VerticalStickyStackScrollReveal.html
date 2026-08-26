@@ -1,0 +1,390 @@
+<style>
+/* Each section is full viewport height and sticks to the top of the
+   viewport. Because they are stacked in normal flow, the next section's
+   sticky element naturally scrolls up and covers the previous one.
+   Increasing z-index per section means later sections stack above
+   earlier ones as they arrive. */
+.stack__section {
+    position: sticky;
+    top: 0;
+    /* 100svh (small viewport height) avoids the height jump some mobile
+       browsers cause with 100vh as the address bar shows/hides.
+       Falls back to 100vh for browsers that don't support svh. */
+    height: 100vh;
+    height: 100svh;
+    width: 100%;
+    display: flex;
+    text-align: center;
+    color: #fff;
+}
+
+.stack__section--1 { z-index: 1; }
+.stack__section--2 { background: white; z-index: 2; }
+.stack__section--3 { z-index: 3; }
+.stack__section--4 { z-index: 4; }
+
+.stack__content {
+    width: 100%;
+    margin: 0 auto;
+    height: 100%;
+}
+
+/* spacer at the end so the last section can fully release its sticky
+   position before hitting the bottom of the document */
+.stack__end {
+    height: 100vh; /* or however long you want the last section to remain pinned */
+}
+
+.video-media-container {
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+}
+
+.video-wrapper video {
+  filter: grayscale(0);
+  display: block;
+  object-fit: cover;
+  width: 100%;
+  height: 100vh;
+}
+@media (max-width: 768px) {
+  .video-wrapper video {
+    height: 90vh;
+  }
+}
+
+.controls {
+  align-items: center;
+  bottom: 6%;
+  display: flex;
+  gap: 1rem;
+  left: 38.5%;
+  padding: 1rem;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 75%;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.controls button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  outline: none; /* removes the focus ring */
+}
+
+.controls button img {
+  display: block;
+}
+
+.icon-mute, .icon-unmute {
+  height: 30px;
+  width: 30px;
+}
+
+.controls .mute {
+  transform: translateY(-1.5px);
+}
+
+/* ---- Optional play/pause button — add a <button class="play is-paused">
+   with .icon-play/.icon-pause <img>s inside .controls to enable ---- */
+.icon-play, .icon-pause {
+  height: 24px;
+  width: 36px;
+}
+.icon-pause { display: none; }
+.play.is-playing .icon-play { display: none; }
+.play.is-playing .icon-pause { display: inline; }
+.play.is-paused .icon-play { display: inline; }
+.play.is-paused .icon-pause { display: none; }
+
+/* ---- Optional seek/progress bar — add a .timeline containing
+   .progressBar > .progressFill and a .seek <input type="range"> inside
+   .controls to enable ---- */
+.timeline {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+.progressBar {
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  height: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+.progressFill {
+  background: white;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  width: 100%;
+  will-change: transform;
+}
+.seek {
+  cursor: pointer;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+.img-wrap {
+  display: block;
+  max-width: 100%;
+  position: relative;
+}
+
+.img-wrap img {
+  display: block;
+  height: 100vh;
+  object-fit: cover;
+  width: 100%;
+}
+@media (max-width: 768px) {
+  .img-wrap img {
+    height: 90vh;
+  }
+}
+
+.img-wrap .caption {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  z-index: 2;
+  text-align: left;
+  color: black;
+}
+
+.img-wrap .caption .caption-label {
+  font-family: proxima-nova;
+  font-size: 12px;
+  margin: 0 0 4px;
+  color: white;
+}
+
+.img-wrap .caption .caption-title {
+  display: inline-block;
+  position: relative;
+  font-family: proxima-nova;
+  font-size: 25px;
+  margin: 0;
+  color: white;
+  text-decoration: none;
+  padding-bottom: 2px;
+  line-height: 28px;
+}
+
+.img-wrap .caption .caption-cta {
+  display: inline-block;
+  position: relative;
+  font-family: proxima-nova;
+  font-size: 14px;
+  color: white;
+  text-decoration: none;
+  padding-bottom: 2px;
+  line-height: 20px;
+}
+
+.img-wrap .caption .caption-cta::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0px;
+  width: 100%;
+  height: 1.5px;
+  background: white;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.img-wrap .caption .caption-cta:hover::after {
+  transform: scaleX(1);
+}
+
+@media (max-width: 768px) {
+  .img-wrap .caption {
+    top: 47%;
+    left: 6%;
+  }
+  .img-wrap .caption .caption-label {
+    font-size: 12px;
+  }
+  .img-wrap .caption .caption-title {
+    font-size: 24px;
+    margin-bottom: 18px;
+  }
+}
+</style>
+
+<!-- Scroll-jacking scaffold: each .stack__section pins to the top of the
+     viewport and is covered by the next one as the user scrolls, in
+     document order, using increasing z-index per section. Add/remove
+     .stack__section--N blocks as needed (bump the z-index and add a
+     matching modifier class for each). Section 1 is
+     WebFullWidthAutoplayVideoMuteControl.html content; sections 2-4 are
+     WebFullWidthImageCaptionOverlayCTA.html content as chapter reveals —
+     swap the image, caption-label/title and CTA link per chapter (or
+     replace a section's content entirely with e.g.
+     WebTextLeftImageRightMobileStack.html). Always end with .stack__end so
+     the final section can release its sticky position. -->
+
+<section class="stack__section stack__section--1">
+  <div class="stack__content">
+    <div class="video-wrapper">
+      <div class="video-media-container">
+        <!-- Desktop -->
+        <video class="video d-md-block d-none" playsinline autoplay muted loop preload="none">
+          <source src="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on-a1.mp4?$staticlink$" type="video/mp4">
+        </video>
+
+        <!-- Mobile -->
+        <video class="video d-block d-md-none" playsinline autoplay muted loop preload="none">
+          <source src="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on-a1_mobile.mp4?$staticlink$" type="video/mp4">
+        </video>
+
+        <!-- Controls: mute-only by default. See CSS comments above to add
+             play/pause and a seek bar. -->
+        <div class="controls">
+          <button class="mute">
+            <img class="icon-mute" src="images/media-assets/mute-black.png?$staticlink$" alt="">
+            <img class="icon-unmute" src="images/media-assets/unmute-black.png?$staticlink$" alt="" style="display:none;">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stack__section stack__section--2">
+  <div class="stack__content">
+    <div class="img-wrap js-vertical-slider">
+      <picture>
+        <img class="d-md-block d-none" src="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on-c1.jpg?$staticlink$" loading="lazy"/>
+        <img class="d-block d-md-none" src="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on-c1_mobile.jpg?$staticlink$" loading="lazy"/>
+      </picture>
+      <div class="caption">
+        <p class="caption-label">Chapter I</p>
+        <p class="mb-0 caption-title">AXXIS</p>
+        <p class="mb-0">
+          <a class="caption-cta" href="$url('Page-Show', 'cid','axxis-pattern-in-motion')$">Discover the collection</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stack__section stack__section--3">
+  <div class="stack__content">
+    <div class="img-wrap js-vertical-slider">
+      <picture>
+        <img class="d-md-block d-none" src="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on-c1.jpg?$staticlink$" loading="lazy"/>
+        <img class="d-block d-md-none" src="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on-c1_mobile.jpg?$staticlink$" loading="lazy"/>
+      </picture>
+      <div class="caption">
+        <p class="caption-label">Chapter II</p>
+        <p class="mb-0 caption-title">[Collection name]</p>
+        <p class="mb-0">
+          <a class="caption-cta" href="$url('Page-Show', 'cid','chapter-two-cid')$">Discover the collection</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stack__section stack__section--4">
+  <div class="stack__content">
+    <div class="img-wrap js-vertical-slider">
+      <picture>
+        <img class="d-md-block d-none" src="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on-c1.jpg?$staticlink$" loading="lazy"/>
+        <img class="d-block d-md-none" src="images/thejournal/2026/aug26/pedro-20-years-on/20-years-on-c1_mobile.jpg?$staticlink$" loading="lazy"/>
+      </picture>
+      <div class="caption">
+        <p class="caption-label">Chapter III</p>
+        <p class="mb-0 caption-title">[Collection name]</p>
+        <p class="mb-0">
+          <a class="caption-cta" href="$url('Page-Show', 'cid','chapter-three-cid')$">Discover the collection</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stack__end"></div>
+
+<script>
+function initVideoControls(scope = document) {
+  scope.querySelectorAll('.video-media-container').forEach(container => {
+    // Videos live directly inside .video-media-container (one per
+    // desktop/mobile breakpoint via d-none/d-block). Pick whichever
+    // one is actually visible.
+    const videos = container.querySelectorAll('video');
+    const video = Array.from(videos).find(v => v.offsetParent !== null) || videos[0];
+    if (!video) return;
+
+    video.volume = 0.2;
+
+    const playBtn = container.querySelector('.play');
+    const muteBtn = container.querySelector('.mute');
+    const seek = container.querySelector('.seek');
+    const progressFill = container.querySelector('.progressFill');
+
+    // Each control is wired up independently — a section may only have
+    // a subset (e.g. mute-only, no play/seek/progress).
+    if (playBtn) {
+      const freshPlayBtn = playBtn.cloneNode(true);
+      playBtn.parentNode.replaceChild(freshPlayBtn, playBtn);
+
+      freshPlayBtn.addEventListener('click', () => {
+        if (video.paused) {
+          video.play();
+          freshPlayBtn.classList.add('is-playing');
+          freshPlayBtn.classList.remove('is-paused');
+        } else {
+          video.pause();
+          freshPlayBtn.classList.add('is-paused');
+          freshPlayBtn.classList.remove('is-playing');
+        }
+      });
+    }
+
+    if (muteBtn) {
+      const freshMuteBtn = muteBtn.cloneNode(true);
+      muteBtn.parentNode.replaceChild(freshMuteBtn, muteBtn);
+
+      const freshIconMute = freshMuteBtn.querySelector('.icon-mute');
+      const freshIconUnmute = freshMuteBtn.querySelector('.icon-unmute');
+
+      freshMuteBtn.addEventListener('click', () => {
+        video.muted = !video.muted;
+        if (freshIconMute) freshIconMute.style.display = video.muted ? 'block' : 'none';
+        if (freshIconUnmute) freshIconUnmute.style.display = video.muted ? 'none' : 'block';
+      });
+    }
+
+    if (seek && progressFill) {
+      video.addEventListener('timeupdate', () => {
+        if (!video.duration) return;
+        const percent = video.currentTime / video.duration;
+        progressFill.style.transform = `scaleX(${percent})`;
+        seek.value = percent * 100;
+      });
+
+      seek.addEventListener('input', () => {
+        const percent = seek.value / 100;
+        if (video.duration) {
+          video.currentTime = percent * video.duration;
+        }
+      });
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  initVideoControls();
+});
+</script>
