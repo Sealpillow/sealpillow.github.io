@@ -5,14 +5,14 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-26",
+    "today": "2026-09-07",
     "frequency": "SEMI-ANNUAL",
     "frequency_display": "Semi-Annual",
     "adaptive_window_days": 152,
     "mean_interval_days": 193.3,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -18.2
+    "price_growth_5yr_pct": -17.8
   },
   "parse_preflight": {
     "columns_detected": [
@@ -27,7 +27,7 @@
     ],
     "date_format_detected": "%d %b %Y",
     "total_rows": 576,
-    "price_rows": 523,
+    "price_rows": 522,
     "dividend_rows": 53,
     "zero_volume_rows": 0,
     "zero_volume_pct": 0.0,
@@ -1510,7 +1510,7 @@
       "est_watch_window_note": null,
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": 16.0714,
+      "current_price_vs_zone": 15.1786,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "UNRELIABLE",
@@ -1596,7 +1596,9 @@
       "potential_ineligible_reasons": [
         "Tail risk is severe"
       ],
-      "structural_health_flags": [],
+      "structural_health_flags": [
+        "DIVIDEND_NOT_COVERED"
+      ],
       "structural_health_override_applied": false
     },
     "S2": {
@@ -1625,7 +1627,7 @@
       "est_watch_window_note": null,
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": 23.7153,
+      "current_price_vs_zone": 22.7636,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "UNRELIABLE",
@@ -1703,16 +1705,19 @@
         "fragility_percentile_band": "TOP_25",
         "fragility_percentile_band_display": "Top 25%"
       },
-      "final_verdict": "Wait",
-      "final_verdict_tone": "warn",
-      "final_verdict_reason": "Price is too far above the entry zone right now.",
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: pattern stability has been degrading in recent cycles; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31).",
       "potential_score": 61.1,
-      "potential_eligible": true,
-      "potential_ineligible_reasons": [],
-      "structural_health_flags": [
-        "DEGRADING"
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Structural health override: pattern stability has been degrading in recent cycles; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31)"
       ],
-      "structural_health_override_applied": false,
+      "structural_health_flags": [
+        "DEGRADING",
+        "DIVIDEND_NOT_COVERED"
+      ],
+      "structural_health_override_applied": true,
       "cluster_track_record": {
         "c1_wins": 0,
         "c2_wins": 1,
@@ -2367,14 +2372,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-26",
-      "c": 2.84
-    },
-    {
-      "d": "2016-09-02",
-      "c": 2.83
-    },
     {
       "d": "2016-09-09",
       "c": 2.83
@@ -4457,15 +4454,19 @@
     },
     {
       "d": "2026-08-28",
-      "c": 1.3
+      "c": 1.29
+    },
+    {
+      "d": "2026-09-04",
+      "c": 1.29
     }
   ],
-  "current_price": 1.3,
+  "current_price": 1.29,
   "anchor_price": 1.29,
   "anchor_date": "2026-08-21",
-  "data_window_start": "2016-08-26",
-  "data_window_end": "2026-08-28",
-  "years_covered": 10.0,
+  "data_window_start": "2016-09-09",
+  "data_window_end": "2026-09-04",
+  "years_covered": 9.98,
   "series_adequacy": {
     "S1": {
       "n_clean": 9,

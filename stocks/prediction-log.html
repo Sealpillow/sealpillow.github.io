@@ -407,12 +407,22 @@ thead th.sortable{cursor:pointer}
       <span class="kpi-sub" id="kpiResolvedSub">cycles completed</span>
     </div>
     <div class="kpi">
-      <span class="kpi-label">Zone hit rate</span>
+      <span class="kpi-label">Price zone hit rate</span>
       <span class="kpi-value" id="kpiHitRate">—</span>
       <span class="kpi-sub" id="kpiHitSub">of resolved cycles</span>
     </div>
     <div class="kpi">
-      <span class="kpi-label">Median date error</span>
+      <span class="kpi-label">Low date hit rate</span>
+      <span class="kpi-value" id="kpiDateHitRate">—</span>
+      <span class="kpi-sub" id="kpiDateHitSub">actual low within 7d of estimate</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-label">Combined hit rate</span>
+      <span class="kpi-value" id="kpiCombinedHitRate">—</span>
+      <span class="kpi-sub" id="kpiCombinedHitSub">zone OR date hit</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-label">Median low date error</span>
       <span class="kpi-value" id="kpiDateErr">—</span>
       <span class="kpi-sub" id="kpiDateErrSub">days (abs), resolved</span>
     </div>
@@ -420,9 +430,9 @@ thead th.sortable{cursor:pointer}
 
   <div class="kpi-row" id="kpiFairRow" style="margin-top:-8px">
     <div class="kpi">
-      <span class="kpi-label">Ex-Unreliable Hit</span>
+      <span class="kpi-label">Reliable + Bimodal Hit Rate</span>
       <span class="kpi-value" id="kpiCoreHitRate">—</span>
-      <span class="kpi-sub" id="kpiCoreHitSub">reliable + bimodal only</span>
+      <span class="kpi-sub" id="kpiCoreHitSub">excludes unreliable timing</span>
     </div>
   </div>
 
@@ -479,7 +489,7 @@ thead th.sortable{cursor:pointer}
       </select>
     </div>
     <div class="filter-group">
-      <label for="fOutcome">Outcome</label>
+      <label for="fOutcome">Price Zone Outcome</label>
       <select id="fOutcome">
         <option value="">All</option>
         <option value="ZONE_HIT">Zone hit</option>
@@ -506,10 +516,10 @@ thead th.sortable{cursor:pointer}
             <th><span class="th-wrap">Timing <span class="th-help" tabindex="0" data-tip="RELIABLE means one tight timing cluster. BIMODAL means two distinct timing windows. UNRELIABLE means timing is too scattered to trust as a date guide.">?</span></span></th>
             <th><span class="th-wrap">Est Low Date(s) <span class="th-help" tabindex="0" data-tip="The model’s estimated dip date window. RELIABLE shows one window. BIMODAL shows two cluster windows: C1 is earlier, C2 is later. UNRELIABLE has no date estimate.">?</span></span></th>
             <th class="sortable" data-col="actual_low_date"><span class="th-wrap">Actual Low <span class="th-help" tabindex="0" data-tip="The observed cycle low date and low price once the cycle resolves.">?</span> <span class="sort-arrow">↕</span></span></th>
-            <th class="sortable num" data-col="date_error_days"><span class="th-wrap">Date Error <span class="th-help" tabindex="0" data-tip="Actual low date minus the nearest estimated low date, in days. Negative means the dip came earlier. For BIMODAL rows this uses whichever cluster center was closer, so do not compare directly against RELIABLE rows.">?</span> <span class="sort-arrow">↕</span></span></th>
+            <th class="sortable num" data-col="date_error_days"><span class="th-wrap">Low Date Error <span class="th-help" tabindex="0" data-tip="Actual low date minus the nearest estimated low date, in days. Negative means the dip came earlier. For BIMODAL rows this uses whichever cluster center was closer, so do not compare directly against RELIABLE rows.">?</span> <span class="sort-arrow">↕</span></span></th>
             <th class="num"><span class="th-wrap">Cluster <span class="th-help" tabindex="0" data-tip="BIMODAL only. Shows whether the actual low was closer to C1, the earlier window, or C2, the later window.">?</span></span></th>
             <th class="num"><span class="th-wrap">Price Error <span class="th-help" tabindex="0" data-tip="(Actual low price minus estimated low price) divided by estimated low price, in percent. Negative means price dipped deeper than forecast.">?</span></span></th>
-            <th><span class="th-wrap">Zone Outcome <span class="th-help" tabindex="0" data-tip="Whether price entered the projected entry zone: Zone Hit means inside the zone, Miss Above means too shallow, Miss Below means it overshot lower than the zone.">?</span></span></th>
+            <th><span class="th-wrap">Price Zone Outcome <span class="th-help" tabindex="0" data-tip="Whether price entered the projected entry zone: Zone Hit means inside the zone, Miss Above means too shallow, Miss Below means it overshot lower than the zone.">?</span></span></th>
             <th class="sortable" data-col="first_seen"><span class="th-wrap">First Seen <span class="th-help" tabindex="0" data-tip="The first date this specific estimate was recorded by the pipeline.">?</span> <span class="sort-arrow">↕</span></span></th>
             <th class="sortable" data-col="last_seen"><span class="th-wrap">Last Seen <span class="th-help" tabindex="0" data-tip="The last date this estimate was still seen unchanged. A bigger model shift creates a new row instead of overwriting the old one.">?</span> <span class="sort-arrow">↕</span></span></th>
           </tr>
@@ -546,22 +556,24 @@ thead th.sortable{cursor:pointer}
         </div>
         <div class="hm-section">
           <div class="hm-label">How accuracy is measured</div>
-          <p class="hm-text">Predictions are logged <strong>before outcomes are known</strong> — this is walk-forward validation, not backtesting. Actuals are matched in automatically once the cycle resolves. There are three accuracy signals: <strong>Zone Hit Rate</strong> (did price enter the projected entry zone?), <strong>Date Error</strong> (how many days off was the timing?), and <strong>Price Error</strong> (how far off was the dip price?). Price error is best read for systematic bias — a consistently negative average means the model regularly underestimates how deep the dip will go.</p>
+          <p class="hm-text">Predictions are logged <strong>before outcomes are known</strong> — this is walk-forward validation, not backtesting. Actuals are matched in automatically once the cycle resolves. There are five accuracy signals: <strong>Price Zone Hit Rate</strong> (did price enter the projected entry zone?), <strong>Low Date Hit Rate</strong> (did the dip land within 7 days of the estimated low date?), <strong>Combined Hit Rate</strong> (did either of those happen?), <strong>Low Date Error</strong> (how many days off was the timing, in magnitude?), and <strong>Price Error</strong> (how far off was the dip price?). Price zone and low date hit rate are tracked independently — a stock can score well on price and poorly on timing, or vice versa — while combined hit rate is the looser either/or number: it's always at least as high as the better of the two individually. Price error is best read for systematic bias — a consistently negative average means the model regularly underestimates how deep the dip will go.</p>
         </div>
         <div class="hm-section">
           <div class="hm-label">Reading the numbers</div>
           <div class="hm-text">Colour thresholds used in the KPI strip and table:
           <ul>
-            <li><strong>Zone hit rate</strong> — <span style="color:var(--hit)">≥ 70%</span> good · <span style="color:var(--warn)">≥ 50%</span> marginal · <span style="color:var(--miss)">below 50%</span> poor</li>
-            <li><strong>Date error</strong> — <span style="color:var(--hit)">≤ 7 days</span> good · <span style="color:var(--warn)">≤ 21 days</span> acceptable · <span style="color:var(--miss)">&gt; 21 days</span> poor</li>
+            <li><strong>Price zone hit rate</strong> — <span style="color:var(--hit)">≥ 70%</span> good · <span style="color:var(--warn)">≥ 50%</span> marginal · <span style="color:var(--miss)">below 50%</span> poor</li>
+            <li><strong>Low date hit rate</strong> — same thresholds as price zone hit rate, but for timing: the share of resolved cycles where the actual low landed within 7 days of the estimate</li>
+            <li><strong>Combined hit rate</strong> — same thresholds again; counts a cycle as a hit if <em>either</em> the price zone or the low date window caught it. Use price zone/low date hit rate to see which signal is actually reliable for a stock, and combined hit rate as the ceiling on how often at least one would have flagged the move</li>
+            <li><strong>Low date error</strong> — <span style="color:var(--hit)">≤ 7 days</span> good · <span style="color:var(--warn)">≤ 21 days</span> acceptable · <span style="color:var(--miss)">&gt; 21 days</span> poor. Kept alongside low date hit rate since a rate alone hides magnitude — two stocks can both "miss" the 7-day window yet be off by 8 days versus 40</li>
             <li><strong>Price error</strong> — no pass/fail threshold; watch for consistent negative bias across resolved rows</li>
-            <li><strong>Timing cards</strong> — compare like-for-like: <span class="chip chip-reliable" style="font-size:10px;padding:1px 6px">Reliable</span> vs <span class="chip chip-bimodal" style="font-size:10px;padding:1px 6px">Bimodal</span> vs <span class="chip chip-unreliable" style="font-size:10px;padding:1px 6px">Unreliable</span>. Bimodal date errors are naturally smaller because they are measured from the nearer cluster center</li>
+            <li><strong>Timing cards</strong> — compare like-for-like: <span class="chip chip-reliable" style="font-size:10px;padding:1px 6px">Reliable</span> vs <span class="chip chip-bimodal" style="font-size:10px;padding:1px 6px">Bimodal</span> vs <span class="chip chip-unreliable" style="font-size:10px;padding:1px 6px">Unreliable</span>. Bimodal low date errors are naturally smaller because they are measured from the nearer cluster center</li>
           </ul></div>
         </div>
         <div class="hm-section">
           <div class="hm-label">Comparing accuracy across timing types</div>
-          <p class="hm-text"><span class="chip chip-bimodal" style="font-size:10px;padding:1px 6px">Bimodal</span> date errors will always look smaller than <span class="chip chip-reliable" style="font-size:10px;padding:1px 6px">Reliable</span> ones — not because Bimodal is more accurate, but because the error is measured from whichever of the two cluster centers happened to be closer to the actual. You always get the benefit of hindsight in choosing the closer target. This is a structural advantage built into the measurement, not a signal of better timing.</p>
-          <p class="hm-text" style="margin-top:6px">Because of this, <strong>never compare Reliable vs Bimodal date errors directly</strong>. Use the per-type timing cards above the table to evaluate each type on its own terms. For Bimodal stocks, the cluster hit tally (C1 vs C2 wins) is the more meaningful signal — it shows which timing window is genuinely predictive over time, independent of how small the measured error is.</p>
+          <p class="hm-text"><span class="chip chip-bimodal" style="font-size:10px;padding:1px 6px">Bimodal</span> low date errors will always look smaller than <span class="chip chip-reliable" style="font-size:10px;padding:1px 6px">Reliable</span> ones — not because Bimodal is more accurate, but because the error is measured from whichever of the two cluster centers happened to be closer to the actual. You always get the benefit of hindsight in choosing the closer target. This is a structural advantage built into the measurement, not a signal of better timing.</p>
+          <p class="hm-text" style="margin-top:6px">Because of this, <strong>never compare Reliable vs Bimodal low date errors directly</strong>. Use the per-type timing cards above the table to evaluate each type on its own terms. For Bimodal stocks, the cluster hit tally (C1 vs C2 wins) is the more meaningful signal — it shows which timing window is genuinely predictive over time, independent of how small the measured error is.</p>
         </div>
         <div class="hm-section">
           <div class="hm-label">Projected Ex-Div Date</div>
@@ -577,7 +589,7 @@ thead th.sortable{cursor:pointer}
           </ul></div>
         </div>
         <div class="hm-section">
-          <div class="hm-label">Date Error</div>
+          <div class="hm-label">Low Date Error</div>
           <p class="hm-text">How many days off the dip-date estimate was. <strong>Negative = actual came earlier</strong> than forecast; positive = came later. For Bimodal stocks this is measured from whichever cluster center was closer to the actual — so Bimodal errors naturally look smaller. Use the timing cards above to compare like-for-like across types.</p>
         </div>
         <div class="hm-section">
@@ -593,7 +605,7 @@ thead th.sortable{cursor:pointer}
           <p class="hm-text">How far off the estimated dip price was. <strong>Negative = stock dipped deeper</strong> than forecast.</p>
         </div>
         <div class="hm-section">
-          <div class="hm-label">Zone Outcome</div>
+          <div class="hm-label">Price Zone Outcome</div>
           <p class="hm-text">Whether price traded inside the projected entry zone (<strong>Zone Hit</strong>), stayed too shallow and never entered it (<strong>Miss Above</strong>), or fell straight through the bottom of it (<strong>Miss Below</strong>).</p>
         </div>
         <div class="hm-section">
@@ -631,11 +643,11 @@ est_low_date_cluster2 = proj_exdiv_date − round(late_cluster_median  × 7)</pr
           <p class="hm-dtext">Ranges = median ± 1 SD (population SD). When SD &gt; 2 weeks, the range is replaced by a ±Nwk badge — the date shown is still the best estimate, but the timing spread is too wide to show a meaningful window. Single-point clusters (only one cycle in that cluster, SD = 0) show just the date with no badge.</p>
         </div>
         <div class="hm-dsection">
-          <div class="hm-dlabel">4. Date Error</div>
+          <div class="hm-dlabel">4. Low Date Error</div>
           <pre class="hm-code">RELIABLE: date_error_days = actual_low_date − est_low_date
 BIMODAL:  date_error_days = actual_low_date − nearest_cluster_center</pre>
           <p class="hm-dtext">Signed: negative = actual came earlier.</p>
-          <p class="hm-dtext" style="margin-top:6px"><strong>Nearest-cluster bias.</strong> For BIMODAL, <em>nearest_cluster_center</em> is always chosen in hindsight — whichever of C1/C2 had the smaller absolute gap to the actual. This guarantees BIMODAL errors are at most as large as the error to the worse cluster, and often considerably smaller. It is a structural measurement effect, not a sign that BIMODAL timing is inherently more precise. Cross-type date error comparisons are therefore meaningless — use the per-type timing cards and the C1/C2 win tally instead.</p>
+          <p class="hm-dtext" style="margin-top:6px"><strong>Nearest-cluster bias.</strong> For BIMODAL, <em>nearest_cluster_center</em> is always chosen in hindsight — whichever of C1/C2 had the smaller absolute gap to the actual. This guarantees BIMODAL errors are at most as large as the error to the worse cluster, and often considerably smaller. It is a structural measurement effect, not a sign that BIMODAL timing is inherently more precise. Cross-type low date error comparisons are therefore meaningless — use the per-type timing cards and the C1/C2 win tally instead.</p>
         </div>
         <div class="hm-dsection">
           <div class="hm-dlabel">5. Cluster Hit (BIMODAL)</div>
@@ -644,7 +656,7 @@ d2 = actual_low_date − est_low_date_cluster2
 cluster_hit = 1  if |d1| ≤ |d2|,  else  2</pre>
         </div>
         <div class="hm-dsection">
-          <div class="hm-dlabel">6. Ex-Div Date Error</div>
+          <div class="hm-dlabel">6. Ex-Div Error</div>
           <pre class="hm-code">exdiv_date_error_days = actual_exdiv_date − proj_exdiv_date</pre>
           <p class="hm-dtext">Signed. Negative = ex-div occurred earlier than projected.</p>
         </div>
@@ -669,10 +681,14 @@ ZONE_MISS_BELOW : actual_low_px < zone_bot  (dip overshot zone)</pre>
         </div>
         <div class="hm-dsection">
           <div class="hm-dlabel">11. KPI strip & timing cards</div>
-          <pre class="hm-code">zone_hit_rate  = zone_hit_count / total_resolved_count × 100   (%)
-med_date_error = median( |date_error_days| )   across resolved rows that have a date estimate
-Colour bands — zone hit rate : ≥70% green · ≥50% amber · &lt;50% red
-              date error     : ≤7d  green · ≤21d  amber · &gt;21d  red</pre>
+          <pre class="hm-code">zone_hit_rate         = zone_hit_count / total_resolved_count × 100   (%)
+low_date_hit_rate     = count(|date_error_days| ≤ 7) / count(rows with a date estimate) × 100   (%)
+combined_hit_rate     = count(zone_hit OR low_date_hit) / total_resolved_count × 100   (%)
+med_low_date_error    = median( |date_error_days| )   across resolved rows that have a date estimate
+Colour bands — price zone/low date/combined hit rate : ≥70% green · ≥50% amber · &lt;50% red
+              low date error                   : ≤7d  green · ≤21d  amber · &gt;21d  red</pre>
+          <p class="hm-dtext">Price zone hit rate and low date hit rate are the two independent track records behind a setup: price zone hit rate answers "did the price actually dip into the projected entry zone," low date hit rate answers "did the dip land near the estimated low date." A stock can score well on one and poorly on the other — a wide, low-conviction price zone can still get hit reliably even if the timing is scattered, and vice versa. The two are watched separately rather than blended into a single score, since a bad timing read doesn't invalidate a good price read or the other way round. Median low date error stays alongside low date hit rate because a rate alone hides magnitude — two stocks can both "miss" the 7-day window yet be off by 8 days versus 40.</p>
+          <p class="hm-dtext" style="margin-top:6px">Combined hit rate counts a cycle as a hit if <strong>either</strong> signal fired, not both — the same either/or logic already used to flag a setup as actionable in the live watch list (inside the price zone, near it, or inside the timing window all separately qualify). Applied here as a backtest: it answers "would this setup have given you a workable signal at all," which is always ≥ both the price zone and low date hit rates individually, by construction. It's a looser, more forgiving number on purpose — use price zone and low date hit rate to understand *which* signal is reliable for a given stock, and combined hit rate for the ceiling on how often at least one of them would have caught the move.</p>
           <p class="hm-dtext">Timing cards repeat these figures per timing rating so RELIABLE and BIMODAL performance is not conflated. For BIMODAL cards the C1 vs C2 win tally records how often each timing window matched the actual dip across all resolved cycles — a long-run forward-test of cluster behaviour, independent of the cluster dominance computed at analysis time.</p>
         </div>
       </div>
@@ -1176,8 +1192,8 @@ function renderDecisionLens(rows){
           ${thTip("Ticker","Ticker symbol and stock name for the candidate.")}
           ${thTip("Score","Internal ranking score for triage. Higher is better, but it is a prioritization aid rather than a buy signal.","num")}
           ${thTip("Timing","Current setup’s timing class: RELIABLE, BIMODAL, or UNRELIABLE.")}
-          ${thTip("Validated Hit Rate","Zone hit rate using only the stronger timing sample, excluding UNRELIABLE rows where possible.","num")}
-          ${thTip("Med Date","Median absolute date error, in days, across resolved validated rows. Lower means tighter timing.","num")}
+          ${thTip("Reliable+Bimodal Hit Rate","Price zone hit rate using only the stronger timing sample, excluding UNRELIABLE rows where possible.","num")}
+          ${thTip("Med Low Date Err","Median absolute low date error, in days, across resolved rows in the stronger timing sample. Lower means tighter timing.","num")}
           ${thTip("Bias","Average price error. Negative means the model tended to underestimate how deep the dip would go.","num")}
           ${thTip("Rev/Cycle","Average number of forecast revisions logged per cycle. Lower means the setup was more stable through time.","num")}
           ${thTip("Next Setup","The next unresolved ex-dividend setup currently being tracked for this stock.")}
@@ -1219,6 +1235,29 @@ function renderKPIs(rows){
   const errors=resolved.filter(r=>r.date_error_days!=null)
     .map(r=>Math.abs(r.date_error_days)).sort((a,b)=>a-b);
   const medErr=errors.length?errors[Math.floor(errors.length/2)]:null;
+  // Mirrors price zone hit rate but for timing: what share of resolved cycles had
+  // the actual low land within 7 days of the estimate, matching the "good"
+  // threshold already used to colour Median low date error, so a stock can be
+  // judged on price accuracy and timing accuracy the same way -- a hit-rate
+  // percentage, not just a raw error magnitude for one of the two.
+  const DATE_HIT_THRESHOLD_DAYS=7;
+  const dateHitCount=errors.filter(e=>e<=DATE_HIT_THRESHOLD_DAYS).length;
+  const dateHitRate=errors.length?Math.round(dateHitCount/errors.length*100):null;
+
+  // A resolved cycle counts as a hit if EITHER signal fired -- the two are
+  // independent (a stock can be accurate on one and off on the other), so
+  // "was this setup actionable at all" is naturally an OR, not a stricter
+  // AND. Mirrors the same either/or logic the live watch-list trigger
+  // already uses (insideZone/nearAboveZone OR inMonitoringWindow) --
+  // this is that same idea applied retrospectively, as a track record.
+  // Denominator is resolved.length (same as price zone hit rate) rather than
+  // errors.length, so rows with no date estimate (UNRELIABLE) still count
+  // -- they just fall back to whatever the zone outcome says.
+  const combinedHits=resolved.filter(r=>
+    r.zone_outcome==="ZONE_HIT" ||
+    (r.date_error_days!=null && Math.abs(r.date_error_days)<=DATE_HIT_THRESHOLD_DAYS)
+  );
+  const combinedHitRate=resolved.length?Math.round(combinedHits.length/resolved.length*100):null;
 
   document.getElementById("kpiTotal").textContent=total;
   document.getElementById("kpiResolved").textContent=resolved.length;
@@ -1235,6 +1274,18 @@ function renderKPIs(rows){
   coreEl.className="kpi-value"+(coreHitRate==null?"":(coreHitRate>=70?" good":coreHitRate>=50?" warn":" bad"));
   document.getElementById("kpiCoreHitSub").textContent=
     coreResolved.length?`${coreHits.length} / ${coreResolved.length} resolved · excludes unreliable`:"no reliable/bimodal resolved rows";
+
+  const dhrEl=document.getElementById("kpiDateHitRate");
+  dhrEl.textContent=dateHitRate!=null?dateHitRate+"%":"—";
+  dhrEl.className="kpi-value"+(dateHitRate==null?"":(dateHitRate>=70?" good":dateHitRate>=50?" warn":" bad"));
+  document.getElementById("kpiDateHitSub").textContent=
+    errors.length?`${dateHitCount} / ${errors.length} within ${DATE_HIT_THRESHOLD_DAYS}d`:"no date data yet";
+
+  const chrEl=document.getElementById("kpiCombinedHitRate");
+  chrEl.textContent=combinedHitRate!=null?combinedHitRate+"%":"—";
+  chrEl.className="kpi-value"+(combinedHitRate==null?"":(combinedHitRate>=70?" good":combinedHitRate>=50?" warn":" bad"));
+  document.getElementById("kpiCombinedHitSub").textContent=
+    resolved.length?`${combinedHits.length} / ${resolved.length} cycles`:"no resolved cycles yet";
 
   const deEl=document.getElementById("kpiDateErr");
   deEl.textContent=medErr!=null?medErr+"d":"—";
@@ -1258,7 +1309,11 @@ function renderKPIs(rows){
     const tHits=tRes.filter(r=>r.zone_outcome==="ZONE_HIT");
     const tErrs=tRes.filter(r=>r.date_error_days!=null).map(r=>r.date_error_days);
     const tMed=medianAbs(tErrs);
+    const tAbsErrs=tErrs.map(e=>Math.abs(e));
+    const tDateHitPct=tAbsErrs.length?Math.round(tAbsErrs.filter(e=>e<=7).length/tAbsErrs.length*100):null;
     const hitPct=tRes.length?Math.round(tHits.length/tRes.length*100):null;
+    const tCombinedHits=tRes.filter(r=>r.zone_outcome==="ZONE_HIT"||(r.date_error_days!=null&&Math.abs(r.date_error_days)<=7));
+    const tCombinedPct=tRes.length?Math.round(tCombinedHits.length/tRes.length*100):null;
     const c1Rows=t.key==="BIMODAL"?tRes.filter(r=>r.cluster_hit===1):[];
     const c2Rows=t.key==="BIMODAL"?tRes.filter(r=>r.cluster_hit===2):[];
     const c1=c1Rows.length, c2=c2Rows.length;
@@ -1266,8 +1321,10 @@ function renderKPIs(rows){
       <div class="timing-card-label ${t.cls}">${t.label}</div>
       <div class="timing-stat"><span class="timing-stat-label">Predictions</span><span class="timing-stat-value">${tRows.length}</span></div>
       <div class="timing-stat"><span class="timing-stat-label">Resolved</span><span class="timing-stat-value">${tRes.length}</span></div>
-      <div class="timing-stat"><span class="timing-stat-label">Zone hit rate</span><span class="timing-stat-value">${hitPct!=null?hitPct+"%":"—"}</span></div>
-      <div class="timing-stat"><span class="timing-stat-label">Median date error</span><span class="timing-stat-value">${tMed!=null?tMed+"d":"—"}</span></div>
+      <div class="timing-stat"><span class="timing-stat-label">Price zone hit rate</span><span class="timing-stat-value">${hitPct!=null?hitPct+"%":"—"}</span></div>
+      <div class="timing-stat"><span class="timing-stat-label">Low date hit rate</span><span class="timing-stat-value">${tDateHitPct!=null?tDateHitPct+"%":"—"}</span></div>
+      <div class="timing-stat"><span class="timing-stat-label">Combined hit rate</span><span class="timing-stat-value">${tCombinedPct!=null?tCombinedPct+"%":"—"}</span></div>
+      <div class="timing-stat"><span class="timing-stat-label">Median low date error</span><span class="timing-stat-value">${tMed!=null?tMed+"d":"—"}</span></div>
       ${t.key==="BIMODAL"&&tRes.length?`<div class="timing-stat"><span class="timing-stat-label">C1 wins</span><span class="timing-stat-value">${c1}</span></div><div class="timing-stat"><span class="timing-stat-label">C2 wins</span><span class="timing-stat-value">${c2}</span></div>`:""}
       ${t.note?`<div class="timing-note">${t.note}</div>`:""}
     </div>`;

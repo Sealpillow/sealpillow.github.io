@@ -5,14 +5,14 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-26",
+    "today": "2026-09-07",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 696.5,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": 77.8
+    "price_growth_5yr_pct": 74.6
   },
   "parse_preflight": {
     "columns_detected": [
@@ -26,14 +26,14 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 538,
-    "price_rows": 523,
+    "total_rows": 537,
+    "price_rows": 522,
     "dividend_rows": 15,
-    "zero_volume_rows": 117,
-    "zero_volume_pct": 22.4,
+    "zero_volume_rows": 116,
+    "zero_volume_pct": 22.2,
     "issues_found": [
       "2 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (117/523, 22.4%) â€” analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (116/522, 22.2%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -548,7 +548,7 @@
       "est_watch_window_note": "Cluster 1: Oct 5 – Oct 25 (best: Oct 15) · Cluster 2: Feb 16",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 35.7576,
+      "current_price_vs_zone": 33.3333,
       "entry_status": "INSIDE",
       "entry_status_display": "Inside",
       "timing_rating": "BIMODAL",
@@ -635,18 +635,19 @@
         "fragility_percentile_band": "BOTTOM_25",
         "fragility_percentile_band_display": "Bottom 25%"
       },
-      "final_verdict": "Small Trades Advised",
-      "final_verdict_tone": "warn",
-      "final_verdict_reason": "Price is in the zone and the setup is active now. Capped from Actionable Now: the projected zone is in the bottom 25% of the tracked universe for reliability.",
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-09-30).",
       "potential_score": 67.8,
       "potential_eligible": false,
       "potential_ineligible_reasons": [
         "Dividend frequency is not one of the preferred cycle structures"
       ],
       "structural_health_flags": [
-        "FRAGILE_ZONE"
+        "FRAGILE_ZONE",
+        "DIVIDEND_NOT_COVERED"
       ],
-      "structural_health_override_applied": false
+      "structural_health_override_applied": true
     }
   },
   "annual_payouts": [
@@ -892,14 +893,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-26",
-      "c": 0.099
-    },
-    {
-      "d": "2016-09-02",
-      "c": 0.075
-    },
     {
       "d": "2016-09-09",
       "c": 0.078
@@ -2982,15 +2975,19 @@
     },
     {
       "d": "2026-08-28",
-      "c": 0.112
+      "c": 0.111
+    },
+    {
+      "d": "2026-09-04",
+      "c": 0.11
     }
   ],
-  "current_price": 0.112,
+  "current_price": 0.11,
   "anchor_price": 0.138,
   "anchor_date": "2026-01-30",
-  "data_window_start": "2016-08-26",
-  "data_window_end": "2026-08-28",
-  "years_covered": 10.0,
+  "data_window_start": "2016-09-09",
+  "data_window_end": "2026-09-04",
+  "years_covered": 9.98,
   "series_adequacy": {
     "S1": {
       "n_clean": 5,

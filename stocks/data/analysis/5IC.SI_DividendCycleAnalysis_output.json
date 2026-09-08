@@ -5,14 +5,14 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-26",
+    "today": "2026-09-07",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 413.3,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": 34.7
+    "price_growth_5yr_pct": 28.2
   },
   "parse_preflight": {
     "columns_detected": [
@@ -27,7 +27,7 @@
     ],
     "date_format_detected": "%d %b %Y",
     "total_rows": 543,
-    "price_rows": 523,
+    "price_rows": 522,
     "dividend_rows": 20,
     "zero_volume_rows": 9,
     "zero_volume_pct": 1.7,
@@ -786,7 +786,7 @@
       "est_watch_window_note": "Cluster 1: Dec 1 – Dec 20 (best: Dec 11) · Cluster 2: Apr 13",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": -29.7325,
+      "current_price_vs_zone": -33.1189,
       "entry_status": "BELOW",
       "entry_status_display": "Below",
       "timing_rating": "BIMODAL",
@@ -873,16 +873,19 @@
         "fragility_percentile_band": "NEAR_MEDIAN",
         "fragility_percentile_band_display": "Near median"
       },
-      "final_verdict": "Wait",
-      "final_verdict_tone": "warn",
-      "final_verdict_reason": "Price is well below the zone and may have overshot the expected entry area.",
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: debt is more than 150% of equity; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31).",
       "potential_score": 76.5,
       "potential_eligible": false,
       "potential_ineligible_reasons": [
         "Dividend frequency is not one of the preferred cycle structures"
       ],
-      "structural_health_flags": [],
-      "structural_health_override_applied": false
+      "structural_health_flags": [
+        "HIGH_LEVERAGE",
+        "DIVIDEND_NOT_COVERED"
+      ],
+      "structural_health_override_applied": true
     }
   },
   "annual_payouts": [
@@ -1162,14 +1165,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-26",
-      "c": 0.244
-    },
-    {
-      "d": "2016-09-02",
-      "c": 0.244
-    },
     {
       "d": "2016-09-09",
       "c": 0.244
@@ -3252,15 +3247,19 @@
     },
     {
       "d": "2026-08-28",
-      "c": 0.415
+      "c": 0.41
+    },
+    {
+      "d": "2026-09-04",
+      "c": 0.395
     }
   ],
-  "current_price": 0.415,
+  "current_price": 0.395,
   "anchor_price": 0.272,
   "anchor_date": "2025-04-30",
-  "data_window_start": "2016-08-26",
-  "data_window_end": "2026-08-28",
-  "years_covered": 10.0,
+  "data_window_start": "2016-09-09",
+  "data_window_end": "2026-09-04",
+  "years_covered": 9.98,
   "series_adequacy": {
     "S1": {
       "n_clean": 9,

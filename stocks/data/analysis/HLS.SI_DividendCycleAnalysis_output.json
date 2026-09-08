@@ -5,7 +5,7 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-26",
+    "today": "2026-09-07",
     "frequency": "SEMI-ANNUAL",
     "frequency_display": "Semi-Annual",
     "adaptive_window_days": 152,
@@ -26,14 +26,14 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 115,
-    "price_rows": 111,
+    "total_rows": 116,
+    "price_rows": 112,
     "dividend_rows": 4,
-    "zero_volume_rows": 61,
-    "zero_volume_pct": 55.0,
+    "zero_volume_rows": 62,
+    "zero_volume_pct": 55.4,
     "issues_found": [
       "1 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (61/111, 55.0%) â€” analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (62/112, 55.4%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -66,7 +66,7 @@
       "id": "S2_2024",
       "series": "S2",
       "exdiv_date": "2024-09-11",
-      "div_amt": 0.0279,
+      "div_amt": 0.0278,
       "prev_dp": 0.29,
       "low_px": 0.29,
       "low_date": "2024-09-06",
@@ -78,8 +78,8 @@
       "rebound": 0.0,
       "wks_before": 0.7143,
       "wks_to_peak": -7.0,
-      "div_yield": 9.6207,
-      "s1": 1924.1379,
+      "div_yield": 9.5862,
+      "s1": 1917.2414,
       "s1_floored": true,
       "s2": 25.8621,
       "degen": true,
@@ -754,16 +754,19 @@
         "fragility_percentile_band": "BOTTOM_25",
         "fragility_percentile_band_display": "Bottom 25%"
       },
-      "final_verdict": "Wait",
-      "final_verdict_tone": "warn",
-      "final_verdict_reason": "Price is too far above the entry zone right now.",
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31).",
       "potential_score": 64.8,
-      "potential_eligible": true,
-      "potential_ineligible_reasons": [],
-      "structural_health_flags": [
-        "FRAGILE_ZONE"
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31)"
       ],
-      "structural_health_override_applied": false
+      "structural_health_flags": [
+        "FRAGILE_ZONE",
+        "DIVIDEND_NOT_COVERED"
+      ],
+      "structural_health_override_applied": true
     },
     "S2": {
       "proj_exdiv_date": "2026-09-21",
@@ -869,25 +872,26 @@
         "fragility_percentile_band": "BOTTOM_25",
         "fragility_percentile_band_display": "Bottom 25%"
       },
-      "final_verdict": "Wait",
-      "final_verdict_tone": "warn",
-      "final_verdict_reason": "Price is too far above the entry zone right now.",
-      "potential_score": 46.3,
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31).",
+      "potential_score": 46.4,
       "potential_eligible": false,
       "potential_ineligible_reasons": [
         "Win rate is below the minimum structural threshold"
       ],
       "structural_health_flags": [
-        "FRAGILE_ZONE"
+        "FRAGILE_ZONE",
+        "DIVIDEND_NOT_COVERED"
       ],
-      "structural_health_override_applied": false
+      "structural_health_override_applied": true
     }
   },
   "annual_payouts": [
     {
       "yr": 2024,
       "count": 1,
-      "total": 0.0279,
+      "total": 0.0278,
       "series": [
         "S2"
       ],
@@ -921,7 +925,7 @@
       "id": "S2_2024",
       "series": "S2",
       "date": "2024-09-11",
-      "amount": 0.0279,
+      "amount": 0.0278,
       "note": "Dividend"
     },
     {
@@ -1390,14 +1394,18 @@
     {
       "d": "2026-08-28",
       "c": 0.24
+    },
+    {
+      "d": "2026-09-04",
+      "c": 0.24
     }
   ],
   "current_price": 0.24,
   "anchor_price": 0.179,
   "anchor_date": "2026-05-18",
   "data_window_start": "2024-07-19",
-  "data_window_end": "2026-08-28",
-  "years_covered": 2.11,
+  "data_window_end": "2026-09-04",
+  "years_covered": 2.13,
   "series_adequacy": {
     "S1": {
       "n_clean": 2,

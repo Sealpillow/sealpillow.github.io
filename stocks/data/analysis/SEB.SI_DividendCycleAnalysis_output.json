@@ -5,7 +5,7 @@
     "active": true,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-26",
+    "today": "2026-09-07",
     "frequency": "SEMI-ANNUAL",
     "frequency_display": "Semi-Annual",
     "adaptive_window_days": 152,
@@ -26,8 +26,8 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 169,
-    "price_rows": 163,
+    "total_rows": 171,
+    "price_rows": 164,
     "dividend_rows": 6,
     "zero_volume_rows": 1,
     "zero_volume_pct": 0.6,
@@ -849,16 +849,19 @@
         "fragility_percentile_band": "BOTTOM_25",
         "fragility_percentile_band_display": "Bottom 25%"
       },
-      "final_verdict": "Wait",
-      "final_verdict_tone": "warn",
-      "final_verdict_reason": "Price is too far above the entry zone right now.",
-      "potential_score": 71.2,
-      "potential_eligible": true,
-      "potential_ineligible_reasons": [],
-      "structural_health_flags": [
-        "FRAGILE_ZONE"
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31).",
+      "potential_score": 71.3,
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31)"
       ],
-      "structural_health_override_applied": false
+      "structural_health_flags": [
+        "FRAGILE_ZONE",
+        "DIVIDEND_NOT_COVERED"
+      ],
+      "structural_health_override_applied": true
     },
     "S2": {
       "proj_exdiv_date": "2027-08-20",
@@ -964,16 +967,19 @@
         "fragility_percentile_band": "BOTTOM_25",
         "fragility_percentile_band_display": "Bottom 25%"
       },
-      "final_verdict": "Wait",
-      "final_verdict_tone": "warn",
-      "final_verdict_reason": "Price is too far above the entry zone right now.",
+      "final_verdict": "Structurally Weak",
+      "final_verdict_tone": "bad",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31).",
       "potential_score": 71.5,
-      "potential_eligible": true,
-      "potential_ineligible_reasons": [],
-      "structural_health_flags": [
-        "FRAGILE_ZONE"
+      "potential_eligible": false,
+      "potential_ineligible_reasons": [
+        "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-12-31)"
       ],
-      "structural_health_override_applied": false
+      "structural_health_flags": [
+        "FRAGILE_ZONE",
+        "DIVIDEND_NOT_COVERED"
+      ],
+      "structural_health_override_applied": true
     }
   },
   "annual_payouts": [
@@ -1715,6 +1721,10 @@
     },
     {
       "d": "2026-08-28",
+      "c": 2.28
+    },
+    {
+      "d": "2026-09-04",
       "c": 2.29
     }
   ],
@@ -1722,8 +1732,8 @@
   "anchor_price": 2.36,
   "anchor_date": "2026-03-04",
   "data_window_start": "2023-07-21",
-  "data_window_end": "2026-08-28",
-  "years_covered": 3.1,
+  "data_window_end": "2026-09-04",
+  "years_covered": 3.12,
   "series_adequacy": {
     "S1": {
       "n_clean": 2,

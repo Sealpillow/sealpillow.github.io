@@ -5,14 +5,14 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-08-26",
+    "today": "2026-09-07",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
     "mean_interval_days": 443.4,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -34.5
+    "price_growth_5yr_pct": -24.0
   },
   "parse_preflight": {
     "columns_detected": [
@@ -26,13 +26,13 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 541,
-    "price_rows": 523,
+    "total_rows": 540,
+    "price_rows": 522,
     "dividend_rows": 18,
-    "zero_volume_rows": 248,
-    "zero_volume_pct": 47.4,
+    "zero_volume_rows": 246,
+    "zero_volume_pct": 47.1,
     "issues_found": [
-      "Zero-volume rows exceed 5% (248/523, 47.4%) â€” analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (246/522, 47.1%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -429,7 +429,7 @@
       "est_watch_window_note": "Cluster 1: Dec 29 – Jan 26 (best: Jan 12) · Cluster 2: Apr 6",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": -31.9227,
+      "current_price_vs_zone": -30.0828,
       "entry_status": "BELOW",
       "entry_status_display": "Below",
       "timing_rating": "BIMODAL",
@@ -516,19 +516,18 @@
         "fragility_percentile_band": "BOTTOM_25",
         "fragility_percentile_band_display": "Bottom 25%"
       },
-      "final_verdict": "Structurally Weak",
-      "final_verdict_tone": "bad",
-      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative.",
+      "final_verdict": "Wait",
+      "final_verdict_tone": "warn",
+      "final_verdict_reason": "Price is well below the zone and may have overshot the expected entry area.",
       "potential_score": 60.3,
       "potential_eligible": false,
       "potential_ineligible_reasons": [
         "Dividend frequency is not one of the preferred cycle structures"
       ],
       "structural_health_flags": [
-        "FRAGILE_ZONE",
-        "PRICE_DECLINE"
+        "FRAGILE_ZONE"
       ],
-      "structural_health_override_applied": true
+      "structural_health_override_applied": false
     }
   },
   "annual_payouts": [
@@ -785,14 +784,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-08-26",
-      "c": 0.305
-    },
-    {
-      "d": "2016-09-02",
-      "c": 0.32
-    },
     {
       "d": "2016-09-09",
       "c": 0.33
@@ -2875,15 +2866,19 @@
     },
     {
       "d": "2026-08-28",
-      "c": 0.074
+      "c": 0.087
+    },
+    {
+      "d": "2026-09-04",
+      "c": 0.076
     }
   ],
-  "current_price": 0.074,
+  "current_price": 0.076,
   "anchor_price": 0.18,
   "anchor_date": "2023-11-06",
-  "data_window_start": "2016-08-26",
-  "data_window_end": "2026-08-28",
-  "years_covered": 10.0,
+  "data_window_start": "2016-09-09",
+  "data_window_end": "2026-09-04",
+  "years_covered": 9.98,
   "series_adequacy": {
     "S1": {
       "n_clean": 3,
