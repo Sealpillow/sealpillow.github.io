@@ -1,0 +1,97 @@
+<style>
+.material-story {
+  display: flex;
+  width: 100%;
+}
+
+.material-story__col {
+  width: 50%;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+.material-story__col--left {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.material-story__col--right {
+  display: flex;
+  align-items: flex-end;
+}
+
+.material-story__text {
+  font-family: proxima-nova, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.material-story__images {
+    display: flex;
+    gap: 24px;
+    margin-left: auto;
+    width: 80%;
+    margin-top: 30%;
+}
+
+.material-story__item {
+  flex: 1;
+}
+
+.material-story__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.material-story__caption {
+  font-family: proxima-nova, sans-serif;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+@media (max-width: 767px) {
+  .material-story {
+    flex-direction: column;
+  }
+
+  .material-story__col {
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .material-story__col--left {
+    margin-bottom: 32px;
+  }
+
+  .material-story__images {
+    gap: 12px;
+  }
+}
+</style>
+
+<!-- 50/50: body text left; duo portrait images offset down 30% right -->
+<section class="material-story">
+  <div class="material-story__col material-story__col--left">
+    <p class="material-story__text">
+      [Body text]
+    </p>
+  </div>
+
+  <div class="material-story__col material-story__col--right">
+    <div class="material-story__images">
+      <div class="material-story__item">
+        <img class="material-story__img" src="../../media/portrait-1.jpg" alt="">
+        <p class="material-story__caption">[Caption 1]</p>
+      </div>
+
+      <div class="material-story__item">
+        <img class="material-story__img" src="../../media/portrait-2.jpg" alt="">
+        <p class="material-story__caption">[Caption 2]</p>
+      </div>
+    </div>
+  </div>
+</section>

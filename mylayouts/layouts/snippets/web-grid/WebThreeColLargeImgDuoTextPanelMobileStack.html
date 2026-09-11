@@ -1,0 +1,77 @@
+<style>
+.split-trio {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    align-items: stretch;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.split-trio__col--img {
+    min-width: 0;
+}
+
+.split-trio__figure {
+    margin: 0;
+}
+
+.split-trio__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.split-trio__caption {
+    font-family: proxima-nova, sans-serif;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #111;
+    margin-top: 12px;
+}
+
+.split-trio__col--text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    text-align: center;
+    padding: 0 5%;
+}
+
+.split-trio__text {
+    font-family: proxima-nova, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .split-trio {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .split-trio__col--text {
+        padding: 0;
+    }
+}
+</style>
+
+<!-- 3-column grid: large image left (2fr), two centered text panels right (1fr each) -->
+<section class="split-trio">
+    <div class="split-trio__col split-trio__col--img">
+        <div class="split-trio__figure">
+            <img class="split-trio__img" src="../../media/portrait-1.jpg" alt="" loading="lazy">
+            <p class="split-trio__caption">[Caption]</p>
+        </div>
+    </div>
+
+    <div class="split-trio__col split-trio__col--text">
+        <p class="split-trio__text">[Body text panel 1]</p>
+    </div>
+
+    <div class="split-trio__col split-trio__col--text">
+        <p class="split-trio__text">[Body text panel 2]</p>
+    </div>
+</section>

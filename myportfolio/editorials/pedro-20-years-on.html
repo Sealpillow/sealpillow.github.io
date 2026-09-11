@@ -33,8 +33,17 @@
       mobile). If horizontal scroll containment is needed for some
       other component elsewhere on the page, apply overflow-x: hidden
       to that component's own wrapper instead — never to html/body. */
+      cursor: none;
   }
 
+  .cursor-follower {
+    position: fixed;
+    width: 38px;
+    height: 38px;
+    pointer-events: none;
+    z-index: 9999;
+    background: url('images/media-assets/pd20-cursor-final.gif?$staticlink$') no-repeat center/contain;
+  }
 /* Folder Header */
 .folder-header {
   display: none;
@@ -60,6 +69,26 @@
 }
 
 
+/* Force icons to be black */
+.theme_light .menu-group .theme_color, .theme_light .page_header-left .theme_color, .theme_light .page_header-right .theme_color {
+  color: black;
+}
+
+/* theme_light present -> black logo instead */
+.page_header.theme_light .logo_static img.logo-white {
+    display: none !important;
+}
+.page_header.theme_light .logo_static img.logo-black {
+    display: inline-block !important;
+}
+
+/*overrides the browser's default pointer cursor on <a> */
+a, button, [role="button"],
+.page_header button,
+.page_header a,
+.page_header [role="button"] {
+  cursor: none !important;
+}
   /* ---------------------------------------------------- */
 
   .img-wrap {
@@ -89,14 +118,14 @@
   color: black;
 }
 
-.img-wrap .caption .caption-label {
+.stack__section--3 .img-wrap .caption .caption-label {
   font-family: proxima-nova;
   font-size: 12px;
   margin: 0 0 4px;
   color: white;
 }
 
-.img-wrap .caption .caption-title {
+.stack__section--3 .img-wrap .caption .caption-title {
   display: inline-block;
   position: relative;
   font-family: proxima-nova;
@@ -108,7 +137,7 @@
   line-height: 28px;
 }
 
-.img-wrap .caption .caption-cta {
+.stack__section--3 .img-wrap .caption .caption-cta {
   display: inline-block;
   position: relative;
   font-family: proxima-nova;
@@ -119,7 +148,7 @@
   line-height: 20px;
 }
 
-.img-wrap .caption .caption-cta::after {
+.stack__section--3 .img-wrap .caption .caption-cta::after {
   content: '';
   position: absolute;
   left: 0;
@@ -127,6 +156,50 @@
   width: 100%;
   height: 1.5px;
   background: white;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+
+.stack__section--4 .img-wrap .caption .caption-label {
+  font-family: proxima-nova;
+  font-size: 12px;
+  margin: 0 0 4px;
+  color: black;
+}
+
+.stack__section--4 .img-wrap .caption .caption-title {
+  display: inline-block;
+  position: relative;
+  font-family: proxima-nova;
+  font-size: 25px;
+  margin: 0;
+  color: black;
+  text-decoration: none;
+  padding-bottom: 2px;
+  line-height: 28px;
+}
+
+.stack__section--4 .img-wrap .caption .caption-cta {
+  display: inline-block;
+  position: relative;
+  font-family: proxima-nova;
+  font-size: 14px;
+  color: black;
+  text-decoration: none;
+  padding-bottom: 2px;
+  line-height: 20px;
+}
+
+.stack__section--4 .img-wrap .caption .caption-cta::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0px;
+  width: 100%;
+  height: 1.5px;
+  background: black;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;
@@ -483,7 +556,25 @@
 
 
 
-
+<section class="stack__section stack__section--4  js-vertical-slider">
+  <div class="stack__content">
+    <div class="img-wrap">
+      <picture>
+            <img class="d-md-block d-none" src="images/pedro-20-years-on/20-years-on-d1.jpg?$staticlink$" loading="lazy"/>
+            <img class="d-block d-md-none" src="images/pedro-20-years-on/20-years-on-d1_mobile.jpg?$staticlink$" loading="lazy"/>
+      </picture>
+      <div class="caption">
+        <p class="caption-label">Chapter II​</p>
+        <p class="mb-0 caption-title">
+          20 Years On
+        </p>
+        <p class="mb-0">
+          <a class="caption-cta" href="$url('Page-Show', 'cid','20-years-on')$">Discover the Story</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <div class="stack__end"></div>
 

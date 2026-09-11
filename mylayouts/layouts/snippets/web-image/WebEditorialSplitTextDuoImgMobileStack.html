@@ -1,0 +1,95 @@
+<style>
+.split-duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    gap: 4%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.split-duo__col {
+    min-width: 0;
+    display: flex;
+}
+
+.split-duo__col--left {
+    flex-direction: column;
+}
+
+.split-duo__intro {
+    font-family: proxima-nova, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 320px;
+    margin: 0;
+}
+
+.split-duo__figure {
+    margin: 0;
+}
+
+.split-duo__figure--offset {
+    align-self: flex-end;
+    width: 65%;
+    margin-top: auto;
+}
+
+.split-duo__col--right .split-duo__figure {
+    width: 100%;
+    padding-bottom: 20%;
+}
+
+.split-duo__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.split-duo__caption {
+    font-family: proxima-nova, sans-serif;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #111;
+    margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+    .split-duo {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .split-duo__intro {
+        margin-bottom: 40px;
+        max-width: 100%;
+    }
+
+    .split-duo__figure--offset {
+        align-self: flex-start;
+        width: 100%;
+        margin-top: 0;
+    }
+}
+</style>
+
+<!-- Editorial Staggered Duo: body text + offset image left, full image right -->
+<section class="split-duo">
+    <div class="split-duo__col split-duo__col--left">
+        <p class="split-duo__intro">[Intro body text]</p>
+
+        <div class="split-duo__figure split-duo__figure--offset">
+            <img class="split-duo__img" src="../../media/portrait-1.jpg" alt="" loading="lazy">
+            <p class="split-duo__caption">[Caption]</p>
+        </div>
+    </div>
+
+    <div class="split-duo__col split-duo__col--right">
+        <div class="split-duo__figure">
+            <img class="split-duo__img" src="../../media/portrait-2.jpg" alt="" loading="lazy">
+            <p class="split-duo__caption">[Caption]</p>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js"></script>
+
+<style>
+
+/* ----------------------------------------------------
+GLOBAL RESET & BASE
+---------------------------------------------------- */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    height: 100vh;
+    color: black;
+    cursor: none;
+}
+
+.cursor-follower {
+    position: fixed;
+    width: 38px;
+    height: 38px;
+    pointer-events: none;
+    z-index: 9999;
+    background: url('images/media-assets/pd20-cursor-final.gif?$staticlink$') no-repeat center/contain;
+}
+
+.page.parallax {
+    padding-top: 0px !important;
+}
+
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+
+/* Force icons to be black */
+.theme_light .menu-group .theme_color,
+.theme_light .page_header-left .theme_color,
+.theme_light .page_header-right .theme_color {
+    color: black;
+}
+
+/* Override to white when a dark timeline section is active */
+.theme_light.icons-white .menu-group .theme_color,
+.theme_light.icons-white .page_header-left .theme_color,
+.theme_light.icons-white .page_header-right .theme_color {
+    color: white;
+}
+
+/* theme_light present -> black logo instead */
+.page_header.theme_light .logo_static img.logo-white {
+    display: none !important;
+}
+
+.page_header.theme_light .logo_static img.logo-black {
+    display: inline-block !important;
+}
+
+/* theme_light + icons-white (dark section active) -> white logo instead */
+.page_header.theme_light.icons-white .logo_static img.logo-white {
+    display: inline-block !important;
+}
+
+.page_header.theme_light.icons-white .logo_static img.logo-black {
+    display: none !important;
+}
+
+/* lock the header in place */
+.page_header,
+.header_banner-main-wrapper {
+    width: 100vw;
+    margin: 0;
+}
+
+/* ----------------------------------------------------
+DESKTOP / MOBILE TIMELINE SWITCH
+(desktop = 6 combined sections, mobile = 11 split sections)
+---------------------------------------------------- */
+
+.timeline-desktop {
+    display: block;
+}
+
+.timeline-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .timeline-desktop {
+        display: none;
+    }
+
+    .timeline-mobile {
+        display: block;
+    }
+}
+
+/* ----------------------------------------------------
+HORIZONTAL TIMELINE
+---------------------------------------------------- */
+
+body.grabbing {
+    cursor: grabbing;
+    user-select: none;
+}
+
+.timeline-container::-webkit-scrollbar {
+    height: 3px;
+}
+
+.timeline-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.timeline-container::-webkit-scrollbar-thumb {
+    background: var(--line);
+}
+
+.timeline-container {
+    width: 100%;
+    height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.timeline-wrapper {
+    display: flex;
+    width: max-content;
+    height: 100%;
+}
+
+/* ----------------------------------------------------
+TIMELINE SECTIONS
+---------------------------------------------------- */
+
+.timeline-section {
+    flex: 0 0 100%;
+    box-sizing: border-box;
+
+    height: 100%;
+    align-items: center;
+
+    border-right: 1px solid var(--line);
+}
+
+.timeline-desktop .timeline-section {
+    width: 16.67vw; /* 100 / 6 sections */
+}
+
+.timeline-mobile .timeline-section {
+    width: 9.09vw; /* 100 / 11 sections */
+}
+
+/* ----------------------------------------------------
+PROGRESS BAR
+---------------------------------------------------- */
+
+.progress {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 4px;
+    width: 100%;
+    background: #e0e0e0;
+    z-index: 10;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #000000;
+    transition: width 0.05s linear;
+}
+
+/* ----------------------------------------------------
+VIDEO FULL-BLEED COVER
+---------------------------------------------------- */
+
+.video-media-container {
+    position: relative;
+    width: 100vw;
+    height: 100%;
+    overflow: hidden;
+}
+
+.video-media-container .hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+    pointer-events: none;
+    filter: grayscale(0);
+}
+
+.hero-video__sound-toggle {
+    position: absolute;
+    right: 24px;
+    bottom: 53px;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.hero-video__icon--muted,
+.hero-video__icon--unmuted {
+    display: none;
+}
+
+.hero-video__sound-toggle.is-muted .hero-video__icon--muted,
+.hero-video__sound-toggle:not(.is-muted) .hero-video__icon--unmuted {
+    display: block;
+}
+
+.hero-video__sound-toggle:focus{
+    outline: none;
+}
+@media (max-width: 768px) {
+    .video-media-container .hero-video{
+    width: 100%;
+    height: 100%;
+    filter: grayscale(0);
+    }
+  .video-media-container {
+    width: 100%;
+    height: 80%;
+
+  }
+  .hero-video__sound-toggle {
+
+    bottom: 30%;
+
+}
+}
+
+/* ----------------------------------------------------
+FEATURE 1 (text + media)
+---------------------------------------------------- */
+
+.timeline-section--feature {
+    padding: 0;
+    align-items: stretch;
+}
+
+.timeline-feature1 {
+    display: flex;
+    height: 100%;
+    padding: 4% 5%;
+}
+
+.timeline-feature1__col {
+    width: 50%;
+    box-sizing: border-box;
+}
+
+.timeline-feature1__col--text {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.timeline-feature1__top {
+    display: flex;
+    align-items: flex-start;
+}
+
+.timeline-feature1__bottom {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.timeline-feature1__label {
+    font-family: 'proxima-nova';
+    font-size: 16px;
+    margin: 0;
+}
+
+.timeline-feature1__description {
+    font-size: 20px;
+    font-family: 'aktiv-grotesk-extended'; 
+    margin: 0;
+}
+
+.timeline-feature1__col--media {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: 5%;
+    margin-left: 15%;
+}
+
+.timeline-feature1__video {
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(0);
+}
+
+.timeline-feature1__caption {
+    margin: 10px 0 0;
+}
+
+/* Modifier: col is alone in its own timeline-section */
+.timeline-feature1--single .timeline-feature1__col {
+    width: 100%;
+}
+
+.timeline-feature1--single .timeline-feature1__col--media {
+    margin-left: 0;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .timeline-feature1__col--media {
+        margin: 25% auto !important;
+        padding: 0;
+        height: 60% !important;
+
+    }
+    .timeline-feature1__description {
+        font-size: 16px;
+    }
+    .timeline-feature1{
+        padding: 0;
+        height: 88.5%;
+    }
+    .timeline-feature1__col {
+        width: 100%;
+    }
+    .timeline-feature1__col--text {
+        padding: 20% 10% 40% 10%;
+    }
+    .timeline-feature1__video {
+        width: 100%;
+    }
+}
+
+/* ----------------------------------------------------
+TEXT DUO / IMG OFFSET
+---------------------------------------------------- */
+
+.text-duo-img-offset {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 4% 6%;
+    box-sizing: border-box;
+}
+
+.text-duo-img-offset__col {
+    width: 50%;
+    padding: 0 40px;
+    box-sizing: border-box;
+}
+
+.text-duo-img-offset__col--left {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.text-duo-img-offset__col--right {
+    display: flex;
+    align-items: flex-end;
+}
+
+.text-duo-img-offset__text {
+    font-family: proxima-nova, sans-serif;
+    font-size: 16px;
+    margin: 0;
+}
+
+.text-duo-img-offset__images {
+    display: flex;
+    gap: 24px;
+    margin-left: 0;
+    width: 100%;
+}
+
+.text-duo-img-offset__figure {
+    flex: 1;
+    margin: 0;
+}
+
+.text-duo-img-offset__img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+.text-duo-img-offset__caption {
+    font-family: proxima-nova, sans-serif;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.text-duo-img-offset__figure--slider {
+    position: relative;
+}
+
+.text-duo-img-offset__splide .splide__track,
+.text-duo-img-offset__splide .splide__list,
+.text-duo-img-offset__splide .splide__slide {
+    height: 100%;
+}
+
+.text-duo-img-offset__splide .splide__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.text-duo-img-offset__splide .splide__slide {
+    margin: 0;
+    padding: 0;
+}
+
+/* Modifier: use when a col is alone in its own timeline-section */
+.text-duo-img-offset--single {
+    padding: 4% 6vw;
+}
+
+.text-duo-img-offset--single .text-duo-img-offset__col {
+    width: 100%;
+    padding: 0;
+}
+
+.text-duo-img-offset--single .text-duo-img-offset__col--left {
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.text-duo-img-offset--single .text-duo-img-offset__col--right {
+    align-items: center;
+    height: 100%;
+}
+
+.text-duo-img-offset--single .text-duo-img-offset__images {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .text-duo-img-offset {
+        flex-direction: column;
+        height: auto;
+        padding: 10% 25% 25% 25%;
+    }
+
+    .text-duo-img-offset__col {
+        width: 70%;
+        padding: 0;
+        margin: 0 auto;
+    }
+
+    .text-duo-img-offset--single .text-duo-img-offset__col--left {
+        align-items: normal;
+        margin-top: 27%;
+    }
+
+    .text-duo-img-offset__images {
+        flex-direction: column;
+        margin-top: 0;
+        width: 100%;
+        gap: 12px;
+    }
+
+    /* Split-section (mobile) variant: the right col is a fixed-height
+       pane, so the stacked slider + image must share it via flex,
+       not their natural intrinsic height — otherwise they overflow.
+       (overrides the height: auto above, which only suits the
+       desktop-only stacked-columns case that never renders at this
+       breakpoint) */
+    .text-duo-img-offset--single {
+        height: 100%;
+    }
+
+    .text-duo-img-offset--single .text-duo-img-offset__col--right {
+        align-items: center;
+        height: 80%;
+    }
+    .text-duo-img-offset--single .text-duo-img-offset__images {
+        height: 100%;
+    }
+
+    .text-duo-img-offset--single .text-duo-img-offset__figure {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .text-duo-img-offset--single .text-duo-img-offset__splide {
+        flex: 1;
+        min-height: 0;
+    }
+
+    .text-duo-img-offset--single .text-duo-img-offset__img {
+        flex: 1;
+        min-height: 0;
+        height: 100%;
+    }
+
+    .text-duo-img-offset--single .text-duo-img-offset__caption {
+        flex: 0 0 auto;
+        margin-bottom: 0;
+    }
+}
+
+/* ----------------------------------------------------
+FEATURE 2 (slider + text)
+---------------------------------------------------- */
+
+.timeline-feature2 {
+    display: flex;
+    height: 100%;
+}
+
+.timeline-feature2__col {
+    width: 50%;
+    box-sizing: border-box;
+}
+
+.timeline-feature2__col--slider {
+    height: 100%;
+}
+
+.timeline-feature2__splide {
+    height: 100%;
+}
+
+.timeline-feature2__splide .splide__track,
+.timeline-feature2__splide .splide__list,
+.timeline-feature2__splide .splide__slide {
+    height: 100%;
+}
+
+.timeline-feature2__slide-img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+}
+
+.timeline-feature2__slide-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(0);
+}
+
+.timeline-feature2__col--text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: left;
+    width: 30%;
+    margin: 0 auto;
+}
+
+.timeline-feature2__description {
+    font-size: 16px;
+    font-family: 'proxima-nova', sans-serif; 
+    margin: 0;
+}
+
+/* Modifier: col is alone in its own timeline-section */
+.timeline-feature2--single .timeline-feature2__col {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .timeline-feature2 {
+        flex-direction: column;
+    }
+    .timeline-feature2__col--slider,
+    .timeline-feature2__col--text {
+        height: 80%;
+        padding: 0% 10%;
+    }
+    .timeline-feature2__slide-img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+/* ----------------------------------------------------
+DUAL STACK FEATURE
+---------------------------------------------------- */
+
+.dual-stack-feature {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+    height: 100%;
+    padding: 10%;
+    box-sizing: border-box;
+}
+
+.dual-stack-feature__col {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.dual-stack-feature__col--stack {
+    width: 33%;
+    gap: 24px;
+}
+
+.dual-stack-feature__col--single {
+    width: 33%;
+}
+
+.dual-stack-feature__item {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.dual-stack-feature__img {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    display: block;
+    object-fit: cover;
+}
+
+.dual-stack-feature__caption {
+    font-family: proxima-nova, sans-serif;
+    font-size: 12px;
+    margin: 10px 0 0;
+    flex: 0 0 auto;
+}
+
+/* Modifier: only one col present, needs more breathing room */
+.dual-stack-feature--single .dual-stack-feature__col--stack,
+.dual-stack-feature--single .dual-stack-feature__col--single {
+    width: 50%;
+}
+
+@media (max-width: 768px) {
+    .dual-stack-feature {
+        flex-direction: column;
+        height: 100%;
+        gap: 12px;
+        justify-content: center;
+    }
+    /* the "single" col variant (05b) needs less breathing room than
+       the stacked-pair variant (05a) — both share the same
+       .dual-stack-feature--single modifier, so target by which
+       child column is actually present */
+    .dual-stack-feature--single:has(.dual-stack-feature__col--single) {
+        padding: 2% 18% 2% 0%;
+    }
+    .dual-stack-feature--single .dual-stack-feature__col--stack,
+    .dual-stack-feature--single .dual-stack-feature__col--single {
+        width: 100%;
+    }
+
+    .dual-stack-feature--single .dual-stack-feature__col--stack{
+        padding: 15% 5% 65% 5%;
+    }
+    .dual-stack-feature--single .dual-stack-feature__col--single {
+        padding: 0% 0% 48% 0%;
+    }
+
+    .dual-stack-feature__img {
+        flex: none;
+        height: auto;
+    }
+}
+
+/* ----------------------------------------------------
+FEATURE 3 (text + grid, dark)
+---------------------------------------------------- */
+
+.timeline-feature3 {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 4% 5%;
+    box-sizing: border-box;
+    background: black;
+    color: white;
+}
+
+.timeline-feature3__col {
+    width: 50%;
+    box-sizing: border-box;
+}
+
+.timeline-feature3__col--text {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-right: 8%;
+}
+
+.timeline-feature3__description {
+    font-size: 20px;
+    font-family: 'aktiv-grotesk-extended'; 
+    margin: 0;
+}
+
+.timeline-feature3__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.timeline-feature3__footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Chapter II row only */
+.timeline-feature3__footer-row:last-child .timeline-feature3__footer-label,
+.timeline-feature3__footer-row:last-child .timeline-feature3__footer-value {
+    color: #CCCCCC;
+}
+
+.timeline-feature3__footer-label,
+.timeline-feature3__footer-value {
+    font-family: 'proxima-nova', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0;
+    color: white;
+}
+
+.timeline-feature3__col--grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 4px;
+}
+
+.timeline-feature3__grid-item {
+    margin: 0;
+    overflow: hidden;
+}
+
+.timeline-feature3__grid-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Modifier: col is alone in its own timeline-section */
+.timeline-feature3--single .timeline-feature3__col {
+    width: 100%;
+}
+
+.timeline-feature3--single .timeline-feature3__col--text {
+    padding-right: 0;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .timeline-feature3 {
+        flex-direction: column;
+        height: 90%;
+        padding: 20% 5%;
+    }
+
+    .timeline-feature3__col {
+        width: 100%;
+    }
+
+    .timeline-feature3__col--text {
+        padding-right: 0;
+        margin-top: 6%;
+    }
+
+    .timeline-feature3__col--grid {
+        gap: 10px;
+    }
+    .timeline-feature3__description {
+        margin-bottom: 40%;
+        font-size: 16px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+
+<!-- ----------------------------------------------------
+TIMELINE — DESKTOP (6 combined sections)
+---------------------------------------------------- -->
+
+<div class="timeline-container timeline-desktop" id="timelineContainer-desktop">
+
+    <div class="timeline-wrapper" id="timelineWrapper-desktop">
+
+        <!-- 01 : video -->
+        <div class="timeline-section">
+            <div class="video-media-container">
+                <video
+                class="hero-video"
+                data-src="images/20-years-on/20-years-on-a1.mp4?$staticlink$"
+                muted loop playsinline preload="none"
+                title="MasterFilm_16x9">
+                </video>
+                <button type="button" class="hero-video__sound-toggle is-muted" aria-pressed="false" aria-label="Unmute video">
+                    <svg class="hero-video__icon hero-video__icon--muted" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <path d="M3 10v4h4l5 5V5L7 10H3z" fill="currentColor"/>
+                        <line x1="16" y1="9" x2="22" y2="15" stroke="currentColor" stroke-width="2"/>
+                        <line x1="22" y1="9" x2="16" y2="15" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <svg class="hero-video__icon hero-video__icon--unmuted" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <path d="M3 10v4h4l5 5V5L7 10H3z" fill="currentColor"/>
+                        <path d="M15.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M18 6a9 9 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- 02 : feature1 (text + media) -->
+        <div class="timeline-section timeline-section--feature">
+            <div class="timeline-feature1">
+                <div class="timeline-feature1__col--text">
+                    <div class="timeline-feature1__top">
+                        <p class="timeline-feature1__label">A Point of View<br>From the Beginning</p>
+                    </div>
+                    <div class="timeline-feature1__bottom">
+                        <p class="timeline-feature1__description">
+                            PEDRO began in 2006 with a desire to bring a different perspective to everyday dressing. From the beginning, the emphasis was on pieces made with a little more thought, balancing fluid forms with details that gave them a distinct character. As the brand grew, this approach has continued to develop alongside the way we dress and live. The collections have changed over the years, but the interest in making the familiar feel new remains.
+                        </p>
+                        <p class="timeline-feature1__label">
+                            ( 2006 - 2026 )
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-feature1__col--media">
+                    <video class="timeline-feature1__video" data-src="images/20-years-on/20-years-on-b1.mp4?$staticlink$" muted loop playsinline preload="none"></video>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 03 : text-duo (text + images) -->
+        <div class="timeline-section timeline-section--split-duo">
+            <section class="text-duo-img-offset">
+                <div class="text-duo-img-offset__col text-duo-img-offset__col--left">
+                    <p class="text-duo-img-offset__text">
+                        The way a piece looks often begins with what it is made from. Materials are chosen for the qualities they bring to a design, and the way they can change the character of a silhouette. As textiles and materials have expanded through the years, we continue to explore different ways of working with them, bringing different techniques into the process while keeping the focus on how the finished piece feels and wears.
+                    </p>
+                </div>
+
+                <div class="text-duo-img-offset__col text-duo-img-offset__col--right">
+                    <div class="text-duo-img-offset__images">
+                        <div class="text-duo-img-offset__figure text-duo-img-offset__figure--slider">
+                            <div class="splide text-duo-img-offset__splide">
+                                <div class="splide__track">
+                                    <ul class="splide__list">
+                                        <li class="splide__slide">
+                                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-c1.jpg?$staticlink$" alt="Demi Bag" loading="lazy">
+                                        </li>
+                                        <li class="splide__slide">
+                                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-c2.jpg?$staticlink$" alt="Demi Bag" loading="lazy">
+                                        </li>
+                                        <li class="splide__slide">
+                                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-c3.jpg?$staticlink$" alt="Demi Bag" loading="lazy">
+                                        </li>
+                                        <li class="splide__slide">
+                                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-c4.jpg?$staticlink$" alt="Demi Bag" loading="lazy">
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p class="text-duo-img-offset__caption">Demi Bag</p>
+                        </div>
+
+                        <div class="text-duo-img-offset__figure">
+                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-d1.jpg?$staticlink$" alt="Asher Tote in Grano Leather" loading="lazy">
+                            <p class="text-duo-img-offset__caption">Asher Tote in Grano Leather</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+        <!-- 04 : feature2 (slider + text) -->
+        <div class="timeline-section timeline-section--feature">
+            <div class="timeline-feature2">
+                <div class="timeline-feature2__col timeline-feature2__col--slider">
+                    <div class="splide timeline-feature2__splide">
+                        <div class="splide__track">
+                            <ul class="splide__list">
+
+                                <!-- image slide -->
+                                <li class="splide__slide">
+                                    <img class="timeline-feature2__slide-img" src="images/20-years-on/20-years-on-e1.jpg?$staticlink$" alt="" loading="lazy">
+                                </li>
+
+                                <!-- video slide -->
+                                <li class="splide__slide">
+                                    <video class="timeline-feature2__slide-video" data-src="images/20-years-on/20-years-on-e2.mp4?$staticlink$" muted loop playsinline preload="none"></video>
+                                </li>
+
+                                <!-- image slide -->
+                                <li class="splide__slide">
+                                    <img class="timeline-feature2__slide-img" src="images/20-years-on/20-years-on-e3.jpg?$staticlink$" alt="" loading="lazy">
+                                </li>
+
+                                <!-- image slide -->
+                                <li class="splide__slide">
+                                    <img class="timeline-feature2__slide-img" src="images/20-years-on/20-years-on-e4.jpg?$staticlink$" alt="" loading="lazy">
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-feature2__col timeline-feature2__col--text">
+                    <p class="timeline-feature2__description">As PEDRO has moved into new cities and markets, stores have become places to experience the brand beyond the collections themselves. Collaborations have offered other ways of bringing people together, while working with a community of tastemakers has brought different perspectives along the way. These encounters have become part of the story, shaping the brand as much as the places it has grown into.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 05 : dual-stack (stacked pair + single) -->
+        <div class="timeline-section timeline-section--feature">
+            <section class="dual-stack-feature">
+                <div class="dual-stack-feature__col dual-stack-feature__col--stack">
+                    <div class="dual-stack-feature__item">
+                        <img class="dual-stack-feature__img" src="images/20-years-on/20-years-on-f1.jpg?$staticlink$" alt="Cambodia Sihanouk Store in 2014" loading="lazy">
+                        <p class="dual-stack-feature__caption">Cambodia Sihanouk Store in 2014.</p>
+                    </div>
+
+                    <div class="dual-stack-feature__item">
+                        <img class="dual-stack-feature__img" src="images/20-years-on/20-years-on-f2.jpg?$staticlink$" alt="Cambodia Sihanouk Store in 2025" loading="lazy">
+                        <p class="dual-stack-feature__caption">Cambodia Sihanouk Store in 2025.</p>
+                    </div>
+                </div>
+
+                <div class="dual-stack-feature__col dual-stack-feature__col--single">
+                    <div class="dual-stack-feature__item">
+                        <img class="dual-stack-feature__img" src="images/20-years-on/20-years-on-f3.jpg?$staticlink$" alt="Singapore Wisma Atria PEDRO Store in 2026" loading="lazy">
+                        <p class="dual-stack-feature__caption">Singapore Wisma Atria PEDRO Store in 2026.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 06 : feature3 (text + grid, dark) -->
+        <div class="timeline-section timeline-section--feature" data-icon-color="white">
+            <div class="timeline-feature3">
+                <div class="timeline-feature3__col timeline-feature3__col--text">
+                    <p class="timeline-feature3__description">
+                        There is still much to explore. The way we live continues to change, as do the materials we work with and the places we inhabit. We continue to look to these shifts for inspiration, bringing what we have learned into future collections and ways of working. The next chapter is not about leaving the past behind, but seeing where the same curiosity can take us next.
+                    </p>
+                    <div class="timeline-feature3__footer">
+                        <div class="timeline-feature3__footer-row">
+                            <a href="$url('Page-Show','cid','axxis-pattern-in-motion')$">
+                                <p class="timeline-feature3__footer-label">Chapter I</p>
+                            </a>
+                            <p class="timeline-feature3__footer-value">AXXIS</p>
+                        </div>
+                        <div class="timeline-feature3__footer-row">
+                            <p class="timeline-feature3__footer-label">Chapter II</p>
+                            <p class="timeline-feature3__footer-value">20 Years On</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-feature3__col timeline-feature3__col--grid">
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g1.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g2.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g3.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g4.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g5.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g6.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g7.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g8.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g9.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ----------------------------------------------------
+TIMELINE — MOBILE (11 split sections)
+---------------------------------------------------- -->
+
+<div class="timeline-container timeline-mobile" id="timelineContainer-mobile">
+
+    <div class="timeline-wrapper" id="timelineWrapper-mobile">
+
+        <!-- 01 : video -->
+        <div class="timeline-section">
+            <div class="video-media-container">
+                <video
+                class="hero-video"
+                data-src="images/20-years-on/20-years-on-a1_mobile.mp4?$staticlink$"
+                muted loop playsinline preload="none"
+                title="dialogue-ana-kras-video_mobile">
+                </video>
+                <button type="button" class="hero-video__sound-toggle is-muted" aria-pressed="false" aria-label="Unmute video">
+                    <svg class="hero-video__icon hero-video__icon--muted" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <path d="M3 10v4h4l5 5V5L7 10H3z" fill="currentColor"/>
+                        <line x1="16" y1="9" x2="22" y2="15" stroke="currentColor" stroke-width="2"/>
+                        <line x1="22" y1="9" x2="16" y2="15" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <svg class="hero-video__icon hero-video__icon--unmuted" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <path d="M3 10v4h4l5 5V5L7 10H3z" fill="currentColor"/>
+                        <path d="M15.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M18 6a9 9 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- 02a : feature1 text -->
+        <div class="timeline-section timeline-section--feature">
+            <div class="timeline-feature1 timeline-feature1--single">
+                <div class="timeline-feature1__col--text">
+                    <div class="timeline-feature1__top">
+                        <p class="timeline-feature1__label">A Point of View<br>From the Beginning</p>
+                    </div>
+                    <div class="timeline-feature1__bottom">
+                        <p class="timeline-feature1__description">
+                            PEDRO began in 2006 with a desire to bring a different perspective to everyday dressing. From the beginning, the emphasis was on pieces made with a little more thought, balancing fluid forms with details that gave them a distinct character. As the brand grew, this approach has continued to develop alongside the way we dress and live. The collections have changed over the years, but the interest in making the familiar feel new remains.
+                        </p>
+                        <p class="timeline-feature1__label">
+                            ( 2006 - 2026 )
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 02b : feature1 media -->
+        <div class="timeline-section timeline-section--feature">
+            <div class="timeline-feature1 timeline-feature1--single">
+                <div class="timeline-feature1__col--media">
+                    <video class="timeline-feature1__video" data-src="images/20-years-on/20-years-on-b1.mp4?$staticlink$" muted loop playsinline preload="none"></video>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 03a : text-duo left (text) -->
+        <div class="timeline-section">
+            <section class="text-duo-img-offset text-duo-img-offset--single">
+                <div class="text-duo-img-offset__col text-duo-img-offset__col--left">
+                    <p class="text-duo-img-offset__text">
+                        The way a piece looks often begins with what it is made from. Materials are chosen for the qualities they bring to a design, and the way they can change the character of a silhouette. As textiles and materials have expanded through the years, we continue to explore different ways of working with them, bringing different techniques into the process while keeping the focus on how the finished piece feels and wears.
+                    </p>
+                </div>
+            </section>
+        </div>
+
+        <!-- 03b : text-duo right (images) -->
+        <div class="timeline-section">
+            <section class="text-duo-img-offset text-duo-img-offset--single">
+                <div class="text-duo-img-offset__col text-duo-img-offset__col--right">
+                    <div class="text-duo-img-offset__images">
+                        <div class="text-duo-img-offset__figure text-duo-img-offset__figure--slider">
+                            <div class="splide text-duo-img-offset__splide">
+                                <div class="splide__track">
+                                    <ul class="splide__list">
+                                        <li class="splide__slide">
+                                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-c1.jpg?$staticlink$" alt="Demi Bag" loading="lazy">
+                                        </li>
+                                        <li class="splide__slide">
+                                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-c2.jpg?$staticlink$" alt="Demi Bag" loading="lazy">
+                                        </li>
+                                        <li class="splide__slide">
+                                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-c3.jpg?$staticlink$" alt="Demi Bag" loading="lazy">
+                                        </li>
+                                        <li class="splide__slide">
+                                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-c4.jpg?$staticlink$" alt="Demi Bag" loading="lazy">
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p class="text-duo-img-offset__caption">Demi Bag</p>
+                        </div>
+
+                        <div class="text-duo-img-offset__figure">
+                            <img class="text-duo-img-offset__img" src="images/20-years-on/20-years-on-d1.jpg?$staticlink$" alt="Asher Tote in Grano Leather" loading="lazy">
+                            <p class="text-duo-img-offset__caption">Asher Tote in Grano Leather</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+        <!-- 04a : feature2 slider -->
+        <div class="timeline-section timeline-section--feature" data-icon-color="white">
+            <div class="timeline-feature2 timeline-feature2--single">
+                <div class="timeline-feature2__col timeline-feature2__col--slider">
+                    <div class="splide timeline-feature2__splide">
+                        <div class="splide__track">
+                            <ul class="splide__list">
+
+                                <!-- image slide -->
+                                <li class="splide__slide">
+                                    <img class="timeline-feature2__slide-img" src="images/20-years-on/20-years-on-e1.jpg?$staticlink$" alt="" loading="lazy">
+                                </li>
+
+                                <!-- video slide -->
+                                <li class="splide__slide">
+                                    <video class="timeline-feature2__slide-video" data-src="images/20-years-on/20-years-on-e2.mp4?$staticlink$" muted loop playsinline preload="none"></video>
+                                </li>
+
+                                <!-- image slide -->
+                                <li class="splide__slide">
+                                    <img class="timeline-feature2__slide-img" src="images/20-years-on/20-years-on-e3.jpg?$staticlink$" alt="" loading="lazy">
+                                </li>
+
+                                <!-- image slide -->
+                                <li class="splide__slide">
+                                    <img class="timeline-feature2__slide-img" src="images/20-years-on/20-years-on-e4.jpg?$staticlink$" alt="" loading="lazy">
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 04b : feature2 text -->
+        <div class="timeline-section timeline-section--feature">
+            <div class="timeline-feature2 timeline-feature2--single">
+                <div class="timeline-feature2__col timeline-feature2__col--text">
+                    <p class="timeline-feature2__description">As PEDRO has moved into new cities and markets, stores have become places to experience the brand beyond the collections themselves. Collaborations have offered other ways of bringing people together, while working with a community of tastemakers has brought different perspectives along the way. These encounters have become part of the story, shaping the brand as much as the places it has grown into.</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 05a : dual-stack stacked pair -->
+        <div class="timeline-section timeline-section--feature">
+            <section class="dual-stack-feature dual-stack-feature--single">
+                <div class="dual-stack-feature__col dual-stack-feature__col--stack">
+                    <div class="dual-stack-feature__item">
+                        <img class="dual-stack-feature__img" src="images/20-years-on/20-years-on-f1.jpg?$staticlink$" alt="Cambodia Sihanouk Store in 2014" loading="lazy">
+                        <p class="dual-stack-feature__caption">Cambodia Sihanouk Store in 2014.</p>
+                    </div>
+
+                    <div class="dual-stack-feature__item">
+                        <img class="dual-stack-feature__img" src="images/20-years-on/20-years-on-f2.jpg?$staticlink$" alt="Cambodia Sihanouk Store in 2025" loading="lazy">
+                        <p class="dual-stack-feature__caption">Cambodia Sihanouk Store in 2025.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 05b : dual-stack single -->
+        <div class="timeline-section timeline-section--feature">
+            <section class="dual-stack-feature dual-stack-feature--single">
+                <div class="dual-stack-feature__col dual-stack-feature__col--single">
+                    <div class="dual-stack-feature__item">
+                        <img class="dual-stack-feature__img" src="images/20-years-on/20-years-on-f3.jpg?$staticlink$" alt="Singapore Wisma Atria PEDRO Store in 2026" loading="lazy">
+                        <p class="dual-stack-feature__caption">Singapore Wisma Atria PEDRO Store in 2026.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+        <!-- 06a : feature3 text -->
+        <div class="timeline-section timeline-section--feature" data-icon-color="white">
+            <div class="timeline-feature3 timeline-feature3--single">
+                <div class="timeline-feature3__col timeline-feature3__col--text">
+                    <p class="timeline-feature3__description">
+                        There is still much to explore. The way we live continues to change, as do the materials we work with and the places we inhabit. We continue to look to these shifts for inspiration, bringing what we have learned into future collections and ways of working. The next chapter is not about leaving the past behind, but seeing where the same curiosity can take us next.
+                    </p>
+                    <div class="timeline-feature3__footer">
+                        <div class="timeline-feature3__footer-row">
+                            <a href="$url('Page-Show','cid','axxis-pattern-in-motion')$">
+                                <p class="timeline-feature3__footer-label">Chapter I</p>
+                            </a>
+                            <p class="timeline-feature3__footer-value">AXXIS</p>
+                        </div>
+                        <div class="timeline-feature3__footer-row">
+                            <p class="timeline-feature3__footer-label">Chapter II</p>
+                            <p class="timeline-feature3__footer-value">20 Years On</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 06b : feature3 grid -->
+        <div class="timeline-section timeline-section--feature" data-icon-color="white">
+            <div class="timeline-feature3 timeline-feature3--single">
+                <div class="timeline-feature3__col timeline-feature3__col--grid">
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g1.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g2.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g3.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g4.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g5.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g6.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g7.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g8.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                    <figure class="timeline-feature3__grid-item">
+                        <img class="timeline-feature3__grid-img" src="images/20-years-on/20-years-on-g9.jpg?$staticlink$" alt="" loading="lazy">
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PROGRESS BAR (shared — only the visible timeline drives it) -->
+<div class="progress">
+    <div class="progress-fill" id="progressFill"></div>
+</div>
+
+
+<script>
+(function () {
+
+    const progressFill = document.getElementById('progressFill');
+    const header = document.querySelector('.page_header');
+
+    function setupTimeline(containerId) {
+
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const sections = container.querySelectorAll('.timeline-wrapper > .timeline-section');
+
+        function isActive() {
+            // display:none containers (the hidden mobile/desktop variant)
+            // have no offsetParent, so their stale scroll state is ignored.
+            return container.offsetParent !== null;
+        }
+
+
+        /* ----------------------------------------
+        LAZY-LOAD VIDEOS (only for the visible variant —
+        the hidden desktop/mobile variant never fetches its videos)
+        ---------------------------------------- */
+
+        function loadActiveVideos() {
+
+            if (!isActive()) return;
+
+            container.querySelectorAll('video[data-src]').forEach((video) => {
+
+                video.src = video.dataset.src;
+                video.removeAttribute('data-src');
+                video.load();
+                video.play().catch(() => {});
+
+            });
+
+        }
+
+        loadActiveVideos();
+
+        // in case the viewport crosses the 768px breakpoint after load
+        window.addEventListener('resize', loadActiveVideos);
+
+
+        /* ----------------------------------------
+        WHEEL → HORIZONTAL SCROLL
+        ---------------------------------------- */
+
+        container.addEventListener('wheel', (e) => {
+
+            if (e.deltaY !== 0) {
+
+                e.preventDefault();
+
+                container.scrollLeft += e.deltaY;
+
+            }
+
+        }, { passive: false });
+
+
+        /* ----------------------------------------
+        DRAG → HORIZONTAL SCROLL
+        ---------------------------------------- */
+
+        let isDown = false;
+        let startX = 0;
+        let startScroll = 0;
+
+
+        container.addEventListener('mousedown', (e) => {
+
+            if (e.target.closest('.splide') || e.target.closest('.hero-video__sound-toggle')) return;
+
+            isDown = true;
+
+            document.body.classList.add('grabbing');
+
+            startX = e.clientX;
+
+            startScroll = container.scrollLeft;
+
+        });
+
+
+        window.addEventListener('mousemove', (e) => {
+
+            if (!isDown) return;
+
+            container.scrollLeft =
+                startScroll - (e.clientX - startX);
+
+        });
+
+
+        window.addEventListener('mouseup', () => {
+
+            isDown = false;
+
+            document.body.classList.remove('grabbing');
+
+        });
+
+
+        /* ----------------------------------------
+        PROGRESS BAR
+        ---------------------------------------- */
+
+        function updateProgress() {
+
+            if (!isActive()) return;
+
+            const max =
+                container.scrollWidth - container.clientWidth;
+
+            const pct =
+                max > 0
+                    ? (container.scrollLeft / max) * 100
+                    : 0;
+
+            progressFill.style.width = pct + '%';
+
+        }
+
+
+        container.addEventListener('scroll', updateProgress);
+
+        window.addEventListener('resize', updateProgress);
+
+
+        updateProgress();
+
+        /* ----------------------------------------
+        ICON COLOR PER SECTION
+        ---------------------------------------- */
+
+        function updateIconColor() {
+
+            if (!isActive()) return;
+
+            const index = Math.round(container.scrollLeft / container.clientWidth);
+
+            const activeSection = sections[index];
+
+            if (activeSection && activeSection.dataset.iconColor === 'white') {
+                header.classList.add('icons-white');
+            } else {
+                header.classList.remove('icons-white');
+            }
+
+        }
+
+        container.addEventListener('scroll', updateIconColor);
+        window.addEventListener('resize', updateIconColor);
+
+        updateIconColor();
+
+    }
+
+    setupTimeline('timelineContainer-desktop');
+    setupTimeline('timelineContainer-mobile');
+
+
+    /* ----------------------------------------
+    HERO VIDEO SOUND — browsers block autoplay
+    with audio, so it starts muted. It only ever
+    unmutes when the visitor presses the button.
+    ---------------------------------------- */
+
+    document.querySelectorAll('.video-media-container').forEach((mediaContainer) => {
+
+        const video = mediaContainer.querySelector('.hero-video');
+        const toggle = mediaContainer.querySelector('.hero-video__sound-toggle');
+
+        if (!video || !toggle) return;
+
+        video.volume = 0.5; // 0 (silent) – 1 (full volume)
+
+        function syncToggle() {
+            toggle.classList.toggle('is-muted', video.muted);
+            toggle.setAttribute('aria-pressed', String(!video.muted));
+            toggle.setAttribute('aria-label', video.muted ? 'Unmute video' : 'Mute video');
+        }
+
+        toggle.addEventListener('click', () => {
+            video.muted = !video.muted;
+        });
+
+        // catches mute changes from anywhere — the button above,
+        // or the first-interaction auto-unmute below
+        video.addEventListener('volumechange', syncToggle);
+
+        syncToggle();
+
+    });
+
+})();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.timeline-feature2__splide').forEach(function (el) {
+        new Splide(el, {
+            type: 'loop',
+            perPage: 1,
+            arrows: false,
+            pagination: false,
+            drag: true,
+            autoScroll: {
+                speed: 1,
+                pauseOnHover: true,
+                pauseOnFocus: false
+            }
+        }).mount({ AutoScroll: window.splide.Extensions.AutoScroll });
+    });
+});
+</script>
+
+<!-- force transparent header -->
+<script>
+(function () {
+  var header = document.querySelector('.page_header');
+  if (!header) return;
+
+  function forceThemeLight() {
+    if (!header.classList.contains('theme_light')) {
+      header.classList.add('theme_light');
+    }
+  }
+
+  forceThemeLight();
+
+  var observer = new MutationObserver(forceThemeLight);
+  observer.observe(header, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.text-duo-img-offset__splide').forEach(function (el) {
+        new Splide(el, {
+            type: 'loop',
+            perPage: 1,
+            arrows: false,
+            pagination: false,
+            drag: true,
+            autoScroll: {
+                speed: 1,
+                pauseOnHover: true,
+                pauseOnFocus: false
+            }
+        }).mount({ AutoScroll: window.splide.Extensions.AutoScroll });
+    });
+});
+</script>
+
+<div class="cursor-follower"></div>
+
+<script>
+(function () {
+  // Only activate on devices that actually have a mouse/fine pointer
+  if (!window.matchMedia('(min-width: 1023px) and (pointer: fine)').matches) {
+    return;
+  }
+
+  const follower = document.querySelector('.cursor-follower');
+  if (!follower) return;
+
+  document.addEventListener('mousemove', (e) => {
+    follower.style.left = `${e.clientX - 16}px`;
+    follower.style.top = `${e.clientY - 16}px`;
+  });
+})();
+</script>
+
+</body>
+
+</html>

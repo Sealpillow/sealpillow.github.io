@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<script src="https://player.vimeo.com/api/player.js"></script>
+
+<style>
+
+/* ----------------------------------------------------
+GLOBAL RESET & BASE
+---------------------------------------------------- */
+body,
+html {
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+    /*background-color: #e8e8e8;*/
+    height:auto; /* make the pedro banner visible at the top when scrolling*/
+}
+.page.parallax {
+    padding-top: 0px !important;
+}
+
+
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+
+/* Force icons to be black */
+.theme_light .menu-group .theme_color, .theme_light .page_header-left .theme_color, .theme_light .page_header-right .theme_color {
+  color: black;
+}
+
+/* theme_light present -> black logo instead */
+.page_header.theme_light .logo_static img.logo-white {
+    display: none !important;
+}
+.page_header.theme_light .logo_static img.logo-black {
+    display: inline-block !important;
+}
+
+/* Img Wrap */
+.img-wrap {
+  display: block;
+  width: 50%;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Img Wrap > Img */
+.img-wrap img {
+    display: block;
+    height: auto;
+    object-fit: cover;
+    width: 100%;
+    margin: 0 auto;
+}
+@media (max-width: 768px) {
+    .img-wrap img {
+        width: 100%;
+    }
+}
+
+/* Img Wrap */
+.img-wrap-2 {
+  display: block;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Img Wrap > Img */
+.img-wrap-2 img {
+    display: block;
+    height: auto;
+    object-fit: cover;
+    width: 100%;
+    margin: 0 auto;
+}
+
+
+.middle-image-container{
+  display: block;
+  margin: 0px auto 0px 33.5%;
+  width: 55%;
+}
+
+.middle-image-container2,
+.middle-image-container3{
+  display: block;
+  margin: 0px auto;
+  width: 33%;
+}
+/* Middle Image */
+.middle-image {
+  width: 100%;
+}
+
+/* Middle Caption */
+.middle-caption {
+  font-size: 14px;
+  margin: 30px auto 0;
+  text-align: center;
+  width: 60%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Middle Image > Middle Caption */
+   .middle-image-container2{
+    width: 90%;
+  }
+  .middle-image-container,
+    .middle-image-container3{
+    width: 100%;
+    margin:0;
+  }
+}
+
+.qna{
+    margin: 75px 0px;
+}
+.question-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* Q | Question | Empty */
+    gap: 16px;
+    align-items: start;
+    margin: 0 auto 25px;
+}
+.q-label {
+    justify-self: end;   /* pushes Q to the right side of its grid column */
+    padding-right: 20%;
+}
+
+.question-text {
+    width: 49%;
+    justify-self: end;
+    font-weight: 500;
+}
+.answer-row {
+    width: 33%;
+    margin: 0 auto;
+    font-weight: 400;
+}
+@media (max-width: 768px) {
+    .question-row {
+        grid-template-columns: auto 1fr;
+        width: 90%;
+        margin: 0 auto 50px;
+    }
+    .q-label {
+        padding: 0;
+    }
+    .empty-column {
+        display: none; /* Remove 3rd column */
+    }
+    .answer-row {
+        width: 90%;
+    }
+}
+
+/* Pair Container > Img */
+.stack-container img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Pair Container > A */
+.stack-container a {
+  display: block;
+  width: 100%;
+}
+
+/* Pair Container */
+.stack-container {
+  display: grid;
+  gap: 15px;
+  margin: 0 auto;
+  width: 33%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Pair Container */
+  .stack-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 90%;
+  }
+
+  /* Pair Container > Img > A */
+  .stack-container img,
+  .stack-container a {
+    width: 100%;
+  }
+
+  /* Pair Container > A */
+  .stack-container a {
+    width: 100%;
+  }
+
+  /* Pair Container > A > Last Child */
+  .stack-container a:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Pair Container > Img > First Child */
+  .stack-container img:first-child {
+    order: 2;
+  }
+
+  /* Pair Container > Img > Last Child */
+  .stack-container img:last-child {
+    order: 1;
+  }
+}
+
+
+/* Pair Container > Img */
+.pair-container img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Pair Container > A */
+.pair-container a {
+  display: block;
+  width: 100%;
+}
+
+/* Pair Container */
+.pair-container {
+  display: flex;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Mobile — max-width: 768px */
+@media (max-width: 768px) {
+  /* Pair Container */
+  .pair-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* Pair Container > Img > A */
+  .pair-container img,
+  .pair-container a {
+    width: 100%;
+  }
+
+
+  /* Pair Container > Img > First Child */
+  .pair-container img:first-child {
+    order: 2;
+  }
+
+  /* Pair Container > Img > Last Child */
+  .pair-container img:last-child {
+    order: 1;
+  }
+}
+
+.flexi-col-image2 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+}
+.flexi-col-image-right2 a,
+.flexi-col-image-left2 a {
+    display: block;
+    width: 100%;
+}
+.flexi-col-image-left2 {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .flexi-col-image2 {
+        display: grid;
+        grid-template-rows: 0.5fr 0.5fr;
+        grid-template-columns: none;
+    }
+    .flexi-col-image-right2 {
+        order: 1;
+        width: 60%;
+        margin-left: auto;
+    }
+    .flexi-col-image-left2 {
+        width: 100%;
+        order: 2;
+    }
+}
+
+.img-shift-left {
+    width: 66.5%;
+    margin: 0px 0 50px auto;
+}
+
+/* Holds the 2 images */
+.img-shift-left__images {
+    display: flex;
+    gap: 10px;
+}
+
+.img-shift-left__link {
+    display: block;
+    width: 50%;
+}
+
+.img-shift-left__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.img-shift-left__caption {
+    margin: 12px 0 0;
+    font-family: proxima-nova, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    left: 50%;
+    position: relative;
+    color: #1a1a1a;
+}
+
+
+@media (max-width: 767px) {
+    .img-shift-left {
+        width: 100%;
+        margin: 50px auto;
+    }
+
+    .img-shift-left__images {
+        flex-direction: column;
+    }
+    .img-shift-left__link,
+    .img-shift-left__text {
+        width: 90%;
+        margin: 0 auto;
+    }
+}
+
+.end-text {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.end-text__title {
+  font-family: "aktiv-grotesk-extended";
+  font-size: 16px;
+  margin-bottom: 40px;
+}
+
+.end-text__items {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.end-text__item {
+  font-family: "aktiv-grotesk-extended";
+  font-size: 16px;
+}
+
+
+
+/* Publish content footer */
+.publish-content {
+padding-bottom: 50px;
+padding-left: 40px;
+}
+
+.publish-content__text {
+font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+
+<div class="img-wrap js-vertical-slider">
+  <a class="js-shop-the-collection" data-pid="PW2-15210024_SAN.NU,PW1-66600029_BLACK" href="$url('Product-Show','pid','PW2-15210024_SAN.NU')$">
+        <picture>
+            <img class="d-md-block d-none" src="images/a-gentle-rhythm/kol-camilla-a1.webp?$staticlink$" />
+            <img class="d-block d-md-none" src="images/a-gentle-rhythm/kol-camilla-a1.webp?$staticlink$" />
+        </picture>
+    </a>
+</div>
+
+<section class="main-title-text text-center" style="margin: 50px 0px;">
+
+    <p class="mb-0 p-0" style="font-family:'Source Serif 4'; font-size:25px; width:100%; margin: 0 auto; text-align: center;">
+       Camilla Deterre
+    </p>
+
+    <p class="mb-0" style="font-family: aktiv-grotesk-extended; font-size:50px; width: 100%; margin: 0 auto; text-align: center; line-height: 55px;">
+        A Gentle Rhythm
+    </p>
+    <p class="mb-0 p-0" style="font-family: 'Source Serif 4'; font-size:12px; width:100%; margin: 0 auto; text-align: center; margin-top: 50px;">
+        <a href="https://www.instagram.com/camilladeterre/">
+            @camilladeterre
+        </a>
+    </p>
+</section>
+
+
+<section class="text-center" style="margin-bottom: 50px;">
+    <!-- Desktop Version -->
+    <p class="d-none d-lg-block" style="font-family: proxima-nova; font-size:25px; width: 33%; margin: 0 auto; text-align: left; line-height:normal; margin-bottom: 50px;">
+        The environments we build inevitably shape the way we see and create. For Camilla Deterre, that relationship has developed naturally across photography, modelling and design, with each experience informing the next. For Fall 2026, the model-designer reflects on the different paths her work has taken, and how her creative perspective has evolved along the way.
+    </p>
+    <!-- Mobile Version -->
+    <p class="d-block d-lg-none" style="font-family: proxima-nova; font-size:25px; width: 90%; margin: 0 auto; text-align: left; line-height:normal; margin-bottom: 50px">
+        The environments we build inevitably shape the way we see and create. For Camilla Deterre, that relationship has developed naturally across photography, modelling and design, with each experience informing the next. For Fall 2026, the model-designer reflects on the different paths her work has taken, and how her creative perspective has evolved along the way.
+    </p>
+    <p class="d-none d-lg-block" style="font-family: proxima-nova; font-size:16px; width: 33%; margin: 0 auto; text-align: left; line-height:normal;">
+        Born and raised in New York, Camilla initially made her mark in front of the lens as a model while cultivating an interest in visual form and photography. Her work later expanded into interior design, with projects including the mid-century-inspired Primo’s at The Frederick Hotel in Tribeca and the nostalgic Mimi in the West Village.
+    </p>
+    <!-- Mobile Version -->
+    <p class="d-block d-lg-none" style="font-family: proxima-nova; font-size:16px; width: 90%; margin: 0 auto; text-align: left; line-height:normal;">
+        Born and raised in New York, Camilla initially made her mark in front of the lens as a model while cultivating an interest in visual form and photography. Her work later expanded into interior design, with projects including the mid-century-inspired Primo’s at The Frederick Hotel in Tribeca and the nostalgic Mimi in the West Village.
+    </p>
+</section>
+
+
+
+
+<div class="middle-image-container">
+  <a class="js-shop-the-collection" data-pid="PW2-15210024_SAN.NU" href="$url('Product-Show','pid','PW2-15210024_SAN.NU')$">
+    <img 
+        src="images/a-gentle-rhythm/kol-camilla-b1.webp?$staticlink$" 
+      class="middle-image">
+  </a>
+</div>
+
+<!-- qna --> 
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            You started in modelling and photography before establishing your own design practice. 
+            How did moving between these disciplines shape your overall approach to creative projects?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>
+            I mostly move intuitively between the two worlds and do things based on how they 
+            make me feel. There is more tangible control in design, which I appreciate. 
+            The more experience I've gained across different disciplines, 
+            the more confident I feel in each.
+        </p>
+    </div>
+</section>
+
+
+<div class="img-wrap-2 js-vertical-slider">
+    <a class="js-shop-the-collection" data-pid="PW2-75210196_BLACK,PW1-45580022_BLACK" href="$url('Product-Show','pid','PW2-75210196_BLACK')$">
+        <picture>
+            <img class="d-md-block d-none" src="images/a-gentle-rhythm/kol-camilla-c1.webp?$staticlink$" />
+            <img class="d-block d-md-none" src="images/a-gentle-rhythm/kol-camilla-c1.webp?$staticlink$" />
+        </picture>
+    </a>
+</div>
+
+
+<!-- qna --> 
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+           Many people feel pressure to follow a linear career path. 
+           Looking back, did you always know where you were headed, 
+           or did you simply follow what interested you along the way?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>
+            I've always been hesitant to subscribe to a single path because things 
+            begin to feel mundane when they become too formulaic. I don't really 
+            know where I’m headed, but for the most part, I enjoy the unknown.
+        </p>
+    </div>
+</section>
+
+
+
+<div class="stack-container">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source srcset="images/a-gentle-rhythm/kol-camilla-d1.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/a-gentle-rhythm/kol-camilla-d1.webp?$staticlink$" alt="Bag">
+      </picture>
+
+    <a class="js-shop-the-collection" data-pid="PW2-75210194_DAR.CA" href="$url('Product-Show','pid','PW2-75210194_DAR.CA')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source srcset="images/a-gentle-rhythm/kol-camilla-e1.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/a-gentle-rhythm/kol-camilla-e1.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+<!-- qna --> 
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            Every creative medium operates on a different clock. 
+            Modelling can be fast and immediate, while spatial projects 
+            can take months or years. How has moving between these different 
+            rhythms changed the way you approach your own process?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>
+            I do get a bit impatient with the pacing of some design projects, 
+            as I tend to move on from my ideas relatively quickly. But ultimately, 
+            it’s a good practice to apply the rhythm and timeframe of one to the 
+            other. It's a "take your time, but don't overthink it" kind of mantra.
+        </p>
+    </div>
+</section>
+
+
+<div class="pair-container">
+    <a class="js-shop-the-collection" data-pid="PW2-75210196-1_MULTI" href="$url('Product-Show','pid','PW2-75210196-1_MULTI')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source srcset="images/a-gentle-rhythm/kol-camilla-f1.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/a-gentle-rhythm/kol-camilla-f1.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+    <a class="js-shop-the-collection" data-pid="PW1-16480018_DAR.CA" href="$url('Product-Show','pid','PW1-16480018_DAR.CA')$">
+      <picture>
+        <!-- Mobile version (smaller image) -->
+        <source srcset="images/a-gentle-rhythm/kol-camilla-f2.webp?$staticlink$" alt="Bag" media="(max-width: 768px)">
+        <!-- Web version (larger image) -->
+        <img src="images/a-gentle-rhythm/kol-camilla-f2.webp?$staticlink$" alt="Bag">
+      </picture>
+    </a>
+</div>
+
+<!-- qna --> 
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            How much does your environment influence the way you think and work? 
+            Has a particular place ever changed the way you see the world?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>
+            My environment influences everything. I am pretty calibrated to the 
+            New York perspective of observation. It is definitely the place where 
+            I feel most aligned, and it affects my thoughts the most. I've travelled
+            quite a bit through modelling, but I don't know if there is a particular
+            place that has changed me so much as every place existing in contrast to 
+            New York.
+        </p>
+    </div>
+</section>
+
+<div class="middle-image-container2">
+  <a class="js-shop-the-collection" data-pid="PW2-75210196_BLACK" href="$url('Product-Show','pid','PW2-75210196_BLACK')$">
+    <img 
+      src="images/a-gentle-rhythm/kol-camilla-g1.webp?$staticlink$" 
+      class="middle-image">
+  </a>
+</div>
+
+<section class="d-block">
+  <div class="position-relative text-center" style="margin: 100px 0px">
+    <!-- Desktop Description -->
+      <p class="mb-0 d-md-block d-none" style="font-family:'Source Serif 4'; font-size:20px; width:33%; margin: 0 auto; text-align: center;">
+        "I've always been hesitant to subscribe to a single path because things begin to feel mundane when they become too formulaic."
+      </p>
+
+      <!-- Mobile Description -->
+      <p class="mb-0 d-block d-md-none" style="font-family:'Source Serif 4'; font-size:20px; width:90%; margin: 0 auto; text-align: center;">
+        "I've always been hesitant to subscribe to a single path because things begin to feel mundane when they become too formulaic."
+      </p>  
+  </div>
+</section>
+
+<div class="flexi-col-image2" style="width: 100%; margin-bottom: 50px;">
+    <!-- Left side: larger image -->
+    <div class="flexi-col-image-left2" style="display: grid; grid-template-columns: 1fr;">
+        <a class="js-shop-the-collection" data-pid="PW2-75210194_DAR.CA" href="$url('Product-Show','pid','PW2-75210194_DAR.CA')$">
+            <picture>
+                <source srcset="images/a-gentle-rhythm/kol-camilla-h1.webp?$staticlink$" media="(min-width: 768px)">
+                <img src="images/a-gentle-rhythm/kol-camilla-h1.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>
+    </div>
+
+    <!-- Right side: smaller image -->
+    <div class="flexi-col-image-right2">
+        <a class="js-shop-the-collection" data-pid="PW2-75210194_DAR.CA" href="$url('Product-Show','pid','PW2-75210194_DAR.CA')$">
+            <picture>
+                <source srcset="images/a-gentle-rhythm/kol-camilla-h2.webp?$staticlink$" media="(min-width: 768px)">
+                <img src="images/a-gentle-rhythm/kol-camilla-h2.webp?$staticlink$" alt="Shoes on white background" style="width: 100%; object-fit: cover;">
+            </picture>
+        </a>
+    </div>
+</div>
+
+
+
+<!-- qna --> 
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            New York has been a constant backdrop throughout your life and work. 
+            What has living there given you as a creative?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>
+            New York is busy and frenetic. As much as I appreciate the beauty of 
+            stillness and nature, it’s definitely within the city's chaos that I 
+            feel most engaged and excited.
+        </p>
+    </div>
+</section>
+
+
+
+
+<section class="img-shift-left">
+
+    <div class="img-shift-left__images">
+        <!-- IMAGE 1 -->
+        <a class="img-shift-left__link js-shop-the-collection"data-pid="PW2-15210024_SAN.NU" href="$url('Product-Show','pid','PW2-15210024_SAN.NU')$">
+            <picture>
+                <source srcset="images/a-gentle-rhythm/kol-camilla-i1.webp?$staticlink$" media="(min-width: 768px)" >
+                <img class="img-shift-left__img" src="images/a-gentle-rhythm/kol-camilla-i1.webp?$staticlink$" alt="Hybrix Leather Derby Shoes" >
+            </picture>
+        </a>
+        <!-- IMAGE 2 -->
+        <a class="img-shift-left__link js-shop-the-collection"data-pid="PW2-75210196-1_MULTI,PW1-45580022_BLACK" href="$url('Product-Show','pid','PW2-75210196-1_MULTI')$">
+            <picture>
+                <source srcset="images/a-gentle-rhythm/kol-camilla-i2.webp?$staticlink$" media="(min-width: 768px)" >
+                <img class="img-shift-left__img" src="images/a-gentle-rhythm/kol-camilla-i2.webp?$staticlink$" alt="Hybrix Leather Derby Shoes">
+            </picture>
+        </a>
+    </div>
+
+</section>
+
+
+<!-- qna --> 
+<section class="qna">
+    <div class="question-row">
+        <div class="q-label">Q:</div>
+        <div class="question-text">
+            As your work continues to evolve, what are you most curious to explore next?
+        </div>
+        <div class="empty-column"></div>
+    </div>
+    <div class="answer-row">
+        <p>
+            Moving images. Video work and film feel like the next natural exploration.
+        </p>
+    </div>
+</section>
+
+
+
+<div class="middle-image-container3">
+  <a class="js-shop-the-collection" data-pid="PW2-75210196_BLACK,PW1-66210006-1_DK.BRW" href="$url('Product-Show','pid','PW2-75210196_BLACK')$">
+    <img 
+      src="images/a-gentle-rhythm/kol-camilla-j1.webp?$staticlink$" 
+      class="middle-image">
+  </a>
+</div>
+
+
+<section class="end-text">
+  <p class="end-text__title">Discover Our Design Philosophy</p>
+
+  <div class="end-text__items">
+    <a href="$url('Page-Show', 'cid', 'design-philosophy-jatte')$" class="end-text__item">Jatte</a>
+    <a href="$url('Page-Show', 'cid', 'design-philosophy-mirelle')$" class="end-text__item">Mirelle Shoulder Bag</a>
+  </div>
+</section>
+
+<!-- Publish Content -->
+<div class="publish-content">
+    <span class="publish-content__text">
+        Published on 7 September 2026
+        <br><br>
+        <a href="$url('Search-Show','cgid','pwnewarrivals')$">
+            SHOP WOMEN'S NEW ARRIVALS
+        </a> &gt;
+        <br>
+        <a href="$url('Search-Show','cgid','pmnewarrivals')$">
+            SHOP MEN'S NEW ARRIVALS
+        </a> &gt;
+    </span>
+</div>
+
+</body>
+
+</html>
+
