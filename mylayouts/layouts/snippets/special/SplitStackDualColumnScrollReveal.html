@@ -1,0 +1,156 @@
+<style>
+  /* ----------------------------------------------------
+  SPLIT STACK (grid)
+  Two columns, any number of scroll steps. Every panel is either an
+  image or text, and is placed by modifiers:
+
+    --left / --right     which column
+    --row-N              the scroll step it arrives on (1 = first)
+
+  Each panel's grid area runs from its row to the END of the grid, and
+  the panel is sticky inside that area. So it stays pinned until a
+  later panel in the same column slides up and covers it. A column
+  with no new panel on a step simply keeps showing what it has.
+
+    - change left only  -> add a --left panel on that row
+    - change right only -> add a --right panel on that row
+    - change both       -> add one of each on that row
+
+  Text panels slide in exactly like image panels: the new text panel
+  rises from the bottom of its column and covers the previous one.
+
+  Set the wrapper's --steps-N to the total number of steps.
+  Every step needs at least one new panel, and row 1 needs both sides.
+
+  Keep panels in the HTML in step order (row 1 left, row 1 right,
+  row 2 ...) — mobile uses that order as a single-column stack.
+
+  Never put overflow: hidden on .split-stack — it breaks sticky.
+  ---------------------------------------------------- */
+  .split-stack {
+    background: white;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    z-index: 2;
+  }
+
+  .split-stack--steps-2 { grid-template-rows: repeat(2, 100vh); grid-template-rows: repeat(2, 100svh); }
+  .split-stack--steps-3 { grid-template-rows: repeat(3, 100vh); grid-template-rows: repeat(3, 100svh); }
+  .split-stack--steps-4 { grid-template-rows: repeat(4, 100vh); grid-template-rows: repeat(4, 100svh); }
+  .split-stack--steps-5 { grid-template-rows: repeat(5, 100vh); grid-template-rows: repeat(5, 100svh); }
+  .split-stack--steps-6 { grid-template-rows: repeat(6, 100vh); grid-template-rows: repeat(6, 100svh); }
+
+  .split-stack__panel {
+    align-self: start;
+    background: white;
+    grid-row-end: -1;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+    position: sticky;
+    top: 0;
+  }
+
+  .split-stack__panel--left  { grid-column: 1; }
+  .split-stack__panel--right { grid-column: 2; }
+
+  .split-stack__panel--row-1 { grid-row-start: 1; z-index: 1; }
+  .split-stack__panel--row-2 { grid-row-start: 2; z-index: 2; }
+  .split-stack__panel--row-3 { grid-row-start: 3; z-index: 3; }
+  .split-stack__panel--row-4 { grid-row-start: 4; z-index: 4; }
+  .split-stack__panel--row-5 { grid-row-start: 5; z-index: 5; }
+  .split-stack__panel--row-6 { grid-row-start: 6; z-index: 6; }
+
+  /* Image panel */
+  .split-stack__img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  /* Text panel */
+  .split-stack__panel--text {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  .split-stack__copy {
+    box-sizing: content-box;
+    color: black;
+    font-family: proxima-nova;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: normal;
+    margin: 0;
+    max-width: 400px;
+    padding: 0 10%;
+    text-align: left;
+  }
+
+  /* Mobile: one column, every panel becomes its own full-screen slide
+    in HTML order, still stacking over the previous one. */
+  @media (max-width: 767px) {
+    .split-stack {
+      display: block;
+    }
+
+    .split-stack__copy {
+      max-width: none;
+      padding: 0 6%;
+    }
+  }
+</style>
+
+<!-- 6 scroll steps, one example of each variation -->
+<section class="split-stack split-stack--steps-6">
+
+  <!-- Step 1: START (image left, text right) -->
+  <div class="split-stack__panel split-stack__panel--left split-stack__panel--row-1 split-stack__panel--image">
+    <img class="split-stack__img" src="../../media/portrait-1.jpg" alt="" loading="lazy">
+  </div>
+  <div class="split-stack__panel split-stack__panel--right split-stack__panel--row-1 split-stack__panel--text">
+    <p class="split-stack__copy">
+      Opening copy for the first step — the image on the left and this text
+      arrive together as the section comes into view.
+    </p>
+  </div>
+
+  <!-- Step 2: RIGHT TEXT changes, left image stays -->
+  <div class="split-stack__panel split-stack__panel--right split-stack__panel--row-2 split-stack__panel--text">
+    <p class="split-stack__copy">
+      The right column now shows new copy while the left image keeps its
+      position, since no new left panel arrives on this step.
+    </p>
+  </div>
+
+  <!-- Step 3: LEFT IMAGE changes, right text stays -->
+  <div class="split-stack__panel split-stack__panel--left split-stack__panel--row-3 split-stack__panel--image">
+    <img class="split-stack__img" src="../../media/portrait-2.jpg" alt="" loading="lazy">
+  </div>
+
+  <!-- Step 4: RIGHT IMAGE changes (text -> image), left image stays -->
+  <div class="split-stack__panel split-stack__panel--right split-stack__panel--row-4 split-stack__panel--image">
+    <img class="split-stack__img" src="../../media/landscape-1.jpg" alt="" loading="lazy">
+  </div>
+
+  <!-- Step 5: LEFT TEXT changes (image -> text), right image stays -->
+  <div class="split-stack__panel split-stack__panel--left split-stack__panel--row-5 split-stack__panel--text">
+    <p class="split-stack__copy">
+      The left column can switch from image to text too — any panel type can
+      follow any other, on either side.
+    </p>
+  </div>
+
+  <!-- Step 6: BOTH change together (image left, text right) -->
+  <div class="split-stack__panel split-stack__panel--left split-stack__panel--row-6 split-stack__panel--image">
+    <img class="split-stack__img" src="../../media/landscape-2.jpg" alt="" loading="lazy">
+  </div>
+  <div class="split-stack__panel split-stack__panel--right split-stack__panel--row-6 split-stack__panel--text">
+    <p class="split-stack__copy">
+      Closing copy for the final step, arriving alongside the last image.
+    </p>
+  </div>
+
+</section>

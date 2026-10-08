@@ -1,0 +1,231 @@
+<style>
+  .editorial-grid {
+    --eg-text: #000;
+    --eg-muted: #333;
+    --eg-center: 460px;
+    --eg-gap: 64px;
+    --eg-sticky-top: 40px;
+    padding: 40px 24px 0;
+    color: var(--eg-text);
+    background: #fff;
+  }
+
+  .editorial-grid__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--eg-center)) minmax(0, 1fr);
+    grid-template-areas:
+      ".     intro aside"
+      "label body  aside"
+      ".     media aside";
+    column-gap: var(--eg-gap);
+    max-width: 1440px;
+    margin: 0 auto;
+    clip-path: inset(0);
+  }
+
+  /* Heading */
+  .editorial-grid__heading {
+    grid-area: heading;
+    margin: 0 0 18px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+  /* Body */
+  .editorial-grid__body {
+    grid-area: body;
+    max-width: 310px;
+    margin-bottom: 70px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--eg-muted);
+  }
+
+  .editorial-grid__body p {
+    margin: 0 0 14px;
+  }
+
+  .editorial-grid__body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .editorial-grid__body--more {
+    grid-area: more;
+    margin: 70px 0 0;
+  }
+
+  /* Centre image */
+  .editorial-grid__media {
+    grid-area: media;
+    margin: 0;
+  }
+
+  .editorial-grid__media-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Sticky aside */
+  .editorial-grid__aside {
+    grid-area: aside;
+    align-self: stretch;
+    margin-bottom: -100vh;
+  }
+
+  .editorial-grid__sticky {
+    position: sticky;
+    top: var(--eg-sticky-top);
+    width: 100%;
+    max-width: 180px;
+    margin: 0;
+  }
+
+  .editorial-grid__sticky-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .editorial-grid__caption {
+    margin: 8px 0 0;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 8px;
+    line-height: 1.4;
+    color: var(--eg-muted);
+  }
+
+  /* Heading variant: centred column, sticky aside running from the image down.
+     Uses CSS subgrid so the sticky block can sit bottom-aligned to the image,
+     then stick as you scroll, without needing fixed row heights. */
+  .editorial-grid--heading {
+    padding-top: 120px;
+    padding-bottom: 80px;
+  }
+
+  .editorial-grid--heading .editorial-grid__grid {
+    grid-template-areas:
+      ".     heading ."
+      ".     body    ."
+      ".     media   aside"
+      ".     more    aside";
+  }
+
+  .editorial-grid--heading .editorial-grid__aside {
+    display: grid;
+    grid-template-rows: subgrid;
+  }
+
+  .editorial-grid--heading .editorial-grid__sticky {
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .editorial-grid--heading .editorial-grid__body {
+    max-width: 300px;
+  }
+
+  /* Tablet */
+  @media (max-width: 991.98px) {
+    .editorial-grid {
+      --eg-center: 420px;
+      --eg-gap: 32px;
+    }
+
+    .editorial-grid__sticky {
+      max-width: 160px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 767.98px) {
+    .editorial-grid__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "intro"
+        "label"
+        "body"
+        "aside"
+        "media";
+      clip-path: none;
+    }
+
+    .editorial-grid--heading {
+      padding-top: 56px;
+      padding-bottom: 56px;
+    }
+
+    .editorial-grid--heading .editorial-grid__grid {
+      grid-template-areas:
+        "heading"
+        "body"
+        "media"
+        "aside"
+        "more";
+    }
+
+    .editorial-grid__body {
+      max-width: none;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .editorial-grid--heading .editorial-grid__body {
+      max-width: none;
+    }
+
+    .editorial-grid__body--more {
+      margin: 40px 0 0;
+    }
+
+    .editorial-grid__aside {
+      margin-bottom: 40px;
+    }
+
+    .editorial-grid--heading .editorial-grid__aside {
+      display: block;
+      margin: 40px 0 0;
+    }
+
+    .editorial-grid__sticky {
+      position: static;
+      max-width: 60%;
+      margin-left: auto;
+    }
+
+    .editorial-grid__caption {
+      font-size: 10px;
+    }
+  }
+</style>
+
+<section class="editorial-grid editorial-grid--heading">
+  <div class="editorial-grid__grid">
+
+    <h2 class="editorial-grid__heading">Beyond the Surface</h2>
+
+    <div class="editorial-grid__body">
+      <p>Opening paragraph for this section — framing what's being explored before the image below.</p>
+    </div>
+
+    <div class="editorial-grid__media">
+      <img class="editorial-grid__media-img" src="../../media/landscape-2.jpg" alt="" loading="lazy">
+    </div>
+
+    <div class="editorial-grid__body editorial-grid__body--more">
+      <p>A follow-up paragraph continuing the thought after the image, developing it further.</p>
+      <p>A closing paragraph that rounds out the section.</p>
+    </div>
+
+    <aside class="editorial-grid__aside">
+      <div class="editorial-grid__sticky">
+        <img class="editorial-grid__sticky-img" src="../../media/portrait-2.jpg" alt="" loading="lazy">
+        <p class="editorial-grid__caption">Caption for the sticky side image.</p>
+      </div>
+    </aside>
+
+  </div>
+</section>

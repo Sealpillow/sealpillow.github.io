@@ -1,0 +1,80 @@
+<style>
+  /* Equal Height Container */
+  .equal-height-container {
+    align-items: stretch;
+    display: flex;
+  }
+
+  /* Equal Height Column */
+  .equal-height-column {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  /* Equal Height Wrapper */
+  .equal-height-wrapper {
+    display: flex;
+    flex: 1;
+  }
+
+  /* Equal Height Wrapper > Video > Img */
+  .equal-height-wrapper video,
+  .equal-height-wrapper img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+</style>
+
+<!-- DESKTOP VIEW -->
+<div class="d-none d-md-block w-100">
+  <div class="equal-height-container">
+
+    <!-- VIDEO COLUMN -->
+    <div class="equal-height-column">
+      <div class="equal-height-wrapper">
+        <div class="w-100 d-none d-md-block" style="padding: 100% 0 0 0; position: relative;">
+          <video playsinline autoplay loop muted
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+            <source src="../../media/landscape_video-1.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAGE COLUMN -->
+    <div class="equal-height-column">
+      <div class="equal-height-wrapper">
+        <a href="$url('Product-Show', 'pid', 'PRODUCT_ID')$">
+          <img src="../../media/product-landscape-1.jpg" alt="">
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MOBILE VIEW -->
+<div class="d-block d-md-none w-100">
+
+  <!-- VIDEO SECTION -->
+  <div>
+    <div style="padding-bottom: 100%; position: relative;">
+      <video playsinline autoplay loop muted
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+        <source src="../../media/portrait_video-1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+
+  <!-- IMAGE SECTION -->
+  <div>
+    <a href="$url('Product-Show', 'pid', 'PRODUCT_ID')$">
+      <img src="../../media/product-portrait-1.jpg" alt="" class="img-fluid w-100">
+    </a>
+  </div>
+
+</div>

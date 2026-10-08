@@ -1,0 +1,92 @@
+<style>
+  .mysection {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #333;
+  }
+  .mysection:nth-child(1) { background: #eee; }
+  .mysection:nth-child(2) { background: #ccc; }
+  .mysection:nth-child(3) { background: #222; color: white; }
+  .mysection:nth-child(4) { background: pink; }
+</style>
+
+<div class="js-vertical-slider mysection toggle-icons-color" data-icon-color="black">Section 1 (light bg)</div>
+<div class="js-vertical-slider mysection toggle-icons-color" data-icon-color="white">Section 2 (light bg)</div>
+<div class="js-vertical-slider mysection toggle-icons-color" data-icon-color="black">Section 3 (dark bg → white icons)</div>
+<div class="js-vertical-slider mysection toggle-icons-color" data-icon-color="custom">Section 4 (custom bg → custom-color icons/logo)</div>
+
+<!-- force header permanently transparent (theme_light) 
+<script>
+(function () {
+  var header = document.querySelector('.page_header');
+  if (!header) return;
+
+  function forceThemeLight() {
+    if (!header.classList.contains('theme_light')) {
+      header.classList.add('theme_light');
+    }
+  }
+  forceThemeLight();
+ 
+  var themeObserver = new MutationObserver(forceThemeLight);
+  themeObserver.observe(header, { attributes: true, attributeFilter: ['class'] });
+})();
+</script> -->
+
+<!-- toggle icon/logo color based on section in view -->
+<script>
+(function () {
+  var header = document.querySelector('.page_header');
+  if (!header) return;
+
+  var sections = document.querySelectorAll('.toggle-icons-color');
+  if (!sections.length) return;
+
+  var currentColor = null;
+
+  function applyIconColor() {
+    // Section overrides only make sense while the header is in its
+    // transparent theme_light state; leave it alone otherwise.
+    if (!header.classList.contains('theme_light')) {
+      header.classList.remove('icons-white', 'icons-black', 'icons-custom');
+      return;
+    }
+    header.classList.toggle('icons-white', currentColor === 'white');
+    header.classList.toggle('icons-black', currentColor === 'black');
+    header.classList.toggle('icons-custom', currentColor === 'custom');
+  }
+
+  var iconObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+        currentColor = entry.target.getAttribute('data-icon-color');
+        applyIconColor();
+      }
+    });
+  }, { threshold: [0.5] });
+
+  sections.forEach(function (section) {
+    iconObserver.observe(section);
+  });
+
+  // Re-apply whenever theme_light is added/removed independently of a
+  // section crossing (e.g. by the native header's own scroll behavior),
+  // so the icon color stays in sync instead of waiting for the next scroll.
+  // Only react when theme_light's presence actually flips — the header's
+  // own scripts may rewrite its class attribute often for unrelated
+  // reasons (e.g. a "scrolled" class), and re-running on every one of
+  // those would add needless overhead on every scroll frame.
+  var lastThemeLight = header.classList.contains('theme_light');
+  var themeWatchObserver = new MutationObserver(function () {
+    var isThemeLight = header.classList.contains('theme_light');
+    if (isThemeLight !== lastThemeLight) {
+      lastThemeLight = isThemeLight;
+      applyIconColor();
+    }
+  });
+  themeWatchObserver.observe(header, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>

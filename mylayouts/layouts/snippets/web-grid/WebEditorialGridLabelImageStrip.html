@@ -1,0 +1,184 @@
+<style>
+  .editorial-grid {
+    --eg-muted: #333;
+    --eg-center: 460px;
+    --eg-gap: 64px;
+    padding: 40px 24px 0;
+    background: #fff;
+  }
+
+  .editorial-grid__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--eg-center)) minmax(0, 1fr);
+    grid-template-areas:
+      ".     intro aside"
+      "label body  aside"
+      ".     media aside";
+    column-gap: var(--eg-gap);
+    max-width: 1440px;
+    margin: 0 auto;
+    clip-path: inset(0);
+  }
+
+  /* Label */
+  .editorial-grid__label {
+    grid-area: label;
+    justify-self: center;
+    margin: 0;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  /* Body */
+  .editorial-grid__body {
+    grid-area: body;
+    max-width: 310px;
+    margin-bottom: 70px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--eg-muted);
+  }
+
+  .editorial-grid__body p {
+    margin: 0 0 14px;
+  }
+
+  .editorial-grid__body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .editorial-grid__body--more {
+    grid-area: more;
+    margin: 70px 0 0;
+  }
+
+  /* Label + body, then a full-width image strip, then a closing paragraph */
+  .editorial-grid--strip {
+    padding-top: 30px;
+    padding-bottom: 80px;
+  }
+
+  .editorial-grid--strip .editorial-grid__grid {
+    grid-template-areas:
+      "label body  ."
+      "strip strip strip"
+      ".     more  .";
+    clip-path: none;
+  }
+
+  .editorial-grid__strip {
+    grid-area: strip;
+    justify-self: center;
+    width: min(100%, calc(var(--eg-center) + 180px));
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .editorial-grid__strip .editorial-grid__tile {
+    aspect-ratio: 3 / 4;
+  }
+
+  /* Shared strip tile */
+  .editorial-grid__tile {
+    min-height: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .editorial-grid__tile-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Tablet */
+  @media (max-width: 991.98px) {
+    .editorial-grid {
+      --eg-center: 420px;
+      --eg-gap: 32px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 767.98px) {
+    .editorial-grid__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "intro"
+        "label"
+        "body"
+        "aside"
+        "media";
+      clip-path: none;
+    }
+
+    .editorial-grid__label {
+      justify-self: start;
+      margin-bottom: 12px;
+    }
+
+    .editorial-grid__body {
+      max-width: none;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .editorial-grid__body--more {
+      margin: 40px 0 0;
+    }
+
+    .editorial-grid--strip {
+      padding-top: 40px;
+      padding-bottom: 56px;
+    }
+
+    .editorial-grid--strip .editorial-grid__grid {
+      grid-template-areas:
+        "label"
+        "body"
+        "strip"
+        "more";
+    }
+
+    .editorial-grid__strip {
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<section class="editorial-grid editorial-grid--strip">
+  <div class="editorial-grid__grid">
+
+    <h2 class="editorial-grid__label">Research<br>Process</h2>
+
+    <div class="editorial-grid__body">
+      <p>A short paragraph introducing the process shown in the image strip below.</p>
+    </div>
+
+    <div class="editorial-grid__strip">
+      <div class="editorial-grid__tile">
+        <img class="editorial-grid__tile-img" src="../../media/product-portrait-1.jpg" alt="" loading="lazy">
+      </div>
+      <div class="editorial-grid__tile">
+        <img class="editorial-grid__tile-img" src="../../media/product-portrait-2.jpg" alt="" loading="lazy">
+      </div>
+      <div class="editorial-grid__tile">
+        <img class="editorial-grid__tile-img" src="../../media/portrait-1.jpg" alt="" loading="lazy">
+      </div>
+      <div class="editorial-grid__tile">
+        <img class="editorial-grid__tile-img" src="../../media/portrait-2.jpg" alt="" loading="lazy">
+      </div>
+    </div>
+
+    <div class="editorial-grid__body editorial-grid__body--more">
+      <p>A closing paragraph reflecting on the process, rounding out the section.</p>
+    </div>
+
+  </div>
+</section>

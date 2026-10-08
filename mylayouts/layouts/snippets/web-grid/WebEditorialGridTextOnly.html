@@ -1,0 +1,127 @@
+<style>
+  .editorial-grid {
+    --eg-text: #000;
+    --eg-muted: #333;
+    --eg-center: 460px;
+    --eg-gap: 64px;
+    padding: 40px 24px 0;
+    color: var(--eg-text);
+    background: #fff;
+  }
+
+  .editorial-grid__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--eg-center)) minmax(0, 1fr);
+    grid-template-areas:
+      ".     intro aside"
+      "label body  aside"
+      ".     media aside";
+    column-gap: var(--eg-gap);
+    max-width: 1440px;
+    margin: 0 auto;
+    clip-path: inset(0);
+  }
+
+  /* Label */
+  .editorial-grid__label {
+    grid-area: label;
+    justify-self: center;
+    margin: 0;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  /* Body */
+  .editorial-grid__body {
+    grid-area: body;
+    max-width: 310px;
+    margin-bottom: 70px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--eg-muted);
+  }
+
+  .editorial-grid__body p {
+    margin: 0 0 14px;
+  }
+
+  .editorial-grid__body p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Text-only section (no aside) */
+  .editorial-grid--text {
+    padding-top: 120px;
+    padding-bottom: 80px;
+  }
+
+  .editorial-grid--text .editorial-grid__grid {
+    grid-template-areas: "label body .";
+    clip-path: none;
+  }
+
+  .editorial-grid--text .editorial-grid__body {
+    margin-bottom: 0;
+  }
+
+  /* Tablet */
+  @media (max-width: 991.98px) {
+    .editorial-grid {
+      --eg-center: 420px;
+      --eg-gap: 32px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 767.98px) {
+    .editorial-grid__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "intro"
+        "label"
+        "body"
+        "aside"
+        "media";
+      clip-path: none;
+    }
+
+    .editorial-grid--text {
+      padding-top: 56px;
+      padding-bottom: 56px;
+    }
+
+    .editorial-grid--text .editorial-grid__grid {
+      grid-template-areas:
+        "label"
+        "body";
+    }
+
+    .editorial-grid__label {
+      justify-self: start;
+      margin-bottom: 12px;
+    }
+
+    .editorial-grid__body {
+      max-width: none;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+  }
+</style>
+
+<section class="editorial-grid editorial-grid--text">
+  <div class="editorial-grid__grid">
+
+    <h2 class="editorial-grid__label">Material<br>&amp; Mindset</h2>
+
+    <div class="editorial-grid__body">
+      <p>Rather than seeing material as something to shape around an idea, the project explores what happens when ideas begin with the material itself.</p>
+      <p>Each piece carries its own dimensions and character. Instead of forcing consistency, these differences become part of the design process.</p>
+      <p>The material begins the conversation and design responds.</p>
+    </div>
+
+  </div>
+</section>

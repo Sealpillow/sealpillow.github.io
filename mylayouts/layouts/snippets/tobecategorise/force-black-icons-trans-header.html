@@ -1,0 +1,38 @@
+<style>
+    /* Force icons to be black */
+.theme_light .menu-group .theme_color, .theme_light .page_header-left .theme_color, .theme_light .page_header-right .theme_color {
+  color: black;
+}
+
+/* theme_light present -> black logo instead */
+.page_header.theme_light .logo_static img.logo-white {
+    display: none !important;
+}
+.page_header.theme_light .logo_static img.logo-black {
+    display: inline-block !important;
+}
+</style>
+
+
+<!-- force transparent header -->
+<script>
+(function () {
+  var header = document.querySelector('.page_header');
+  if (!header) return;
+
+  function forceThemeLight() {
+    if (!header.classList.contains('theme_light')) {
+      header.classList.add('theme_light');
+    }
+  }
+
+  // Apply immediately on load
+  forceThemeLight();
+
+  // Re-apply any time the class attribute changes (e.g. their scroll
+  // handler adding/removing js-is-sticky--change and stripping theme_light
+  // along with it)
+  var observer = new MutationObserver(forceThemeLight);
+  observer.observe(header, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>

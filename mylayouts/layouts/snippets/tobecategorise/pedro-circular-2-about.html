@@ -1,0 +1,217 @@
+<style>
+  .circular {
+    --circular-text: #000;
+    --circular-muted: #333;
+    --circular-center: 460px;
+    --circular-gap: 64px;
+    --circular-sticky-top: 40px;
+    padding: 40px 24px 0;
+    color: var(--circular-text);
+    background: #fff;
+  }
+
+  .circular__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--circular-center)) minmax(0, 1fr);
+    grid-template-areas:
+      ".     intro aside"
+      "label body  aside"
+      ".     media aside";
+    column-gap: var(--circular-gap);
+    max-width: 1440px;
+    margin: 0 auto;
+    /* Crops the sticky aside at the section edge without breaking position: sticky */
+    clip-path: inset(0);
+  }
+
+  /* Intro */
+  .circular__intro {
+    grid-area: intro;
+    margin-bottom: 110px;
+  }
+
+  .circular__logo {
+    margin: 0 0 22px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .circular__logo-brand {
+    font-weight: 700;
+  }
+
+  .circular__logo-name {
+    font-weight: 300;
+    margin-left: 0.35em;
+  }
+
+  .circular__tagline {
+    margin: 0;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 15px;
+    line-height: 1.45;
+    max-width: 300px;
+  }
+
+  /* Label */
+  .circular__label {
+    grid-area: label;
+    justify-self: center;
+    margin: 0;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  /* Body */
+  .circular__body {
+    grid-area: body;
+    max-width: 310px;
+    margin-bottom: 70px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--circular-muted);
+  }
+
+  .circular__body p {
+    margin: 0 0 14px;
+  }
+
+  .circular__body p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Centre image */
+  .circular__media {
+    grid-area: media;
+    margin: 0;
+  }
+
+  .circular__media-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Sticky aside
+     Negative bottom margin stretches the aside past the grid, so the image keeps
+     sticking while the section scrolls away and clip-path crops it from below. */
+  .circular__aside {
+    grid-area: aside;
+    align-self: stretch;
+    margin-bottom: -100vh;
+  }
+
+  .circular__sticky {
+    position: sticky;
+    top: var(--circular-sticky-top);
+    width: 100%;
+    max-width: 180px;
+    margin: 0;
+  }
+
+  .circular__sticky-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .circular__caption {
+    margin: 8px 0 0;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 8px;
+    line-height: 1.4;
+    color: var(--circular-muted);
+  }
+
+  /* Tablet */
+  @media (max-width: 991.98px) {
+    .circular {
+      --circular-center: 420px;
+      --circular-gap: 32px;
+    }
+
+    .circular__sticky {
+      max-width: 160px;
+    }
+  }
+
+  /* Mobile: stack, sticky and crop off */
+  @media (max-width: 767.98px) {
+    .circular__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "intro"
+        "label"
+        "body"
+        "aside"
+        "media";
+      clip-path: none;
+    }
+
+    .circular__intro {
+      margin-bottom: 56px;
+    }
+
+    .circular__label {
+      justify-self: start;
+      margin-bottom: 12px;
+    }
+
+    .circular__body {
+      max-width: none;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .circular__aside {
+      margin-bottom: 40px;
+    }
+
+    .circular__sticky {
+      position: static;
+      max-width: 60%;
+      margin-left: auto;
+    }
+
+    .circular__caption {
+      font-size: 10px;
+    }
+  }
+</style>
+
+<section class="circular" id="circular-about">
+  <div class="circular__grid">
+
+    <header class="circular__intro">
+      <h1 class="circular__logo">
+        <span class="circular__logo-brand">Pedro</span><span class="circular__logo-name">Circular</span>
+      </h1>
+      <p class="circular__tagline">A research platform exploring the life, meaning and future of what already exists.</p>
+    </header>
+
+    <h2 class="circular__label">Why it Exists</h2>
+
+    <div class="circular__body">
+      <p>Waste is an inevitable part of making. Every pattern cut leaves behind pieces that no longer belong to the original design. Their irregular proportions often make them difficult to use again, despite the quality of the material remaining unchanged.</p>
+      <p>Project Circular begins at this point. Rather than viewing these remnants as the end of one process, we explore how they might become the beginning of another. Guided by the material's size, shape and character, design unfolds differently. Constraints become prompts, and familiar limitations become opportunities for new forms of creativity.</p>
+    </div>
+
+    <div class="circular__media">
+      <img class="circular__media-img" src="images/testfile/2.jpg?$staticlink$" alt="Paper pattern pieces and chalk laid out on leather" loading="lazy">
+    </div>
+
+    <aside class="circular__aside">
+      <div class="circular__sticky">
+        <img class="circular__sticky-img" src="images/testfile/3.jpg?$staticlink$" alt="Leather offcuts in assorted colours" loading="lazy">
+        <p class="circular__caption">Their irregular proportions often make them difficult to use again, despite the quality of the material remaining unchanged.</p>
+      </div>
+    </aside>
+
+  </div>
+</section>

@@ -1,0 +1,226 @@
+<style>
+  /* The centred slide grows taller than its neighbours; drag, click a side
+     slide, or use arrow keys to change focus. Each slide keeps its own
+     image aspect ratio (height is fixed, width follows naturally). */
+  .center-slider {
+    --center-slider-h: clamp(120px, 20vw, 230px);
+    --center-slider-h-active: calc(var(--center-slider-h) * 1.5);
+    --center-slider-gap: 10px;
+    --center-slider-speed: 0.6s;
+    position: relative;
+    overflow: hidden;
+    height: var(--center-slider-h-active);
+    outline: none;
+  }
+
+  .center-slider:focus-visible {
+    outline: 1px solid #000;
+    outline-offset: 4px;
+  }
+
+  /* Hidden element used by the script to read the slide heights in px */
+  .center-slider__probe {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    width: var(--center-slider-h);
+    height: var(--center-slider-h-active);
+  }
+
+  .center-slider__track {
+    display: flex;
+    align-items: center;
+    gap: var(--center-slider-gap);
+    height: 100%;
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    will-change: transform;
+    transition: transform var(--center-slider-speed) cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .center-slider__track--dragging {
+    cursor: grabbing;
+    transition: none;
+  }
+
+  .center-slider__slide {
+    flex: 0 0 auto;
+    height: var(--center-slider-h);
+    cursor: pointer;
+    transition: height var(--center-slider-speed) cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .center-slider__slide--active {
+    height: var(--center-slider-h-active);
+    cursor: grab;
+  }
+
+  .center-slider__track--dragging .center-slider__slide {
+    transition: none;
+  }
+
+  .center-slider__slide-img {
+    display: block;
+    width: auto;
+    height: 100%;
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .center-slider__track,
+    .center-slider__slide {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .center-slider {
+      --center-slider-h: 32vw;
+      --center-slider-gap: 6px;
+    }
+  }
+</style>
+
+<div class="center-slider js-center-slider" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Gallery">
+  <div class="center-slider__probe" aria-hidden="true"></div>
+  <div class="center-slider__track">
+    <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
+      <img class="center-slider__slide-img" src="../../media/portrait-1.jpg" alt="">
+    </div>
+    <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
+      <img class="center-slider__slide-img" src="../../media/landscape-1.jpg" alt="">
+    </div>
+    <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
+      <img class="center-slider__slide-img" src="../../media/portrait-2.jpg" alt="">
+    </div>
+    <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
+      <img class="center-slider__slide-img" src="../../media/landscape-2.jpg" alt="">
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  document.querySelectorAll('.js-center-slider').forEach(function (slider) {
+    var track = slider.querySelector('.center-slider__track');
+    var probe = slider.querySelector('.center-slider__probe');
+    var slides = Array.prototype.slice.call(track.querySelectorAll('.center-slider__slide'));
+    if (!slides.length) return;
+    var imgs = slides.map(function (slide) {
+      return slide.querySelector('.center-slider__slide-img');
+    });
+
+    var draggingClass = 'center-slider__track--dragging';
+    var activeClass = 'center-slider__slide--active';
+    var start = parseInt(slider.getAttribute('data-start'), 10);
+    var index = isNaN(start) ? Math.floor((slides.length - 1) / 2) : start;
+    var startX = null;
+    var delta = 0;
+    var dragged = false;
+
+    function metrics() {
+      return {
+        h: probe.offsetWidth,
+        hActive: probe.offsetHeight,
+        gap: parseFloat(getComputedStyle(track).columnGap) || 0
+      };
+    }
+
+    // Width / height of each image, 1 until it has loaded
+    function ratio(n) {
+      var img = imgs[n];
+      return img && img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1;
+    }
+
+    // Uses the final (settled) widths, so the centre lands correctly while sizes animate
+    function render() {
+      var m = metrics();
+      var offset = 0;
+      for (var j = 0; j < index; j++) offset += m.h * ratio(j) + m.gap;
+      offset += (m.hActive * ratio(index)) / 2;
+      var x = slider.clientWidth / 2 - offset + delta;
+      track.style.transform = 'translate3d(' + x + 'px, 0, 0)';
+    }
+
+    function goTo(i) {
+      index = Math.min(Math.max(i, 0), slides.length - 1);
+      slides.forEach(function (slide, n) {
+        var isActive = n === index;
+        slide.classList.toggle(activeClass, isActive);
+        slide.setAttribute('aria-current', isActive ? 'true' : 'false');
+      });
+      render();
+    }
+
+    track.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      startX = e.clientX;
+      delta = 0;
+      dragged = false;
+    });
+
+    track.addEventListener('pointermove', function (e) {
+      if (startX === null) return;
+      delta = e.clientX - startX;
+      if (!dragged && Math.abs(delta) > 6) {
+        dragged = true;
+        track.classList.add(draggingClass);
+        track.setPointerCapture(e.pointerId);
+      }
+      if (dragged) render();
+    });
+
+    function endDrag() {
+      if (startX === null) return;
+      startX = null;
+      track.classList.remove(draggingClass);
+      if (!dragged) return;
+      var m = metrics();
+      var steps = Math.round(-delta / (m.h * ratio(index) + m.gap));
+      if (steps === 0 && Math.abs(delta) > 40) steps = delta < 0 ? 1 : -1;
+      delta = 0;
+      goTo(index + steps);
+    }
+
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+
+    // Click a side slide to bring it to the centre
+    track.addEventListener('click', function (e) {
+      if (dragged) {
+        dragged = false;
+        return;
+      }
+      var slide = e.target.closest('.center-slider__slide');
+      if (slide) goTo(slides.indexOf(slide));
+    });
+
+    slider.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goTo(index - 1);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goTo(index + 1);
+      }
+    });
+
+    window.addEventListener('resize', render);
+
+    imgs.forEach(function (img) {
+      if (img && !img.complete) img.addEventListener('load', render);
+    });
+
+    // First paint without animating into place
+    track.classList.add(draggingClass);
+    goTo(index);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        track.classList.remove(draggingClass);
+      });
+    });
+  });
+})();
+</script>

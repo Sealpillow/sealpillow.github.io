@@ -1,0 +1,128 @@
+<style>
+  .circular {
+    --circular-text: #000;
+    --circular-muted: #333;
+    --circular-center: 460px;
+    --circular-gap: 64px;
+    --circular-sticky-top: 40px;
+    padding: 40px 24px 0;
+    color: var(--circular-text);
+    background: #fff;
+  }
+
+  .circular__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--circular-center)) minmax(0, 1fr);
+    grid-template-areas:
+      ".     intro aside"
+      "label body  aside"
+      ".     media aside";
+    column-gap: var(--circular-gap);
+    max-width: 1440px;
+    margin: 0 auto;
+    clip-path: inset(0);
+  }
+
+  /* Label */
+  .circular__label {
+    grid-area: label;
+    justify-self: center;
+    margin: 0;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  /* Body */
+  .circular__body {
+    grid-area: body;
+    max-width: 310px;
+    margin-bottom: 70px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--circular-muted);
+  }
+
+  .circular__body p {
+    margin: 0 0 14px;
+  }
+
+  .circular__body p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Text-only section (no aside) */
+  .circular--text {
+    padding-top: 120px;
+    padding-bottom: 80px;
+  }
+
+  .circular--text .circular__grid {
+    grid-template-areas: "label body .";
+    clip-path: none;
+  }
+
+  .circular--text .circular__body {
+    margin-bottom: 0;
+  }
+
+  /* Tablet */
+  @media (max-width: 991.98px) {
+    .circular {
+      --circular-center: 420px;
+      --circular-gap: 32px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 767.98px) {
+    .circular__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "intro"
+        "label"
+        "body"
+        "aside"
+        "media";
+      clip-path: none;
+    }
+
+    .circular--text {
+      padding-top: 56px;
+      padding-bottom: 56px;
+    }
+
+    .circular--text .circular__grid {
+      grid-template-areas:
+        "label"
+        "body";
+    }
+
+    .circular__label {
+      justify-self: start;
+      margin-bottom: 12px;
+    }
+
+    .circular__body {
+      max-width: none;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+  }
+</style>
+
+<section class="circular circular--text">
+  <div class="circular__grid">
+
+    <h2 class="circular__label">Material<br>&amp; Mindset</h2>
+
+    <div class="circular__body">
+      <p>Rather than seeing material as something to shape around an idea, Project Circular explores what happens when ideas begin with the material itself.</p>
+      <p>Each offcut carries its own dimensions, grain and character. Instead of forcing consistency, these differences become part of the design process.</p>
+      <p>The material begins the conversation and design responds.</p>
+    </div>
+
+  </div>
+</section>

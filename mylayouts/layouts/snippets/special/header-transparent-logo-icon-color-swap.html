@@ -1,0 +1,255 @@
+<!-- ============================= -->
+<!-- Dependencies                  -->
+<!-- ============================= -->
+<!-- Assumes the site's sticky header is an element matching `.page_header`,
+     containing icon/menu elements with a `.theme_color` class and a logo
+     wrapped in `.logo_static`. Built for a header that is normally opaque
+     and switches to transparent (`.theme_light`) at the top of light pages;
+     this snippet forces that transparent state permanently, then lets
+     individual page sections override the icon/logo colour as they scroll
+     through, via `data-icon-color` on each `.toggle-icon-color` section. -->
+
+<style>
+  /* ===========================================================
+     LOGO — DESKTOP SIZING
+     Fixes the logo dimensions on large screens (>=1023px)
+     =========================================================== */
+  @media (min-width: 1023px) {
+    .parallax_banner-logo {
+      height: 40px !important;
+      width: 150px !important;
+      max-width: 150px !important;
+    }
+  }
+
+  /* ===========================================================
+     LOGO — COLOR SWAP LOGIC
+     Three logo images (white + black + custom gif) sit in the DOM together.
+     Precedence (later rules win ties, since specificity is equal):
+       1. `.theme_light` sets the page-level DEFAULT (white logo).
+       2. `.icons-white` / `.icons-black` / `.icons-custom` are section-driven
+          OVERRIDES from the scroll script below and must be declared AFTER
+          theme_light so they can win even when theme_light is also forced.
+     =========================================================== */
+
+  /* Hide all by default; the rules below decide which one appears */
+  .logo_static img.logo-white,
+  .logo_static img.logo-black,
+  .logo_static img.logo-custom {
+    display: none !important;
+  }
+
+  /* default: black logo */
+  .page_header .logo_static img.logo-black {
+    display: inline-block !important;
+  }
+
+  /* theme_light present -> transparent header background -> white logo (page-level default) */
+  .page_header.theme_light .logo_static img.logo-white {
+    display: inline-block !important;
+  }
+  .page_header.theme_light .logo_static img.logo-black {
+    display: none !important;
+  }
+
+  /* icons-white present (section override) -> white logo, even if theme_light is also set */
+  .page_header.icons-white .logo_static img.logo-white {
+    display: inline-block !important;
+  }
+  .page_header.icons-white .logo_static img.logo-black {
+    display: none !important;
+  }
+
+  /* icons-black present (section override) -> force BLACK logo, overriding theme_light's white default */
+  .page_header.icons-black .logo_static img.logo-black {
+    display: inline-block !important;
+  }
+  .page_header.icons-black .logo_static img.logo-white {
+    display: none !important;
+  }
+
+  /* icons-custom present (section override) -> force CUSTOM logo, overriding theme_light's white default */
+  .page_header.icons-custom .logo_static img.logo-custom {
+    display: inline-block !important;
+  }
+  .page_header.icons-custom .logo_static img.logo-white,
+  .page_header.icons-custom .logo_static img.logo-black {
+    display: none !important;
+  }
+
+  /* ===========================================================
+     HEADER ICONS — COLOR SWAP LOGIC
+     Same default/override logic and precedence as the logo above.
+     =========================================================== */
+
+  /* opaque header (theme_light not present) -> black icons (page-level default) */
+  .page_header {
+    --icon-color: black;
+  }
+
+  /* transparent header (theme_light present) -> white icons (page-level default) */
+  .page_header.theme_light {
+    --icon-color: white;
+  }
+
+  /* icons-white present (section override) -> white icons */
+  .page_header.icons-white {
+    --icon-color: white;
+  }
+
+  /* icons-black present (section override) -> force BLACK icons, overriding theme_light */
+  .page_header.icons-black {
+    --icon-color: black;
+  }
+
+  /* icons-custom present (section override) -> force CUSTOM icons, overriding theme_light */
+  .page_header.icons-custom {
+    --icon-color: #c91f4e;
+  }
+
+  .page_header .menu-group .theme_color,
+  .page_header .page_header-left .theme_color,
+  .page_header .page_header-right .theme_color {
+    color: var(--icon-color);
+  }
+
+  /* Logo (SVG use) follows the same --icon-color variable as the icons above,
+     so it also goes white/black/custom automatically. Requires the sprite
+     symbol's <path>s to use fill="currentColor" (no hardcoded fill) —
+     otherwise this rule has no visible effect and the GIF markup below
+     should be used instead. */
+  .page_header .logo_static .theme_color {
+    color: var(--icon-color);
+    fill: currentColor;
+  }
+
+  /* ===========================================================
+     DEMO SECTIONS
+     Each section that should drive the header colour gets
+     `toggle-icon-color` plus a `data-icon-color` of white/black/custom.
+     =========================================================== */
+  .demo-section {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #333;
+  }
+  .demo-section:nth-child(1) { background: #eee; }
+  .demo-section:nth-child(2) { background: #222; color: white; }
+  .demo-section:nth-child(3) { background: pink; }
+</style>
+
+<!-- =============================================================
+     LOGO MARKUP — OPTION A: GIF (color-swapping version)
+     Use when the header background changes (transparent -> white on
+     scroll, or light-theme pages). The CSS above toggles between the
+     white, black, and custom gif automatically, based on `.theme_light`,
+     `.icons-white`, `.icons-black`, and `.icons-custom` on `.page_header`.
+     Delete the logo-custom <img> below if a page doesn't need the
+     custom-colour variant.
+     ============================================================= -->
+<!--
+<a href="$url('Home-Show')$" class="logo_static" title="Home">
+    <img class="icon d-inline-block logo_static-img parallax_banner-logo theme_color logo-white"
+        src="../../media/logo-white.gif" width="110" height="25" alt="Logo">
+    <img class="icon d-inline-block logo_static-img parallax_banner-logo theme_color logo-black"
+        src="../../media/logo-black.gif" width="110" height="25" alt="Logo">
+    <img class="icon d-inline-block logo_static-img parallax_banner-logo theme_color logo-custom"
+        src="../../media/logo-custom.gif" width="110" height="25" alt="Logo">
+</a>
+-->
+
+<!-- =============================================================
+     LOGO MARKUP — OPTION B: SVG via <use> (color-swapping version)
+     Use instead of Option A when you'd rather not ship separate
+     white/black/custom gif files. A single SVG symbol follows
+     `--icon-color` (see the ".logo_static .theme_color" rule above).
+     NOTE: only works if the sprite symbol's <path>s use
+     fill="currentColor" (no hardcoded fill) — otherwise use Option A.
+     ============================================================= -->
+<a href="$url('Home-Show')$" class="logo_static" title="Home">
+    <svg class="icon d-inline-block logo_static-img parallax_banner-logo theme_color">
+        <use xlink:href="#logo-sprite" />
+    </svg>
+</a>
+
+<!-- Example sections driving the header colour as each one scrolls into view -->
+<div class="demo-section toggle-icon-color" data-icon-color="black">Section 1 (light bg -> black icons)</div>
+<div class="demo-section toggle-icon-color" data-icon-color="white">Section 2 (dark bg -> white icons)</div>
+<div class="demo-section toggle-icon-color" data-icon-color="custom">Section 3 (custom bg -> custom-colour icons/logo)</div>
+
+<!-- Force the header into its transparent (theme_light) state permanently -->
+<script>
+(function () {
+  var header = document.querySelector('.page_header');
+  if (!header) return;
+
+  function forceThemeLight() {
+    if (!header.classList.contains('theme_light')) {
+      header.classList.add('theme_light');
+    }
+  }
+  forceThemeLight();
+
+  // Re-apply any time the class attribute changes (e.g. the site's own scroll
+  // handler stripping theme_light along with an unrelated "scrolled" class)
+  var themeObserver = new MutationObserver(forceThemeLight);
+  themeObserver.observe(header, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+
+<!-- Toggle icon/logo colour based on which section is in view -->
+<script>
+(function () {
+  var header = document.querySelector('.page_header');
+  if (!header) return;
+
+  var sections = document.querySelectorAll('.toggle-icon-color');
+  if (!sections.length) return;
+
+  var currentColor = null;
+
+  function applyIconColor() {
+    // Section overrides only make sense while the header is in its
+    // transparent theme_light state; leave it alone otherwise.
+    if (!header.classList.contains('theme_light')) {
+      header.classList.remove('icons-white', 'icons-black', 'icons-custom');
+      return;
+    }
+    header.classList.toggle('icons-white', currentColor === 'white');
+    header.classList.toggle('icons-black', currentColor === 'black');
+    header.classList.toggle('icons-custom', currentColor === 'custom');
+  }
+
+  var iconObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+        currentColor = entry.target.getAttribute('data-icon-color');
+        applyIconColor();
+      }
+    });
+  }, { threshold: [0.5] });
+
+  sections.forEach(function (section) {
+    iconObserver.observe(section);
+  });
+
+  // Re-apply whenever theme_light is added/removed independently of a
+  // section crossing, so the icon colour stays in sync instead of waiting
+  // for the next scroll. Only react when theme_light's presence actually
+  // flips — the header's own scripts may rewrite its class attribute often
+  // for unrelated reasons, and re-running on every one of those would add
+  // needless overhead on every scroll frame.
+  var lastThemeLight = header.classList.contains('theme_light');
+  var themeWatchObserver = new MutationObserver(function () {
+    var isThemeLight = header.classList.contains('theme_light');
+    if (isThemeLight !== lastThemeLight) {
+      lastThemeLight = isThemeLight;
+      applyIconColor();
+    }
+  });
+  themeWatchObserver.observe(header, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
