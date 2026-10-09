@@ -3,6 +3,31 @@
 <!-- ============================= -->
 <!-- No external dependencies used -->
 
+<!-- ============================================================
+     THIS FILE HAS TWO KINDS OF CONTENT, and two separate ★ EXTRACT
+     mechanics bundled together:
+
+     ★ EXTRACT 1 — sticky-lock header: a sentinel/wrapper/placeholder
+       trio (CSS + the toggleFixedHeader()/stickyObserver JS) that
+       locks ANY content to the top of the page once scrolled past,
+       without the usual layout jump. Works regardless of what's
+       inside the wrapper — here it happens to be a year nav, but it
+       could be anything.
+
+     ★ EXTRACT 2 — fade-in-on-scroll: the .year-section opacity/
+       transform/transition properties + .is-visible class + the
+       fadeInObserver JS. Pure IntersectionObserver fade logic,
+       reusable on any elements, independent of what content is
+       actually inside them.
+
+     DEMO ONLY — everything else: the year-range generation, the
+       year nav's drag-to-scroll wiring, and the scrollspy
+       (setActiveYear/sectionObserver) are all built specifically
+       around "years 2000–2026" and are tightly wired to this demo's
+       own ids/classes — swap in your real content and nav/scrollspy
+       logic rather than extracting these as-is.
+     ============================================================ -->
+
 <!-- ============================= -->
 <!-- HTML                          -->
 <!-- ============================= -->
@@ -12,9 +37,13 @@
     <p>Scroll down to explore our journey year by year. Once you pass the year selector below, it will lock to the top of the page as a sticky header.</p>
   </section>
 
+  <!-- ★ EXTRACT 1 — sticky-lock header (HTML): sentinel + wrapper +
+       placeholder. Put whatever you want locked to the top inside
+       the wrapper — the year nav below is just this demo's content. -->
   <div class="carousel-sentinel" id="carouselSentinel"></div>
 
   <div class="carousel-wrapper" id="carouselWrapper">
+    <!-- DEMO ONLY: the year nav itself -->
     <nav class="year-carousel" id="yearCarousel" aria-label="Year navigation">
       <ul class="year-list" id="yearList">
         <!-- Year items injected by JS -->
@@ -23,6 +52,7 @@
   </div>
 
   <div class="carousel-placeholder" id="carouselPlaceholder"></div>
+  <!-- ★ END EXTRACT 1 -->
 
   <main class="content" id="content">
     <!-- Sections injected by JS -->
@@ -76,6 +106,7 @@
     margin: 0 auto;
   }
 
+  /* ★ EXTRACT 1 — sticky-lock header (CSS) */
   .carousel-sentinel {
     height: 1px;
   }
@@ -101,7 +132,9 @@
   .carousel-placeholder.is-active {
     display: block;
   }
+  /* ★ END EXTRACT 1 */
 
+  /* DEMO ONLY from here — year nav bar styling + drag cursor */
   .year-carousel {
     width: 100%;
     height: var(--header-height);
@@ -188,7 +221,10 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     scroll-margin-top: calc(var(--header-height) + 16px);
 
-    /* Fade-in-on-scroll: initial hidden state */
+    /* ★ EXTRACT 2 — fade-in-on-scroll (CSS): just these 3 properties
+       + the .is-visible rule below. Everything else on .year-section
+       above this point is demo card styling (background, padding,
+       shadow, etc.), not part of the fade mechanic. */
     opacity: 0;
     transform: translateY(24px);
     transition: opacity 0.6s ease, transform 0.6s ease;
@@ -198,7 +234,9 @@
     opacity: 1;
     transform: translateY(0);
   }
+  /* ★ END EXTRACT 2 */
 
+  /* DEMO ONLY */
   .year-section h2 {
     margin: 0 0 12px;
     font-size: 28px;
@@ -217,6 +255,9 @@
 <!-- ============================= -->
 <script>
   (function () {
+    // DEMO ONLY from here — year range generation + scrollspy
+    // (setActiveYear/sectionObserver), both specific to this demo's
+    // year ids. The two ★ EXTRACT mechanics are further down.
     const START_YEAR = 2000;
     const END_YEAR = 2026;
 
@@ -310,8 +351,10 @@
 
     sections.forEach((section) => sectionObserver.observe(section));
 
-    // ---- Fade-in-on-scroll for each year section (repeats both directions) ----
-	const fadeInObserver = new IntersectionObserver(
+    // ★ EXTRACT 2 — fade-in-on-scroll (JS). Works on any NodeList of
+    // elements with a .is-visible CSS rule defined; nothing here is
+    // specific to years.
+    const fadeInObserver = new IntersectionObserver(
 	(entries) => {
 		entries.forEach((entry) => {
 		entry.target.classList.toggle('is-visible', entry.isIntersecting);
@@ -325,7 +368,12 @@
 	);
 
 	sections.forEach((section) => fadeInObserver.observe(section));
+    // ★ END EXTRACT 2
 
+    // ★ EXTRACT 1 — sticky-lock header (JS). toggleFixedHeader() and
+    // the sentinel-watching stickyObserver below work on whatever
+    // elements carousel/carouselWrapper/carouselPlaceholder/
+    // carouselSentinel point at — none of this references years.
     // ---- Carousel becomes a fixed header once scrolled past its original position ----
     function toggleFixedHeader(isFixed) {
       if (isFixed) {
@@ -352,7 +400,9 @@
     );
 
     stickyObserver.observe(carouselSentinel);
+    // ★ END EXTRACT 1
 
+    // DEMO ONLY from here to the end of this script.
     // ---- Drag-to-scroll for the carousel (mouse + touch) ----
     let isPointerDown = false;
     let startX = 0;

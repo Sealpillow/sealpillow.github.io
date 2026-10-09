@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+  <link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+
+<style>
+  /* =========================================================
+    A SHARED GROUND — EDITORIAL STYLES
+    ---------------------------------------------------------
+    00  Tokens & base
+    01  Shared: animated underline links
+    02  Hero .................. Sections 1, 4, 6, 8, 10
+    03  Intro ................. Section 2
+    04  Q&A ................... Sections 3, 5, 7, 9
+    05  Q&A grid .............. Sections 5, 7, 9
+    05a Q&A grid, bottom-aligned (Section 5)
+    05b Q&A grid, top-aligned (Section 7)
+    06  Credits ............... Section 11
+    07  CTA ................... Section 12
+    08  Publish info .......... Section 13
+    09  Reduced motion
+
+    Each block: desktop first, then mobile (max-width: 767.98px).
+    Keep 05a / 05b below 05 — they override it.
+    Keep 09 last — it overrides transitions above.
+    ========================================================= */
+
+
+  /* =========================================================
+    00 — TOKENS & BASE
+    ========================================================= */
+  @media (max-width: 767.98px) {
+    :root {
+      --ed-space-section: 60px;  /* hero ↔ Q&A section */
+      --ed-space-block: 50px;    /* question → answer, answer → answer */
+      --ed-space-text: 45px;     /* body text → first media */
+      --ed-space-header: 30px;   /* name → body text */
+      --ed-space-media: 16px;    /* media → media */
+    }
+  }
+
+  html,
+  body {
+    height: auto;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    color: #000;
+  }
+
+  /* Override Bootstrap's blue links: follow the surrounding text colour */
+  a,
+  a:hover {
+    color: inherit;
+  }
+
+  .page.parallax {
+    padding-top: 0 !important;
+  }
+
+  /* Hide folder headers (SiteGenesis leftover) */
+  .folder-header,
+  .folder_post .folder-container .container {
+    display: none !important;
+  }
+
+
+  /* =========================================================
+    01 — SHARED: ANIMATED UNDERLINE LINKS (left to right)
+    ========================================================= */
+  .editorial-qa__handle,
+  .editorial-cta__link,
+  .editorial-publish__link {
+    padding-bottom: 3px;
+    color: #000;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition: background-size 0.4s ease;
+  }
+
+  .editorial-qa__handle:hover,
+  .editorial-qa__handle:focus-visible,
+  .editorial-cta__link:hover,
+  .editorial-cta__link:focus-visible,
+  .editorial-publish__link:hover,
+  .editorial-publish__link:focus-visible {
+    color: #000;
+    text-decoration: none;
+    background-size: 100% 1px;
+  }
+
+  .editorial-qa__handle:focus-visible,
+  .editorial-cta__link:focus-visible,
+  .editorial-publish__link:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 4px;
+  }
+
+
+  /* =========================================================
+    02 — HERO (split duo, hover caption)
+    Sections 1, 4, 6, 8, 10
+    ========================================================= */
+  .editorial-hero {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .editorial-hero__item {
+    position: relative;
+    flex: 1 1 50%;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .editorial-hero__link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .editorial-hero__link:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: -4px;
+  }
+
+  .editorial-hero__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+  }
+
+  .editorial-hero__caption {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    color: #fff;
+    font-size: 35px;
+    font-weight: 300;
+    line-height: 1.3;
+    text-align: left;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .editorial-hero__item:hover .editorial-hero__caption,
+  .editorial-hero__item:focus-within .editorial-hero__caption {
+    opacity: 1;
+  }
+
+  /* Modifier: tall (Sections 4, 8) */
+  .editorial-hero--tall .editorial-hero__item {
+    aspect-ratio: 4 / 5;
+  }
+
+  /* Modifier: wide-left / wide-right (Sections 6, 10) — 66 / 34 split */
+  @media (min-width: 768px) {
+    .editorial-hero--wide-left,
+    .editorial-hero--wide-right {
+      align-items: flex-start;
+    }
+
+    .editorial-hero--wide-left .editorial-hero__item,
+    .editorial-hero--wide-right .editorial-hero__item {
+      aspect-ratio: 4 / 5;
+    }
+
+    .editorial-hero--wide-left .editorial-hero__item:first-child,
+    .editorial-hero--wide-right .editorial-hero__item:last-child {
+      flex: 0 0 66%;
+    }
+
+    .editorial-hero--wide-left .editorial-hero__item:last-child,
+    .editorial-hero--wide-right .editorial-hero__item:first-child {
+      flex: 0 0 34%;
+    }
+  }
+
+  /* Touch devices: caption always visible at the bottom */
+  @media (hover: none) {
+    .editorial-hero__caption {
+      align-items: flex-end;
+      padding: 16px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 40%);
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .editorial-hero {
+      flex-direction: column;
+    }
+
+    .editorial-hero__item {
+      flex-basis: auto;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+    }
+
+    .editorial-hero__caption {
+      display: none;
+    }
+
+    /* Section 6: clay image moves on top, 60% width, right-aligned */
+    .editorial-hero--wide-left .editorial-hero__item:last-child {
+      order: -1;
+      align-self: flex-end;
+      width: 60%;
+    }
+
+    /* Section 10: sneakers image on top, 60% width, right-aligned */
+    .editorial-hero--wide-right .editorial-hero__item:first-child {
+      align-self: flex-end;
+      width: 60%;
+    }
+  }
+
+
+  /* =========================================================
+    03 — INTRO
+    Section 2
+    ========================================================= */
+  .editorial-intro {
+    width: 40%;
+    margin: 75px auto 0;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    color: #000;
+  }
+
+  .editorial-intro__title {
+    margin: 0 0 48px;
+    font-size: 50px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-align: center;
+  }
+
+  .editorial-intro__body {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .editorial-intro__lead {
+    margin: 0 0 28px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .editorial-intro__text {
+    margin: 0 0 18px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .editorial-intro__text:last-child {
+    margin-bottom: 0;
+  }
+
+  .editorial-intro__text--context {
+    font-size: 20px;
+  }
+
+  .editorial-intro__text--outro {
+    font-size: 16px;
+  }
+
+  @media (max-width: 767.98px) {
+    .editorial-intro {
+      width: 90%;
+      margin: var(--ed-space-block) auto var(--ed-space-section);
+    }
+
+    .editorial-intro__title {
+      margin-bottom: var(--ed-space-block);
+      font-size: 35px;
+    }
+
+    .editorial-intro__lead {
+      margin-bottom: var(--ed-space-block);
+    }
+  }
+
+
+  /* =========================================================
+    04 — Q&A (staggered duo)
+    Sections 3, 5, 7, 9
+    ========================================================= */
+  .editorial-qa {
+    padding: 0 0 75px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    color: #000;
+  }
+
+  .editorial-qa__question {
+    width: fit-content;
+    margin: 75px auto;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  /* Answers */
+  .editorial-qa__answer {
+    width: 33%;
+  }
+
+  .editorial-qa__answer--left {
+    margin-left: 5%;
+  }
+
+  .editorial-qa__answer--right {
+    margin-top: 48px;
+    margin-left: 62%;
+  }
+
+  .editorial-qa__header {
+    display: flex;
+    align-items: baseline;
+    gap: 40px;
+    margin-bottom: 20px;
+  }
+
+  .editorial-qa__name {
+    margin: 0;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  .editorial-qa__handle {
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+  }
+
+  .editorial-qa__text {
+    margin: 0 0 32px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  /* Figures & images */
+  .editorial-qa__figure {
+    margin: 0 0 24px;
+  }
+
+  .editorial-qa__figure:last-child {
+    margin-bottom: 0;
+  }
+
+  .editorial-qa__link {
+    display: block;
+  }
+
+  .editorial-qa__link:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+  }
+
+  .editorial-qa__img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    object-fit: cover;
+  }
+
+  .editorial-qa__img--square {
+    aspect-ratio: 1 / 1;
+  }
+
+  .editorial-qa__img--portrait {
+    aspect-ratio: 4 / 5;
+  }
+
+  /* Video */
+  .editorial-qa__video {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    filter: grayscale(0);
+  }
+
+  .editorial-qa__media {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Sound toggle */
+  .editorial-qa__sound {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .editorial-qa__sound:focus,
+  .editorial-qa__sound:active {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .editorial-qa__sound:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  .editorial-qa__sound svg {
+    width: 20px;
+    height: 20px;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.35));
+  }
+
+  .editorial-qa__sound .editorial-qa__icon--on,
+  .editorial-qa__sound[aria-pressed="true"] .editorial-qa__icon--off {
+    display: none;
+  }
+
+  .editorial-qa__sound[aria-pressed="true"] .editorial-qa__icon--on {
+    display: block;
+  }
+
+  /* Desktop: a figure followed only by a hidden mobile aside is visually last */
+  @media (min-width: 768px) {
+    .editorial-qa__figure:has(+ .editorial-qa__aside--mobile:last-child) {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .editorial-qa {
+      width: 90%;
+      margin: 0 auto;
+      padding: 0 0 var(--ed-space-section);
+    }
+
+    .editorial-qa__question {
+      width: 100%;
+      margin: 0 0 var(--ed-space-block);
+      font-size: 19px;
+      text-align: left;
+    }
+
+    .editorial-qa__answer,
+    .editorial-qa__answer--left,
+    .editorial-qa__answer--right {
+      width: 100%;
+      margin: 0;
+    }
+
+    /* Second answer in any section, regardless of left/right order */
+    .editorial-qa .editorial-qa__answer ~ .editorial-qa__answer {
+      margin-top: var(--ed-space-block);
+    }
+
+    .editorial-qa__header {
+      gap: 24px;
+      margin-bottom: var(--ed-space-header);
+    }
+
+    .editorial-qa__text {
+      margin: 0 0 var(--ed-space-text);
+    }
+
+    .editorial-qa__figure {
+      margin: 0 0 var(--ed-space-media);
+    }
+
+    /* Mobile-only asides that sit inside an answer */
+    .editorial-qa .editorial-qa__answer > .editorial-qa__aside {
+      margin: 0 0 var(--ed-space-media);
+    }
+
+    .editorial-qa .editorial-qa__answer > :last-child,
+    .editorial-qa .editorial-qa__stack > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+
+  /* =========================================================
+    05 — Q&A GRID (modifier on 04)
+    Sections 5, 7, 9
+    ========================================================= */
+  .editorial-qa--grid {
+    padding: 75px;
+  }
+
+  .editorial-qa__layout {
+    display: grid;
+    grid-template-columns: 5% 33% 1fr 33% 5%;
+    row-gap: 60px;
+  }
+
+  .editorial-qa__layout > :first-child {
+    grid-row: 1;
+  }
+
+  .editorial-qa__layout > :last-child {
+    grid-row: 2;
+  }
+
+  .editorial-qa--grid .editorial-qa__answer {
+    width: auto;
+    margin: 0;
+  }
+
+  .editorial-qa--grid .editorial-qa__answer--left {
+    grid-column: 2;
+  }
+
+  .editorial-qa--grid .editorial-qa__answer--right {
+    grid-column: 4;
+  }
+
+  /* Aside image (sits in the column opposite the first answer) */
+  .editorial-qa__aside {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    margin: 0;
+  }
+
+  .editorial-qa__aside--right {
+    grid-column: 4;
+  }
+
+  .editorial-qa__aside--end {
+    align-self: end;
+  }
+
+  @media (max-width: 767.98px) {
+    .editorial-qa--grid {
+      padding: var(--ed-space-section) 0;
+    }
+
+    .editorial-qa__layout {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .editorial-qa__aside {
+      width: 100%;
+    }
+  }
+
+
+  /* =========================================================
+    05a — Q&A GRID, BOTTOM-ALIGNED (modifier on 05)
+    Section 5 — left image bottom lines up with the first right image
+    ========================================================= */
+  .editorial-qa__layout--aligned-end {
+    row-gap: 0;
+  }
+
+  .editorial-qa__layout--aligned-end .editorial-qa__answer--right {
+    display: contents;
+  }
+
+  .editorial-qa__layout--aligned-end .editorial-qa__intro {
+    grid-column: 4;
+    grid-row: 1;
+  }
+
+  .editorial-qa__layout--aligned-end .editorial-qa__answer--right > .editorial-qa__figure:nth-of-type(1) {
+    grid-column: 4;
+    grid-row: 2;
+  }
+
+  .editorial-qa__layout--aligned-end .editorial-qa__answer--right > .editorial-qa__figure:nth-of-type(2) {
+    grid-column: 4;
+    grid-row: 3;
+  }
+
+  .editorial-qa__layout--aligned-end .editorial-qa__aside {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    margin-bottom: 24px;
+  }
+
+  .editorial-qa__layout--aligned-end .editorial-qa__answer--left {
+    grid-column: 2;
+    grid-row: 4;
+    margin-top: 48px;
+  }
+
+  @media (max-width: 767.98px) {
+    .editorial-qa__layout--aligned-end .editorial-qa__answer--right {
+      display: block;
+    }
+  }
+
+
+  /* =========================================================
+    05b — Q&A GRID, TOP-ALIGNED (modifier on 05)
+    Section 7 — right image top lines up with the first left image
+    ========================================================= */
+  .editorial-qa__layout--aligned {
+    row-gap: 0;
+  }
+
+  .editorial-qa__layout--aligned .editorial-qa__answer--left {
+    display: contents;
+  }
+
+  .editorial-qa__layout--aligned .editorial-qa__intro {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .editorial-qa__layout--aligned .editorial-qa__stack {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .editorial-qa__layout--aligned .editorial-qa__aside {
+    grid-column: 4;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .editorial-qa__layout--aligned .editorial-qa__answer--right {
+    grid-column: 4;
+    grid-row: 3;
+    margin-top: 48px;
+  }
+
+  @media (max-width: 767.98px) {
+    .editorial-qa__layout--aligned .editorial-qa__answer--left {
+      display: block;
+    }
+
+    /* Bag image follows the left stack as part of the same media run */
+    .editorial-qa__layout--aligned > .editorial-qa__aside {
+      margin: var(--ed-space-media) 0 0;
+    }
+  }
+
+
+  /* =========================================================
+    06 — CREDITS
+    Section 11
+    ========================================================= */
+  .credits {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 100px 24px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    color: #000;
+    text-align: left;
+  }
+
+  .credits__group {
+    margin: 0;
+  }
+
+  .credits__name {
+    margin: 0;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  .credits__role {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+
+  @media (max-width: 767.98px) {
+    .credits {
+      gap: 28px;
+      width: 90%;
+      padding: var(--ed-space-section) 0 var(--ed-space-block);
+    }
+  }
+
+
+  /* =========================================================
+    07 — CTA
+    Section 12
+    ========================================================= */
+  .editorial-cta {
+    padding-bottom: 100px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    text-align: center;
+  }
+
+  .editorial-cta__link {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  @media (max-width: 767.98px) {
+    .editorial-cta {
+      padding-bottom: var(--ed-space-section);
+    }
+  }
+
+
+  /* =========================================================
+    08 — PUBLISH INFO
+    Section 13
+    ========================================================= */
+  .editorial-publish {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 48px 40px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;
+    color: #000;
+  }
+
+  .editorial-publish__date {
+    margin: 0;
+  }
+
+  @media (max-width: 767.98px) {
+    .editorial-publish {
+      padding: 40px 5%;
+    }
+  }
+
+
+  /* =========================================================
+    09 — REDUCED MOTION
+    ========================================================= */
+  @media (prefers-reduced-motion: reduce) {
+    .editorial-hero__caption,
+    .editorial-qa__handle,
+    .editorial-cta__link,
+    .editorial-publish__link {
+      transition: none;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+
+  <!-- =========================================================
+      SECTION 1 — EDITORIAL HERO (split duo, hover caption)
+      ========================================================= -->
+  <section class="editorial-hero js-vertical-slider" aria-label="A Shared Ground">
+    <figure class="editorial-hero__item">
+      <a class="editorial-hero__link js-shop-the-collection" data-pid="PU2-25210002_ESBRWE,PU1-76210001_BLACK" href="$url('Product-Show','pid','PU2-25210002_ESBRWE')$">
+        <picture class="editorial-hero__picture">
+          <source
+            media="(max-width: 767.98px)"
+            srcset="images/a-shared-ground/a-shared-ground-a1_mobile.jpg?$staticlink$">
+          <img
+            class="editorial-hero__img"
+            src="images/a-shared-ground/a-shared-ground-a1.jpg?$staticlink$"
+            alt="Jabari Wimbley in his studio holding a black PEDRO bag"
+            fetchpriority="high">
+        </picture>
+      </a>
+      <figcaption class="editorial-hero__caption">Jabari Wimbley</figcaption>
+    </figure>
+    <figure class="editorial-hero__item">
+      <a class="editorial-hero__link js-shop-the-collection" data-pid="PU2-25210002_BLK.EM,PU1-76210001_CHALK" href="$url('Product-Show','pid','PU2-25210002_BLK.EM')$">
+        <img
+          class="editorial-hero__img"
+          src="images/a-shared-ground/a-shared-ground-a2.jpg?$staticlink$"
+          alt="Tahni Bouhadana in a long black coat holding a black PEDRO bag"
+          fetchpriority="high">
+      </a>
+      <figcaption class="editorial-hero__caption">Tahni Bouhadana</figcaption>
+    </figure>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 2 — EDITORIAL INTRO
+      ========================================================= -->
+  <section class="editorial-intro">
+    <h1 class="editorial-intro__title">A Shared Ground</h1>
+    <div class="editorial-intro__body">
+      <p class="editorial-intro__lead">An experiment to find yourself in what you do not see.</p>
+      <p class="editorial-intro__text editorial-intro__text--context">Sculptor Tahni Bouhadana and photographer-textile artist Jabari Wimbley work across different disciplines, finding inspiration in the objects, textures and details around them. Though their practices take different paths, both begin with close observation, looking beyond the familiar to find new possibilities.</p>
+      <p class="editorial-intro__text editorial-intro__text--outro">For Fall 2026, PEDRO brings these perspectives together, exploring how creative expression can reveal something personal in the everyday. Here, Tahni and Jabari share the influences behind their practices and how they transform what they encounter into something of their own.</p>
+    </div>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 3 — EDITORIAL Q&A (staggered duo, repeatable)
+      ========================================================= -->
+  <section class="editorial-qa">
+    <h2 class="editorial-qa__question">Who are you and how would you describe your practice?</h2>
+
+    <article class="editorial-qa__answer editorial-qa__answer--left">
+      <header class="editorial-qa__header">
+        <h3 class="editorial-qa__name">Tahni Bouhadana</h3>
+        <a class="editorial-qa__handle" href="https://www.instagram.com/Tahnibou/" target="_blank" rel="noopener">@Tahnibou</a>
+      </header>
+      <p class="editorial-qa__text">I’m Tahni Bouhadana, a sculptor working with ceramics, resin and spatial form. My work is about giving physical weight to memory and geometry, taking visual stillness and carving it into tangible objects.</p>
+      <figure class="editorial-qa__figure">
+        <a class="editorial-qa__link js-shop-the-collection" data-pid="PU2-25210001_BLK.EM" href="$url('Product-Show','pid','PU2-25210001_BLK.EM')$">
+          <img class="editorial-qa__img" src="images/a-shared-ground/a-shared-ground-b1.jpg?$staticlink$" alt="Tahni Bouhadana seated at a worktable in her ceramics studio" loading="lazy">
+        </a>
+      </figure>
+      <figure class="editorial-qa__figure">
+        <img class="editorial-qa__img" src="images/a-shared-ground/a-shared-ground-c1.jpg?$staticlink$" alt="Sketchbook with vessel drawings beside ceramic bowls" loading="lazy">
+      </figure>
+    </article>
+
+    <article class="editorial-qa__answer editorial-qa__answer--right">
+      <header class="editorial-qa__header">
+        <h3 class="editorial-qa__name">Jabari Wimbley</h3>
+        <a class="editorial-qa__handle" href="https://www.instagram.com/Wimbleyyy/" target="_blank" rel="noopener">@Wimbleyyy</a>
+      </header>
+      <p class="editorial-qa__text">I’m Jabari Wimbley, a photographer and textile artist based in Los Angeles. I focus on portraiture using latch-hooking, raw fabrics and domestic objects to explore human character and everyday intimacy.</p>
+      <figure class="editorial-qa__figure">
+        <div class="editorial-qa__video">
+          <video
+            class="editorial-qa__media"
+            src="images/a-shared-ground/a-shared-ground-d1.mp4?$staticlink$"
+            poster="https://placehold.co/1000x1250/e9e7e3/999?text=Jabari+Video"
+            aria-label="Jabari Wimbley in his studio"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"></video>
+          <button class="editorial-qa__sound" type="button" aria-pressed="false" aria-label="Turn sound on">
+            <svg class="editorial-qa__icon editorial-qa__icon--off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/>
+              <path d="M16 9.5l5 5M21 9.5l-5 5" stroke-linecap="round"/>
+            </svg>
+            <svg class="editorial-qa__icon editorial-qa__icon--on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/>
+              <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </figure>
+    </article>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 4 — EDITORIAL SPLIT DUO, TALL
+      ========================================================= -->
+  <section class="editorial-hero editorial-hero--tall" aria-label="Jabari Wimbley portraits">
+    <figure class="editorial-hero__item">
+      <a class="editorial-hero__link js-shop-the-collection" data-pid="PU2-25210002_ESBRWE" href="$url('Product-Show','pid','PU2-25210002_ESBRWE')$">
+        <img
+          class="editorial-hero__img"
+          src="images/a-shared-ground/a-shared-ground-e1.jpg?$staticlink$"
+          alt="Jabari Wimbley seated with a dark brown PEDRO bag on his lap"
+          loading="lazy">
+      </a>
+    </figure>
+    <figure class="editorial-hero__item">
+      <a class="editorial-hero__link js-shop-the-collection" data-pid="PU1-76210001_BLACK" href="$url('Product-Show','pid','PU1-76210001_BLACK')$">
+        <img
+          class="editorial-hero__img"
+          src="images/a-shared-ground/a-shared-ground-e2.jpg?$staticlink$"
+          alt="Close-up of black and white PEDRO sneakers on a wooden floor"
+          loading="lazy">
+      </a>
+    </figure>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 5 — EDITORIAL Q&A GRID
+      ========================================================= -->
+  <section class="editorial-qa editorial-qa--grid">
+    <h2 class="editorial-qa__question">What inspires your work?</h2>
+
+    <div class="editorial-qa__layout editorial-qa__layout--aligned-end">
+      <article class="editorial-qa__answer editorial-qa__answer--right">
+        <div class="editorial-qa__intro">
+          <header class="editorial-qa__header">
+            <h3 class="editorial-qa__name">Jabari Wimbley</h3>
+          </header>
+          <p class="editorial-qa__text">I’m inspired by domestic intimacy, the way people live with their things and the unspoken character inside everyday objects. It’s the lived-in details that pull me in. When I come across a texture or object that feels honest and unscripted, it can become the starting point for a new textile piece or portrait.</p>
+        </div>
+        <figure class="editorial-qa__figure">
+          <a class="editorial-qa__link js-shop-the-collection" data-pid="PU1-76210001_BLACK" href="$url('Product-Show','pid','PU1-76210001_BLACK')$">
+            <img class="editorial-qa__img editorial-qa__img--portrait" src="images/a-shared-ground/a-shared-ground-f2.jpg?$staticlink$" alt="Jabari Wimbley crouched on a wooden floor wearing black and white PEDRO sneakers" loading="lazy">
+          </a>
+        </figure>
+        <figure class="editorial-qa__figure">
+          <a class="editorial-qa__link js-shop-the-collection" data-pid="PU1-76210001_BLACK,PU2-25210002_ESBRWE" href="$url('Product-Show','pid','PU1-76210001_BLACK')$">
+            <img class="editorial-qa__img" src="images/a-shared-ground/a-shared-ground-g1.jpg?$staticlink$" alt="Jabari Wimbley standing beside his textile work in a bright studio" loading="lazy">
+          </a>
+        </figure>
+      </article>
+
+      <figure class="editorial-qa__aside editorial-qa__aside--end d-md-block d-none">
+        <a class="editorial-qa__link js-shop-the-collection" data-pid="PU2-25210001_BLK.EM" href="$url('Product-Show','pid','PU2-25210001_BLK.EM')$">
+          <img class="editorial-qa__img" src="images/a-shared-ground/a-shared-ground-f1.jpg?$staticlink$" alt="A black PEDRO bag on a shelf among white ceramic vessels" loading="lazy">
+        </a>
+      </figure>
+
+      <article class="editorial-qa__answer editorial-qa__answer--left">
+        <header class="editorial-qa__header">
+          <h3 class="editorial-qa__name">Tahni Bouhadana</h3>
+        </header>
+        <p class="editorial-qa__text">I'm shaped by quiet memory, light and how raw earth feels under your hands. I pay close attention to the way shapes settle and light lands. When a feeling or sound stays with me, I know it's worth exploring, and I translate that moment into something physical and lasting.</p>
+        <figure class="editorial-qa__figure">
+          <div class="editorial-qa__video">
+            <video
+              class="editorial-qa__media"
+              src="images/a-shared-ground/a-shared-ground-h1.mp4?$staticlink$"
+              poster="https://placehold.co/1000x1250/e9e7e3/999?text=Tahei+Video"
+              aria-label="Tahni Bouhadana in her studio"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"></video>
+            <button class="editorial-qa__sound" type="button" aria-pressed="false" aria-label="Turn sound on">
+              <svg class="editorial-qa__icon editorial-qa__icon--off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/>
+                <path d="M16 9.5l5 5M21 9.5l-5 5" stroke-linecap="round"/>
+              </svg>
+              <svg class="editorial-qa__icon editorial-qa__icon--on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/>
+                <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </figure>
+        <figure class="editorial-qa__aside editorial-qa__aside--mobile d-block d-md-none">
+          <a class="editorial-qa__link js-shop-the-collection" data-pid="PU2-25210001_BLK.EM" href="$url('Product-Show','pid','PU2-25210001_BLK.EM')$">
+            <img class="editorial-qa__img" src="images/a-shared-ground/a-shared-ground-f1.jpg?$staticlink$" alt="A black PEDRO bag on a shelf among white ceramic vessels" loading="lazy">
+          </a>
+        </figure>
+      </article>
+    </div>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 6 — EDITORIAL SPLIT DUO, WIDE LEFT
+      ========================================================= -->
+  <section class="editorial-hero editorial-hero--wide-left" aria-label="Tahni Bouhadana in the studio">
+    <figure class="editorial-hero__item">
+      <a class="editorial-hero__link js-shop-the-collection" data-pid="PU2-25210002_BLK.EM" href="$url('Product-Show','pid','PU2-25210002_BLK.EM')$">
+        <img
+          class="editorial-hero__img"
+          src="images/a-shared-ground/a-shared-ground-i1.jpg?$staticlink$"
+          alt="Tahni Bouhadana leaning against a white wall holding a black PEDRO bag"
+          loading="lazy">
+      </a>
+    </figure>
+    <figure class="editorial-hero__item">
+      <img
+        class="editorial-hero__img"
+        src="images/a-shared-ground/a-shared-ground-i2.jpg?$staticlink$"
+        alt="Hands shaping a clay bowl on a pottery wheel"
+        loading="lazy">
+    </figure>
+  </section>
+
+
+  <!-- =========================================================
+    SECTION 7 — EDITORIAL Q&A GRID
+    ========================================================= -->
+  <section class="editorial-qa editorial-qa--grid">
+    <h2 class="editorial-qa__question">How do you take an idea from another medium and translate it into your own?</h2>
+
+    <div class="editorial-qa__layout editorial-qa__layout--aligned">
+      <article class="editorial-qa__answer editorial-qa__answer--left">
+        <div class="editorial-qa__intro">
+          <header class="editorial-qa__header">
+            <h3 class="editorial-qa__name">Tahni Bouhadana</h3>
+          </header>
+          <p class="editorial-qa__text">I use photography as a blueprint for form. When I look at a flat image, I'm reading the line, the shadow and the negative space. In the studio, I take those two-dimensional cues and give them three-dimensional body and surface through my hands.</p>
+        </div>
+        <div class="editorial-qa__stack">
+          <figure class="editorial-qa__figure">
+            <a class="editorial-qa__link js-shop-the-collection" data-pid="PU1-76210001_BLACK" href="$url('Product-Show','pid','PU1-76210001_BLACK')$">
+              <img class="editorial-qa__img" src="images/a-shared-ground/a-shared-ground-j1.jpg?$staticlink$" alt="Tahni Bouhadana working at a pottery wheel in her studio" loading="lazy">
+            </a>
+          </figure>
+          <figure class="editorial-qa__figure">
+            <div class="editorial-qa__video">
+              <video
+                class="editorial-qa__media"
+                src="images/a-shared-ground/a-shared-ground-k1.mp4?$staticlink$"
+                poster="https://placehold.co/1000x1250/e9e7e3/999?text=Tahei+Bouhadana+at+work"
+                aria-label="Tahni Bouhadana at work"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"></video>
+              <button class="editorial-qa__sound" type="button" aria-pressed="false" aria-label="Turn sound on">
+                <svg class="editorial-qa__icon editorial-qa__icon--off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/>
+                  <path d="M16 9.5l5 5M21 9.5l-5 5" stroke-linecap="round"/>
+                </svg>
+                <svg class="editorial-qa__icon editorial-qa__icon--on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/>
+                  <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </figure>
+        </div>
+      </article>
+
+      <figure class="editorial-qa__aside editorial-qa__aside--right">
+        <a class="editorial-qa__link js-shop-the-collection" data-pid="PU2-25210001_OLIVE" href="$url('Product-Show','pid','PU2-25210001_OLIVE')$">
+          <img class="editorial-qa__img editorial-qa__img--portrait" src="images/a-shared-ground/a-shared-ground-j2.jpg?$staticlink$" alt="A brown PEDRO bag resting on a stool beside a pottery wheel" loading="lazy">
+        </a>
+      </figure>
+
+      <article class="editorial-qa__answer editorial-qa__answer--right">
+        <header class="editorial-qa__header">
+          <h3 class="editorial-qa__name">Jabari Wimbley</h3>
+        </header>
+        <p class="editorial-qa__text">I work in reverse, starting with raw physical materials and arranging objects by hand. Once that tactile scene exists, I photograph it. The camera translates all that physical texture back into a flat visual frame.</p>
+        <figure class="editorial-qa__figure">
+          <img class="editorial-qa__img editorial-qa__img--portrait" src="images/a-shared-ground/a-shared-ground-l1.jpg?$staticlink$" alt="Jabari Wimbley hanging a large textile piece on a wall" loading="lazy">
+        </figure>
+      </article>
+    </div>
+  </section>
+
+  <!-- =========================================================
+      SECTION 8 — EDITORIAL SPLIT DUO, TALL
+      ========================================================= -->
+  <section class="editorial-hero editorial-hero--tall" aria-label="Portraits by the window">
+    <figure class="editorial-hero__item">
+      <a class="editorial-hero__link js-shop-the-collection" data-pid="PU1-76210001_BLACK,PU2-25210001_BLK.EM" href="$url('Product-Show','pid','PU1-76210001_BLACK')$">
+        <img
+          class="editorial-hero__img"
+          src="images/a-shared-ground/a-shared-ground-m1.jpg?$staticlink$"
+          alt="Tahni Bouhadana in a long black coat standing by a large window"
+          loading="lazy">
+      </a>
+    </figure>
+    <figure class="editorial-hero__item">
+      <a class="editorial-hero__link js-shop-the-collection" data-pid="PU2-25210001_BLK.EM" href="$url('Product-Show','pid','PU2-25210001_BLK.EM')$">
+        <img
+          class="editorial-hero__img"
+          src="images/a-shared-ground/a-shared-ground-m2.jpg?$staticlink$"
+          alt="Jabari Wimbley holding a black PEDRO bag in front of him"
+          loading="lazy">
+      </a>
+    </figure>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 9 — EDITORIAL Q&A GRID
+      ========================================================= -->
+  <section class="editorial-qa editorial-qa--grid">
+    <h2 class="editorial-qa__question">What is the biggest misconception about making art today?</h2>
+
+    <div class="editorial-qa__layout">
+      <article class="editorial-qa__answer editorial-qa__answer--right">
+        <header class="editorial-qa__header">
+          <h3 class="editorial-qa__name">Jabari Wimbley</h3>
+        </header>
+        <p class="editorial-qa__text">That art has to be clean and perfect to be good. In a world full of polished digital images, it's easy to overlook the character that comes from raw textures and imperfections. Fraying threads, rough edges and domestic clutter can make a portrait feel more human.</p>
+        <figure class="editorial-qa__figure">
+          <a class="editorial-qa__link js-shop-the-collection" data-pid="PU1-76210001_CHALK,PU2-25210002_ESBRWE" href="$url('Product-Show','pid','PU1-76210001_CHALK')$">
+            <img class="editorial-qa__img editorial-qa__img--portrait" src="images/a-shared-ground/a-shared-ground-n1.jpg?$staticlink$" alt="Jabari Wimbley standing in a doorway holding a brown PEDRO bag" loading="lazy">
+          </a>
+        </figure>
+        <figure class="editorial-qa__figure">
+          <div class="editorial-qa__video">
+            <video
+              class="editorial-qa__media"
+              src="images/a-shared-ground/a-shared-ground-o2.mp4?$staticlink$"
+              poster="https://placehold.co/1000x1250/e9e7e3/999?text=Jabari+Video"
+              aria-label="Jabari Wimbley at home"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"></video>
+            <button class="editorial-qa__sound" type="button" aria-pressed="false" aria-label="Turn sound on">
+              <svg class="editorial-qa__icon editorial-qa__icon--off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/>
+                <path d="M16 9.5l5 5M21 9.5l-5 5" stroke-linecap="round"/>
+              </svg>
+              <svg class="editorial-qa__icon editorial-qa__icon--on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/>
+                <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </figure>
+      </article>
+
+      <figure class="editorial-qa__aside editorial-qa__aside--end d-md-block d-none">
+        <a class="editorial-qa__link js-shop-the-collection" data-pid="PU2-25210002_BLK.EM" href="$url('Product-Show','pid','PU2-25210002_BLK.EM')$">
+          <img class="editorial-qa__img" src="images/a-shared-ground/a-shared-ground-o1.jpg?$staticlink$" alt="A black PEDRO bag on top of stacked cardboard boxes" loading="lazy">
+        </a>
+      </figure>
+
+      <article class="editorial-qa__answer editorial-qa__answer--left">
+        <header class="editorial-qa__header">
+          <h3 class="editorial-qa__name">Tahni Bouhadana</h3>
+        </header>
+        <p class="editorial-qa__text">That making things should be fast. Sculpture forces you to work at the pace of the material. Clay needs time to dry, it resists, it cracks. You spend hours sanding, correcting and sitting with mistakes. That physical friction is part of the work, and often where the work takes shape.</p>
+        <figure class="editorial-qa__aside d-block d-md-none">
+          <a class="editorial-qa__link js-shop-the-collection" data-pid="PU2-25210002_BLK.EM" href="$url('Product-Show','pid','PU2-25210002_BLK.EM')$">
+            <img class="editorial-qa__img" src="images/a-shared-ground/a-shared-ground-o1.jpg?$staticlink$" alt="A black PEDRO bag on top of stacked cardboard boxes" loading="lazy">
+          </a>
+        </figure>
+        <figure class="editorial-qa__figure">
+          <a class="editorial-qa__link js-shop-the-collection" data-pid="PU2-25210002_BLK.EM" href="$url('Product-Show','pid','PU2-25210002_BLK.EM')$">
+            <img class="editorial-qa__img editorial-qa__img--portrait" src="images/a-shared-ground/a-shared-ground-p1.jpg?$staticlink$" alt="Tahni Bouhadana holding a black PEDRO bag" loading="lazy">
+          </a>
+        </figure>
+      </article>
+    </div>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 10 — EDITORIAL SPLIT DUO, WIDE RIGHT
+      ========================================================= -->
+  <section class="editorial-hero editorial-hero--wide-right" aria-label="Jabari Wimbley outdoors">
+    <figure class="editorial-hero__item">
+      <a class="editorial-hero__link js-shop-the-collection" data-pid="PU1-76210001_CHALK" href="$url('Product-Show','pid','PU1-76210001_CHALK')$">
+        <img
+          class="editorial-hero__img"
+          src="images/a-shared-ground/a-shared-ground-q1.jpg?$staticlink$"
+          alt="A pair of white PEDRO sneakers with navy panels"
+          loading="lazy">
+      </a>
+    </figure>
+    <figure class="editorial-hero__item">
+      <a class="editorial-hero__link js-shop-the-collection" data-pid="PU2-25210001_TAU.SU,PU1-76210001_CHALK" href="$url('Product-Show','pid','PU2-25210001_TAU.SU')$">
+        <img
+          class="editorial-hero__img"
+          src="images/a-shared-ground/a-shared-ground-q2.jpg?$staticlink$"
+          alt="Jabari Wimbley in a beige suit leaning against a white brick wall"
+          loading="lazy">
+      </a>
+    </figure>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 11 — CREDITS
+      ========================================================= -->
+  <section class="credits" aria-label="Credits">
+    <div class="credits__group">
+      <p class="credits__name">Tahni Bouhadana</p>
+      <p class="credits__role">Photography &amp; Video: Marieke Bosma</p>
+    </div>
+    <div class="credits__group">
+      <p class="credits__name">Jabari Wimbley</p>
+      <p class="credits__role">Photography: Spruce Bohen</p>
+      <p class="credits__role">Styling: Kevin Collide</p>
+      <p class="credits__role">Video: Allius Barnes</p>
+    </div>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 12 — EDITORIAL CTA
+      ========================================================= -->
+  <section class="editorial-cta">
+    <a class="editorial-cta__link" href="$url('Page-Show','cid','universal')$">Discover our Universal Collection</a>
+  </section>
+
+
+  <!-- =========================================================
+      SECTION 13 — PUBLISH INFO
+      ========================================================= -->
+  <section class="editorial-publish">
+    <p class="editorial-publish__date">Published on 12 October 2026</p>
+    <a class="editorial-publish__link" href="$url('Search-Show','cgid','pwnewarrivals')$">SHOP WOMEN'S NEW ARRIVALS</a>
+    <a class="editorial-publish__link" href="$url('Search-Show','cgid','pmnewarrivals')$">SHOP MEN'S NEW ARRIVALS</a>
+  </section>
+
+
+  <script>
+    (function () {
+      function setup(wrap) {
+        if (wrap.dataset.videoReady) return;
+        wrap.dataset.videoReady = 'true';
+
+        var video = wrap.querySelector('.editorial-qa__media');
+        var toggle = wrap.querySelector('.editorial-qa__sound');
+        if (!video || !toggle) return;
+
+        video.muted = true;
+        var attempt = video.play();
+        if (attempt && attempt.catch) attempt.catch(function () {});
+
+        toggle.addEventListener('click', function () {
+          var soundOn = video.muted;
+          video.muted = !soundOn;
+          if (soundOn) {
+            video.volume = 1;
+            var resume = video.play();
+            if (resume && resume.catch) resume.catch(function () {});
+          }
+          toggle.setAttribute('aria-pressed', String(soundOn));
+          toggle.setAttribute('aria-label', soundOn ? 'Turn sound off' : 'Turn sound on');
+        });
+      }
+
+      function init() {
+        var videos = document.querySelectorAll('.editorial-qa__video');
+        Array.prototype.forEach.call(videos, setup);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+
+</body>
+
+</html>

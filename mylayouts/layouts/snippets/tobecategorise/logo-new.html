@@ -1,0 +1,164 @@
+<style>
+
+/* ===========================================================
+   PEDRO LOGO — DESKTOP SIZING
+   Fixes the logo dimensions on large screens (≥1023px)
+   =========================================================== */
+@media (min-width: 1023px) {
+    .parallax_banner-logo {
+        height: 40px !important;
+        width: 150px !important;
+        max-width: 150px !important;
+    }
+}
+
+/* ===========================================================
+   PEDRO LOGO — COLOR SWAP LOGIC
+   Three logo images (white + black + custom gif) sit in the DOM together.
+   Precedence (later rules win ties, since specificity is equal):
+     1. `.theme_light` sets the page-level DEFAULT (white logo).
+     2. `.icons-white` / `.icons-black` / `.icons-custom` are section-driven
+        OVERRIDES from the scroll script (updateIconColor) and
+        must be declared AFTER theme_light so they can win even
+        when theme_light is also present/forced on the page.
+   =========================================================== */
+
+/* Hide all by default; the rules below decide which one appears */
+.logo_static img.logo-white,
+.logo_static img.logo-black,
+.logo_static img.logo-custom {
+    display: none !important;
+}
+
+/* default: black logo */
+.page_header .logo_static img.logo-black {
+    display: inline-block !important;
+}
+
+/* theme_light present -> transparent header background -> white logo (page-level default) */
+.page_header.theme_light .logo_static img.logo-white {
+    display: inline-block !important;
+}
+.page_header.theme_light .logo_static img.logo-black {
+    display: none !important;
+}
+
+/* icons-white present (section override) -> white logo, even if theme_light is also set */
+.page_header.icons-white .logo_static img.logo-white {
+    display: inline-block !important;
+}
+.page_header.icons-white .logo_static img.logo-black {
+    display: none !important;
+}
+
+/* icons-black present (section override) -> force BLACK logo, overriding theme_light's white default */
+.page_header.icons-black .logo_static img.logo-black {
+    display: inline-block !important;
+}
+.page_header.icons-black .logo_static img.logo-white {
+    display: none !important;
+}
+
+/* icons-custom present (section override) -> force CUSTOM logo, overriding theme_light's white default */
+.page_header.icons-custom .logo_static img.logo-custom {
+    display: inline-block !important;
+}
+.page_header.icons-custom .logo_static img.logo-white,
+.page_header.icons-custom .logo_static img.logo-black {
+    display: none !important;
+}
+
+/* default: black logo for checkout mobile (no color-swap needed here) */
+.navigation .header .logo_static img.logo-black {
+    display: inline-block !important;
+}
+
+/* ===========================================================
+   HEADER ICONS — COLOR SWAP LOGIC
+   Same default/override logic and precedence as the logo above.
+   =========================================================== */
+
+/* opaque white header (theme_light not present) -> black icons (page-level default) */
+.page_header {
+    --icon-color: black;
+}
+
+/* transparent header (theme_light present) -> white icons (page-level default) */
+/* ADJUST THIS ONLY specifically for homepage use case*/
+.page_header.theme_light {
+    --icon-color: white;
+}
+
+/* icons-white present (section override) -> white icons */
+.page_header.icons-white {
+    --icon-color: white;
+}
+
+/* icons-black present (section override) -> force BLACK icons, overriding theme_light */
+.page_header.icons-black {
+    --icon-color: black;
+}
+
+/* icons-custom present (section override) -> force CUSTOM icons, overriding theme_light */
+.page_header.icons-custom {
+    --icon-color: pink;
+}
+
+.page_header .menu-group .theme_color,
+.page_header .page_header-left .theme_color,
+.page_header .page_header-right .theme_color {
+    color: var(--icon-color);
+}
+
+/* Logo (Option B, SVG use) follows the same --icon-color variable as the
+   icons above, so it also goes white/black/custom automatically.
+   Requires the #pedro sprite symbol to use fill="currentColor" internally
+   (no hardcoded fill on its <path>s) — otherwise this has no visible effect. */
+.page_header .logo_static .theme_color {
+    color: var(--icon-color);
+    fill: currentColor;
+}
+
+</style>
+
+
+
+<!-- =============================================================
+     OPTION A — GIF LOGO (color-swapping version)
+     Use this when the header background changes (transparent ->
+     white on scroll, or light-theme pages). The CSS above toggles
+     between the white, black, and custom gif automatically, based on
+     `.theme_light`, `.icons-white`, `.icons-black`, and `.icons-custom`
+     on `.page_header`. Includes all three variants (white/black/custom);
+     delete the logo-custom <img> below if a page doesn't need the
+     custom-color variant.
+     ============================================================= -->
+<!--
+<a href="$url('Home-Show')$" class="logo_static" title="Pedro Home">
+    <img class="icon d-inline-block logo_static-img parallax_banner-logo theme_color logo-white"
+        src="images/logo/pedro-logo-white.gif?$staticlink$" width="110" height="25" alt="Pedro">
+    <img class="icon d-inline-block logo_static-img parallax_banner-logo theme_color logo-black"
+        src="images/logo/pedro-logo-black.gif?$staticlink$" width="110" height="25" alt="Pedro">
+    <img class="icon d-inline-block logo_static-img parallax_banner-logo theme_color logo-custom"
+        src="images/logo/pedro-logo-custom.gif?$staticlink$" width="110" height="25" alt="Pedro">
+</a>  -->
+
+
+<!-- =============================================================
+     OPTION B — SVG LOGO via <use> (color-swapping version)
+     Use this instead of Option A when you'd rather not ship
+     separate white/black/custom gif files. A single SVG symbol
+     follows `--icon-color` (see the ".logo_static .theme_color"
+     rule above), so it responds to `.theme_light`, `.icons-white`,
+     `.icons-black`, and `.icons-custom` the same way Option A does.
+     NOTE: this only works if the `#pedro` sprite symbol's <path>s
+     use fill="currentColor" (no hardcoded fill) — if the sprite
+     hardcodes its own fill color, the logo will stay that color
+     regardless of header state, and Option A should be used instead.
+     ============================================================= -->
+<!-- -->
+<a href="$url('Home-Show')$" class="logo_static" title="Pedro Home">
+    <svg class="icon d-inline-block logo_static-img parallax_banner-logo theme_color">
+        <use xlink:href="#pedro" />
+    </svg>
+</a>   

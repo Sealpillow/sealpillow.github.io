@@ -1,23 +1,23 @@
 <style>
-  .editorial-grid {
-    --eg-text: #000;
-    --eg-muted: #333;
-    --eg-center: 460px;
-    --eg-gap: 64px;
-    --eg-sticky-top: 40px;
+  .circular {
+    --circular-text: #000;
+    --circular-muted: #333;
+    --circular-center: 460px;
+    --circular-gap: 64px;
+    --circular-sticky-top: 40px;
     padding: 40px 24px 0;
-    color: var(--eg-text);
+    color: var(--circular-text);
     background: #fff;
   }
 
-  .editorial-grid__grid {
+  .circular__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, var(--eg-center)) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--circular-center)) minmax(0, 1fr);
     grid-template-areas:
       ".     intro aside"
       "label body  aside"
       ".     media aside";
-    column-gap: var(--eg-gap);
+    column-gap: var(--circular-gap);
     max-width: 1440px;
     margin: 0 auto;
     /* Crops the sticky aside at the section edge without breaking position: sticky */
@@ -25,12 +25,12 @@
   }
 
   /* Intro */
-  .editorial-grid__intro {
+  .circular__intro {
     grid-area: intro;
     margin-bottom: 110px;
   }
 
-  .editorial-grid__logo {
+  .circular__logo {
     margin: 0 0 22px;
     font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
     font-size: 22px;
@@ -39,16 +39,16 @@
     text-transform: uppercase;
   }
 
-  .editorial-grid__logo-brand {
+  .circular__logo-brand {
     font-weight: 700;
   }
 
-  .editorial-grid__logo-name {
+  .circular__logo-name {
     font-weight: 300;
     margin-left: 0.35em;
   }
 
-  .editorial-grid__tagline {
+  .circular__tagline {
     margin: 0;
     font-family: baskerville, "Libre Baskerville", Georgia, serif;
     font-size: 15px;
@@ -57,7 +57,7 @@
   }
 
   /* Label */
-  .editorial-grid__label {
+  .circular__label {
     grid-area: label;
     justify-self: center;
     margin: 0;
@@ -68,31 +68,31 @@
   }
 
   /* Body */
-  .editorial-grid__body {
+  .circular__body {
     grid-area: body;
     max-width: 310px;
     margin-bottom: 70px;
     font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
     font-size: 12px;
     line-height: 1.4;
-    color: var(--eg-muted);
+    color: var(--circular-muted);
   }
 
-  .editorial-grid__body p {
+  .circular__body p {
     margin: 0 0 14px;
   }
 
-  .editorial-grid__body p:last-child {
+  .circular__body p:last-child {
     margin-bottom: 0;
   }
 
   /* Centre image */
-  .editorial-grid__media {
+  .circular__media {
     grid-area: media;
     margin: 0;
   }
 
-  .editorial-grid__media-img {
+  .circular__media-img {
     display: block;
     width: 100%;
     height: auto;
@@ -101,49 +101,49 @@
   /* Sticky aside
      Negative bottom margin stretches the aside past the grid, so the image keeps
      sticking while the section scrolls away and clip-path crops it from below. */
-  .editorial-grid__aside {
+  .circular__aside {
     grid-area: aside;
     align-self: stretch;
     margin-bottom: -100vh;
   }
 
-  .editorial-grid__sticky {
+  .circular__sticky {
     position: sticky;
-    top: var(--eg-sticky-top);
+    top: var(--circular-sticky-top);
     width: 100%;
     max-width: 180px;
     margin: 0;
   }
 
-  .editorial-grid__sticky-img {
+  .circular__sticky-img {
     display: block;
     width: 100%;
     height: auto;
   }
 
-  .editorial-grid__caption {
+  .circular__caption {
     margin: 8px 0 0;
     font-family: baskerville, "Libre Baskerville", Georgia, serif;
     font-size: 8px;
     line-height: 1.4;
-    color: var(--eg-muted);
+    color: var(--circular-muted);
   }
 
   /* Tablet */
   @media (max-width: 991.98px) {
-    .editorial-grid {
-      --eg-center: 420px;
-      --eg-gap: 32px;
+    .circular {
+      --circular-center: 420px;
+      --circular-gap: 32px;
     }
 
-    .editorial-grid__sticky {
+    .circular__sticky {
       max-width: 160px;
     }
   }
 
   /* Mobile: stack, sticky and crop off */
   @media (max-width: 767.98px) {
-    .editorial-grid__grid {
+    .circular__grid {
       grid-template-columns: minmax(0, 1fr);
       grid-template-areas:
         "intro"
@@ -154,62 +154,62 @@
       clip-path: none;
     }
 
-    .editorial-grid__intro {
+    .circular__intro {
       margin-bottom: 56px;
     }
 
-    .editorial-grid__label {
+    .circular__label {
       justify-self: start;
       margin-bottom: 12px;
     }
 
-    .editorial-grid__body {
+    .circular__body {
       max-width: none;
       margin-bottom: 40px;
       font-size: 14px;
     }
 
-    .editorial-grid__aside {
+    .circular__aside {
       margin-bottom: 40px;
     }
 
-    .editorial-grid__sticky {
+    .circular__sticky {
       position: static;
       max-width: 60%;
       margin-left: auto;
     }
 
-    .editorial-grid__caption {
+    .circular__caption {
       font-size: 10px;
     }
   }
 </style>
 
-<section class="editorial-grid">
-  <div class="editorial-grid__grid">
+<section class="circular" id="circular-about">
+  <div class="circular__grid">
 
-    <header class="editorial-grid__intro">
-      <h1 class="editorial-grid__logo">
-        <span class="editorial-grid__logo-brand">Brand</span><span class="editorial-grid__logo-name">Project</span>
+    <header class="circular__intro">
+      <h1 class="circular__logo">
+        <span class="circular__logo-brand">Pedro</span><span class="circular__logo-name">Circular</span>
       </h1>
-      <p class="editorial-grid__tagline">A short tagline introducing the project or research platform shown below.</p>
+      <p class="circular__tagline">A research platform exploring the life, meaning and future of what already exists.</p>
     </header>
 
-    <h2 class="editorial-grid__label">Why it Exists</h2>
+    <h2 class="circular__label">Why it Exists</h2>
 
-    <div class="editorial-grid__body">
-      <p>Opening paragraph setting up the idea — what problem or observation this section responds to.</p>
-      <p>A second paragraph developing the thought further, building toward the image below.</p>
+    <div class="circular__body">
+      <p>Waste is an inevitable part of making. Every pattern cut leaves behind pieces that no longer belong to the original design. Their irregular proportions often make them difficult to use again, despite the quality of the material remaining unchanged.</p>
+      <p>Project Circular begins at this point. Rather than viewing these remnants as the end of one process, we explore how they might become the beginning of another. Guided by the material's size, shape and character, design unfolds differently. Constraints become prompts, and familiar limitations become opportunities for new forms of creativity.</p>
     </div>
 
-    <div class="editorial-grid__media">
-      <img class="editorial-grid__media-img" src="../../media/landscape-1.jpg" alt="" loading="lazy">
+    <div class="circular__media">
+      <img class="circular__media-img" src="images/testfile/2.jpg?$staticlink$" alt="Paper pattern pieces and chalk laid out on leather" loading="lazy">
     </div>
 
-    <aside class="editorial-grid__aside">
-      <div class="editorial-grid__sticky">
-        <img class="editorial-grid__sticky-img" src="../../media/portrait-1.jpg" alt="" loading="lazy">
-        <p class="editorial-grid__caption">A short caption describing the sticky side image, which stays in view while this section scrolls.</p>
+    <aside class="circular__aside">
+      <div class="circular__sticky">
+        <img class="circular__sticky-img" src="images/testfile/3.jpg?$staticlink$" alt="Leather offcuts in assorted colours" loading="lazy">
+        <p class="circular__caption">Their irregular proportions often make them difficult to use again, despite the quality of the material remaining unchanged.</p>
       </div>
     </aside>
 

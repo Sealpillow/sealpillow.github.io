@@ -1,12 +1,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+/* ============================================================
+   ★ EXTRACT — the progress nav (desktop side dots + mobile bottom
+   bar): works against ANY sections, driven entirely by data-target
+   ids. Look for the ★ EXTRACT markers on the CSS (:root vars,
+   .section-nav* / .section-nav-mobile* rules, and the mobile media
+   query), the HTML (both <nav> blocks), and the JS (the whole
+   script — it only ever reads data-target, nothing is hardcoded).
+
+   DEMO ONLY — the 4 .demo-section blocks just give the nav
+   something to point at for preview. Swap data-target/ids to point
+   at your real sections and drop the demo blocks.
+   ============================================================ */
+
 /* Body */
 body {
   overflow-x: hidden;
 }
 
-/* Demo Content */
+/* DEMO ONLY */
 .demo-section {
   height: 100vh;
   display: flex;
@@ -18,6 +31,8 @@ body {
   color: #7a7268;
   border-bottom: 1px solid rgba(0,0,0,0.08);
 }
+
+/* ★ EXTRACT from here... */
 
 /* ── Variables ─────────────────────────────────────── */
 :root {
@@ -215,7 +230,12 @@ body {
   .section-nav-mobile { display: flex; }
   body { padding-bottom: 72px; }
 }
+/* ★ END EXTRACT */
 </style>
+
+<!-- ★ EXTRACT — the progress nav (HTML): both the desktop side nav and
+     mobile bottom bar below. data-target must match the id of whatever
+     real section each dot should jump to / track. -->
 
 <!-- Desktop side nav -->
 <nav class="section-nav" aria-label="Page sections">
@@ -253,13 +273,17 @@ body {
     <button class="section-nav-mobile-dot" data-target="section-4"></button>
   </div>
 </nav>
+<!-- ★ END EXTRACT -->
 
-<!-- Demo sections -->
+<!-- DEMO ONLY — real sections go here instead -->
 <div class="demo-section" id="section-1">SECTION 1</div>
 <div class="demo-section" id="section-2">SECTION 2</div>
 <div class="demo-section" id="section-3">SECTION 3</div>
 <div class="demo-section" id="section-4">SECTION 4</div>
 
+<!-- ★ EXTRACT — the progress nav (JS): entirely driven by the dots'
+     own data-target attributes above, nothing here is hardcoded to
+     these specific demo sections. -->
 <script>
   (function(){
     const dots       = Array.from(document.querySelectorAll('.section-nav-dot'));
@@ -306,3 +330,4 @@ body {
     update();
   })();
 </script>
+<!-- ★ END EXTRACT -->

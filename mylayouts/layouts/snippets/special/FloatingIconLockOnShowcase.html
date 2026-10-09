@@ -1,0 +1,498 @@
+<style>
+  /* ============================================================
+     THIS FILE HAS TWO KINDS OF CONTENT:
+
+     ★ EXTRACT — the floating icon itself: works with ANY target element,
+       not just the carousel below. Look for the ★ EXTRACT markers on
+       the CSS (.hero-float-icon / .hero-float-icon__img, base rule +
+       its mobile override), the HTML (.hero-float-icon div), and the
+       JS (the first <script> block). That's the whole component —
+       swap data-stop-at to point at whatever section you actually
+       want it to lock onto.
+
+     DEMO ONLY — everything else (video hero, jump nav, the carousel,
+       the trailing buffer section) just exists so the icon has a real
+       target to lock onto when you preview this file. None of it is
+       required by the icon itself; drop it when you extract.
+     ============================================================ */
+
+  /* ----------------------------------------------------
+     PART 1 — Video hero with a jump-link nav and a floating icon that
+     starts centred on screen, then "locks on" to a real section below
+     once that section scrolls up to meet it (see PART 3 for how).
+     ---------------------------------------------------- */
+  /* DEMO ONLY from here... */
+  .hero-video-wrap {
+    display: block;
+    max-width: 100%;
+    position: relative;
+  }
+
+  .hero-video-wrap video {
+    display: block;
+    height: auto;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  .hero-jump-nav {
+    position: absolute;
+    top: 50%;
+    right: 48px;
+    z-index: 2;
+    transform: translateY(-50%);
+  }
+
+  .hero-jump-nav__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hero-jump-nav__link {
+    display: flex;
+    gap: 34px;
+    padding: 1px 0;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #000;
+    text-decoration: none;
+  }
+
+  .hero-jump-nav__link:hover .hero-jump-nav__text,
+  .hero-jump-nav__link:focus-visible .hero-jump-nav__text {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .hero-jump-nav__link:focus-visible {
+    outline: 1px solid #000;
+    outline-offset: 2px;
+  }
+
+  .hero-jump-nav__num {
+    min-width: 18px;
+  }
+
+  /* ...DEMO ONLY up to here. */
+
+  /* ★ EXTRACT — the floating icon (CSS).
+     Fixed to the left edge, vertically centred by default. Once the real
+     target section's own centre reaches screen-centre, the script in
+     PART 3 shifts it up so it travels with that section instead. */
+  .hero-float-icon {
+    position: fixed;
+    top: 50%;
+    left: 44px;
+    z-index: 10;
+    transform: translateY(-50%);
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .hero-float-icon__img {
+    display: block;
+    width: 88px;
+    height: auto;
+  }
+  /* ★ END EXTRACT (base rule — mobile override further down) */
+
+  /* DEMO ONLY from here... */
+  @media (max-width: 767.98px) {
+    .hero-jump-nav {
+      right: 16px;
+    }
+
+    .hero-jump-nav__link {
+      gap: 14px;
+      font-size: 12px;
+    }
+
+    /* ...DEMO ONLY paused — ★ EXTRACT: mobile override for the icon */
+    .hero-float-icon {
+      left: 12px;
+    }
+
+    .hero-float-icon__img {
+      width: 44px;
+    }
+    /* ★ END EXTRACT — DEMO ONLY resumes below */
+  }
+
+  /* DEMO ONLY from here to the end of this <style> block. */
+
+  /* ----------------------------------------------------
+     PART 1b — Trailing buffer section, placed AFTER the real target
+     (see the HTML further down). Exists purely so there's somewhere to
+     scroll into past the carousel: continuing past it shows the icon
+     has stopped following, proving the lock-on was scoped to that one
+     section rather than persisting for the rest of the page.
+     ---------------------------------------------------- */
+  .showcase-buffer {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px 24px;
+  }
+
+  .showcase-buffer__inner {
+    max-width: 480px;
+  }
+
+  .showcase-buffer__label {
+    margin: 0 0 16px;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 12px;
+  }
+
+  .showcase-buffer__text {
+    margin: 0;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+  }
+
+  /* ----------------------------------------------------
+     PART 2 — The real target: a centre-focus, drag-to-grow carousel.
+     This is what the floating icon above is actually tracking — scroll
+     down until this section reaches the middle of the screen and the
+     icon locks on and rides along with it.
+     ---------------------------------------------------- */
+  .showcase-collection {
+    padding: 120px 24px;
+  }
+
+  .showcase-collection__label {
+    margin: 0 0 24px;
+    padding: 0 24px;
+    text-align: center;
+    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .center-slider {
+    --center-slider-h: clamp(120px, 20vw, 230px);
+    --center-slider-h-active: calc(var(--center-slider-h) * 1.5);
+    --center-slider-gap: 10px;
+    --center-slider-speed: 0.6s;
+    position: relative;
+    overflow: hidden;
+    height: var(--center-slider-h-active);
+    outline: none;
+  }
+
+  .center-slider:focus-visible {
+    outline: 1px solid #000;
+    outline-offset: 4px;
+  }
+
+  .center-slider__probe {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    width: var(--center-slider-h);
+    height: var(--center-slider-h-active);
+  }
+
+  .center-slider__track {
+    display: flex;
+    align-items: center;
+    gap: var(--center-slider-gap);
+    height: 100%;
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    will-change: transform;
+    transition: transform var(--center-slider-speed) cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .center-slider__track--dragging {
+    cursor: grabbing;
+    transition: none;
+  }
+
+  .center-slider__slide {
+    flex: 0 0 auto;
+    height: var(--center-slider-h);
+    cursor: pointer;
+    transition: height var(--center-slider-speed) cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .center-slider__slide--active {
+    height: var(--center-slider-h-active);
+    cursor: grab;
+  }
+
+  .center-slider__track--dragging .center-slider__slide {
+    transition: none;
+  }
+
+  .center-slider__slide-img {
+    display: block;
+    width: auto;
+    height: 100%;
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .center-slider__track,
+    .center-slider__slide {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .center-slider {
+      --center-slider-h: 32vw;
+      --center-slider-gap: 6px;
+    }
+  }
+</style>
+
+<!-- DEMO ONLY from here... -->
+
+<!-- PART 1: hero -->
+<div class="hero-video-wrap">
+  <video class="d-md-block d-none" playsinline autoplay loop muted style="width: 100%; object-fit: cover;">
+    <source src="../../media/landscape_video-1.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <video class="d-md-none d-block" playsinline autoplay loop muted style="width: 100%; object-fit: cover;">
+    <source src="../../media/portrait_video-1.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <nav class="hero-jump-nav" aria-label="Page sections">
+    <ol class="hero-jump-nav__list">
+      <li class="hero-jump-nav__item">
+        <a class="hero-jump-nav__link" href="#showcase-collection"><span class="hero-jump-nav__num">01</span><span class="hero-jump-nav__text">The Collection</span></a>
+      </li>
+    </ol>
+  </nav>
+</div>
+
+<!-- ...DEMO ONLY paused. -->
+
+<!-- ★ EXTRACT — the floating icon (HTML). The icon starts centred on
+     screen and travels once the element matched by data-stop-at reaches
+     the middle of the viewport. Point data-stop-at at whatever section
+     you actually want it to lock onto. -->
+<div class="hero-float-icon js-hero-float-icon" data-stop-at="#showcase-collection .js-center-slider">
+  <img class="hero-float-icon__img" src="../../media/product-portrait-1.jpg" alt="">
+</div>
+<!-- ★ END EXTRACT -->
+
+<!-- DEMO ONLY resumes: PART 2, the real target. Scroll from the hero
+     straight into this — the icon stays centred on screen until this
+     section's own centre reaches the middle of the viewport, then locks
+     on and rides with it. -->
+<section class="showcase-collection" id="showcase-collection">
+  <h2 class="showcase-collection__label">The Collection</h2>
+
+  <div class="center-slider js-center-slider" tabindex="0" role="region" aria-roledescription="carousel" aria-label="The Collection">
+    <div class="center-slider__probe" aria-hidden="true"></div>
+    <div class="center-slider__track">
+      <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
+        <img class="center-slider__slide-img" src="../../media/portrait-1.jpg" alt="">
+      </div>
+      <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
+        <img class="center-slider__slide-img" src="../../media/landscape-1.jpg" alt="">
+      </div>
+      <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
+        <img class="center-slider__slide-img" src="../../media/portrait-2.jpg" alt="">
+      </div>
+      <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
+        <img class="center-slider__slide-img" src="../../media/landscape-2.jpg" alt="">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 1b: trailing buffer section — placed AFTER the real target on
+     purpose. Keep scrolling past the carousel above and notice the icon
+     does NOT keep following down here: it scrolls away with the carousel
+     section instead of trailing along for the rest of the page. That's
+     the proof that the lock-on was scoped to that one section only. -->
+<section class="showcase-buffer" id="showcase-buffer">
+  <div class="showcase-buffer__inner">
+    <p class="showcase-buffer__label">After the Collection</p>
+    <p class="showcase-buffer__text">
+      Placeholder closing section. Notice the icon is gone from view down
+      here — it was only ever locked to the carousel section above, not to
+      the page as a whole.
+    </p>
+  </div>
+</section>
+
+<!-- ★ EXTRACT — the floating icon (JS). This is the whole behaviour:
+     stays centred on screen until it lines up with the target element's
+     centre, then moves up with it as if it were part of that section.
+     Nothing in here references the carousel or anything else below —
+     it only cares about whatever `data-stop-at` points at. -->
+<script>
+(function () {
+  var icon = document.querySelector('.js-hero-float-icon');
+  if (!icon) return;
+  var target = document.querySelector(icon.getAttribute('data-stop-at'));
+  if (!target) return;
+  var ticking = false;
+
+  function update() {
+    ticking = false;
+    var rect = target.getBoundingClientRect();
+    var shift = Math.min(0, rect.top + rect.height / 2 - window.innerHeight / 2);
+    icon.style.transform = 'translateY(calc(-50% + ' + shift + 'px))';
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  update();
+})();
+</script>
+<!-- ★ END EXTRACT -->
+
+<!-- DEMO ONLY: this second script only drives the carousel below (the
+     real target in this demo) — it has nothing to do with the floating
+     icon and isn't needed when you extract it. -->
+<script>
+(function () {
+  document.querySelectorAll('.js-center-slider').forEach(function (slider) {
+    var track = slider.querySelector('.center-slider__track');
+    var probe = slider.querySelector('.center-slider__probe');
+    var slides = Array.prototype.slice.call(track.querySelectorAll('.center-slider__slide'));
+    if (!slides.length) return;
+    var imgs = slides.map(function (slide) {
+      return slide.querySelector('.center-slider__slide-img');
+    });
+
+    var draggingClass = 'center-slider__track--dragging';
+    var activeClass = 'center-slider__slide--active';
+    var start = parseInt(slider.getAttribute('data-start'), 10);
+    var index = isNaN(start) ? Math.floor((slides.length - 1) / 2) : start;
+    var startX = null;
+    var delta = 0;
+    var dragged = false;
+
+    function metrics() {
+      return {
+        h: probe.offsetWidth,
+        hActive: probe.offsetHeight,
+        gap: parseFloat(getComputedStyle(track).columnGap) || 0
+      };
+    }
+
+    function ratio(n) {
+      var img = imgs[n];
+      return img && img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1;
+    }
+
+    function render() {
+      var m = metrics();
+      var offset = 0;
+      for (var j = 0; j < index; j++) offset += m.h * ratio(j) + m.gap;
+      offset += (m.hActive * ratio(index)) / 2;
+      var x = slider.clientWidth / 2 - offset + delta;
+      track.style.transform = 'translate3d(' + x + 'px, 0, 0)';
+    }
+
+    function goTo(i) {
+      index = Math.min(Math.max(i, 0), slides.length - 1);
+      slides.forEach(function (slide, n) {
+        var isActive = n === index;
+        slide.classList.toggle(activeClass, isActive);
+        slide.setAttribute('aria-current', isActive ? 'true' : 'false');
+      });
+      render();
+    }
+
+    track.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      startX = e.clientX;
+      delta = 0;
+      dragged = false;
+    });
+
+    track.addEventListener('pointermove', function (e) {
+      if (startX === null) return;
+      delta = e.clientX - startX;
+      if (!dragged && Math.abs(delta) > 6) {
+        dragged = true;
+        track.classList.add(draggingClass);
+        track.setPointerCapture(e.pointerId);
+      }
+      if (dragged) render();
+    });
+
+    function endDrag() {
+      if (startX === null) return;
+      startX = null;
+      track.classList.remove(draggingClass);
+      if (!dragged) return;
+      var m = metrics();
+      var steps = Math.round(-delta / (m.h * ratio(index) + m.gap));
+      if (steps === 0 && Math.abs(delta) > 40) steps = delta < 0 ? 1 : -1;
+      delta = 0;
+      goTo(index + steps);
+    }
+
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+
+    track.addEventListener('click', function (e) {
+      if (dragged) {
+        dragged = false;
+        return;
+      }
+      var slide = e.target.closest('.center-slider__slide');
+      if (slide) goTo(slides.indexOf(slide));
+    });
+
+    slider.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goTo(index - 1);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goTo(index + 1);
+      }
+    });
+
+    window.addEventListener('resize', render);
+
+    imgs.forEach(function (img) {
+      if (img && !img.complete) img.addEventListener('load', render);
+    });
+
+    track.classList.add(draggingClass);
+    goTo(index);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        track.classList.remove(draggingClass);
+      });
+    });
+  });
+})();
+</script>
