@@ -1329,6 +1329,27 @@ function monthName(m){return["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Se
 function doy(ds){const d=new Date(ds);return Number.isNaN(d.getTime())?null:Math.floor((d-new Date(d.getFullYear(),0,0))/86400000)}
 function dayMonth(ds){const d=new Date(ds);return Number.isNaN(d.getTime())?ds:d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})}
 function tipLabel(label,text){return`${label}<span class="help" title="${esc(text)}">i</span>`}
+function anchorSourceText(source,windowOpenDate){
+  if(source==="window_open_close")return"Window-open price";
+  if(source==="provisional_current_price")return windowOpenDate?`Provisional: today's price (window opens ${dt(windowOpenDate)})`:"Provisional: today's price";
+  // Analysis files generated before the window-open anchor.
+  if(source==="previous_exdiv_prev_dp")return"Most Recent Ex-Div Anchor";
+  if(source==="special_exdiv_prev_dp")return"Special Div Anchor (most recent ex-div)";
+  if(source==="current_price_fallback")return"Fallback: Current Price";
+  if(source==="most_recent_prev_dp_fallback")return"Fallback: Most Recent Available Anchor";
+  return source||"-";
+}
+// "Low landed in this range in X of N past cycles" -- shown next to the
+// low-date estimates so a date range doesn't read as more certain than its
+// walk-forward record supports.
+function lowTimingRecordHtml(proj){
+  const r=proj?.low_timing_track_record;
+  if(!r||!r.tested)return"";
+  const parts=[];
+  if(r.wide_from&&r.wide_to)parts.push(`Typical range ${dtShort(r.wide_from)} – ${dtShort(r.wide_to)} <span class="small muted">(${n(r.wide_wks_min,0)}–${n(r.wide_wks_max,0)} wks before ex-div)</span>: low landed in range <strong>${r.wide_hits} of ${r.tested}</strong> past cycles`);
+  if(proj.est_low_date_from&&proj.est_low_date_to&&!proj.est_low_date_cluster1)parts.push(`Middle-50% window above: <strong>${r.window_hits} of ${r.tested}</strong>`);
+  return parts.map(p=>`<div class="small">${p}</div>`).join("");
+}
 
 function syncMobileTopbarActions(){
   const actions=document.querySelector(".topbar-actions");
@@ -1543,15 +1564,8 @@ function renderSeriesCard(s,data,m){
   const hasTailWarn=toBool(proj.tail_risk?.tail_warning);
   const hasFragWarn=toBool(proj.zone_fragility?.fragility_warning);
   const fragSeverity=resolveFragilitySeverity(proj);
-  const anchorSourceLabel = proj.anchor_source === "previous_exdiv_prev_dp"
-    ? "Most Recent Ex-Div Anchor"
-    : proj.anchor_source === "special_exdiv_prev_dp"
-      ? "Special Div Anchor (most recent ex-div)"
-      : proj.anchor_source === "current_price_fallback"
-        ? "Fallback: Current Price"
-        : proj.anchor_source === "most_recent_prev_dp_fallback"
-          ? "Fallback: Most Recent Available Anchor"
-          : (proj.anchor_source || "-");
+  const anchorSourceLabel = anchorSourceText(proj.anchor_source, proj.window_open_date);
+  const timingRecord = lowTimingRecordHtml(proj);
   const primaryClusterLabel = proj.est_watch_window_primary_note
     ? proj.est_watch_window_primary_note
         .replace("Primary cluster: EARLY", "Primary cluster: Early")
@@ -1578,13 +1592,14 @@ function renderSeriesCard(s,data,m){
       ${proj.cluster_dominance?`<div>${tipLabel("Cluster dominance","How often each cluster appeared across all historical cycles, with each cluster's average historical dip depth (% from anchor price). A dominant cluster (≥75%) suggests the stock may behave like RELIABLE single-cluster timing. C1 = early dip (farther from ex-div); C2 = late dip (closer). Recent indicates which cluster prevailed in the last 3 clean cycles.")}</div><div>${clusterDominanceTag(proj.cluster_dominance)}</div>`:""}
       ${proj.cluster_track_record&&clusterTrackRecordTag(proj.cluster_track_record)?`<div>${tipLabel("Cluster track record","C1/C2 win counts from out-of-sample predictions logged before outcomes were known. Unlike historical dominance, this reflects how often each window correctly called the actual dip in live forward testing — a growing empirical check that accumulates as cycles resolve.")}</div><div>${clusterTrackRecordTag(proj.cluster_track_record)}</div>`:""}
       ${!proj.est_low_date_cluster1&&proj.est_low_date?`<div>${tipLabel("Estimated low timing","For reliable timing only. Range is the p25–p75 watch window from historical weeks-before-ex-div values; best estimate is the median.")}</div><div>${dtClusterRange(proj.est_low_date_from,proj.est_low_date,proj.est_low_date_to)}</div>`:""}
+      ${timingRecord?`<div>${tipLabel("Low timing track record","Walk-forward check: for each past cycle, the window that would have been drawn from the cycles before it, and whether the actual low landed inside. The wider range is the full spread of the last 5 cycles' timings. A middle-50% window from 5 cycles catches only about 1 in 3 lows even when working as designed, so treat dates as a rough season, not a target.")}</div><div>${timingRecord}</div>`:""}
       <div>Days away</div><div class="${(daysFrom(proj.proj_exdiv_date)||999)<=45?"warn":""}">${daysFrom(proj.proj_exdiv_date)!==null?`${daysFrom(proj.proj_exdiv_date)}d`:"-"}</div>
       <div>Current price</div><div>${ccy(data.current_price,m.currency)}</div>
       <div>${tipLabel("5yr price growth","Total price return over the past 5 years (weekly close ~5 years ago vs today). Excludes dividends — capital change only. Use as a background check: consistent growth suggests a healthy business; sustained decline may mean dividends are masking capital erosion.")}</div><div class="${growthCls(m.price_growth_5yr_pct)}">${growthFmt(m.price_growth_5yr_pct)}</div>
-      <div>${tipLabel("Anchor method","The pre-dividend reference price used to anchor the forward zone. Normally taken from the most recent prior ex-div event (the closing price just before that ex-date). Falls back to the current live price if no prior ex-div cycle with a prev_dp is available. Displayed for reference only — the entry zone is built from the ex-dividend adjusted level: anchor minus the dividend paid, which is where the stock actually resets after the payout.")}</div>
-      <div><div>${esc(anchorSourceLabel)}</div><div class="small muted">Anchor ref (pre-div) ${ccy(proj.anchor,m.currency)}</div></div>
+      <div>${tipLabel("Anchor method","The price every projection for this cycle is built from: the close when the pre-ex-div window opened. The entry zone, estimated low, estimated ex-div price and estimated peak are this series' typical moves from its own window-open price in recent cycles, applied to this one. Until the window opens the anchor is provisional — today's price — and it resets to the real window-open close once that date passes.")}</div>
+      <div><div>${esc(anchorSourceLabel)}</div><div class="small muted">Anchor ${ccy(proj.anchor,m.currency)}${proj.window_open_date?` · window ${proj.anchor_provisional?"opens":"opened"} ${dt(proj.window_open_date)}`:""}</div></div>
 
-      <div>${tipLabel("Entry zone","The projected buy range. Built from the ex-dividend adjusted anchor (anchor price minus the dividend paid), which is where the stock theoretically resets on ex-div date. Dip percentiles from clean historical cycles are applied to that adjusted level.")}</div>
+      <div>${tipLabel("Entry zone","The projected buy range: how far below its window-open price this series' low has typically landed in recent clean cycles (a percentile band of those dips), applied to this cycle's anchor. Provisional until the window opens. Expect it to catch the low in only a minority of cycles — see the zone hit rate.")}</div>
       <div>${zoneInline(proj.zone_bot,proj.zone_top,m.currency)}</div>
       <div>Entry status</div><div class="${tagClass(proj.entry_status)}">${esc(proj.entry_status_display || "-")}</div>
 
@@ -1653,11 +1668,7 @@ function panelProjections(data){
   const m=data.meta||{},rows=Object.entries(data.proj_series||{});
   if(!rows.length)return`<div class="empty">No projection data found.</div>`;
   const primaryUpcomingId=upcomingSeries(data)?.id||null;
-  const anchorSourceLabel = source => source === "previous_exdiv_prev_dp"
-    ? "Most Recent Ex-Div Anchor"
-    : source === "most_recent_prev_dp_fallback"
-      ? "Fallback: Most Recent Available Anchor"
-      : (source || "-");
+  const anchorSourceLabel = source => anchorSourceText(source);
   return`
   <div class="panel">
     <h2>Forward Projection Table</h2>
@@ -1691,7 +1702,7 @@ function panelProjections(data){
             <td><strong>${esc(id)}</strong>${isReferenceOnly?`<div class="small muted">Reference only</div>`:""}</td>
             <td>${dt(p.proj_exdiv_date)}</td>
             <td class="${days!==null&&days<=30?"warn":""}">${days!==null?`${days}d`:"-"}</td>
-            <td><div>${ccy(p.anchor,m.currency)}</div><div class="small muted">${esc(anchorSourceLabel(p.anchor_source))}</div><div class="small muted">Anchor ref (pre-div)</div></td>
+            <td><div>${ccy(p.anchor,m.currency)}</div><div class="small muted">${esc(anchorSourceLabel(p.anchor_source))}</div>${p.window_open_date?`<div class="small muted">Window ${p.anchor_provisional?"opens":"opened"} ${dt(p.window_open_date)}</div>`:""}</td>
             <td><span style="font-family:var(--mono);font-size:12px">${ccy(p.zone_bot,m.currency)} – ${ccy(p.zone_top,m.currency)}</span></td>
             <td>${ccy(p.est_low_px,m.currency)}</td>
             <td>${ccy(p.est_exdiv_px,m.currency)}</td>
@@ -6420,6 +6431,57 @@ function portfolioRows(){
     return{...h,loaded:!!data,stockName:data?.meta?.stock_name||"",currency,currentPrice,totalCost,currentValue,pnl,pnlPct};
   });
 }
+// Expected dividend income over the next 12 months: for each holding, every
+// series whose projected ex-div date falls in that window contributes
+// quantity x the series' projected per-share amount (med_div_amt, with the
+// div_amt_lo/hi band). Regular dividends only -- specials are excluded from
+// the projections, so a separate trailing-12-month figure (all dividends
+// actually paid, specials included) is computed alongside for comparison.
+function portfolioDividendOutlook(){
+  const today=new Date();
+  const todayStr=today.toISOString().slice(0,10);
+  const horizonStr=new Date(today.getTime()+365*86400000).toISOString().slice(0,10);
+  const ttmStartStr=new Date(today.getTime()-365*86400000).toISOString().slice(0,10);
+  const upcoming=[];
+  const byTicker={};
+  (state.portfolio||[]).forEach(h=>{
+    const data=stockEntryForTicker(h.ticker)?.data;
+    if(!data)return;
+    const qty=Number(h.quantity)||0;
+    const currency=data.meta?.currency||"";
+    const lapsed=(data.edge_case_flags||[]).includes("LAPSED_DIVIDEND");
+    const price=Number(data.current_price)>0?Number(data.current_price):null;
+    const avgCost=Number(h.avgCostPrice)>0?Number(h.avgCostPrice):null;
+    const t=byTicker[h.ticker]={est:0,lo:0,hi:0,ttm:0,next:null,lapsed,currency,price,avgCost,perShare12m:0};
+    if(!lapsed){
+      Object.entries(data.proj_series||{}).forEach(([sid,p])=>{
+        const d=p?.proj_exdiv_date;
+        const perShare=Number(p?.med_div_amt);
+        if(!d||d<todayStr||d>horizonStr||!(perShare>0))return;
+        const lo=Number(p.div_amt_lo)>0?Number(p.div_amt_lo):perShare;
+        const hi=Number(p.div_amt_hi)>0?Number(p.div_amt_hi):perShare;
+        const item={ticker:h.ticker,stockName:data.meta?.stock_name||"",series:sid,date:d,perShare,
+          est:qty*perShare,lo:qty*lo,hi:qty*hi,currency,announced:toBool(p.div_amt_announced),
+          yieldOnPrice:price?perShare/price*100:null,yieldOnCost:avgCost?perShare/avgCost*100:null};
+        upcoming.push(item);
+        t.perShare12m+=perShare;
+        t.est+=item.est;t.lo+=item.lo;t.hi+=item.hi;
+        if(!t.next||d<t.next.date)t.next=item;
+      });
+    }
+    [...(data.divs||[]),...(data.anomalies_excluded||[])].forEach(dv=>{
+      if(dv?.date&&dv.date>ttmStartStr&&dv.date<=todayStr&&Number(dv.amount)>0)t.ttm+=qty*Number(dv.amount);
+    });
+  });
+  upcoming.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+  Object.values(byTicker).forEach(t=>{
+    t.yieldOnPrice=t.price&&t.perShare12m>0?t.perShare12m/t.price*100:null;
+    t.yieldOnCost=t.avgCost&&t.perShare12m>0?t.perShare12m/t.avgCost*100:null;
+  });
+  const sum=k=>Object.values(byTicker).reduce((a,t)=>a+t[k],0);
+  return{upcoming,byTicker,est:sum("est"),lo:sum("lo"),hi:sum("hi"),ttm:sum("ttm"),
+    lapsedTickers:Object.keys(byTicker).filter(k=>byTicker[k].lapsed)};
+}
 // Reconstructs what today's holdings would have been worth at each week
 // since purchase, using the same weekly price_data every stock already
 // loads for its Price History chart -- pure derived data, nothing new
@@ -6592,6 +6654,11 @@ function panelPortfolio(){
   if(subTab==="history")return header+panelPortfolioHistory({totalPnl,totalCost});
   if(subTab==="reconcile")return header+panelPortfolioReconcile();
 
+  const divOutlook=portfolioDividendOutlook();
+  const divYieldOnValue=totalValue>0&&divOutlook.est>0?divOutlook.est/totalValue*100:null;
+  const divYieldOnCost=totalCost>0&&divOutlook.est>0?divOutlook.est/totalCost*100:null;
+  const nextDiv=divOutlook.upcoming[0]||null;
+
   const tickerOptions=activeStockList()
     .slice()
     .sort((a,b)=>(a.data?.meta?.ticker||"").localeCompare(b.data?.meta?.ticker||""))
@@ -6602,6 +6669,7 @@ function panelPortfolio(){
     <div class="planner-summary-card"><div class="label">Total cost</div><div class="value">${pfCcy(totalCost,"SGD")}</div><div class="small muted">${loadedRows.length} holding${loadedRows.length===1?"":"s"} with a live price</div></div>
     <div class="planner-summary-card"><div class="label">Current value</div><div class="value">${pfCcy(totalValue,"SGD")}</div><div class="small muted">${unloadedCount?`${unloadedCount} holding${unloadedCount===1?"":"s"} excluded — not loaded`:"All holdings priced"}</div></div>
     <div class="planner-summary-card"><div class="label">Unrealized P&amp;L</div><div class="value ${pnlTone(totalPnl)}">${totalCost>0?pfCcy(totalPnl,"SGD"):"-"}${totalPnlPct!=null?`<span style="font-size:12px;font-weight:400;margin-left:8px;opacity:.75">· ${pct(totalPnlPct)}</span>`:""}</div></div>
+    <div class="planner-summary-card"><div class="label">Expected dividends (12 mo)</div><div class="value good">${divOutlook.est>0?pfCcy(divOutlook.est,"SGD"):"-"}</div><div class="small muted">${divOutlook.est>0?`Range ${pfCcy(divOutlook.lo)}–${pfCcy(divOutlook.hi)}${divYieldOnValue!=null?` · ${pctRaw(divYieldOnValue,2)} on value`:""}${divYieldOnCost!=null?` · ${pctRaw(divYieldOnCost,2)} on cost`:""}`:"No projected ex-div dates in the next 12 months"}</div><div class="small muted">${nextDiv?`Next: ${esc(nextDiv.ticker)} ${dt(nextDiv.date)} ≈ ${pfCcy(nextDiv.est,nextDiv.currency)}`:""}${divOutlook.ttm>0?`${nextDiv?" · ":""}Last 12 mo payouts: ${pfCcy(divOutlook.ttm,"SGD")}`:""}</div></div>
     <div class="planner-summary-card"><div class="label">Holdings tracked</div><div class="value">${rows.length}</div><div class="small muted">Stored only in this browser</div></div>
   </div>`;
 
@@ -6630,6 +6698,11 @@ function panelPortfolio(){
     <td class="num">${r.currentValue!=null?pfCcy(r.currentValue,r.currency):"-"}</td>
     <td class="num ${pnlTone(r.pnl)}">${r.pnl!=null?pfCcy(r.pnl,r.currency):"-"}</td>
     <td class="num ${pnlTone(r.pnl)}">${r.pnlPct!=null?`${r.pnlPct>=0?"+":""}${n(r.pnlPct,1)}%`:"-"}</td>
+    ${(()=>{const d=divOutlook.byTicker[r.ticker];
+      if(!d)return`<td class="num">-</td><td class="num">-</td>`;
+      if(d.lapsed)return`<td class="num"><span class="small muted" title="No dividend paid recently (LAPSED_DIVIDEND) -- not projected">lapsed</span></td><td class="num">-</td>`;
+      const yl=(onPrice,onCost)=>[onPrice!=null?`${pctRaw(onPrice,2)} on price`:"",onCost!=null?`${pctRaw(onCost,2)} on cost`:""].filter(Boolean).join(" · ");
+      return`<td class="num">${d.next?`${pfCcy(d.next.est,d.currency)}<div class="small muted">${dt(d.next.date)}</div><div class="small muted">${yl(d.next.yieldOnPrice,d.next.yieldOnCost)}</div>`:"-"}</td><td class="num">${d.est>0?`${pfCcy(d.est,d.currency)}<div class="small muted">${yl(d.yieldOnPrice,d.yieldOnCost)}</div>`:"-"}</td>`;})()}
     <td><button class="btn btn-compact" type="button" data-portfolio-edit="${esc(r.ticker)}">Edit</button> <button class="btn btn-compact" type="button" data-portfolio-delete="${esc(r.ticker)}">Delete</button></td>
   </tr>`).join("");
 
@@ -6647,12 +6720,31 @@ function panelPortfolio(){
       <table>
         <thead><tr>
           <th>Stock</th><th class="num">Qty</th><th class="num">Avg Cost</th><th class="num">Total Cost</th>
-          <th class="num">Current Price</th><th class="num">Current Value</th><th class="num">P&amp;L</th><th class="num">P&amp;L %</th><th></th>
+          <th class="num">Current Price</th><th class="num">Current Value</th><th class="num">P&amp;L</th><th class="num">P&amp;L %</th><th class="num">${tipLabel("Next dividend","Estimated amount for your quantity at the next projected ex-div date. Hold the shares before this date to receive it; payment usually follows a few weeks later. % = this one payment per share as a share of the current price and of your average cost.")}</th><th class="num">${tipLabel("Est. 12 mo","Sum of every projected regular dividend in the next 12 months for your quantity. Specials are excluded. % = forward 12-month yield on the current price and on your average cost.")}</th><th></th>
         </tr></thead>
         <tbody>${tableRows}</tbody>
       </table>
     </div>`:`<div class="empty">No holdings yet. Add one above, or load a backup.</div>`}
-  </div>`;
+  </div>
+  ${divOutlook.upcoming.length?`<div class="panel">
+    <h2>Upcoming Dividends</h2>
+    <p class="small muted" style="margin:0 0 10px">Projected ex-div dates and amounts for your current quantities over the next 12 months, from each stock's dividend series (median of the last 4 same-series payments, with its low–high band). These are estimates until the company announces; special dividends aren't projected.${divOutlook.lapsedTickers.length?` Not projected (no recent dividend): ${divOutlook.lapsedTickers.map(esc).join(", ")}.`:""}</p>
+    <div class="cmp-table-wrap drag-scroll">
+      <table>
+        <thead><tr><th>Ex-div date</th><th>Stock</th><th>Series</th><th class="num">Per share</th><th class="num">${tipLabel("Yield","This one payment per share as a % of the current price, and of your average cost.")}</th><th class="num">Est. amount</th><th class="num">Range</th></tr></thead>
+        <tbody>${divOutlook.upcoming.map(u=>`<tr>
+          <td>${dt(u.date)}<div class="small muted">${(()=>{const dd=daysFrom(u.date);return dd==null?"":dd===0?"today":`in ${dd} day${dd===1?"":"s"}`;})()}</div></td>
+          <td>${esc(u.ticker)}<div class="small muted">${esc(u.stockName)}</div></td>
+          <td>${esc(u.series)}</td>
+          <td class="num">${u.currency?esc(u.currency)+" ":""}${n(u.perShare,4)}</td>
+          <td class="num">${u.yieldOnPrice!=null?pctRaw(u.yieldOnPrice,2):"-"}<div class="small muted">${u.yieldOnCost!=null?`${pctRaw(u.yieldOnCost,2)} on cost`:""}</div></td>
+          <td class="num">${pfCcy(u.est,u.currency)}</td>
+          <td class="num small muted">${pfCcy(u.lo)}–${pfCcy(u.hi)}</td>
+        </tr>`).join("")}</tbody>
+        <tfoot><tr><td colspan="4"><strong>Total (12 mo)</strong></td><td class="num"><strong>${divYieldOnValue!=null?pctRaw(divYieldOnValue,2):"-"}</strong><div class="small muted">${divYieldOnCost!=null?`${pctRaw(divYieldOnCost,2)} on cost`:""}</div></td><td class="num"><strong>${pfCcy(divOutlook.est,"SGD")}</strong></td><td class="num small muted">${pfCcy(divOutlook.lo)}–${pfCcy(divOutlook.hi)}</td></tr></tfoot>
+      </table>
+    </div>
+  </div>`:""}`;
 }
 // The "History & P&L" sub-tab -- everything derived from statement imports
 // rather than live prices: realized gains on positions you've since sold,

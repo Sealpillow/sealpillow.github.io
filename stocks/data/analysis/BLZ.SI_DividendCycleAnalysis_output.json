@@ -5,11 +5,13 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-10-08",
-    "frequency": "IRREGULAR",
-    "frequency_display": "Irregular",
-    "adaptive_window_days": 152,
-    "mean_interval_days": 298.6,
+    "today": "2026-10-14",
+    "frequency": "ANNUAL",
+    "frequency_display": "Annual",
+    "adaptive_window_days": 182,
+    "mean_interval_days": 431.3,
+    "typical_interval_days": 365.2,
+    "payments_per_year": 1.0,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
     "price_growth_5yr_pct": 42.2
@@ -26,37 +28,35 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 542,
-    "price_rows": 522,
+    "total_rows": 543,
+    "price_rows": 523,
     "dividend_rows": 20,
-    "zero_volume_rows": 149,
-    "zero_volume_pct": 28.5,
+    "zero_volume_rows": 150,
+    "zero_volume_pct": 28.7,
     "issues_found": [
       "2 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (149/522, 28.5%) â€” analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (150/523, 28.7%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
   "edge_case_flags": [
     "THIN_TRADING_HISTORY",
-    "IRREGULAR_SCHEDULE",
     "SINGLE_SERIES",
     "LAPSED_DIVIDEND"
   ],
   "edge_case_flags_display": [
     "Thin Trading History",
-    "Irregular Schedule",
     "Single Series",
     "Lapsed Dividend"
   ],
   "series_meta": [
     {
       "id": "S1",
-      "label": "Series 1 — May/Sep ex-div",
-      "sub": "Irregular",
+      "label": "Series 1 — May ex-div",
+      "sub": "Annual",
       "color": "#3b82f6",
       "bg": "rgba(59,130,246,0.1)",
-      "window_days": 152
+      "window_days": 182
     }
   ],
   "cycles": [
@@ -71,6 +71,11 @@
       "peak_px": 0.385,
       "peak_date": "2017-03-17",
       "low_vs_prevdp": -37.1429,
+      "wopen_px": 0.28,
+      "wopen_date": "2016-11-04",
+      "low_vs_wopen": -21.4286,
+      "prevdp_vs_wopen": 25.0,
+      "peak_vs_wopen": 37.5,
       "exdiv_vs_prevdp": 2.9412,
       "peak_vs_prevdp": 10.0,
       "rebound": 59.0909,
@@ -85,11 +90,11 @@
       "outlier": false,
       "macro": false,
       "macro_detail": {
-        "market_index_return": 10.6311,
-        "stock_excess_return": 6.0356
+        "market_index_return": 15.8107,
+        "stock_excess_return": 9.1893
       },
       "volume_avg_30d": 123862.0,
-      "volume_entry_ratio": 1.0776,
+      "volume_entry_ratio": 0.8945,
       "volume_trend": "INCREASING",
       "max_drawdown_pre_exdiv": -26.6667,
       "recovery_time_days": 126,
@@ -115,7 +120,7 @@
   ],
   "ss_series": {
     "S1": {
-      "window_days": 152,
+      "window_days": 182,
       "full": {
         "wks_before": {
           "avg": 18.0,
@@ -258,7 +263,7 @@
       },
       "liquidity": {
         "avg_volume_30d": 123862.0,
-        "volume_ratio_median": 1.0776,
+        "volume_ratio_median": 0.8945,
         "adequacy_pct": 100.0
       },
       "risk": {
@@ -286,19 +291,30 @@
   "cgc_ranking": null,
   "proj_series": {
     "S1": {
-      "proj_exdiv_date": "2027-04-07",
-      "anchor": 0.29,
-      "anchor_source": "special_exdiv_prev_dp",
-      "zone_bot": 0.1515,
-      "zone_top": 0.1515,
+      "proj_exdiv_date": "2026-12-24",
+      "anchor": 0.161,
+      "anchor_source": "window_open_close",
+      "anchor_provisional": false,
+      "window_open_date": "2026-06-25",
+      "zone_bot": 0.1265,
+      "zone_top": 0.1265,
       "zone_degradation_adjusted": false,
       "zone_degradation_widen_pct": 0.0,
-      "est_low_px": 0.1515,
-      "est_exdiv_px": 0.241,
-      "est_peak_px": 0.2651,
-      "est_low_date": "2026-12-02",
-      "est_low_date_from": "2026-12-02",
-      "est_low_date_to": "2026-12-02",
+      "est_low_px": 0.1265,
+      "low_timing_track_record": {
+        "tested": 0,
+        "window_hits": 0,
+        "wide_hits": 0,
+        "wide_from": "2026-08-20",
+        "wide_to": "2026-08-20",
+        "wide_wks_min": 18.0,
+        "wide_wks_max": 18.0
+      },
+      "est_exdiv_px": 0.1869,
+      "est_peak_px": 0.2214,
+      "est_low_date": "2026-08-20",
+      "est_low_date_from": "2026-08-20",
+      "est_low_date_to": "2026-08-20",
       "est_low_date_cluster1": null,
       "est_low_date_cluster1_from": null,
       "est_low_date_cluster1_to": null,
@@ -311,9 +327,9 @@
       "est_watch_window_note": null,
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": -15.5116,
-      "entry_status": "BELOW",
-      "entry_status_display": "Below",
+      "current_price_vs_zone": 1.1858,
+      "entry_status": "ABOVE",
+      "entry_status_display": "Above",
       "timing_rating": "RELIABLE",
       "timing_rating_display": "Reliable",
       "cluster_dominance": null,
@@ -323,16 +339,16 @@
       "entry_timing_reliable": true,
       "stability_verdict": "INSUFFICIENT_DATA",
       "stability_verdict_display": "Insufficient data",
-      "med_div_amt": 0.0135,
+      "med_div_amt": 0.025,
       "div_amt_announced": false,
-      "div_amt_note": "Projected from the last 4 clean same-series payments",
+      "div_amt_note": "Projected from the most recent clean same-series payment",
       "div_trend": "STABLE",
       "div_trend_display": "Stable",
-      "div_amt_lo": 0.0128,
-      "div_amt_hi": 0.0142,
-      "div_yield_lo": 8.4488,
-      "div_yield_hi": 9.3729,
-      "anchor_extreme_flag": "NORMAL",
+      "div_amt_lo": 0.0238,
+      "div_amt_hi": 0.0263,
+      "div_yield_lo": 18.8142,
+      "div_yield_hi": 20.7905,
+      "anchor_extreme_flag": "LOW",
       "historical_frequencies": {
         "entry_zone_hit_rate": 0.0,
         "exit_target_hit_rate": 100.0,
@@ -345,28 +361,28 @@
       "scenarios": {
         "base": {
           "description": "Filled around the middle of the projected entry zone",
-          "entry_px": 0.1515,
-          "exit_px": 0.241,
+          "entry_px": 0.1265,
+          "exit_px": 0.1869,
           "expected_hold_days": 126,
           "historical_frequency": "mid-zone fill"
         },
         "downside": {
           "description": "Filled near the top of the projected entry zone",
-          "entry_px": 0.1515,
-          "exit_px": 0.241,
+          "entry_px": 0.1265,
+          "exit_px": 0.1869,
           "expected_hold_days": 126,
           "historical_frequency": "higher fill"
         },
         "upside": {
           "description": "Filled near the bottom of the projected entry zone",
-          "entry_px": 0.1515,
-          "exit_px": 0.241,
+          "entry_px": 0.1265,
+          "exit_px": 0.1869,
           "expected_hold_days": 126,
           "historical_frequency": "lower fill"
         }
       },
       "risk_metrics": {
-        "max_expected_drawdown": -37.1429,
+        "max_expected_drawdown": -21.4286,
         "expected_recovery_days": 126.0,
         "liquidity_adequate": true,
         "gap_risk": false,
@@ -374,8 +390,8 @@
         "success_rate_all_historical": 100.0
       },
       "tail_risk": {
-        "worst_drawdown_pct": -37.1429,
-        "worst_tail_avg": -37.1429,
+        "worst_drawdown_pct": -21.4286,
+        "worst_tail_avg": -21.4286,
         "tail_vs_zone_gap": 0.0,
         "tail_warning": "False",
         "tail_level": "CAUTION",
@@ -383,16 +399,16 @@
       },
       "zone_fragility": {
         "pct_cycles_outside_zone_clean": 100.0,
-        "pct_cycles_outside_zone_full": 100.0,
+        "pct_cycles_outside_zone_full": 0.0,
         "fragility_warning": true,
         "median_miss_pct": null,
         "fragility_percentile_band": "BOTTOM_25",
         "fragility_percentile_band_display": "Bottom 25%"
       },
-      "final_verdict": "Wait",
+      "final_verdict": "Watch Closely",
       "final_verdict_tone": "warn",
-      "final_verdict_reason": "Price is well below the zone and may have overshot the expected entry area.",
-      "potential_score": 69.0,
+      "final_verdict_reason": "Price is close to the zone and may become actionable soon.",
+      "potential_score": 73.0,
       "potential_eligible": false,
       "potential_ineligible_reasons": [
         "Dividend frequency is not one of the preferred cycle structures",
@@ -417,8 +433,8 @@
     },
     {
       "yr": 2007,
-      "count": 2,
-      "total": 0.0255,
+      "count": 1,
+      "total": 0.0105,
       "series": [
         "S1"
       ],
@@ -427,8 +443,8 @@
     },
     {
       "yr": 2008,
-      "count": 3,
-      "total": 0.0435,
+      "count": 1,
+      "total": 0.0105,
       "series": [
         "S1"
       ],
@@ -467,8 +483,8 @@
     },
     {
       "yr": 2013,
-      "count": 2,
-      "total": 0.018,
+      "count": 1,
+      "total": 0.009,
       "series": [
         "S1"
       ],
@@ -522,30 +538,9 @@
       "note": "Dividend"
     },
     {
-      "id": "S1_2007",
-      "series": "S1",
-      "date": "2007-08-03",
-      "amount": 0.015,
-      "note": "Dividend"
-    },
-    {
-      "id": "S1_2008",
-      "series": "S1",
-      "date": "2008-04-28",
-      "amount": 0.0225,
-      "note": "Dividend"
-    },
-    {
       "id": "S1_2008",
       "series": "S1",
       "date": "2008-06-12",
-      "amount": 0.0105,
-      "note": "Dividend"
-    },
-    {
-      "id": "S1_2008",
-      "series": "S1",
-      "date": "2008-09-16",
       "amount": 0.0105,
       "note": "Dividend"
     },
@@ -574,13 +569,6 @@
       "id": "S1_2013",
       "series": "S1",
       "date": "2013-05-03",
-      "amount": 0.009,
-      "note": "Dividend"
-    },
-    {
-      "id": "S1_2013",
-      "series": "S1",
-      "date": "2013-08-30",
       "amount": 0.009,
       "note": "Dividend"
     },
@@ -2694,14 +2682,18 @@
     {
       "d": "2026-10-09",
       "c": 0.128
+    },
+    {
+      "d": "2026-10-16",
+      "c": 0.128
     }
   ],
   "current_price": 0.128,
   "anchor_price": 0.35,
   "anchor_date": "2017-05-05",
   "data_window_start": "2016-10-14",
-  "data_window_end": "2026-10-09",
-  "years_covered": 9.98,
+  "data_window_end": "2026-10-16",
+  "years_covered": 10.0,
   "series_adequacy": {
     "S1": {
       "n_clean": 1,
@@ -2711,6 +2703,21 @@
     }
   },
   "anomalies_excluded": [
+    {
+      "date": "2007-08-03",
+      "amount": 0.015,
+      "reason": "extra payment in S1 slot (2007-05-09 kept as the regular one)"
+    },
+    {
+      "date": "2008-04-28",
+      "amount": 0.0225,
+      "reason": "extra payment in S1 slot (2008-06-12 kept as the regular one)"
+    },
+    {
+      "date": "2008-09-16",
+      "amount": 0.0105,
+      "reason": "extra payment in S1 slot (2008-06-12 kept as the regular one)"
+    },
     {
       "date": "2009-09-03",
       "amount": 0.042,
@@ -2735,6 +2742,11 @@
       "date": "2012-09-10",
       "amount": 0.042,
       "reason": "special/bumper amount (0.0420 > 2.5x baseline 0.0141)"
+    },
+    {
+      "date": "2013-08-30",
+      "amount": 0.009,
+      "reason": "extra payment in S1 slot (2013-05-03 kept as the regular one)"
     },
     {
       "date": "2018-01-12",

@@ -614,7 +614,7 @@ thead th.sortable{cursor:pointer}
         </div>
         <div class="hm-section">
           <div class="hm-label">Resolved</div>
-          <p class="hm-text">An estimate becomes resolved once the projected ex-div date has passed. At that point the pre-ex-div window has closed, the cycle low is finalised, and actuals are filled in automatically.</p>
+          <p class="hm-text">An estimate becomes resolved once the projected ex-div date has passed. At that point the pre-ex-div window has closed, the cycle low is finalised, and actuals are filled in automatically. The Resolved count and every hit rate cover forward-test rows only; hindsight rows are counted separately.</p>
         </div>
       </div>
 
@@ -622,7 +622,7 @@ thead th.sortable{cursor:pointer}
       <div class="hm-pane hm-hidden" id="hm-depth">
         <div class="hm-dsection">
           <div class="hm-dlabel">0. Walk-forward validation</div>
-          <p class="hm-dtext">Estimates are committed as snapshots at <code>first_seen</code>, before the dividend cycle resolves. Actuals are matched in post-cycle from the stock's completed cycle history by ex-div date proximity. The model never uses future data to construct an estimate, and no parameters are fitted to the outcomes being measured here — making these out-of-sample forward-test results, not backtest figures.</p>
+          <p class="hm-dtext">Estimates are committed as snapshots at <code>first_seen</code>. A row's price zone keeps refreshing on each pipeline run until the projected pre-ex-div window opens, then freezes; <code>zone_issued</code> records when it was last set. Actuals are matched once the ex-div date has passed. A resolved row only counts toward the hit-rate stats (<code>forward_test</code>) if its zone was issued at least 5 days before the actual low — rows logged after the low already happened are tagged <em>Hindsight</em> and shown, but excluded.</p>
         </div>
         <div class="hm-dsection">
           <div class="hm-dlabel">1. Projected Ex-Div Date</div>
@@ -663,7 +663,7 @@ cluster_hit = 1  if |d1| ≤ |d2|,  else  2</pre>
         <div class="hm-dsection">
           <div class="hm-dlabel">7. Price Error</div>
           <pre class="hm-code">price_error_pct = (actual_low_px − est_low_px) / est_low_px × 100</pre>
-          <p class="hm-dtext"><code>est_low_px = zone_anchor_price × (1 + median_dip / 100)</code>. Negative = dipped deeper than estimated.</p>
+          <p class="hm-dtext"><code>est_low_px = window_open_close × (1 + median_dip_from_window_open / 100)</code> (the anchor is provisional — today's price — until the pre-ex-div window opens). Negative = dipped deeper than estimated.</p>
         </div>
         <div class="hm-dsection">
           <div class="hm-dlabel">8. Zone Outcome</div>
@@ -771,6 +771,14 @@ function renderEstDates(rec){
   return"<span class='err-na muted' style='font-size:11px'>No estimate</span>";
 }
 
+// Only rows whose zone was issued before the actual low count toward accuracy
+// stats; rows first logged (or last re-zoned) after the low are hindsight.
+const isScored=r=>r.cycle_resolved && r.forward_test===true;
+function hindsightChip(r){
+  return r.cycle_resolved && r.forward_test!==true
+    ? ` <span class="chip chip-unresolved" style="font-size:10px;padding:2px 6px" title="Zone was issued after the actual low, so this row is not a forward test and is excluded from hit-rate stats.">Hindsight</span>`
+    : "";
+}
 function outcomeChip(o){
   if(o==="ZONE_HIT")    return`<span class="chip chip-hit">Zone hit</span>`;
   if(o==="ZONE_MISS_BELOW") return`<span class="chip chip-miss-below">Miss below</span>`;
@@ -888,7 +896,7 @@ function renderTable(){
       <td class="num">${dateErrDisplay}</td>
       <td class="num">${r.cluster_hit!=null?`<span class="chip" style="font-size:10px;padding:2px 6px">C${r.cluster_hit}</span>`:`<span class="err-na">—</span>`}</td>
       <td class="num">${priceErrDisplay}</td>
-      <td>${outcomeChip(r.zone_outcome)}</td>
+      <td>${outcomeChip(r.zone_outcome)}${hindsightChip(r)}</td>
       <td class="mono muted">${dtFull(r.first_seen)||"—"}</td>
       <td class="mono muted">${dtFull(r.last_seen)||"—"}</td>
     </tr>`;
@@ -960,7 +968,7 @@ function renderDecisionLens(rows){
   const TODAY_ISO=new Date().toISOString().slice(0,10);
   const byTicker=groupBy(rows, r=>r.ticker);
   const tickerStats=[...byTicker.entries()].map(([ticker,tRows])=>{
-    const resolved=tRows.filter(r=>r.cycle_resolved);
+    const resolved=tRows.filter(isScored);
     const coreResolved=resolved.filter(r=>r.timing_rating!=="UNRELIABLE");
     const future=tRows
       .filter(r=>!r.cycle_resolved && r.proj_exdiv_date && r.proj_exdiv_date>=TODAY_ISO)
@@ -1225,7 +1233,8 @@ function renderDecisionLens(rows){
 
 function renderKPIs(rows){
   const total=rows.length;
-  const resolved=rows.filter(r=>r.cycle_resolved);
+  const resolved=rows.filter(isScored);
+  const hindsightCount=rows.filter(r=>r.cycle_resolved && !isScored(r)).length;
   const hits=resolved.filter(r=>r.zone_outcome==="ZONE_HIT");
   const hitRate=resolved.length?Math.round(hits.length/resolved.length*100):null;
   const coreResolved=resolved.filter(r=>r.timing_rating!=="UNRELIABLE");
@@ -1261,7 +1270,7 @@ function renderKPIs(rows){
 
   document.getElementById("kpiTotal").textContent=total;
   document.getElementById("kpiResolved").textContent=resolved.length;
-  document.getElementById("kpiResolvedSub").textContent=`${total-resolved.length} pending`;
+  document.getElementById("kpiResolvedSub").textContent=`${total-resolved.length-hindsightCount} pending · ${hindsightCount} hindsight excluded`;
 
   const hrEl=document.getElementById("kpiHitRate");
   hrEl.textContent=hitRate!=null?hitRate+"%":"—";
@@ -1305,7 +1314,7 @@ function renderKPIs(rows){
   const cards=TIMINGS.map(t=>{
     const tRows=rows.filter(r=>r.timing_rating===t.key);
     if(!tRows.length)return"";
-    const tRes=tRows.filter(r=>r.cycle_resolved);
+    const tRes=tRows.filter(isScored);
     const tHits=tRes.filter(r=>r.zone_outcome==="ZONE_HIT");
     const tErrs=tRes.filter(r=>r.date_error_days!=null).map(r=>r.date_error_days);
     const tMed=medianAbs(tErrs);
@@ -1363,7 +1372,7 @@ function parseCSV(text){
       if(v===""){rec[h]=null;}
       else if(FLOAT_COLS.has(h)){rec[h]=parseFloat(v);}
       else if(INT_COLS.has(h)){rec[h]=parseInt(v,10);}
-      else if(h==="cycle_resolved"){rec[h]=v.toLowerCase()==="true";}
+      else if(h==="cycle_resolved"||h==="forward_test"){rec[h]=v.toLowerCase()==="true";}
       else{rec[h]=v;}
     });
     return rec;
