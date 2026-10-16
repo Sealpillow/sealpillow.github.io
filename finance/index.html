@@ -1,0 +1,1629 @@
+/*
+ * Ledger Local — a private, offline finance tracker.
+ * All data is encrypted (AES-GCM, key from PBKDF2-SHA256) and stored only in this
+ * browser's IndexedDB. The page's Content-Security-Policy sets connect-src 'none',
+ * so no code on this page can send data over the network.
+ */
+'use strict';
+
+/* =====================================================================
+ * 1. Small DOM helpers (no innerHTML with user data — everything is text nodes)
+ * ===================================================================== */
+const $ = (s, root = document) => root.querySelector(s);
+
+function el(tag, props, ...children) {
+  const e = document.createElement(tag);
+  if (props) {
+    for (const [k, v] of Object.entries(props)) {
+      if (v == null || v === false) continue;
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+      else if (k === 'value' || k === 'checked' || k === 'disabled' || k === 'selected') e[k] = v;
+      else e.setAttribute(k, v === true ? '' : String(v));
+    }
+  }
+  for (const c of children.flat(Infinity)) {
+    if (c == null || c === false) continue;
+    e.append(c instanceof Node ? c : String(c));
+  }
+  return e;
+}
+
+const SVGNS = 'http://www.w3.org/2000/svg';
+function svg(tag, attrs, ...children) {
+  const e = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs || {})) if (v != null) e.setAttribute(k, String(v));
+  for (const c of children.flat(Infinity)) if (c != null) e.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  return e;
+}
+
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('toast--show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove('toast--show'), 2600);
+}
+
+/* =====================================================================
+ * 2. Formatting & parsing
+ * ===================================================================== */
+const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+const num = (v) => (typeof v === 'number' && isFinite(v) ? v : 0);
+const sum = (arr, f = (x) => x) => arr.reduce((a, x) => a + num(f(x)), 0);
+
+let _fmt = null;
+function money(n, opts = {}) {
+  if (n == null || !isFinite(n)) return '–';
+  const s = S?.settings || {};
+  const key = (s.currency || 'SGD') + (s.locale || 'en-SG') + (opts.compact ? 'c' : '');
+  if (!_fmt || _fmt.key !== key) {
+    try {
+      _fmt = {
+        key,
+        f: new Intl.NumberFormat(s.locale || 'en-SG', {
+          style: 'currency',
+          currency: s.currency || 'SGD',
+          maximumFractionDigits: opts.compact ? 0 : 2,
+          minimumFractionDigits: opts.compact ? 0 : 2,
+        }),
+      };
+    } catch {
+      _fmt = { key, f: new Intl.NumberFormat('en-SG', { style: 'currency', currency: 'SGD' }) };
+    }
+  }
+  return _fmt.f.format(n);
+}
+const pct = (n, d = 1) => (n == null || !isFinite(n) ? '–' : (n * 100).toFixed(d) + '%');
+
+/** Parses "$4,500.00", "30.0%", "(1,200)", "1 200,50" style values from CSV. */
+function parseNum(v) {
+  if (v == null) return null;
+  if (typeof v === 'number') return v;
+  let s = String(v).trim();
+  if (!s || s === '-' || s === '–') return null;
+  const isPct = s.endsWith('%');
+  let neg = false;
+  if (/^\(.*\)$/.test(s)) { neg = true; s = s.slice(1, -1); }
+  s = s.replace(/[^\d.,\-]/g, '');
+  if (s.includes(',') && !s.includes('.') && /,\d{1,2}$/.test(s)) s = s.replace(',', '.');
+  s = s.replace(/,/g, '');
+  let n = parseFloat(s);
+  if (!isFinite(n)) return null;
+  if (neg) n = -n;
+  return isPct ? n / 100 : n;
+}
+
+/* ---- months / dates (all local, as YYYY-MM / YYYY-MM-DD strings) ---- */
+const pad = (n) => String(n).padStart(2, '0');
+const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const thisMonth = () => todayISO().slice(0, 7);
+function addMonths(ym, k) {
+  const [y, m] = ym.split('-').map(Number);
+  const t = y * 12 + (m - 1) + k;
+  return `${Math.floor(t / 12)}-${pad((t % 12) + 1)}`;
+}
+function monthDiff(a, b) { // b - a in months
+  const [y1, m1] = a.split('-').map(Number), [y2, m2] = b.split('-').map(Number);
+  return (y2 - y1) * 12 + (m2 - m1);
+}
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function monthLabel(ym) { if (!ym) return '–'; const [y, m] = ym.split('-'); return `${MONTHS[+m - 1]} ${y}`; }
+function dateLabel(iso) { if (!iso) return '–'; const [y, m, d] = iso.split('-'); return `${+d} ${MONTHS[+m - 1]} ${y}`; }
+function normDate(v) {
+  if (!v) return '';
+  const s = String(v).trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?/);
+  if (m) return m[3] ? `${m[1]}-${pad(m[2])}-${pad(m[3])}` : `${m[1]}-${pad(m[2])}`;
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); // d/m/yyyy (SG format)
+  if (m) return `${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+  const d = new Date(s);
+  if (!isNaN(d)) return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return '';
+}
+function daysBetween(isoA, isoB) { return Math.round((new Date(isoB) - new Date(isoA)) / 86400000); }
+const uid = () => crypto.getRandomValues(new Uint32Array(2)).join('-');
+
+/* =====================================================================
+ * 3. Encryption + IndexedDB vault
+ * ===================================================================== */
+const VAULT = {
+  DB: 'ledger-local',
+  STORE: 'vault',
+  KEY: 'main',
+  ITER: 600000,
+
+  open() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open(this.DB, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore(this.STORE);
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async get() {
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const r = db.transaction(this.STORE).objectStore(this.STORE).get(this.KEY);
+      r.onsuccess = () => res(r.result || null);
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async put(rec) {
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(this.STORE, 'readwrite');
+      tx.objectStore(this.STORE).put(rec, this.KEY);
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  },
+  async wipe() {
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(this.STORE, 'readwrite');
+      tx.objectStore(this.STORE).clear();
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  },
+};
+
+const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+async function deriveKey(pass, salt, iter) {
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' },
+    base,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt'],
+  );
+}
+async function sealData(key, meta, data) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(data)));
+  return { app: 'ledger-local', v: 1, kdf: 'PBKDF2-SHA256', iter: meta.iter, salt: meta.salt, iv: b64(iv), ct: b64(ct), savedAt: new Date().toISOString() };
+}
+async function openSealed(rec, pass) {
+  const key = await deriveKey(pass, unb64(rec.salt), rec.iter);
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(rec.iv) }, key, unb64(rec.ct));
+  return { key, data: JSON.parse(new TextDecoder().decode(pt)), meta: { salt: rec.salt, iter: rec.iter } };
+}
+
+/* =====================================================================
+ * 4. Data model & defaults
+ * ===================================================================== */
+// Singapore resident rates, YA2024 onwards (IRAS). Editable in the app.
+const DEFAULT_TAX = [
+  [0, 0], [20000, 0.02], [30000, 0.035], [40000, 0.07], [80000, 0.115], [120000, 0.15],
+  [160000, 0.18], [200000, 0.19], [240000, 0.195], [280000, 0.2], [320000, 0.22],
+  [500000, 0.23], [1000000, 0.24],
+].map(([lower, rate]) => ({ id: uid(), lower, rate }));
+
+// CPF contribution & allocation schedule (private sector, SC / 3rd-yr SPR). Editable in Settings.
+function cpfRows(from, rows) {
+  return rows.map(([ageAbove, ageUpTo, ee, er, oa]) => ({ id: uid(), from, ageAbove, ageUpTo, ee, er, oa, oaRate: 0.025, samaRate: 0.04 }));
+}
+const DEFAULT_CPF = [
+  ...cpfRows('2025-01-01', [
+    [-1, 35, 0.2, 0.17, 0.622], [35, 45, 0.2, 0.17, 0.568], [45, 50, 0.2, 0.17, 0.514], [50, 55, 0.2, 0.17, 0.406],
+    [55, 60, 0.17, 0.155, 0.369], [60, 65, 0.115, 0.12, 0.149], [65, 70, 0.075, 0.09, 0.061], [70, 200, 0.05, 0.075, 0.08],
+  ]),
+  ...cpfRows('2026-01-01', [
+    [-1, 35, 0.2, 0.17, 0.622], [35, 45, 0.2, 0.17, 0.568], [45, 50, 0.2, 0.17, 0.514], [50, 55, 0.2, 0.17, 0.406],
+    [55, 60, 0.18, 0.16, 0.353], [60, 65, 0.125, 0.125, 0.14], [65, 70, 0.075, 0.09, 0.061], [70, 200, 0.05, 0.075, 0.08],
+  ]),
+];
+
+const RELIEF_PRESETS = [
+  { name: 'Parent Relief (living with parent)', amount: 9000 },
+  { name: 'Parent Relief (not living with parent)', amount: 5500 },
+  { name: 'NSman Relief (active NS activities)', amount: 3000 },
+  { name: 'NSman Relief (key command/staff)', amount: 5000 },
+  { name: 'NSman Relief (no NS activities)', amount: 1500 },
+  { name: 'SRS contributions (cap 15,300)', amount: 0 },
+  { name: 'CPF cash top-up — self (cap 8,000)', amount: 0 },
+  { name: 'CPF cash top-up — family (cap 8,000)', amount: 0 },
+  { name: 'Other relief', amount: 0 },
+];
+
+function defaultData() {
+  return {
+    version: 1,
+    settings: {
+      currency: 'SGD',
+      locale: 'en-SG',
+      cpfEnabled: true,
+      startCash: 0,
+      goalName: 'Savings goal',
+      goalAmount: 0,
+      cpfStart: { oa: 0, sa: 0, ma: 0 },
+      cpfExtraRate: 0.01,
+      maAlloc: 0.2162,
+      owCeiling: 8000,
+      bankBalance: null,
+      bankBalanceDate: '',
+      autoLockMin: 10,
+      lastBackup: null,
+      reliefCap: 80000,
+      donationMultiplier: 2.5,
+    },
+    assumptions: [],
+    cpfSchedule: DEFAULT_CPF,
+    ledger: [],
+    deposits: [],
+    portfolio: [],
+    liabilities: [],
+    policies: [],
+    taxBrackets: DEFAULT_TAX,
+    reliefs: {}, // { "2026": [{id, name, amount}] }
+    donations: {}, // { "2026": amount }
+    checks: {}, // { "2026-10": { key: true } } manual ticks
+  };
+}
+
+function migrate(d) {
+  const base = defaultData();
+  const out = { ...base, ...d, settings: { ...base.settings, ...(d.settings || {}) } };
+  out.settings.cpfStart = { ...base.settings.cpfStart, ...(d.settings?.cpfStart || {}) };
+  for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'liabilities', 'policies']) if (!Array.isArray(out[k])) out[k] = [];
+  if (!Array.isArray(out.cpfSchedule) || !out.cpfSchedule.length) out.cpfSchedule = DEFAULT_CPF;
+  if (!Array.isArray(out.taxBrackets) || !out.taxBrackets.length) out.taxBrackets = DEFAULT_TAX;
+  return out;
+}
+
+/* =====================================================================
+ * 5. Calculations (mirrors the spreadsheet's logic)
+ * ===================================================================== */
+const byKey = (k) => (a, b) => (a[k] < b[k] ? -1 : a[k] > b[k] ? 1 : 0);
+
+/** Assumption in force for a worked month: latest row whose Effective Date is on/before the 1st of that month. */
+function assumptionFor(ym) {
+  const rows = [...S.assumptions].filter((a) => a.effective).sort(byKey('effective'));
+  if (!rows.length) return null;
+  const first = ym + '-01';
+  let best = null;
+  for (const a of rows) if (a.effective <= first) best = a;
+  return best || rows[0];
+}
+
+/** CPF rates for an age at a month: latest schedule whose "from" ≤ month, with ageAbove < age ≤ ageUpTo. */
+function cpfFor(ym, age) {
+  const first = ym + '-01';
+  const sched = S.cpfSchedule.filter((r) => r.from && r.from <= first);
+  const pool = sched.length ? sched : S.cpfSchedule;
+  const latest = pool.reduce((m, r) => (r.from > m ? r.from : m), '');
+  const band = pool.find((r) => r.from === latest && num(age) > num(r.ageAbove) && num(age) <= num(r.ageUpTo));
+  return band || { ee: 0, er: 0, oa: 0, oaRate: 0, samaRate: 0 };
+}
+
+function taxTable() {
+  const rows = [...S.taxBrackets].filter((r) => r.lower != null).sort((a, b) => a.lower - b.lower);
+  let base = 0;
+  return rows.map((r, i) => {
+    if (i > 0) base += (r.lower - rows[i - 1].lower) * num(rows[i - 1].rate);
+    return { ...r, base };
+  });
+}
+function taxOn(income, table = taxTable()) {
+  if (!(income > 0) || !table.length) return 0;
+  let row = table[0];
+  for (const r of table) if (r.lower <= income) row = r;
+  return Math.max(0, row.base + (income - row.lower) * num(row.rate));
+}
+function earnedIncomeRelief(age) { return age >= 60 ? 8000 : age >= 55 ? 6000 : 1000; }
+function reliefTotal(year) {
+  const list = S.reliefs[year] || [];
+  const r = Math.min(num(S.settings.reliefCap) || Infinity, sum(list, (x) => x.amount));
+  return r + num(S.donations[year]) * num(S.settings.donationMultiplier);
+}
+
+function premiumsFor(ym) {
+  let total = 0;
+  const items = [];
+  for (const p of S.policies) {
+    if (!p.start) continue;
+    const [sy, sm] = p.start.split('-').map(Number);
+    const [y, m] = ym.split('-').map(Number);
+    const k = y - sy;
+    if (m === sm && k >= 0 && k < num(p.years || 1)) {
+      const actual = p.actual?.[k];
+      const amt = actual != null && actual !== '' ? num(actual) : num(p.premium);
+      total += amt;
+      items.push({ policy: p.name, year: k + 1, amount: amt });
+    }
+  }
+  return { total, items };
+}
+
+/**
+ * Compute every ledger month in order. `extraMonth` adds a virtual row (used for "this month" on the dashboard).
+ */
+function computeLedger(extraMonth) {
+  const st = S.settings;
+  const entries = [...S.ledger].sort(byKey('month'));
+  if (extraMonth && !entries.some((e) => e.month >= extraMonth)) entries.push({ id: '_virtual', month: extraMonth, virtual: true });
+  entries.sort(byKey('month'));
+  const table = taxTable();
+  let oa = num(st.cpfStart.oa), sa = num(st.cpfStart.sa), ma = num(st.cpfStart.ma);
+  const cum = { after: 0, salary: 0, savings: 0, ee: 0, er: 0, exp: 0, food: 0, transport: 0, parents: 0, tax: 0, others: 0, invest: 0, insurance: 0, maDed: 0 };
+  const ytdAfter = {};
+  const rows = [];
+  for (const e of entries) {
+    const a = assumptionFor(e.month) || {};
+    const ov = (k, dflt) => (e[k] != null && e[k] !== '' ? num(e[k]) : dflt);
+    const age = num(a.age);
+    const c = st.cpfEnabled ? cpfFor(e.month, age) : { ee: 0, er: 0, oa: 0, oaRate: 0, samaRate: 0 };
+    const salary = ov('salary', num(a.salary));
+    const bonus = num(e.bonus);
+    const ceiling = num(st.owCeiling);
+    const cpfBase = (ceiling > 0 ? Math.min(salary, ceiling) : salary) + bonus;
+    const ee = round2(cpfBase * num(c.ee));
+    const er = round2(cpfBase * num(c.er));
+    const after = salary + bonus - ee;
+    const workDays = ov('workDays', num(a.workDays));
+    const food = ov('food', num(a.foodDay) * workDays);
+    const transport = ov('transport', num(a.transportDay) * workDays);
+    const parents = ov('parents', num(a.parents));
+    const others = ov('others', num(a.others));
+    const invest = ov('invest', after * num(a.investPct));
+    const prem = premiumsFor(e.month);
+    const extras = sum(e.extras || [], (x) => x.amount);
+
+    // Income tax: projected chargeable income for the calendar year ÷ 12 (same as the sheet's column K).
+    const [yy, mm] = e.month.split('-').map(Number);
+    ytdAfter[yy] = (ytdAfter[yy] || 0) + after;
+    const projected = ytdAfter[yy] + (ceiling > 0 ? Math.min(salary, ceiling) * (1 - num(c.ee)) + Math.max(0, salary - ceiling) : salary * (1 - num(c.ee))) * (12 - mm);
+    const chargeable = Math.max(0, projected - earnedIncomeRelief(age) - reliefTotal(yy));
+    const tax = e.tax != null && e.tax !== '' ? num(e.tax) : round2(taxOn(chargeable, table) / 12);
+
+    const expenditure = food + transport + parents + others + tax + prem.total + extras;
+    const savings = after - expenditure - invest;
+
+    // CPF balances (monthly approximation of CPF interest incl. 1% extra on first $60k, max $20k from OA)
+    const total = ee + er;
+    const x = num(st.cpfExtraRate) / 12;
+    const maAlloc = num(st.maAlloc);
+    const eOA = Math.min(oa, 20000);
+    const eSA = Math.min(sa, 60000 - eOA);
+    const eMA = Math.min(ma, Math.max(60000 - eOA - sa, 0));
+    const maDed = num(e.maDed);
+    const nOA = oa * (1 + num(c.oaRate) / 12) + total * num(c.oa);
+    const nSA = sa * (1 + num(c.samaRate) / 12) + eOA * x + eSA * x + total * Math.max(0, 1 - num(c.oa) - maAlloc);
+    const nMA = ma * (1 + num(c.samaRate) / 12) + eMA * x + total * maAlloc - maDed;
+    if (st.cpfEnabled) { oa = nOA; sa = nSA; ma = nMA; }
+
+    if (!e.virtual) {
+      cum.after += after; cum.salary += salary + bonus; cum.savings += savings; cum.ee += ee; cum.er += er;
+      cum.exp += expenditure; cum.food += food; cum.transport += transport; cum.parents += parents;
+      cum.tax += tax; cum.others += others; cum.invest += invest; cum.insurance += prem.total; cum.maDed += maDed;
+    }
+    rows.push({
+      entry: e, month: e.month, virtual: !!e.virtual, assumption: a, age, rates: c,
+      salary, bonus, ee, er, after, workDays, food, transport, parents, others, invest, tax, chargeable, projected,
+      insurance: prem.total, insuranceItems: prem.items, extras, expenditure, savings,
+      savingsRate: after ? savings / after : 0,
+      oa, sa, ma, cpfTotal: oa + sa + ma, maDed,
+      cum: { ...cum },
+      cash: num(st.startCash) + cum.savings,
+      overrides: ['salary', 'workDays', 'food', 'transport', 'parents', 'others', 'invest', 'tax'].filter((k) => e[k] != null && e[k] !== ''),
+    });
+  }
+  return rows;
+}
+
+function summary() {
+  const st = S.settings;
+  const rows = computeLedger();
+  const last = rows[rows.length - 1] || null;
+  const deposits = sum(S.deposits, (d) => d.amount);
+  const planned = last ? last.cum.invest : 0;
+  const extraInvested = deposits - planned;
+  const pv = [...S.portfolio].filter((p) => p.date).sort(byKey('date'));
+  const portfolio = pv.length ? num(pv[pv.length - 1].value) : 0;
+  const liabilities = sum(S.liabilities, (l) => l.balance);
+  const cumSavings = last ? last.cum.savings : 0;
+  const cpf = st.cpfEnabled ? (last ? last.cpfTotal : num(st.cpfStart.oa) + num(st.cpfStart.sa) + num(st.cpfStart.ma)) : 0;
+  const netWorth = num(st.startCash) + cumSavings + portfolio + cpf - liabilities - extraInvested;
+  const liquid = netWorth - cpf;
+  const saved = num(st.startCash) + cumSavings + portfolio - extraInvested;
+  const recent = rows.slice(-12);
+  const pace = recent.length ? sum(recent, (r) => r.savings + r.invest) / recent.length : 0;
+  const remaining = Math.max(0, num(st.goalAmount) - saved);
+  const monthsToGoal = remaining <= 0 ? 0 : pace > 0 ? Math.ceil(remaining / pace) : null;
+  const expectedCash = num(st.startCash) + cumSavings - extraInvested;
+  return {
+    rows, last, deposits, planned, extraInvested, portfolio, portfolioDate: pv.length ? pv[pv.length - 1].date : null,
+    liabilities, cumSavings, cpf, netWorth, liquid, saved, pace, remaining, monthsToGoal,
+    goalMonth: monthsToGoal != null ? addMonths(thisMonth(), monthsToGoal) : null,
+    progress: num(st.goalAmount) > 0 ? Math.min(1, saved / num(st.goalAmount)) : null,
+    expectedCash,
+  };
+}
+
+/** Months to pay off: NPER(rate/12, -payment, balance). Null if the payment never covers interest. */
+function payoff(l) {
+  const B = num(l.balance), P = num(l.payment), r = num(l.rate) / 12;
+  if (B <= 0) return { months: 0 };
+  if (P <= 0) return { months: null };
+  let n;
+  if (r === 0) n = B / P;
+  else {
+    if (P <= B * r) return { months: null };
+    n = -Math.log(1 - (r * B) / P) / Math.log(1 + r);
+  }
+  const months = Math.ceil(n);
+  return { months, date: addMonths(thisMonth(), months), interest: Math.max(0, n * P - B) };
+}
+
+function checklist(sm) {
+  const items = [];
+  const now = thisMonth();
+  const lastWorked = addMonths(now, -1);
+  const has = (ym) => S.ledger.some((e) => e.month === ym);
+  if (S.assumptions.length === 0) {
+    items.push({ ok: false, text: 'Add your first assumptions row', detail: 'Salary, CPF age, daily food/transport, investment % — on the Assumptions page.', go: 'assumptions' });
+  }
+  items.push(has(lastWorked)
+    ? { ok: true, text: `Ledger row for ${monthLabel(lastWorked)} added` }
+    : { ok: false, text: `Add the ledger row for ${monthLabel(lastWorked)}`, detail: 'Do this when the payslip for that month arrives.', go: 'ledger' });
+  const depThisMonth = S.deposits.some((d) => (d.date || '').slice(0, 7) === now);
+  items.push(depThisMonth
+    ? { ok: true, text: `Investment deposit logged for ${monthLabel(now)}` }
+    : { ok: false, text: `Log this month's investment deposit`, detail: 'Skip if you did not invest this month.', go: 'investments' });
+  if (S.portfolio.length) {
+    const age = daysBetween(sm.portfolioDate, todayISO());
+    items.push(age <= 35
+      ? { ok: true, text: 'Portfolio value is up to date', detail: `Last updated ${dateLabel(sm.portfolioDate)}` }
+      : { ok: false, text: 'Update your portfolio value', detail: `Last updated ${dateLabel(sm.portfolioDate)} (${age} days ago)`, go: 'investments' });
+  }
+  for (const p of S.policies) {
+    if (!p.start) continue;
+    const [sy, sm2] = p.start.split('-').map(Number);
+    for (let k = 0; k < num(p.years); k++) {
+      const due = `${sy + k}-${pad(sm2)}`;
+      const diff = monthDiff(now, due);
+      const paid = p.actual?.[k] != null && p.actual[k] !== '';
+      if (diff >= -2 && diff <= 1 && !paid) {
+        items.push({ ok: false, text: `${p.name || 'Policy'}: premium ${diff >= 0 ? 'due' : 'was due'} ${monthLabel(due)}`, detail: `Expected ${money(num(p.premium))}. Log Actual Paid when you pay.`, go: 'insurance' });
+      }
+    }
+  }
+  if (S.settings.bankBalance != null && S.settings.bankBalance !== '') {
+    const diff = num(S.settings.bankBalance) - sm.expectedCash;
+    const ok = Math.abs(diff) < Math.max(100, Math.abs(sm.expectedCash) * 0.02);
+    items.push({ ok, text: ok ? 'Bank balance matches expected cash' : 'Bank balance differs from expected cash', detail: `Actual ${money(num(S.settings.bankBalance))} vs expected ${money(sm.expectedCash)} (${diff >= 0 ? '+' : ''}${money(diff)})`, go: ok ? null : 'networth' });
+  }
+  const lb = S.settings.lastBackup;
+  const bAge = lb ? daysBetween(lb.slice(0, 10), todayISO()) : null;
+  items.push(lb && bAge <= 30
+    ? { ok: true, text: 'Encrypted backup is recent', detail: `Last exported ${dateLabel(lb.slice(0, 10))}` }
+    : { ok: false, text: 'Export an encrypted backup', detail: lb ? `Last backup ${bAge} days ago.` : 'Clearing browser data would erase everything without one.', go: 'data' });
+  return items;
+}
+
+/* =====================================================================
+ * 6. App state, saving, locking
+ * ===================================================================== */
+let S = null; // decrypted data (memory only)
+let KEY = null; // CryptoKey (non-extractable)
+let META = null; // { salt, iter }
+let saveTimer = null;
+let lastActivity = Date.now();
+
+function commit({ rerender = true } = {}) {
+  clearTimeout(saveTimer);
+  setStatus('Saving…');
+  saveTimer = setTimeout(persist, 300);
+  if (rerender) render();
+}
+async function persist() {
+  if (!S || !KEY) return;
+  try {
+    await VAULT.put(await sealData(KEY, META, S));
+    setStatus('Saved · encrypted on this device');
+  } catch (err) {
+    setStatus('Save failed');
+    toast('Could not save: ' + err.message);
+  }
+}
+function setStatus(t) { const s = $('#save-status'); if (s) s.textContent = t; }
+
+function lock() {
+  clearTimeout(saveTimer);
+  const pending = S && KEY ? persist() : Promise.resolve();
+  pending.finally(() => {
+    S = null; KEY = null; META = null;
+    $('#dlg').open && $('#dlg').close();
+    renderLock();
+  });
+}
+['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach((ev) => addEventListener(ev, () => { lastActivity = Date.now(); }, { passive: true }));
+setInterval(() => {
+  if (S && num(S.settings.autoLockMin) > 0 && Date.now() - lastActivity > S.settings.autoLockMin * 60000) lock();
+}, 15000);
+
+/* =====================================================================
+ * 7. Lock / create / restore screens
+ * ===================================================================== */
+async function renderLock() {
+  const app = $('#app');
+  app.replaceChildren();
+  const rec = await VAULT.get().catch(() => null);
+  const err = el('div', { class: 'lock__error' });
+  const brand = el('div', { class: 'lock__title' }, el('span', { class: 'shell__brand-dot' }), 'Ledger Local');
+
+  if (rec) {
+    const pass = el('input', { class: 'input', type: 'password', autocomplete: 'current-password', placeholder: 'Passphrase', 'aria-label': 'Passphrase' });
+    const btn = el('button', { class: 'btn btn--primary', type: 'submit', text: 'Unlock' });
+    const form = el('form', {
+      onsubmit: async (e) => {
+        e.preventDefault();
+        btn.disabled = true; btn.textContent = 'Unlocking…'; err.textContent = '';
+        try {
+          const o = await openSealed(rec, pass.value);
+          KEY = o.key; META = o.meta; S = migrate(o.data);
+          lastActivity = Date.now();
+          renderShell();
+        } catch {
+          err.textContent = 'Wrong passphrase — or the stored data is damaged.';
+          btn.disabled = false; btn.textContent = 'Unlock';
+        }
+      },
+    }, el('div', { class: 'field' }, pass), err, btn);
+    app.append(el('div', { class: 'lock' }, el('div', { class: 'card lock__card' },
+      brand,
+      el('p', { class: 'muted', text: 'Your records are encrypted on this device. Enter your passphrase to open them.' }),
+      form,
+      el('div', { class: 'lock__links' },
+        el('button', { class: 'link-btn', type: 'button', text: 'Restore from a backup file', onclick: () => restoreFlow(true) }),
+        el('button', { class: 'link-btn', type: 'button', text: 'Erase data on this device', onclick: eraseFlow }),
+      ),
+    )));
+    pass.focus();
+    return;
+  }
+
+  const p1 = el('input', { class: 'input', type: 'password', autocomplete: 'new-password', placeholder: 'At least 10 characters', 'aria-label': 'New passphrase' });
+  const p2 = el('input', { class: 'input', type: 'password', autocomplete: 'new-password', placeholder: 'Type it again', 'aria-label': 'Confirm passphrase' });
+  const sample = el('input', { type: 'checkbox', id: 'sample' });
+  const btn = el('button', { class: 'btn btn--primary', type: 'submit', text: 'Create encrypted vault' });
+  const form = el('form', {
+    onsubmit: async (e) => {
+      e.preventDefault();
+      err.textContent = '';
+      if (p1.value.length < 10) { err.textContent = 'Use at least 10 characters (a short sentence works well).'; return; }
+      if (p1.value !== p2.value) { err.textContent = 'The passphrases do not match.'; return; }
+      btn.disabled = true; btn.textContent = 'Creating…';
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      META = { salt: b64(salt), iter: VAULT.ITER };
+      KEY = await deriveKey(p1.value, salt, VAULT.ITER);
+      S = sample.checked ? sampleData() : defaultData();
+      await persist();
+      lastActivity = Date.now();
+      location.hash = '#/dashboard';
+      renderShell();
+    },
+  },
+  el('div', { class: 'field' }, el('label', { class: 'field__label', text: 'Choose a passphrase' }), p1),
+  el('div', { class: 'field' }, el('label', { class: 'field__label', text: 'Confirm passphrase' }), p2),
+  el('label', { class: 'field__hint', for: 'sample' }, sample, ' Start with sample data (fictional numbers, to explore)'),
+  err, btn);
+
+  app.append(el('div', { class: 'lock' }, el('div', { class: 'card lock__card' },
+    brand,
+    el('p', { class: 'muted', text: 'A private finance tracker that runs entirely in your browser.' }),
+    el('ul', { class: 'lock__list' },
+      el('li', { text: 'Records are encrypted with your passphrase and stored only on this device.' }),
+      el('li', { text: 'This page is blocked from making network requests — nothing is uploaded.' }),
+      el('li', { text: 'There is no account and no reset. Forget the passphrase and the data cannot be recovered.' }),
+      el('li', { text: 'Export an encrypted backup regularly; clearing browser data erases the vault.' }),
+    ),
+    form,
+    el('div', { class: 'lock__links' },
+      el('button', { class: 'link-btn', type: 'button', text: 'Restore from a backup file', onclick: () => restoreFlow(true) }),
+    ),
+  )));
+  p1.focus();
+}
+
+function pickFile(accept) {
+  return new Promise((res) => {
+    const i = el('input', { type: 'file', accept, class: 'hide' });
+    i.addEventListener('change', () => { res(i.files[0] || null); i.remove(); });
+    document.body.append(i);
+    i.click();
+  });
+}
+
+async function restoreFlow(fromLock) {
+  const file = await pickFile('.json,application/json');
+  if (!file) return;
+  let rec;
+  try { rec = JSON.parse(await file.text()); } catch { toast('That file is not a valid backup.'); return; }
+  if (rec?.app !== 'ledger-local' || !rec.ct) { toast('That file is not a Ledger Local backup.'); return; }
+  const pass = el('input', { class: 'input', type: 'password', placeholder: 'Passphrase used for that backup' });
+  const err = el('div', { class: 'lock__error' });
+  openDialog('Restore backup', [
+    el('p', { text: `Backup saved ${rec.savedAt ? dateLabel(rec.savedAt.slice(0, 10)) : ''}. Restoring replaces the data currently on this device.` }),
+    el('div', { class: 'field' }, pass), err,
+  ], [
+    { label: 'Cancel' },
+    {
+      label: 'Restore', primary: true, keepOpen: true,
+      run: async () => {
+        try {
+          const o = await openSealed(rec, pass.value);
+          KEY = o.key; META = o.meta; S = migrate(o.data);
+          await persist();
+          $('#dlg').close();
+          toast('Backup restored');
+          lastActivity = Date.now();
+          renderShell();
+        } catch { err.textContent = 'Wrong passphrase for this backup.'; }
+      },
+    },
+  ]);
+  setTimeout(() => pass.focus(), 50);
+  void fromLock;
+}
+
+function eraseFlow() {
+  const conf = el('input', { class: 'input', placeholder: 'Type ERASE' });
+  openDialog('Erase data on this device', [
+    el('p', { text: 'This permanently deletes the encrypted vault from this browser. Only an exported backup can bring it back.' }),
+    el('div', { class: 'field' }, conf),
+  ], [
+    { label: 'Cancel' },
+    {
+      label: 'Erase', danger: true, keepOpen: true,
+      run: async () => {
+        if (conf.value.trim() !== 'ERASE') { toast('Type ERASE to confirm'); return; }
+        await VAULT.wipe();
+        S = null; KEY = null; META = null;
+        $('#dlg').close();
+        renderLock();
+      },
+    },
+  ]);
+}
+
+/* =====================================================================
+ * 8. Dialog
+ * ===================================================================== */
+function openDialog(title, body, buttons) {
+  const d = $('#dlg');
+  d.replaceChildren(
+    el('h2', { text: title }),
+    ...[body].flat(),
+    el('div', { class: 'dialog__foot' }, buttons.map((b) => el('button', {
+      class: 'btn' + (b.primary ? ' btn--primary' : '') + (b.danger ? ' btn--danger' : ''),
+      type: 'button',
+      text: b.label,
+      onclick: async () => { if (b.run) await b.run(); if (!b.keepOpen) d.close(); },
+    }))),
+  );
+  if (!d.open) d.showModal();
+}
+
+/* =====================================================================
+ * 9. Generic editable table
+ * ===================================================================== */
+/**
+ * cols: [{ key, label, type: 'text'|'money'|'number'|'pct'|'date'|'month', width, get?, readonly?, align? }]
+ */
+function editTable({ cols, rows, onDelete, emptyText = 'Nothing here yet.', totals }) {
+  const head = el('tr', null, cols.map((c) => el('th', { class: 'table__th' + (c.type === 'text' || c.type === 'date' || c.type === 'month' ? ' table__th--left' : ''), text: c.label })), onDelete ? el('th', { class: 'table__th' }) : null);
+  const body = rows.map((r) => el('tr', { class: 'table__row' },
+    cols.map((c) => {
+      if (c.readonly || c.get) {
+        const v = c.get ? c.get(r) : r[c.key];
+        const cls = 'table__td' + (c.type === 'text' || c.type === 'date' || c.type === 'month' ? ' table__td--left' : '') + (c.cls ? ' ' + c.cls(r) : '');
+        const shown = v instanceof Node ? v : c.get && typeof v === 'string' ? v : fmtCell(v, c.type);
+        return el('td', { class: cls }, shown);
+      }
+      return el('td', { class: 'table__td table__td--edit' }, inputFor(r, c));
+    }),
+    onDelete ? el('td', { class: 'table__td' }, el('button', { class: 'btn btn--icon btn--small btn--danger', type: 'button', title: 'Delete row', 'aria-label': 'Delete row', text: '×', onclick: () => onDelete(r) })) : null,
+  ));
+  const foot = totals ? el('tr', { class: 'table__row table__row--total' }, cols.map((c, i) => el('td', { class: 'table__td' + (i === 0 ? ' table__td--left' : '') }, totals[c.key] != null ? (totals[c.key] instanceof Node ? totals[c.key] : fmtCell(totals[c.key], c.type)) : (i === 0 ? 'Total' : ''))), onDelete ? el('td', { class: 'table__td' }) : null) : null;
+  return el('div', { class: 'table-wrap' }, el('table', { class: 'table' },
+    el('thead', null, head),
+    el('tbody', null, rows.length ? body : el('tr', null, el('td', { class: 'table__empty', colspan: cols.length + (onDelete ? 1 : 0), text: emptyText })), foot),
+  ));
+}
+function fmtCell(v, type) {
+  if (v == null || v === '') return '–';
+  if (type === 'money') return money(v);
+  if (type === 'pct') return pct(v);
+  if (type === 'month') return monthLabel(v);
+  if (type === 'date') return dateLabel(v);
+  if (type === 'number') return String(round2(v));
+  return String(v);
+}
+function inputFor(r, c, { onChange } = {}) {
+  const t = c.type;
+  const attrs = { class: 'input', 'aria-label': c.label };
+  let val = r[c.key];
+  if (t === 'date') Object.assign(attrs, { type: 'date', value: val || '' });
+  else if (t === 'month') Object.assign(attrs, { type: 'month', value: val || '' });
+  else if (t === 'text') Object.assign(attrs, { type: 'text', value: val ?? '' });
+  else Object.assign(attrs, { type: 'number', step: t === 'pct' ? '0.01' : c.step || '0.01', inputmode: 'decimal', value: val == null || val === '' ? '' : t === 'pct' ? round2(val * 100 * 100) / 100 : val, placeholder: c.placeholder || '' });
+  attrs.onchange = (e) => {
+    const raw = e.target.value;
+    let v;
+    if (t === 'text' || t === 'date' || t === 'month') v = raw;
+    else v = raw === '' ? (c.nullable ? null : 0) : t === 'pct' ? parseFloat(raw) / 100 : parseFloat(raw);
+    r[c.key] = v;
+    onChange ? onChange(v) : commit();
+  };
+  return el('input', attrs);
+}
+function field(label, input, hint) {
+  return el('div', { class: 'field' }, el('label', { class: 'field__label', text: label }), input, hint ? el('div', { class: 'field__hint', text: hint }) : null);
+}
+function settingInput(obj, key, type, label, hint, extra = {}) {
+  return field(label, inputFor(obj, { key, type, label, ...extra }), hint);
+}
+
+/* =====================================================================
+ * 10. Charts (inline SVG, no libraries)
+ * ===================================================================== */
+function lineChart(series, labels, { height = 220, format = (v) => money(v, { compact: true }) } = {}) {
+  const W = 640, H = height, L = 64, R = 26, T = 12, B = 28;
+  const all = series.flatMap((s) => s.values).filter((v) => isFinite(v));
+  if (!all.length || labels.length < 2) return el('p', { class: 'muted', text: 'Add at least two months to see a trend.' });
+  let min = Math.min(0, ...all), max = Math.max(...all);
+  if (max === min) max = min + 1;
+  const step = niceStep((max - min) / 4);
+  min = Math.floor(min / step) * step; max = Math.ceil(max / step) * step;
+  const x = (i) => L + (i * (W - L - R)) / (labels.length - 1);
+  const y = (v) => T + (H - T - B) * (1 - (v - min) / (max - min));
+  const grid = [];
+  for (let v = min; v <= max + 1e-9; v += step) {
+    grid.push(svg('line', { class: 'chart__grid', x1: L, x2: W - R, y1: y(v), y2: y(v) }));
+    grid.push(svg('text', { class: 'chart__axis', x: L - 6, y: y(v) + 4, 'text-anchor': 'end' }, format(v)));
+  }
+  const every = Math.max(1, Math.ceil(labels.length / 7));
+  const xl = labels.map((lb, i) => ((i % every === 0 && labels.length - 1 - i >= every / 2) || i === labels.length - 1) ? svg('text', { class: 'chart__axis', x: x(i), y: H - 8, 'text-anchor': i === labels.length - 1 ? 'end' : 'middle' }, lb) : null);
+  const lines = series.map((s, si) => svg('polyline', { class: `chart__line chart__line--${si + 1}`, points: s.values.map((v, i) => `${x(i)},${y(v)}`).join(' ') }, svg('title', null, s.name)));
+  return el('div', null,
+    svg('svg', { class: 'chart', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': series.map((s) => s.name).join(', ') + ' over time' }, grid, xl, lines),
+    el('div', { class: 'legend' }, series.map((s, si) => el('span', null, el('span', { class: `legend__swatch legend__swatch--${si + 1}` }), s.name))),
+  );
+}
+function barChart(values, labels, { height = 180, format = (v) => pct(v, 0) } = {}) {
+  const W = 640, H = height, L = 44, R = 8, T = 10, B = 26;
+  if (!values.length) return el('p', { class: 'muted', text: 'No months yet.' });
+  let min = Math.min(0, ...values), max = Math.max(0.01, ...values);
+  const step = niceStep((max - min) / 4);
+  min = Math.floor(min / step) * step; max = Math.ceil(max / step) * step;
+  const y = (v) => T + (H - T - B) * (1 - (v - min) / (max - min));
+  const bw = (W - L - R) / values.length;
+  const parts = [];
+  for (let v = min; v <= max + 1e-9; v += step) {
+    parts.push(svg('line', { class: 'chart__grid', x1: L, x2: W - R, y1: y(v), y2: y(v) }));
+    parts.push(svg('text', { class: 'chart__axis', x: L - 6, y: y(v) + 4, 'text-anchor': 'end' }, format(v)));
+  }
+  const every = Math.max(1, Math.ceil(values.length / 8));
+  values.forEach((v, i) => {
+    const y0 = y(0), y1 = y(v);
+    parts.push(svg('rect', { class: 'chart__bar' + (v < 0 ? ' chart__bar--neg' : ''), x: L + i * bw + bw * 0.15, width: bw * 0.7, y: Math.min(y0, y1), height: Math.max(1, Math.abs(y1 - y0)), rx: 2 }, svg('title', null, `${labels[i]}: ${format(v)}`)));
+    if (i % every === 0) parts.push(svg('text', { class: 'chart__axis', x: L + i * bw + bw / 2, y: H - 8, 'text-anchor': 'middle' }, labels[i]));
+  });
+  return svg('svg', { class: 'chart', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Savings rate by month' }, parts);
+}
+function niceStep(raw) {
+  if (!(raw > 0)) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const f = raw / p;
+  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+}
+function bars(items) {
+  const max = Math.max(...items.map((i) => i.value), 1);
+  return items.map((i) => {
+    const fill = el('div', { class: 'bar__fill' });
+    fill.style.width = Math.max(0, (i.value / max) * 100) + '%';
+    return el('div', { class: 'bar' }, el('div', { class: 'bar__head' }, el('span', { text: i.label }), el('span', { text: money(i.value) })), el('div', { class: 'bar__track' }, fill));
+  });
+}
+function progressBar(p) {
+  const f = el('div', { class: 'progress__fill' });
+  f.style.width = Math.round((p || 0) * 100) + '%';
+  return el('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': Math.round((p || 0) * 100), 'aria-valuemin': 0, 'aria-valuemax': 100 }, f);
+}
+function stat(label, value, note, key) {
+  return el('div', { class: 'card stat' + (key ? ' stat--key' : '') }, el('div', { class: 'stat__label', text: label }), el('div', { class: 'stat__value', text: value }), note ? el('div', { class: 'stat__note', text: note }) : null);
+}
+function kv(pairs) {
+  return el('div', { class: 'kv' }, pairs.flatMap(([k, v, strong, cls]) => [
+    el('div', { class: 'kv__k' + (strong ? ' kv__k--strong' : ''), text: k }),
+    el('div', { class: 'kv__v' + (strong ? ' kv__v--strong' : '') + (cls ? ' ' + cls : ''), text: v }),
+  ]));
+}
+const sign = (n) => (n < 0 ? 'neg' : n > 0 ? 'pos' : '');
+
+/* =====================================================================
+ * 11. Shell & router
+ * ===================================================================== */
+const PAGES = [
+  ['dashboard', 'Dashboard'],
+  ['ledger', 'Monthly ledger'],
+  ['assumptions', 'Assumptions'],
+  ['investments', 'Investments'],
+  ['liabilities', 'Liabilities'],
+  ['insurance', 'Insurance'],
+  ['tax', 'Tax & reliefs'],
+  ['networth', 'Goal & net worth'],
+  ['data', 'Settings & data'],
+];
+const route = () => (location.hash.replace(/^#\/?/, '') || 'dashboard').split('?')[0];
+addEventListener('hashchange', () => S && render());
+
+function renderShell() {
+  const app = $('#app');
+  app.replaceChildren(el('div', { class: 'shell' },
+    el('nav', { class: 'shell__nav', 'aria-label': 'Sections' },
+      el('div', { class: 'shell__brand' }, el('span', { class: 'shell__brand-dot' }), 'Ledger Local'),
+      PAGES.map(([id, label]) => el('a', { class: 'nav__link', href: '#/' + id, 'data-page': id, text: label })),
+      el('div', { class: 'shell__spacer' }),
+      el('div', { class: 'status' }, el('span', { class: 'status__dot' }), el('span', { id: 'save-status', text: 'Encrypted on this device' })),
+      el('button', { class: 'btn', type: 'button', text: 'Lock', onclick: lock }),
+    ),
+    el('main', { class: 'shell__main', id: 'main' }),
+  ));
+  render();
+}
+
+function render() {
+  if (!S) return;
+  const p = route();
+  document.querySelectorAll('.nav__link').forEach((a) => a.classList.toggle('nav__link--active', a.dataset.page === p));
+  const main = $('#main');
+  if (!main) return renderShell();
+  const scroll = main.scrollTop, wy = scrollY;
+  const view = ({ dashboard: pageDashboard, ledger: pageLedger, assumptions: pageAssumptions, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[p] || pageDashboard)();
+  main.replaceChildren(view);
+  main.scrollTop = scroll; scrollTo(0, wy);
+}
+
+function pageHead(title, sub, ...actions) {
+  return el('div', { class: 'page__head' },
+    el('div', null, el('h1', { text: title }), sub ? el('p', { class: 'page__sub', text: sub }) : null),
+    actions.length ? el('div', { class: 'page__actions' }, actions) : null,
+  );
+}
+const go = (p) => { location.hash = '#/' + p; };
+
+/* =====================================================================
+ * 12. Pages
+ * ===================================================================== */
+function pageDashboard() {
+  const sm = summary();
+  const now = thisMonth();
+  const cur = computeLedger(now).find((r) => r.month === now);
+  const rows = sm.rows;
+  const checks = checklist(sm);
+  const due = checks.filter((c) => !c.ok).length;
+  const frag = el('div', null, pageHead('Dashboard', `Right now · ${monthLabel(now)}`));
+
+  if (!S.assumptions.length) {
+    frag.append(el('div', { class: 'notice notice--info' }, 'Start on ', el('a', { href: '#/assumptions', text: 'Assumptions' }), ' (salary, costs, investment %), then add months in the ', el('a', { href: '#/ledger', text: 'Monthly ledger' }), '. Coming from the spreadsheet? Use ', el('a', { href: '#/data', text: 'Settings & data → Import CSV' }), '.'));
+  }
+
+  frag.append(el('div', { class: 'grid grid--stats' },
+    stat('Net worth', money(sm.netWorth), 'Incl. CPF', true),
+    stat('Liquid net worth', money(sm.liquid), 'Excl. CPF'),
+    stat('Left this month', cur ? money(cur.savings) : '–', cur ? `Savings rate ${pct(cur.savingsRate)}` : null),
+    stat('Total CPF', money(sm.cpf), S.settings.cpfEnabled ? 'OA + SA + MA' : 'CPF tracking off'),
+  ));
+
+  const goal = el('div', { class: 'card' },
+    el('div', { class: 'card__title' }, el('span', { text: S.settings.goalName || 'Savings goal' }), el('a', { class: 'card__hint', href: '#/networth', text: 'Details' })),
+  );
+  if (num(S.settings.goalAmount) > 0) {
+    goal.append(
+      el('div', { class: 'bar__head' }, el('span', { text: `${money(sm.saved)} of ${money(S.settings.goalAmount)}` }), el('strong', { text: pct(sm.progress, 0) })),
+      progressBar(sm.progress),
+      el('div', { class: 'card__hint', text: sm.remaining <= 0 ? 'Goal reached.' : sm.monthsToGoal != null ? `About ${sm.monthsToGoal} months to go at your 12-month pace (${money(sm.pace)}/month) — around ${monthLabel(sm.goalMonth)}.` : 'Not enough saving pace yet to project a date.' }),
+    );
+  } else goal.append(el('p', { class: 'muted' }, 'Set a goal amount on ', el('a', { href: '#/networth', text: 'Goal & net worth' }), '.'));
+
+  const month = el('div', { class: 'card' }, el('div', { class: 'card__title', text: `This month (from current assumptions)` }));
+  if (cur) {
+    month.append(kv([
+      ['Salary' + (cur.bonus ? ' + bonus' : ''), money(cur.salary + cur.bonus)],
+      ['CPF (employee)', '−' + money(cur.ee)],
+      ['After CPF', money(cur.after), true],
+      ['Food', '−' + money(cur.food)],
+      ['Transport', '−' + money(cur.transport)],
+      ['Parents', '−' + money(cur.parents)],
+      ['Others', '−' + money(cur.others)],
+      ['Income tax (monthly)', '−' + money(cur.tax)],
+      ...(cur.insurance ? [['Insurance premium', '−' + money(cur.insurance)]] : []),
+      ['Investment (planned)', '−' + money(cur.invest)],
+      ['Left', money(cur.savings), true, sign(cur.savings)],
+      ['Employer CPF (not in take-home)', money(cur.er)],
+    ]));
+  } else month.append(el('p', { class: 'muted', text: 'Add an assumptions row to see this.' }));
+
+  const chk = el('div', { class: 'card' }, el('div', { class: 'card__title' }, el('span', { text: 'Checklist' }), el('span', { class: 'card__hint', text: due ? `${due} to do` : 'All done' })),
+    checks.map((c) => el('div', { class: 'check' },
+      el('div', { class: 'check__icon ' + (c.ok ? 'check__icon--ok' : 'check__icon--due'), text: c.ok ? '✓' : '!' }),
+      el('div', { class: 'check__text' }, el('div', { text: c.text }), c.detail ? el('div', { class: 'check__detail', text: c.detail }) : null),
+      c.go ? el('button', { class: 'btn btn--small', type: 'button', text: 'Open', onclick: () => go(c.go) }) : null,
+    )));
+
+  frag.append(el('div', { class: 'grid grid--two' }, el('div', null, goal, chk), month));
+
+  if (rows.length) {
+    const labels = rows.map((r) => monthLabel(r.month).replace(' 20', " '"));
+    const series = [{ name: 'Cash (start + cumulative savings)', values: rows.map((r) => r.cash) }];
+    if (S.settings.cpfEnabled) series.push({ name: 'Total CPF', values: rows.map((r) => r.cpfTotal) });
+    series.push({ name: 'Cumulative invested (planned)', values: rows.map((r) => r.cum.invest) });
+    frag.append(el('div', { class: 'grid grid--two' },
+      el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Balances over time' }), lineChart(series, labels)),
+      el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Savings rate by month' }), barChart(rows.map((r) => r.savingsRate), labels),
+        el('div', { class: 'card__title section-gap', text: 'Where the money went (all months)' }),
+        bars([
+          { label: 'Food', value: sm.last.cum.food }, { label: 'Transport', value: sm.last.cum.transport }, { label: 'Parents', value: sm.last.cum.parents },
+          { label: 'Others', value: sm.last.cum.others }, { label: 'Income tax', value: sm.last.cum.tax }, { label: 'Insurance', value: sm.last.cum.insurance },
+        ].filter((b) => b.value > 0).sort((a, b) => b.value - a.value)),
+      ),
+    ));
+  }
+  return frag;
+}
+
+function pageLedger() {
+  const rows = computeLedger();
+  const addNext = () => {
+    const last = [...S.ledger].sort(byKey('month')).pop();
+    const m = last ? addMonths(last.month, 1) : addMonths(thisMonth(), -1);
+    if (S.ledger.some((e) => e.month === m)) return toast('That month already exists');
+    S.ledger.push({ id: uid(), month: m, bonus: 0, maDed: 0 });
+    commit();
+    toast(`Added ${monthLabel(m)}`);
+  };
+  const mark = (r, k) => (r.overrides.includes(k) ? el('span', { class: 'table__mark', title: 'Adjusted for this month', text: '•' }) : null);
+  const cell = (r, k) => el('span', null, money(r[k]), mark(r, k));
+  const cols = [
+    { key: 'month', label: 'Month (worked)', type: 'month', get: (r) => monthLabel(r.month) },
+    { key: 'salary', label: 'Salary', type: 'money', get: (r) => cell(r, 'salary') },
+    { key: 'bonus', label: 'Bonus', type: 'money', get: (r) => money(r.bonus) },
+    ...(S.settings.cpfEnabled ? [{ key: 'ee', label: 'CPF', type: 'money', get: (r) => money(r.ee) }, { key: 'er', label: 'Employer CPF', type: 'money', get: (r) => money(r.er) }] : []),
+    { key: 'after', label: 'After CPF', type: 'money', get: (r) => money(r.after) },
+    { key: 'food', label: 'Food', type: 'money', get: (r) => cell(r, 'food') },
+    { key: 'transport', label: 'Transport', type: 'money', get: (r) => cell(r, 'transport') },
+    { key: 'parents', label: 'Parents', type: 'money', get: (r) => cell(r, 'parents') },
+    { key: 'others', label: 'Others', type: 'money', get: (r) => cell(r, 'others') },
+    { key: 'extras', label: 'One-offs', type: 'money', get: (r) => money(r.extras) },
+    { key: 'insurance', label: 'Insurance', type: 'money', get: (r) => money(r.insurance) },
+    { key: 'tax', label: 'Income tax', type: 'money', get: (r) => cell(r, 'tax') },
+    { key: 'invest', label: 'Investment', type: 'money', get: (r) => cell(r, 'invest') },
+    { key: 'savings', label: 'Savings', type: 'money', get: (r) => money(r.savings), cls: (r) => sign(r.savings) },
+    { key: 'cumsav', label: 'Cum. savings', type: 'money', get: (r) => money(r.cum.savings) },
+    { key: 'rate', label: 'Savings rate', type: 'pct', get: (r) => pct(r.savingsRate) },
+    ...(S.settings.cpfEnabled ? [
+      { key: 'oa', label: 'CPF OA', type: 'money', get: (r) => money(r.oa) },
+      { key: 'sa', label: 'CPF SA', type: 'money', get: (r) => money(r.sa) },
+      { key: 'ma', label: 'CPF MA', type: 'money', get: (r) => money(r.ma) },
+    ] : []),
+    { key: 'edit', label: '', type: 'text', get: (r) => el('button', { class: 'btn btn--small', type: 'button', text: 'Edit', onclick: () => editMonth(r.entry) }) },
+  ];
+  const last = rows[rows.length - 1];
+  return el('div', null,
+    pageHead('Monthly ledger', 'One row per worked month. Everything fills in from your assumptions — edit a month only if it was unusual.',
+      el('button', { class: 'btn btn--primary', type: 'button', text: '+ Add next month', onclick: addNext })),
+    last ? el('div', { class: 'grid grid--stats' },
+      stat('Cumulative savings', money(last.cum.savings)),
+      stat('Cumulative after-CPF', money(last.cum.after)),
+      stat('Cumulative expenditure', money(last.cum.exp)),
+      stat('Cumulative CPF (you + employer)', money(last.cum.ee + last.cum.er)),
+    ) : null,
+    el('div', { class: 'section-gap' }, editTable({ cols, rows: [...rows].reverse(), emptyText: 'No months yet — click “Add next month”.' })),
+    el('p', { class: 'card__hint section-gap' }, el('span', { class: 'table__mark', text: '•' }), ' = value adjusted for that month only. Income tax is your projected annual tax for that calendar year ÷ 12.'),
+  );
+}
+
+function editMonth(e) {
+  const r = computeLedger().find((x) => x.entry.id === e.id);
+  const tmp = JSON.parse(JSON.stringify(e));
+  tmp.extras = tmp.extras || [];
+  const ovField = (k, label, computed) => field(label, inputFor(tmp, { key: k, type: 'money', label, nullable: true, placeholder: `Auto: ${round2(computed)}` }, { onChange: () => {} }), 'Leave blank to use the automatic value.');
+  const extrasBox = el('div');
+  const drawExtras = () => extrasBox.replaceChildren(
+    ...tmp.extras.map((x, i) => el('div', { class: 'form-grid' },
+      field('One-off item', inputFor(x, { key: 'label', type: 'text', label: 'Item' }, { onChange: () => {} })),
+      field('Amount', el('div', { class: 'page__actions' }, inputFor(x, { key: 'amount', type: 'money', label: 'Amount' }, { onChange: () => {} }), el('button', { class: 'btn btn--small btn--danger', type: 'button', text: 'Remove', onclick: () => { tmp.extras.splice(i, 1); drawExtras(); } }))),
+    )),
+    el('button', { class: 'btn btn--small', type: 'button', text: '+ One-off expense', onclick: () => { tmp.extras.push({ label: '', amount: 0 }); drawExtras(); } }),
+  );
+  drawExtras();
+  openDialog(`Edit ${monthLabel(e.month)}`, [
+    el('div', { class: 'form-grid' },
+      field('Month worked', inputFor(tmp, { key: 'month', type: 'month', label: 'Month' }, { onChange: () => {} })),
+      field('Bonus', inputFor(tmp, { key: 'bonus', type: 'money', label: 'Bonus' }, { onChange: () => {} })),
+      S.settings.cpfEnabled ? field('MediSave (MA) deductions', inputFor(tmp, { key: 'maDed', type: 'money', label: 'MA deductions' }, { onChange: () => {} }), 'If MediSave paid for something this month.') : null,
+    ),
+    el('h3', { class: 'section-gap', text: 'Adjust this month only' }),
+    el('div', { class: 'form-grid' },
+      ovField('salary', 'Salary', r?.assumption?.salary || 0),
+      ovField('workDays', 'Work days', r?.assumption?.workDays || 0),
+      ovField('food', 'Food', r ? (r.overrides.includes('food') ? num(r.assumption.foodDay) * r.workDays : r.food) : 0),
+      ovField('transport', 'Transport', r ? (r.overrides.includes('transport') ? num(r.assumption.transportDay) * r.workDays : r.transport) : 0),
+      ovField('parents', 'Parents', r?.assumption?.parents || 0),
+      ovField('others', 'Others', r?.assumption?.others || 0),
+      ovField('invest', 'Investment (planned)', r ? r.after * num(r.assumption.investPct) : 0),
+      ovField('tax', 'Income tax', r ? r.tax : 0),
+    ),
+    extrasBox,
+    field('Note', inputFor(tmp, { key: 'note', type: 'text', label: 'Note' }, { onChange: () => {} })),
+  ], [
+    { label: 'Delete month', danger: true, run: () => { S.ledger = S.ledger.filter((x) => x.id !== e.id); commit(); } },
+    { label: 'Cancel' },
+    {
+      label: 'Save', primary: true, run: () => {
+        if (!tmp.month) return;
+        if (S.ledger.some((x) => x.id !== e.id && x.month === tmp.month)) { toast('Another row already uses that month'); return; }
+        Object.keys(e).forEach((k) => delete e[k]);
+        Object.assign(e, tmp);
+        commit();
+      },
+    },
+  ]);
+}
+
+function pageAssumptions() {
+  const rows = [...S.assumptions].sort(byKey('effective'));
+  const add = () => {
+    const last = rows[rows.length - 1];
+    S.assumptions.push(last ? { ...JSON.parse(JSON.stringify(last)), id: uid(), effective: todayISO(), notes: '' } : { id: uid(), effective: thisMonth() + '-01', salary: 0, age: 30, workDays: 22, foodDay: 0, transportDay: 0, parents: 0, investPct: 0, others: 0, notes: '' });
+    commit();
+  };
+  const cols = [
+    { key: 'effective', label: 'Effective date', type: 'date' },
+    { key: 'salary', label: 'Salary', type: 'money' },
+    ...(S.settings.cpfEnabled ? [{ key: 'age', label: 'Age', type: 'number', step: '1' }] : []),
+    { key: 'workDays', label: 'Work days/mo', type: 'number', step: '1' },
+    { key: 'foodDay', label: 'Food/day', type: 'money' },
+    { key: 'transportDay', label: 'Transport/day', type: 'money' },
+    { key: 'parents', label: 'Parents support', type: 'money' },
+    { key: 'others', label: 'Others/month', type: 'money' },
+    { key: 'investPct', label: 'Investment %', type: 'pct' },
+    ...(S.settings.cpfEnabled ? [
+      { key: 'cpfEE', label: 'CPF rate', type: 'pct', get: (a) => pct(cpfFor(a.effective?.slice(0, 7) || thisMonth(), a.age).ee) },
+      { key: 'cpfER', label: 'Employer CPF', type: 'pct', get: (a) => pct(cpfFor(a.effective?.slice(0, 7) || thisMonth(), a.age).er) },
+      { key: 'cpfOA', label: 'OA alloc.', type: 'pct', get: (a) => pct(cpfFor(a.effective?.slice(0, 7) || thisMonth(), a.age).oa) },
+    ] : []),
+    { key: 'notes', label: 'Notes', type: 'text' },
+  ];
+  return el('div', null,
+    pageHead('Assumptions history', 'Every input that can change over time. When something changes (a raise, costs going up), add a new row — past months stay untouched.',
+      el('button', { class: 'btn btn--primary', type: 'button', text: rows.length ? '+ Copy last row' : '+ Add first row', onclick: add })),
+    el('div', { class: 'notice notice--info', text: 'A row applies from the first month that starts on or after its effective date. Example: effective 30 May → used from June. CPF rates come from the age band in Settings → CPF schedule.' }),
+    editTable({ cols, rows, onDelete: (r) => { S.assumptions = S.assumptions.filter((x) => x !== r); commit(); }, emptyText: 'No assumptions yet.' }),
+  );
+}
+
+function pageInvestments() {
+  const sm = summary();
+  const dep = [...S.deposits].sort(byKey('date'));
+  const pv = [...S.portfolio].sort(byKey('date'));
+  const gain = sm.portfolio - sm.deposits;
+  return el('div', null,
+    pageHead('Investments', 'Log what you actually deposit, and update the portfolio value whenever you check it.'),
+    el('div', { class: 'grid grid--stats' },
+      stat('Portfolio value', money(sm.portfolio), sm.portfolioDate ? `As of ${dateLabel(sm.portfolioDate)}` : 'No value logged', true),
+      stat('Total deposited', money(sm.deposits)),
+      stat('Gain / loss', money(gain), sm.deposits ? pct(gain / sm.deposits) : null),
+      stat('Actual vs planned', money(sm.extraInvested), `Planned so far ${money(sm.planned)}`),
+    ),
+    el('p', { class: 'card__hint section-gap', text: 'The ledger subtracts your planned investment. Any difference between actual and planned deposits is corrected in net worth and expected cash, so nothing is counted twice.' }),
+    el('div', { class: 'grid grid--two section-gap' },
+      el('div', null,
+        el('div', { class: 'card__title' }, el('span', { text: 'Deposits' }), el('button', { class: 'btn btn--small btn--primary', type: 'button', text: '+ Deposit', onclick: () => { S.deposits.push({ id: uid(), date: todayISO().slice(0, 8) + '01', amount: 0, notes: '' }); commit(); } })),
+        editTable({ cols: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'amount', label: 'Amount', type: 'money' }, { key: 'notes', label: 'Notes', type: 'text' }], rows: dep, onDelete: (r) => { S.deposits = S.deposits.filter((x) => x !== r); commit(); }, totals: dep.length ? { amount: sm.deposits } : null }),
+      ),
+      el('div', null,
+        el('div', { class: 'card__title' }, el('span', { text: 'Portfolio value log' }), el('button', { class: 'btn btn--small btn--primary', type: 'button', text: '+ Value', onclick: () => { S.portfolio.push({ id: uid(), date: todayISO(), value: sm.portfolio, notes: '' }); commit(); } })),
+        editTable({ cols: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'value', label: 'Value', type: 'money' }, { key: 'notes', label: 'Notes', type: 'text' }], rows: pv, onDelete: (r) => { S.portfolio = S.portfolio.filter((x) => x !== r); commit(); } }),
+      ),
+    ),
+    pv.length > 1 ? el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: 'Portfolio value' }), lineChart([{ name: 'Portfolio value', values: pv.map((p) => num(p.value)) }], pv.map((p) => dateLabel(p.date).replace(/^\d+ /, '')))) : null,
+  );
+}
+
+function pageLiabilities() {
+  const total = sum(S.liabilities, (l) => l.balance);
+  const cols = [
+    { key: 'name', label: 'Item', type: 'text' },
+    { key: 'balance', label: 'Balance', type: 'money' },
+    { key: 'rate', label: 'Interest % / yr', type: 'pct' },
+    { key: 'payment', label: 'Monthly payment', type: 'money' },
+    { key: 'months', label: 'Months to pay off', type: 'text', get: (l) => { const p = payoff(l); return p.months == null ? 'Never at this payment' : String(p.months); } },
+    { key: 'date', label: 'Payoff', type: 'text', get: (l) => { const p = payoff(l); return p.date ? monthLabel(p.date) : '–'; } },
+    { key: 'interest', label: 'Interest left', type: 'money', get: (l) => { const p = payoff(l); return p.interest != null ? money(p.interest) : '–'; } },
+    { key: 'notes', label: 'Notes', type: 'text' },
+  ];
+  return el('div', null,
+    pageHead('Liabilities', 'Loans or debts. They are subtracted from net worth.',
+      el('button', { class: 'btn btn--primary', type: 'button', text: '+ Liability', onclick: () => { S.liabilities.push({ id: uid(), name: '', balance: 0, rate: 0, payment: 0, notes: '' }); commit(); } })),
+    el('div', { class: 'grid grid--stats' }, stat('Total liabilities', money(total), null, true)),
+    el('div', { class: 'section-gap' }, editTable({ cols, rows: S.liabilities, onDelete: (r) => { S.liabilities = S.liabilities.filter((x) => x !== r); commit(); }, emptyText: 'No liabilities — nice.', totals: S.liabilities.length ? { balance: total } : null })),
+    el('p', { class: 'card__hint section-gap', text: 'Payoff uses NPER(rate/12, −payment, balance). Update the balance, rate or payment when they change.' }),
+  );
+}
+
+function pageInsurance() {
+  const add = () => { S.policies.push({ id: uid(), name: 'Whole life policy', start: todayISO(), years: 20, premium: 0, actual: {} }); commit(); };
+  const cards = S.policies.map((p) => {
+    const years = Math.max(0, Math.min(100, num(p.years)));
+    p.actual = p.actual || {};
+    const [sy, smn, sd] = (p.start || todayISO()).split('-');
+    const sched = Array.from({ length: years }, (_, k) => ({ k, date: `${+sy + k}-${smn}-${sd}`, expected: num(p.premium), actual: p.actual[k] }));
+    const paid = sum(sched, (r) => (r.actual != null && r.actual !== '' ? r.actual : 0));
+    const cols = [
+      { key: 'k', label: 'Year', type: 'text', get: (r) => String(r.k + 1) },
+      { key: 'date', label: 'Due date', type: 'date', get: (r) => dateLabel(r.date) },
+      { key: 'expected', label: 'Expected', type: 'money', readonly: true },
+      { key: 'actual', label: 'Actual paid', type: 'money', get: (r) => inputFor(p.actual, { key: r.k, type: 'money', label: 'Actual paid', nullable: true, placeholder: '—' }) },
+      { key: 'var', label: 'Variance', type: 'money', get: (r) => (r.actual != null && r.actual !== '' ? money(num(r.actual) - r.expected) : '–'), cls: (r) => (r.actual != null && r.actual !== '' ? sign(num(r.actual) - r.expected) : '') },
+    ];
+    return el('div', { class: 'card' },
+      el('div', { class: 'card__title' }, el('span', { text: p.name || 'Policy' }), el('button', { class: 'btn btn--small btn--danger', type: 'button', text: 'Delete policy', onclick: () => { if (confirm('Delete this policy and its payment log?')) { S.policies = S.policies.filter((x) => x !== p); commit(); } } })),
+      el('div', { class: 'form-grid' },
+        settingInput(p, 'name', 'text', 'Policy name'),
+        settingInput(p, 'start', 'date', 'Policy start date'),
+        settingInput(p, 'years', 'number', 'Premium term (years)', null, { step: '1' }),
+        settingInput(p, 'premium', 'money', 'Annual premium (expected)'),
+      ),
+      el('p', { class: 'card__hint', text: `Paid so far ${money(paid)}. Premiums reduce that month's “Left” and count as spending, but are not added to net worth (paid premiums ≠ cash value).` }),
+      editTable({ cols, rows: sched }),
+    );
+  });
+  return el('div', null,
+    pageHead('Insurance', 'Premium schedule for each policy. Log the actual amount each year when you pay.',
+      el('button', { class: 'btn btn--primary', type: 'button', text: '+ Policy', onclick: add })),
+    cards.length ? cards : el('div', { class: 'card muted', text: 'No policies yet.' }),
+  );
+}
+
+function pageTax() {
+  const rows = computeLedger(thisMonth());
+  const years = [...new Set([...rows.map((r) => r.month.slice(0, 4)), thisMonth().slice(0, 4)])].sort();
+  const q = new URLSearchParams(location.hash.split('?')[1] || '');
+  const year = q.get('y') && years.includes(q.get('y')) ? q.get('y') : thisMonth().slice(0, 4);
+  const inYear = rows.filter((r) => r.month.startsWith(year));
+  const lastRow = inYear[inYear.length - 1];
+  const table = taxTable();
+
+  const list = (S.reliefs[year] = S.reliefs[year] || []);
+  const age = lastRow ? lastRow.age : num(assumptionFor(thisMonth())?.age);
+  const eir = earnedIncomeRelief(age);
+  const projected = lastRow ? lastRow.projected : 0;
+  const base = Math.max(0, projected - eir);
+  const taxNo = taxOn(base, table);
+  let cur = base, capLeft = num(S.settings.reliefCap) || Infinity;
+  const shares = list.map((r) => {
+    const amt = Math.min(num(r.amount), capLeft);
+    capLeft -= amt;
+    const next = Math.max(0, cur - amt);
+    const saved = taxOn(cur, table) - taxOn(next, table);
+    cur = next;
+    return { r, applied: amt, saved };
+  });
+  const don = num(S.donations[year]) * num(S.settings.donationMultiplier);
+  const nextD = Math.max(0, cur - don);
+  const donSaved = taxOn(cur, table) - taxOn(nextD, table);
+  cur = nextD;
+  const taxWith = taxOn(cur, table);
+
+  const yearSel = el('select', { class: 'select', 'aria-label': 'Income year', onchange: (e) => { location.hash = '#/tax?y=' + e.target.value; } }, years.map((y) => el('option', { value: y, selected: y === year, text: `Income year ${y} (YA ${+y + 1})` })));
+
+  const reliefCols = [
+    { key: 'name', label: 'Relief', type: 'text' },
+    { key: 'amount', label: 'Amount', type: 'money' },
+    { key: 'applied', label: 'Applied (after cap)', type: 'money', get: (r) => money(shares.find((s) => s.r === r)?.applied) },
+    { key: 'saved', label: 'Tax saved', type: 'money', get: (r) => money(shares.find((s) => s.r === r)?.saved), cls: () => 'pos' },
+  ];
+
+  return el('div', null,
+    pageHead('Tax & reliefs', 'Projected chargeable income from your ledger, taxed with the bracket table below.', yearSel),
+    el('div', { class: 'grid grid--stats' },
+      stat('Projected tax', money(taxWith), `≈ ${money(taxWith / 12)} / month`, true),
+      stat('Tax without reliefs', money(taxNo)),
+      stat('Tax saved by reliefs', money(taxNo - taxWith), null),
+      stat('Chargeable income', money(cur), `After ${money(eir, { compact: true })} earned income relief`),
+    ),
+    el('div', { class: 'grid grid--two section-gap' },
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title', text: 'How it is worked out' }),
+        kv([
+          [`After-CPF pay so far in ${year} + current pay × remaining months`, money(projected)],
+          ['Earned income relief', '−' + money(eir)],
+          ['Income before other reliefs', money(base), true],
+          ['Other reliefs (capped at ' + money(num(S.settings.reliefCap), { compact: true }) + ')', '−' + money(sum(shares, (s) => s.applied))],
+          [`Donations × ${num(S.settings.donationMultiplier) * 100}%`, '−' + money(don)],
+          ['Chargeable income', money(cur), true],
+        ]),
+        el('p', { class: 'card__hint section-gap', text: 'Reliefs are applied one after another from the top, so each one’s share adds up to the total saved. Later reliefs save less once earlier ones push income into a lower band. CPF relief is already included by using after-CPF pay.' }),
+      ),
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title', text: `Reliefs for ${year}` }),
+        el('div', { class: 'chips' }, RELIEF_PRESETS.map((p) => el('button', { class: 'btn btn--small', type: 'button', text: '+ ' + p.name, onclick: () => { list.push({ id: uid(), name: p.name, amount: p.amount }); commit(); } }))),
+        editTable({ cols: reliefCols, rows: list, onDelete: (r) => { S.reliefs[year] = list.filter((x) => x !== r); commit(); }, emptyText: 'No reliefs added for this year.' }),
+        el('div', { class: 'form-grid section-gap' },
+          field('Donations to approved IPCs (amount given)', inputFor(S.donations, { key: year, type: 'money', label: 'Donations' }), `Deducted at ${num(S.settings.donationMultiplier) * 100}%. Not part of the relief cap.`),
+          field('Donation tax saving', el('div', { class: 'stat__value pos', text: money(donSaved) })),
+        ),
+        el('p', { class: 'card__hint', text: 'Relief amounts and caps change — check the current rules on the IRAS website. This is an estimate, not tax advice.' }),
+      ),
+    ),
+    el('h2', { class: 'section-gap', text: 'Tax brackets' }),
+    el('p', { class: 'card__hint', text: 'Default: Singapore resident rates, YA2024 onwards. Edit lower bound or rate if they change — base tax recalculates itself. Non-Singapore users can replace the whole table.' }),
+    el('div', { class: 'page__actions' },
+      el('button', { class: 'btn btn--small', type: 'button', text: '+ Bracket', onclick: () => { S.taxBrackets.push({ id: uid(), lower: 0, rate: 0 }); commit(); } }),
+      el('button', { class: 'btn btn--small', type: 'button', text: 'Reset to SG defaults', onclick: () => { if (confirm('Replace the bracket table with Singapore defaults?')) { S.taxBrackets = DEFAULT_TAX.map((r) => ({ ...r, id: uid() })); commit(); } } }),
+    ),
+    el('div', { class: 'section-gap' }, editTable({
+      cols: [{ key: 'lower', label: 'Lower bound', type: 'money' }, { key: 'rate', label: 'Rate', type: 'pct' }, { key: 'base', label: 'Base tax (auto)', type: 'money', get: (r) => money(table.find((t) => t.id === r.id)?.base) }],
+      rows: [...S.taxBrackets].sort((a, b) => a.lower - b.lower),
+      onDelete: (r) => { S.taxBrackets = S.taxBrackets.filter((x) => x !== r); commit(); },
+    })),
+  );
+}
+
+function pageNetWorth() {
+  const sm = summary();
+  const st = S.settings;
+  const bankDiff = st.bankBalance != null && st.bankBalance !== '' ? num(st.bankBalance) - sm.expectedCash : null;
+  return el('div', null,
+    pageHead('Goal & net worth', 'Cash savings, CPF, investments and liabilities in one picture.'),
+    el('div', { class: 'grid grid--stats' },
+      stat('Net worth', money(sm.netWorth), 'Incl. CPF', true),
+      stat('Liquid net worth', money(sm.liquid), 'Excl. CPF (not withdrawable pre-retirement)'),
+      stat('Saved toward goal', money(sm.saved), sm.progress != null ? pct(sm.progress, 0) + ' of goal' : null),
+      stat('12-month pace', money(sm.pace) + '/mo', sm.monthsToGoal != null && sm.remaining > 0 ? `Goal around ${monthLabel(sm.goalMonth)}` : null),
+    ),
+    el('div', { class: 'grid grid--two section-gap' },
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title', text: 'Net worth breakdown' }),
+        kv([
+          ['Start amount', money(num(st.startCash))],
+          ['Cumulative savings (ledger)', money(sm.cumSavings)],
+          ['Portfolio value', money(sm.portfolio)],
+          ['Actual − planned investing', (sm.extraInvested >= 0 ? '−' : '+') + money(Math.abs(sm.extraInvested))],
+          ...(st.cpfEnabled ? [['Total CPF', money(sm.cpf)]] : []),
+          ['Liabilities', '−' + money(sm.liabilities)],
+          ['Net worth', money(sm.netWorth), true],
+        ]),
+        el('div', { class: 'card__title section-gap', text: 'Cash check' }),
+        kv([
+          ['Expected cash (start + savings − extra invested)', money(sm.expectedCash)],
+          ['Actual bank balance', st.bankBalance != null && st.bankBalance !== '' ? money(num(st.bankBalance)) : '–'],
+          ['Difference', bankDiff != null ? money(bankDiff) : '–', true, bankDiff != null ? sign(bankDiff) : ''],
+        ]),
+      ),
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title', text: 'Your inputs' }),
+        el('div', { class: 'form-grid' },
+          settingInput(st, 'goalName', 'text', 'Goal name'),
+          settingInput(st, 'goalAmount', 'money', 'Savings goal'),
+          settingInput(st, 'startCash', 'money', 'Start amount', 'Cash you had before the first ledger month.'),
+          settingInput(st, 'bankBalance', 'money', 'Actual bank balance', 'Compare with expected cash.', { nullable: true }),
+        ),
+        st.cpfEnabled ? el('div', null,
+          el('div', { class: 'card__title section-gap', text: 'CPF' }),
+          el('div', { class: 'form-grid' },
+            settingInput(st.cpfStart, 'oa', 'money', 'Starting OA balance', 'Balance before your first ledger month.'),
+            settingInput(st.cpfStart, 'sa', 'money', 'Starting SA balance'),
+            settingInput(st.cpfStart, 'ma', 'money', 'Starting MA balance'),
+            settingInput(st, 'cpfExtraRate', 'pct', 'Extra interest rate', '1% on the first $60k combined (max $20k from OA).'),
+            settingInput(st, 'maAlloc', 'pct', 'MA allocation %', 'Share of total contributions going to MediSave for your age band.'),
+          ),
+          sm.last ? kv([['OA', money(sm.last.oa)], ['SA', money(sm.last.sa)], ['MA', money(sm.last.ma)], ['Total CPF', money(sm.cpf), true]]) : null,
+          el('p', { class: 'card__hint section-gap', text: 'Planning approximation: CPF credits interest yearly in January, while this accrues monthly. Re-calibrate the starting balances if they drift from your statement.' }),
+        ) : null,
+      ),
+    ),
+  );
+}
+
+function pageData() {
+  const st = S.settings;
+  return el('div', null,
+    pageHead('Settings & data', 'Everything stays on this device. Backups are encrypted with your passphrase.'),
+    el('div', { class: 'grid grid--two' },
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title', text: 'Backup & restore' }),
+        el('p', { class: 'card__hint', text: st.lastBackup ? `Last backup: ${dateLabel(st.lastBackup.slice(0, 10))}` : 'No backup yet. Browser data can be cleared by you, the browser, or the OS — keep a backup somewhere safe.' }),
+        el('div', { class: 'page__actions' },
+          el('button', { class: 'btn btn--primary', type: 'button', text: 'Export encrypted backup', onclick: exportBackup }),
+          el('button', { class: 'btn', type: 'button', text: 'Restore backup…', onclick: () => restoreFlow(false) }),
+        ),
+        el('div', { class: 'card__title section-gap', text: 'Unencrypted exports' }),
+        el('p', { class: 'card__hint', text: 'Readable files for use elsewhere. Anyone with the file can read it.' }),
+        el('div', { class: 'page__actions' },
+          el('button', { class: 'btn', type: 'button', text: 'Ledger as CSV', onclick: exportLedgerCSV }),
+          el('button', { class: 'btn', type: 'button', text: 'All data as JSON', onclick: exportPlainJSON }),
+        ),
+      ),
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title', text: 'Import from your spreadsheet (CSV)' }),
+        el('p', { class: 'card__hint', text: 'In Google Sheets: open a tab → File → Download → Comma-separated values. Import Assumptions first, then the Monthly Ledger (so one-off edits can be detected).' }),
+        el('div', { class: 'chips' },
+          ['assumptions', 'ledger', 'deposits', 'portfolio', 'liabilities'].map((t) => el('button', { class: 'btn btn--small', type: 'button', text: { assumptions: 'Assumptions History', ledger: 'Monthly Ledger', deposits: 'Investment deposits', portfolio: 'Portfolio values', liabilities: 'Liabilities' }[t], onclick: () => importCSV(t) })),
+        ),
+        el('p', { class: 'card__hint', text: 'Deposits / portfolio CSV: a header row with Date and Amount (or Value) columns, plus optional Notes.' }),
+      ),
+    ),
+    el('div', { class: 'grid grid--two section-gap' },
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title', text: 'General' }),
+        el('div', { class: 'form-grid' },
+          settingInput(st, 'currency', 'text', 'Currency code', 'e.g. SGD, MYR, TWD, HKD, USD'),
+          settingInput(st, 'locale', 'text', 'Number format locale', 'e.g. en-SG, zh-TW, en-US'),
+          settingInput(st, 'autoLockMin', 'number', 'Auto-lock after (minutes idle)', '0 = never', { step: '1' }),
+          field('Track CPF', el('select', { class: 'select', onchange: (e) => { st.cpfEnabled = e.target.value === 'yes'; commit(); } },
+            el('option', { value: 'yes', selected: st.cpfEnabled, text: 'Yes — Singapore CPF' }), el('option', { value: 'no', selected: !st.cpfEnabled, text: 'No' }))),
+          settingInput(st, 'owCeiling', 'money', 'CPF ordinary wage ceiling / month', '0 = no ceiling. S$8,000 from 2026.'),
+          settingInput(st, 'reliefCap', 'money', 'Personal relief cap / year'),
+        ),
+        el('div', { class: 'card__title section-gap', text: 'Security' }),
+        el('div', { class: 'page__actions' },
+          el('button', { class: 'btn', type: 'button', text: 'Change passphrase', onclick: changePass }),
+          el('button', { class: 'btn btn--danger', type: 'button', text: 'Erase this device…', onclick: eraseFlow }),
+        ),
+        el('p', { class: 'card__hint section-gap', text: 'Encryption: AES-256-GCM with a key derived from your passphrase (PBKDF2-SHA256, 600,000 rounds). The passphrase is never stored.' }),
+      ),
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title' }, el('span', { text: 'CPF contribution schedule' }), el('button', { class: 'btn btn--small', type: 'button', text: '+ Row', onclick: () => { const last = S.cpfSchedule[S.cpfSchedule.length - 1]; S.cpfSchedule.push({ ...last, id: uid() }); commit(); } })),
+        el('p', { class: 'card__hint', text: 'Rows with the latest “From” date on or before a month are used. To add a new year, add one row per age band with the new From date. Rates as % of wages.' }),
+      ),
+    ),
+    el('div', { class: 'section-gap' }, editTable({
+      cols: [
+        { key: 'from', label: 'From', type: 'date' }, { key: 'ageAbove', label: 'Age above', type: 'number', step: '1' }, { key: 'ageUpTo', label: 'Age up to', type: 'number', step: '1' },
+        { key: 'ee', label: 'Employee', type: 'pct' }, { key: 'er', label: 'Employer', type: 'pct' }, { key: 'oa', label: 'OA allocation', type: 'pct' },
+        { key: 'oaRate', label: 'OA interest', type: 'pct' }, { key: 'samaRate', label: 'SA/MA interest', type: 'pct' },
+      ],
+      rows: [...S.cpfSchedule].sort((a, b) => (a.from + String(1000 + num(a.ageAbove))).localeCompare(b.from + String(1000 + num(b.ageAbove)))),
+      onDelete: (r) => { S.cpfSchedule = S.cpfSchedule.filter((x) => x !== r); commit(); },
+    })),
+    el('p', { class: 'card__hint section-gap', text: 'Ledger Local is a tracking tool, not financial or tax advice. Figures are estimates.' }),
+  );
+}
+
+/* =====================================================================
+ * 13. Import / export
+ * ===================================================================== */
+function download(name, content, type) {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const a = el('a', { href: url, download: name, class: 'hide' });
+  document.body.append(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+}
+async function exportBackup() {
+  S.settings.lastBackup = new Date().toISOString();
+  const rec = await sealData(KEY, META, S);
+  download(`ledger-local-backup-${todayISO()}.json`, JSON.stringify(rec), 'application/json');
+  commit();
+  toast('Encrypted backup downloaded');
+}
+function exportPlainJSON() {
+  if (!confirm('This file will NOT be encrypted. Anyone who gets it can read your finances. Continue?')) return;
+  download(`ledger-local-plain-${todayISO()}.json`, JSON.stringify(S, null, 2), 'application/json');
+}
+function csvCell(v) { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+function exportLedgerCSV() {
+  if (!confirm('This CSV will NOT be encrypted. Continue?')) return;
+  const rows = computeLedger();
+  const head = ['Month', 'Salary', 'Bonus', 'CPF', 'Employer CPF', 'After CPF', 'Food', 'Transport', 'Parents', 'Others', 'One-offs', 'Insurance', 'Income Tax', 'Investment', 'Savings', 'Cumulative Savings', 'CPF OA', 'CPF SA', 'CPF MA', 'MA Deductions', 'Savings Rate'];
+  const lines = [head.join(',')].concat(rows.map((r) => [r.month, r.salary, r.bonus, r.ee, r.er, r.after, r.food, r.transport, r.parents, r.others, r.extras, r.insurance, r.tax, r.invest, r.savings, r.cum.savings, r.oa, r.sa, r.ma, r.maDed, r.savingsRate].map((v) => csvCell(typeof v === 'number' ? round2(v) : v)).join(',')));
+  download(`ledger-${todayISO()}.csv`, lines.join('\n'), 'text/csv');
+}
+
+function parseCSV(text) {
+  const rows = []; let row = [], cell = '', q = false;
+  text = text.replace(/^﻿/, '');
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ',') { row.push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter((r) => r.some((c) => c.trim()));
+}
+/** Finds the header row (within the first 6 rows) that matches the most of `want`. Returns {idx, map} with column indexes. */
+function headerMap(rows, want) {
+  let best = { idx: -1, map: {}, score: 0 };
+  rows.slice(0, 6).forEach((r, i) => {
+    const map = {}; let score = 0;
+    for (const [key, patterns] of Object.entries(want)) {
+      const j = r.findIndex((c) => patterns.some((p) => p.test(c.trim())));
+      if (j >= 0) { map[key] = j; score++; }
+    }
+    if (score > best.score) best = { idx: i, map, score };
+  });
+  return best;
+}
+const H = {
+  effective: [/^effective date$/i, /^effective/i, /^date$/i],
+  salary: [/^salary$/i, /^salary/i],
+  workDays: [/work days/i],
+  foodDay: [/^food\s*\/\s*day/i, /^food per day/i],
+  transportDay: [/^transport\s*\/\s*day/i, /^transport per day/i],
+  parents: [/^parents/i],
+  investPct: [/^investment %/i, /^invest.*%/i],
+  others: [/^others/i],
+  notes: [/^notes?$/i],
+  age: [/^age \(years\)/i, /^age$/i],
+  month: [/^month/i],
+  bonus: [/^bonus$/i],
+  maDed: [/^ma deductions?$/i],
+  food: [/^food$/i],
+  transport: [/^transport$/i],
+  date: [/date/i, /^month/i],
+  amount: [/^amount$/i, /deposit/i, /^amount/i, /invested/i],
+  value: [/^value$/i, /portfolio value/i, /value/i],
+  item: [/^item$/i, /^name$/i, /liabilit/i],
+  balance: [/balance/i, /^amount$/i],
+  rate: [/interest/i, /rate/i],
+  payment: [/payment/i],
+};
+async function importCSV(type) {
+  const file = await pickFile('.csv,text/csv');
+  if (!file) return;
+  const rows = parseCSV(await file.text());
+  const pick = (keys) => Object.fromEntries(keys.map((k) => [k, H[k]]));
+  let added = 0, adjusted = 0;
+  const cellAt = (r, map, k) => (map[k] != null ? r[map[k]] : undefined);
+
+  if (type === 'assumptions') {
+    const { idx, map } = headerMap(rows, pick(['effective', 'salary', 'workDays', 'foodDay', 'transportDay', 'parents', 'investPct', 'others', 'notes', 'age']));
+    if (idx < 0 || map.effective == null || map.salary == null) return toast('Could not find “Effective Date” and “Salary” columns.');
+    for (const r of rows.slice(idx + 1)) {
+      const eff = normDate(cellAt(r, map, 'effective'));
+      const sal = parseNum(cellAt(r, map, 'salary'));
+      if (!eff || sal == null || eff.length < 10) continue;
+      S.assumptions = S.assumptions.filter((a) => a.effective !== eff);
+      S.assumptions.push({
+        id: uid(), effective: eff, salary: sal,
+        age: parseNum(cellAt(r, map, 'age')) ?? 30,
+        workDays: parseNum(cellAt(r, map, 'workDays')) ?? 22,
+        foodDay: parseNum(cellAt(r, map, 'foodDay')) ?? 0,
+        transportDay: parseNum(cellAt(r, map, 'transportDay')) ?? 0,
+        parents: parseNum(cellAt(r, map, 'parents')) ?? 0,
+        investPct: parseNum(cellAt(r, map, 'investPct')) ?? 0,
+        others: parseNum(cellAt(r, map, 'others')) ?? 0,
+        notes: (cellAt(r, map, 'notes') || '').trim(),
+      });
+      added++;
+    }
+  } else if (type === 'ledger') {
+    const { idx, map } = headerMap(rows, pick(['month', 'salary', 'bonus', 'maDed', 'food', 'transport', 'parents', 'others']));
+    if (idx < 0 || map.month == null) return toast('Could not find a “Month” column.');
+    const imported = [];
+    for (const r of rows.slice(idx + 1)) {
+      const m = normDate(cellAt(r, map, 'month'));
+      if (!m || !/^\d{4}-\d{2}/.test(m)) continue;
+      const ym = m.slice(0, 7);
+      let e = S.ledger.find((x) => x.month === ym);
+      if (!e) { e = { id: uid(), month: ym }; S.ledger.push(e); }
+      e.bonus = parseNum(cellAt(r, map, 'bonus')) ?? 0;
+      e.maDed = parseNum(cellAt(r, map, 'maDed')) ?? 0;
+      imported.push([e, r]);
+      added++;
+    }
+    // Detect months that were edited by hand in the sheet: if the sheet value differs from ours, keep it as an override.
+    const comp = Object.fromEntries(computeLedger().map((x) => [x.entry.id, x]));
+    for (const [e, r] of imported) {
+      for (const k of ['salary', 'food', 'transport', 'parents', 'others']) {
+        const v = parseNum(cellAt(r, map, k));
+        if (v == null || !comp[e.id]) continue;
+        if (Math.abs(v - comp[e.id][k]) > 0.01) { e[k] = v; adjusted++; }
+      }
+    }
+  } else if (type === 'deposits' || type === 'portfolio') {
+    const vk = type === 'deposits' ? 'amount' : 'value';
+    const { idx, map } = headerMap(rows, pick(['date', vk, 'notes']));
+    if (idx < 0 || map.date == null || map[vk] == null) return toast(`Could not find Date and ${vk === 'amount' ? 'Amount' : 'Value'} columns.`);
+    // Sheets with side-by-side blocks: use the date column closest to the left of the value column.
+    const hdr = rows[idx];
+    for (let j = map[vk] - 1; j >= 0; j--) if (H.date.some((p) => p.test(hdr[j].trim()))) { map.date = j; break; }
+    const nj = hdr.findIndex((c, j) => j > map[vk] && /^notes?$/i.test(c.trim()));
+    map.notes = nj >= 0 && nj <= map[vk] + 2 ? nj : undefined;
+    for (const r of rows.slice(idx + 1)) {
+      let d = normDate(cellAt(r, map, 'date'));
+      const v = parseNum(cellAt(r, map, vk));
+      if (!d || v == null || /total/i.test(r.join(' '))) continue;
+      if (d.length === 7) d += '-01';
+      (type === 'deposits' ? S.deposits : S.portfolio).push({ id: uid(), date: d, [vk]: v, notes: (cellAt(r, map, 'notes') || '').trim() });
+      added++;
+    }
+  } else if (type === 'liabilities') {
+    const { idx, map } = headerMap(rows, pick(['item', 'balance', 'rate', 'payment', 'notes']));
+    if (idx < 0 || map.item == null || map.balance == null) return toast('Could not find Item and Balance columns.');
+    for (const r of rows.slice(idx + 1)) {
+      const name = (cellAt(r, map, 'item') || '').trim();
+      const bal = parseNum(cellAt(r, map, 'balance'));
+      if (!name || bal == null || /total|\(none/i.test(name)) continue;
+      S.liabilities.push({ id: uid(), name, balance: bal, rate: parseNum(cellAt(r, map, 'rate')) ?? 0, payment: parseNum(cellAt(r, map, 'payment')) ?? 0, notes: (cellAt(r, map, 'notes') || '').trim() });
+      added++;
+    }
+  }
+  commit();
+  toast(added ? `Imported ${added} row${added === 1 ? '' : 's'}${adjusted ? `, ${adjusted} hand-edited value${adjusted === 1 ? '' : 's'} kept` : ''}` : 'No rows found in that file.');
+}
+
+function changePass() {
+  const p0 = el('input', { class: 'input', type: 'password', placeholder: 'Current passphrase', autocomplete: 'current-password' });
+  const p1 = el('input', { class: 'input', type: 'password', placeholder: 'New passphrase (10+ characters)', autocomplete: 'new-password' });
+  const p2 = el('input', { class: 'input', type: 'password', placeholder: 'Confirm new passphrase', autocomplete: 'new-password' });
+  const err = el('div', { class: 'lock__error' });
+  openDialog('Change passphrase', [field('Current', p0), field('New', p1), field('Confirm', p2), err, el('p', { class: 'card__hint', text: 'Old backups keep their old passphrase. Export a new backup afterwards.' })], [
+    { label: 'Cancel' },
+    {
+      label: 'Change', primary: true, keepOpen: true,
+      run: async () => {
+        err.textContent = '';
+        const rec = await VAULT.get();
+        try { await openSealed(rec, p0.value); } catch { err.textContent = 'Current passphrase is wrong.'; return; }
+        if (p1.value.length < 10) { err.textContent = 'Use at least 10 characters.'; return; }
+        if (p1.value !== p2.value) { err.textContent = 'New passphrases do not match.'; return; }
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        META = { salt: b64(salt), iter: VAULT.ITER };
+        KEY = await deriveKey(p1.value, salt, VAULT.ITER);
+        await persist();
+        $('#dlg').close();
+        toast('Passphrase changed');
+      },
+    },
+  ]);
+}
+
+/* =====================================================================
+ * 14. Sample data (fictional)
+ * ===================================================================== */
+function sampleData() {
+  const d = defaultData();
+  const start = addMonths(thisMonth(), -10);
+  d.settings = { ...d.settings, startCash: 8000, goalName: 'Emergency fund + house', goalAmount: 60000, cpfStart: { oa: 12000, sa: 4000, ma: 6000 }, bankBalance: null };
+  d.assumptions = [
+    { id: uid(), effective: addMonths(start, -1) + '-28', salary: 4200, age: 28, workDays: 22, foodDay: 12, transportDay: 4.5, parents: 400, investPct: 0.2, others: 150, notes: 'Example starting point' },
+    { id: uid(), effective: addMonths(start, 5) + '-01', salary: 4500, age: 28, workDays: 22, foodDay: 13, transportDay: 4.5, parents: 400, investPct: 0.25, others: 150, notes: 'Example raise' },
+  ];
+  for (let i = 0; i < 10; i++) d.ledger.push({ id: uid(), month: addMonths(start, i), bonus: i === 6 ? 2000 : 0, maDed: 0, ...(i === 3 ? { extras: [{ label: 'Laptop repair', amount: 280 }] } : {}) });
+  for (let i = 0; i < 10; i++) d.deposits.push({ id: uid(), date: addMonths(start, i + 1) + '-01', amount: i < 5 ? 750 : 1000, notes: 'Index fund' });
+  d.portfolio = [
+    { id: uid(), date: addMonths(start, 4) + '-15', value: 3900, notes: '' },
+    { id: uid(), date: addMonths(start, 9) + '-15', value: 8900, notes: '' },
+  ];
+  d.liabilities = [{ id: uid(), name: 'Example study loan', balance: 6000, rate: 0.045, payment: 300, notes: '' }];
+  d.policies = [{ id: uid(), name: 'Example life policy', start: addMonths(start, 2) + '-15', years: 20, premium: 1800, actual: { 0: 1800 } }];
+  const y = thisMonth().slice(0, 4);
+  d.reliefs[y] = [{ id: uid(), name: 'Parent Relief (living with parent)', amount: 9000 }];
+  return d;
+}
+
+/* =====================================================================
+ * 15. Boot
+ * ===================================================================== */
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+if (!window.crypto?.subtle || !window.indexedDB) {
+  $('#app').append(el('div', { class: 'lock' }, el('div', { class: 'card lock__card' }, el('h1', { text: 'Browser not supported' }), el('p', { text: 'This app needs Web Crypto and IndexedDB. Open it over https:// in a current browser (not a private window on some browsers).' }))));
+} else {
+  renderLock();
+}
