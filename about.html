@@ -3,1135 +3,731 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brian Lua - About</title>
+<title>About — Brian Lua</title>
 <meta name="description" content="About Brian Lua — IT Business Analyst at Charles &amp; Keith, NTU Computer Science graduate, frontend developer and QA automation builder based in Singapore.">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sealpillow.github.io/about.html">
-<meta property="og:title" content="Brian Lua - About">
+<meta property="og:title" content="About — Brian Lua">
 <meta property="og:description" content="IT Business Analyst at Charles &amp; Keith, NTU Computer Science graduate, frontend developer and QA automation builder based in Singapore.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
 
 <style>
-  *, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* Site palette (identical token block in index.html) */
+  :root {
+    --bg: #f6f4f0;
+    --surface: #ece8e1;
+    --ink: #151413;
+    --text: #2e2b28;
+    --text-2: #5c5751;
+    --line: rgba(21, 20, 19, 0.12);
+    --accent: #7a2e24;
+    --on-ink: #f6f4f0;
+    --on-ink-2: #b4ada4;
+    --accent-on-ink: #e0aa9c;
+    --btn-line: rgba(21, 20, 19, 0.28);
+    --media-bg: #dcd7cf;
+    --ok: #3f7a4a;
+    color-scheme: light;
+
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --pad: clamp(24px, 5vw, 72px);
+    --max: 1280px;
   }
 
-  :root {
-    --cream: #e2dbd0;
-    --bone: #d8d0c4;
-    --ink: #1a1714;
-    --charcoal: #2e2a26;
-    --gold: #b89a6a;
-    --gold-light: #d4b896;
-    --muted: #7a7268;
-    --text-strong: #2b2520;
-    --text-body: #52483d;
-    --text-soft: #6d6255;
-    --rule: rgba(26,23,20,0.12);
+  /* Dark theme: set by the toggle (data-theme), or by the system when no script has run */
+  :root[data-theme="dark"] {
+    --bg: #161412;
+    --surface: #211e1b;
+    --ink: #f3efe8;
+    --text: #dcd6cd;
+    --text-2: #a8a095;
+    --line: rgba(243, 239, 232, 0.14);
+    --accent: #e09c8c;
+    --on-ink: #161412;
+    --on-ink-2: #5c5751;
+    --accent-on-ink: #7a2e24;
+    --btn-line: rgba(243, 239, 232, 0.3);
+    --media-bg: #2a2622;
+    --ok: #6fb07d;
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg: #161412;
+      --surface: #211e1b;
+      --ink: #f3efe8;
+      --text: #dcd6cd;
+      --text-2: #a8a095;
+      --line: rgba(243, 239, 232, 0.14);
+      --accent: #e09c8c;
+      --on-ink: #161412;
+      --on-ink-2: #5c5751;
+      --accent-on-ink: #7a2e24;
+      --btn-line: rgba(243, 239, 232, 0.3);
+      --media-bg: #2a2622;
+      --ok: #6fb07d;
+      color-scheme: dark;
+    }
   }
 
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'Montserrat', sans-serif;
-    background: var(--cream);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  img { display: block; max-width: 100%; height: auto; }
+  a { color: inherit; }
+
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad); }
+
+  .label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .display {
+    font-family: var(--serif);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
     color: var(--ink);
-    min-height: 100vh;
-    overflow-x: hidden;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
+  .h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-top: 14px; }
+
+  .link {
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
   }
 
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bone); }
-  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 0; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--charcoal); }
+  .link:hover { color: var(--ink); }
 
-  .nav-bar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(245, 240, 232, 0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--rule);
-    padding: 0 60px;
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 24px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid var(--ink);
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .btn-primary { background: var(--ink); color: var(--on-ink); }
+  .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-secondary { color: var(--ink); border-color: var(--btn-line); }
+  .btn-secondary:hover { border-color: var(--ink); }
+
+  section { padding: clamp(72px, 9vw, 120px) 0; }
+
+  /* ── Header */
+  .site-header { border-bottom: 1px solid var(--line); }
+
+  .site-header .wrap {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 56px;
+    height: 68px;
   }
 
-  .nav-left {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-  }
-
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    font-weight: 300;
-    letter-spacing: 0.15em;
+  .wordmark {
+    font-family: var(--serif);
+    font-size: 24px;
     color: var(--ink);
     text-decoration: none;
-    transition: color 0.2s ease;
   }
 
-  .nav-logo:hover { color: var(--gold); }
+  .nav { display: flex; align-items: center; gap: 32px; }
 
-  .nav-links {
-    display: flex;
-    gap: 32px;
-    align-items: center;
-  }
-
-  .nav-link {
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--text-soft);
+  .nav a {
+    font-size: 15px;
+    color: var(--text-2);
     text-decoration: none;
     transition: color 0.2s ease;
   }
 
-  .nav-link:hover { color: var(--ink); }
-  .nav-link.active { color: var(--gold); }
+  .nav a:hover, .nav a[aria-current="page"] { color: var(--ink); }
 
-  .hero {
-    position: relative;
-    padding: 100px 60px 80px;
+  /* ── Intro: name and summary, facts at a glance */
+  .intro { padding-top: clamp(64px, 9vw, 120px); }
+
+  .intro .wrap {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: end;
-    border-bottom: 1px solid var(--rule);
-    animation: fadeDown 1.2s ease both;
-    overflow: hidden;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(40px, 6vw, 96px);
+    align-items: start;
   }
 
-  .hero::after {
-    content: 'ABOUT';
-    position: absolute;
-    right: -20px;
-    bottom: -10px;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(80px, 14vw, 160px);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: rgba(184,154,106,0.07);
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-  }
+  .intro h1 { font-size: clamp(3rem, 6.5vw, 5.6rem); margin-top: 14px; animation: rise 0.8s ease both; }
+  .intro h1 em { font-style: italic; }
 
-  .hero-left {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-  }
-
-  .eyebrow {
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: var(--gold);
-  }
-
-  .hero-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(3rem, 6vw, 5.5rem);
-    font-weight: 300;
-    letter-spacing: 0.04em;
-    line-height: 0.95;
-    color: var(--ink);
-  }
-
-  .hero-name em { font-style: italic; color: var(--charcoal); }
-
-  .hero-rule {
-    width: 50px;
-    height: 1px;
-    background: var(--gold);
-  }
-
-  .hero-tagline {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    font-weight: 300;
-    font-style: italic;
+  .intro-lede {
+    margin-top: 28px;
+    font-size: 19px;
     line-height: 1.6;
-    color: var(--text-body);
-    max-width: 420px;
+    color: var(--text);
+    max-width: 40ch;
+    animation: rise 0.8s ease 0.1s both;
   }
 
-  .hero-right {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding-bottom: 8px;
-  }
+  .intro-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
 
-  .hero-intro {
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0.05em;
-    line-height: 2;
-    color: var(--text-body);
-  }
+  .facts { margin-top: 10px; border-top: 2px solid var(--ink); }
 
-  .hero-contact {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 0;
-    padding-top: 8px;
-    border-top: 1px solid var(--rule);
-    margin-top: 8px;
-  }
-
-  .hero-contact-item {
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    color: var(--text-soft);
-    text-decoration: none;
-    transition: color 0.2s ease;
-    white-space: nowrap;
-  }
-
-  .hero-contact-item:hover { color: var(--gold); }
-
-  .hero-contact-sep {
-    color: var(--rule);
-    font-size: 12px;
-    padding: 0 12px;
-    user-select: none;
-  }
-
-  .profile-section {
-    position: relative;
-    padding: 80px 60px;
-    border-bottom: 1px solid var(--rule);
-    animation: fadeUp 1s ease 0.2s both;
-  }
-
-  .about-content {
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
-    max-width: 920px;
-  }
-
-.content-block {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .block-label {
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: var(--gold);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .block-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--rule);
-    max-width: 60px;
-  }
-
-  .block-heading {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
-    font-weight: 400;
-    letter-spacing: 0.04em;
-    line-height: 1.2;
-    color: var(--text-strong);
-  }
-
-  .block-heading em { font-style: italic; }
-
-  .block-body {
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0.04em;
-    line-height: 2;
-    color: var(--text-body);
-  }
-
-  .tags-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  .tag {
-    padding: 6px 14px;
-    border: 1px solid var(--rule);
-    font-size: 9px;
-    font-weight: 400;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-soft);
-    transition: all 0.2s ease;
-    background: rgba(255,255,255,0.35);
-  }
-
-  .tag:hover {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(184,154,106,0.05);
-  }
-
-  .resume-section {
-    padding: 80px 60px;
-    border-bottom: 1px solid var(--rule);
-    animation: fadeUp 1s ease 0.3s both;
-  }
-
-  .resume-grid {
+  .facts div {
     display: grid;
-    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .facts dt { font-size: 14px; color: var(--text-2); }
+  .facts dd { font-size: 15px; color: var(--text); }
+  .facts dd a { text-decoration: none; border-bottom: 1px solid var(--line); }
+  .facts dd a:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── Numbers band */
+  .numbers { background: var(--surface); color: var(--ink); padding: clamp(56px, 7vw, 88px) 0; }
+
+  .numbers .wrap {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 40px;
   }
 
-  .resume-sidebar,
-  .resume-main {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-  }
-
-  .resume-card {
-    background: rgba(255,255,255,0.72);
-    border: 1px solid rgba(26,23,20,0.14);
-    padding: 28px 28px 30px;
-  }
-
-  .resume-card-label {
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.38em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 18px;
-    display: inline-block;
-  }
-
-  .resume-item + .resume-item {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid var(--rule);
-  }
-
-  .resume-kicker {
-    font-size: 9px;
+  .stat strong {
+    display: block;
+    font-family: var(--serif);
+    font-size: clamp(3rem, 5vw, 4.4rem);
     font-weight: 400;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-soft);
-    margin-bottom: 8px;
-  }
-
-  .resume-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 26px;
-    font-weight: 400;
-    letter-spacing: 0.03em;
-    line-height: 1.1;
-    color: var(--text-strong);
-    margin-bottom: 6px;
-  }
-
-  .resume-subtitle {
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 12px;
-  }
-
-  .resume-text {
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0.04em;
-    line-height: 1.95;
-    color: var(--text-body);
-  }
-
-  .resume-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 14px;
-  }
-
-  .resume-list li {
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.03em;
-    line-height: 1.85;
-    color: var(--text-body);
-    padding-left: 16px;
-    position: relative;
-  }
-
-  .resume-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 10px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--gold);
-  }
-
-  .mini-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .mini-tag {
-    padding: 7px 12px;
-    border: 1px solid var(--rule);
-    font-size: 9px;
-    font-weight: 400;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-soft);
-    background: rgba(255,255,255,0.62);
-  }
-
-
-  .cta-section {
-    position: relative;
-    padding: 80px 60px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 60px;
-    align-items: center;
-    border-bottom: 1px solid var(--rule);
-    animation: fadeUp 1s ease 0.5s both;
-  }
-
-
-  .cta-left {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .cta-heading {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 300;
-    letter-spacing: 0.05em;
-    line-height: 1.1;
-    color: var(--ink);
-  }
-
-  .cta-heading em { font-style: italic; }
-
-  .cta-sub {
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    color: var(--text-body);
-    line-height: 1.8;
-  }
-
-  .cta-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-end;
-  }
-
-  .btn-primary {
-    padding: 14px 36px;
-    background: var(--ink);
-    color: var(--cream);
-    border: 1px solid var(--ink);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.25s ease;
-    white-space: nowrap;
-  }
-
-  .btn-primary:hover { background: transparent; color: var(--ink); }
-
-  .btn-secondary {
-    padding: 14px 36px;
-    background: transparent;
-    color: var(--ink);
-    border: 1px solid var(--rule);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 9px;
-    font-weight: 400;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.25s ease;
-    white-space: nowrap;
-  }
-
-  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
-
-  .site-footer {
-    border-top: 1px solid var(--rule);
-    padding: 40px 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .footer-mark {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 13px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: var(--text-soft);
-  }
-
-  .footer-back {
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--gold);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .footer-back:hover { color: var(--ink); }
-
-  /* Section progress nav */
-  .section-nav {
-    position: fixed;
-    left: 28px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 90;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-  }
-
-  .section-nav-track {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: var(--rule);
-    transform: translateX(-50%);
-    z-index: 0;
-  }
-
-  .section-nav-progress {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    width: 1px;
-    height: 0%;
-    background: var(--gold);
-    transform: translateX(-50%);
-    z-index: 1;
-    transition: height 0.15s ease;
-  }
-
-  .section-nav-dot {
-    position: relative;
-    z-index: 2;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .section-nav-dot::after {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    border: 1px solid var(--gold-light);
-    background: var(--cream);
-    transition: all 0.2s ease;
-  }
-
-  .section-nav-dot:hover::after,
-  .section-nav-dot.active::after {
-    background: var(--gold);
-    border-color: var(--gold);
-    transform: scale(1.3);
-  }
-
-  .section-nav-label {
-    position: absolute;
-    left: calc(100% + 6px);
-    font-size: 9px;
-    font-weight: 400;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-soft);
-    white-space: nowrap;
-    opacity: 0;
-    transform: translateX(-6px);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    pointer-events: none;
-  }
-
-  .section-nav-dot:hover .section-nav-label,
-  .section-nav-dot.active .section-nav-label {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  .section-nav-mobile {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 90;
-    background: rgba(245, 240, 232, 0.92);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid var(--rule);
-    padding: 10px 24px 16px;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .section-nav-mobile-labels {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .section-nav-mobile-label {
-    font-size: 8px;
-    font-weight: 400;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-soft);
-    transition: color 0.2s ease;
     line-height: 1;
-    flex: 1;
-    text-align: center;
   }
 
-  .section-nav-mobile-label.active {
-    color: var(--gold);
+  .stat span { display: block; margin-top: 12px; font-size: 14px; line-height: 1.55; color: var(--text-2); max-width: 24ch; }
+
+  /* ── Approach */
+  .approach .wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(40px, 6vw, 96px);
   }
 
-  .section-nav-mobile-dots-row {
-    position: relative;
+  .quote {
+    margin-top: 20px;
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 2.8vw, 2.4rem);
+    line-height: 1.25;
+    color: var(--ink);
+  }
+
+  .approach-body { display: flex; flex-direction: column; gap: 20px; padding-top: 36px; color: var(--text); }
+
+  /* ── Experience */
+  .experience { padding-top: 0; }
+
+  .job {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(24px, 4vw, 64px);
+    padding: 40px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .experience .jobs { margin-top: 48px; border-bottom: 1px solid var(--line); }
+
+  .job-when { font-size: 14px; color: var(--text-2); }
+  .job-org { margin-top: 6px; font-size: 18px; font-weight: 500; color: var(--ink); }
+  .job-where { font-size: 14px; color: var(--text-2); }
+
+  .job h3 { font-family: var(--serif); font-size: clamp(1.7rem, 2.4vw, 2.1rem); font-weight: 400; line-height: 1.15; color: var(--ink); }
+  .job-summary { margin-top: 10px; color: var(--text); }
+
+  .job ul { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+
+  .job li { position: relative; padding-left: 20px; font-size: 15px; color: var(--text-2); }
+
+  .job li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 8px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .job li strong { font-weight: 500; color: var(--text); }
+
+  /* ── Skills and education */
+  .background { background: var(--surface); }
+
+  .background .wrap {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(48px, 6vw, 96px);
+  }
+
+  .list { margin-top: 32px; border-top: 2px solid var(--ink); }
+
+  .list > div {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .list dt { font-size: 14px; color: var(--text-2); }
+  .list dd { font-size: 15px; color: var(--text); }
+  .list dd strong { display: block; font-size: 17px; font-weight: 500; color: var(--ink); }
+  .list dd span { display: block; margin-top: 4px; color: var(--text-2); }
+
+  /* ── Work */
+  .work-head {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
+    gap: 24px;
+  }
+
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    margin-top: 48px;
+  }
+
+  .project { text-decoration: none; }
+  .project-media { overflow: hidden; background: var(--media-bg); }
+
+  .project-media img {
     width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    outline: 1px solid var(--line); /* keeps white-background shots from dissolving into the page */
+    outline-offset: -1px;
+    transition: transform 0.6s ease;
   }
 
-  .section-nav-mobile-track {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    transform: translateY(-50%);
-    background: var(--rule);
+  .project:hover .project-media img { transform: scale(1.025); }
+  .project-title { margin-top: 16px; font-size: 17px; font-weight: 500; color: var(--ink); }
+  .project:hover .project-title { color: var(--accent); }
+  .project-desc { margin-top: 2px; font-size: 14px; color: var(--text-2); }
+
+  .side-projects {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+    margin-top: 56px;
   }
 
-  .section-nav-mobile-progress {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 1px;
-    width: 0%;
-    background: var(--gold);
-    transition: width 0.15s ease;
+  .side-projects div { border-top: 2px solid var(--ink); padding-top: 20px; }
+  .side-projects h3 { font-size: 17px; font-weight: 500; color: var(--ink); }
+  .side-projects p { margin-top: 6px; font-size: 15px; color: var(--text-2); }
+
+  /* ── Contact band (identical in index.html) */
+  .contact { background: var(--surface); }
+
+  .contact .wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 48px;
+    align-items: end;
   }
 
-  .section-nav-mobile-dot {
-    position: relative;
-    z-index: 2;
-    width: 24px;
-    height: 24px;
+  .contact h2 { margin-top: 14px; font-size: clamp(2.4rem, 5vw, 4.4rem); }
+  .contact p { margin-top: 18px; color: var(--text-2); max-width: 46ch; }
+
+  .contact-links { list-style: none; display: flex; flex-direction: column; }
+
+  .contact-links a {
     display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .contact-links li:first-child a { border-top: 2px solid var(--ink); }
+  .contact-links a span { color: var(--text-2); }
+  .contact-links a:hover { color: var(--accent); }
+
+  .site-footer { color: var(--text-2); font-size: 14px; }
+
+  .site-footer .wrap {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  /* Theme toggle: moon in light mode, sun in dark mode */
+  .theme-toggle {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: none;
-    border: none;
-    cursor: pointer;
+    width: 36px;
+    height: 36px;
     padding: 0;
-  }
-
-  .section-nav-mobile-dot::after {
-    content: '';
-    width: 8px;
-    height: 8px;
+    background: none;
+    border: 1px solid var(--line);
     border-radius: 50%;
-    border: 1px solid var(--gold-light);
-    background: var(--cream);
-    transition: all 0.2s ease;
-  }
-
-  .section-nav-mobile-dot.active::after {
-    background: var(--gold);
-    border-color: var(--gold);
-    transform: scale(1.3);
-  }
-
-  @media (max-width: 900px) {
-    .section-nav { display: none; }
-    .section-nav-mobile { display: flex; }
-    body { padding-bottom: 72px; }
-  }
-
-  /* Back to top */
-  .back-to-top {
-    position: fixed;
-    bottom: 32px;
-    right: 32px;
-    z-index: 90;
-    width: 40px;
-    height: 40px;
-    border: 1px solid var(--rule);
-    background: rgba(245, 240, 232, 0.92);
-    backdrop-filter: blur(8px);
-    color: var(--text-soft);
+    color: var(--text-2);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.2s ease, color 0.2s ease;
-    pointer-events: none;
+    transition: color 0.2s ease, border-color 0.2s ease;
   }
 
-  .back-to-top.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
+  .theme-toggle:hover { color: var(--ink); border-color: var(--text-2); }
 
-  .back-to-top:hover {
-    border-color: var(--gold);
-    color: var(--gold);
-  }
-
-  .back-to-top svg {
-    width: 14px;
-    height: 14px;
-    stroke: currentColor;
+  .theme-toggle svg {
+    width: 16px;
+    height: 16px;
     fill: none;
-    stroke-width: 1.5;
+    stroke: currentColor;
+    stroke-width: 1.6;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
 
-  @media (max-width: 900px) {
-    .back-to-top { bottom: 88px; right: 16px; }
+  .theme-toggle .icon-sun,
+  :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes pgFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-
+  @keyframes pgFadeIn { from { opacity: 0; } to { opacity: 1; } }
   body { animation: pgFadeIn 0.25s ease both; }
 
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
   @media (max-width: 900px) {
-    .site-header { padding: 50px 24px 40px; }
-    .nav-bar { padding: 0 24px; }
-    .hero {
-      padding: 60px 24px 50px;
-      grid-template-columns: 1fr;
-      gap: 40px;
-    }
-    .hero::after { display: none; }
-    .hero-tagline { max-width: 100%; }
-    .profile-section { padding: 50px 24px; }
-    .resume-section { padding: 50px 24px; }
-    .resume-grid { grid-template-columns: 1fr; gap: 24px; }
-    .cta-section {
-      grid-template-columns: 1fr;
-      gap: 32px;
-      padding: 50px 24px;
-    }
-    .cta-actions {
-      align-items: flex-start;
-      flex-direction: row;
-      flex-wrap: wrap;
-    }
-    .site-footer {
-      padding: 30px 24px;
-      flex-direction: column;
-      gap: 12px;
-      text-align: center;
-    }
+    .intro .wrap,
+    .approach .wrap,
+    .job,
+    .background .wrap,
+    .contact .wrap { grid-template-columns: 1fr; }
+    .numbers .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 24px; }
+    .approach-body { padding-top: 0; }
+    .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .work-grid .project:last-child { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    .nav { gap: 20px; }
+    .nav a { font-size: 14px; }
+    .facts div, .list > div { grid-template-columns: 1fr; gap: 4px; }
+    .work-head { flex-direction: column; align-items: flex-start; }
+    .work-grid { grid-template-columns: 1fr; }
+    .work-grid .project:last-child { display: block; }
+    .side-projects { grid-template-columns: 1fr; }
+    .site-footer .wrap { flex-direction: column; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
 </style>
+<script>
+  // Apply the saved theme, or the system one, before first paint
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
 </head>
 <body>
 
-<nav class="section-nav" aria-label="Page sections">
-  <div class="section-nav-track"></div>
-  <div class="section-nav-progress"></div>
-  <button class="section-nav-dot" data-target="section-intro">
-    <span class="section-nav-label">Intro</span>
-  </button>
-  <button class="section-nav-dot" data-target="section-profile">
-    <span class="section-nav-label">Profile</span>
-  </button>
-  <button class="section-nav-dot" data-target="section-resume">
-    <span class="section-nav-label">Resume</span>
-  </button>
-  <button class="section-nav-dot" data-target="section-contact">
-    <span class="section-nav-label">Contact</span>
-  </button>
-</nav>
-
-<nav class="section-nav-mobile" aria-label="Page sections">
-  <div class="section-nav-mobile-labels">
-    <span class="section-nav-mobile-label" data-target="section-intro">Intro</span>
-    <span class="section-nav-mobile-label" data-target="section-profile">Profile</span>
-    <span class="section-nav-mobile-label" data-target="section-resume">Resume</span>
-    <span class="section-nav-mobile-label" data-target="section-contact">Contact</span>
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="wordmark">Brian Lua</a>
+    <nav class="nav" aria-label="Main">
+      <a href="myportfolio/">Work</a>
+      <a href="about.html" aria-current="page">About</a>
+      <a href="mylayouts/">Layouts</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    </nav>
   </div>
-  <div class="section-nav-mobile-dots-row">
-    <div class="section-nav-mobile-track">
-      <div class="section-nav-mobile-progress"></div>
-    </div>
-    <button class="section-nav-mobile-dot" data-target="section-intro"></button>
-    <button class="section-nav-mobile-dot" data-target="section-profile"></button>
-    <button class="section-nav-mobile-dot" data-target="section-resume"></button>
-    <button class="section-nav-mobile-dot" data-target="section-contact"></button>
-  </div>
-</nav>
+</header>
 
-<nav class="nav-bar">
-  <div class="nav-left">
-    <a href="index.html" class="nav-logo">Brian Lua</a>
-    <div class="nav-links">
-      <a href="about.html" class="nav-link active">About</a>
-      <a href="myportfolio/" class="nav-link">Work</a>
-      <a href="mylayouts/" class="nav-link">Layouts</a>
-    </div>
-  </div>
-</nav>
-
-<section class="hero" id="section-intro">
-  <div class="hero-left">
-    <span class="eyebrow">About Me</span>
-    <h1 class="hero-name">Brian <em>Lua</em><br>Zhi Heng</h1>
-    <div class="hero-rule"></div>
-    <p class="hero-tagline">I build and ship things for the web, currently running storefront delivery and automation at Charles &amp; Keith across 20+ markets.</p>
-  </div>
-  <div class="hero-right">
-    <p class="hero-intro">I'm an IT Business Analyst at Charles &amp; Keith, where I build and maintain homepage, editorial, and campaign storefront experiences on Salesforce Commerce Cloud across 20+ international markets. I also built the team's QA automation tool from scratch using Playwright and Python, covering checkout flows, asset validation, and content checks across every storefront.</p>
-    <p class="hero-intro">I graduated from NTU in 2025 with a degree in Computer Science. I work best when a role involves both building things and thinking about how they should work, whether that's writing code, mapping out requirements, or improving a process.</p>
-    <div class="hero-contact">
-      <span class="hero-contact-item">Singapore</span>
-      <span class="hero-contact-sep">·</span>
-      <a href="mailto:luatan68@hotmail.com" class="hero-contact-item">luatan68@hotmail.com</a>
-      <span class="hero-contact-sep">·</span>
-      <a href="https://linkedin.com/in/brian-lua-40237a134" class="hero-contact-item" target="_blank" rel="noopener">LinkedIn</a>
-      <span class="hero-contact-sep">·</span>
-      <a href="https://github.com/Sealpillow" class="hero-contact-item" target="_blank" rel="noopener">GitHub</a>
-    </div>
-  </div>
-</section>
-
-<section class="profile-section" id="section-profile">
-<div class="about-content">
-    <div class="content-block">
-      <span class="block-label">Profile</span>
-      <h2 class="block-heading">Current <em>focus</em></h2>
-      <p class="block-body">My current role at Charles &amp; Keith spans business analysis and hands-on frontend delivery — from storefront content builds to platform administration, requirement gathering, and stakeholder coordination across 20+ international markets. I sustain a median 2-day turnaround across 700+ assigned tickets, with 80% closed within a week, keeping regional marketing and operations teams unblocked for time-sensitive launches.</p>
-      <p class="block-body">The QA automation tool I built cut manual regression effort significantly, with configurable market presets, retry logic, and auto-generated test summaries. This work has strengthened my interest in frontend implementation, especially where business needs, structured thinking, and user-facing presentation intersect in a live e-commerce environment.</p>
-    </div>
-
-    <div class="content-block">
-      <span class="block-label">Approach</span>
-      <h2 class="block-heading">How I <em>work</em></h2>
-      <p class="block-body">I tend to pick things up on my own when something interests me. Most of what I know about frontend came from building things and figuring out why they weren't working.</p>
-    </div>
-
-    <div class="content-block">
-      <span class="block-label">Core Areas</span>
-      <h2 class="block-heading">What I <em>do</em></h2>
-      <p class="block-body">Business analysis, SFCC storefront delivery, and platform administration at Charles &amp; Keith, with QA automation across 20+ markets.</p>
-      <div class="tags-wrap">
-        <span class="tag">Business Analysis</span>
-        <span class="tag">Front-End Development</span>
-        <span class="tag">SFCC</span>
-        <span class="tag">HTML CSS JavaScript</span>
-        <span class="tag">Python</span>
-        <span class="tag">Playwright</span>
-        <span class="tag">QA Automation</span>
-        <span class="tag">Requirements Gathering</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="resume-section" id="section-resume">
-  <div class="resume-grid">
-    <div class="resume-sidebar">
-      <div class="resume-card">
-        <span class="resume-card-label">Skills</span>
-        <div class="mini-tags">
-          <span class="mini-tag">Python</span>
-          <span class="mini-tag">JavaScript</span>
-          <span class="mini-tag">HTML5</span>
-          <span class="mini-tag">CSS3</span>
-          <span class="mini-tag">Flask</span>
-          <span class="mini-tag">SFCC</span>
-          <span class="mini-tag">Playwright</span>
-          <span class="mini-tag">ABAP</span>
-          <span class="mini-tag">Jira</span>
-          <span class="mini-tag">GA4</span>
-          <span class="mini-tag">GitHub</span>
+<main>
+  <section class="intro">
+    <div class="wrap">
+      <div>
+        <p class="label">About</p>
+        <h1 class="display">Brian <em>Lua</em><br>Zhi Heng</h1>
+        <p class="intro-lede">I build and ship things for the web. I work best when a role involves both building things and thinking about how they should work, whether that's writing code, mapping out requirements, or improving a process.</p>
+        <div class="intro-actions">
+          <a href="mailto:luatan68@hotmail.com" class="btn btn-primary">Get in touch &rarr;</a>
+          <a href="brianlua-resume.pdf" class="btn btn-secondary" download>Download résumé</a>
         </div>
       </div>
 
-      <div class="resume-card">
-        <span class="resume-card-label">Education</span>
-        <div class="resume-item">
-          <div class="resume-kicker">Aug 2021 - May 2025</div>
-          <h3 class="resume-title">B.Comp. Computer Science</h3>
-          <div class="resume-subtitle">Nanyang Technological University - Singapore</div>
-          <p class="resume-text">Computer Science graduate with project experience spanning software development, data analysis, AI-assisted tools, and digital product implementation.</p>
+      <dl class="facts">
+        <div><dt>Currently</dt><dd>IT Business Analyst, Charles &amp; Keith</dd></div>
+        <div><dt>Focus</dt><dd>SFCC storefront delivery, QA automation, business analysis</dd></div>
+        <div><dt>Education</dt><dd>B.Comp. Computer Science, NTU (2025)</dd></div>
+        <div><dt>Based in</dt><dd>Singapore</dd></div>
+        <div><dt>Elsewhere</dt><dd><a href="https://linkedin.com/in/brian-lua-40237a134" target="_blank" rel="noopener">LinkedIn</a>, <a href="https://github.com/Sealpillow" target="_blank" rel="noopener">GitHub</a></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <div class="numbers" aria-label="At a glance">
+    <div class="wrap">
+      <p class="stat"><strong>700+</strong><span>tickets handled at Charles &amp; Keith</span></p>
+      <p class="stat"><strong>2 days</strong><span>median turnaround, with 80% closed within a week</span></p>
+      <p class="stat"><strong>20+</strong><span>international storefronts supported</span></p>
+      <p class="stat"><strong>129</strong><span>front-end content builds delivered end to end</span></p>
+    </div>
+  </div>
+
+  <section class="approach" aria-labelledby="approach-title">
+    <div class="wrap">
+      <div>
+        <p class="label" id="approach-title">How I work</p>
+        <p class="quote">Most of what I know about frontend came from building things and figuring out why they weren't working.</p>
+      </div>
+      <div class="approach-body">
+        <p>My role spans business analysis and hands-on frontend delivery: storefront content builds, platform administration, requirement gathering, and coordinating with regional marketing and operations teams so time-sensitive launches stay unblocked.</p>
+        <p>The QA automation tool I built covers checkout flows, asset validation and content checks across every storefront, with configurable market presets, retry logic and auto-generated test summaries. It's the work that pulled me further into frontend, where business needs, structured thinking and what the customer actually sees meet.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="experience" aria-labelledby="experience-title">
+    <div class="wrap">
+      <p class="label">Experience</p>
+      <h2 class="display h2" id="experience-title">Where I've worked</h2>
+
+      <div class="jobs">
+        <article class="job">
+          <div>
+            <p class="job-when">Jul 2025 – present</p>
+            <p class="job-org">Charles &amp; Keith</p>
+            <p class="job-where">Singapore</p>
+          </div>
+          <div>
+            <h3>IT Business Analyst</h3>
+            <p class="job-summary">E-commerce delivery, platform administration and requirement gathering, with direct involvement in storefront content and campaigns on Salesforce Commerce Cloud.</p>
+            <ul>
+              <li>Developed and maintained homepage, editorial and campaign storefront experiences in HTML, CSS and JavaScript, <strong>delivering 129 front-end content tickets</strong> end to end across 20+ international storefronts.</li>
+              <li>Owned SFCC Business Manager administration (catalog, pricing, site configuration and campaign setup), <strong>executing 540+ operational tickets</strong> with zero-downtime platform configuration.</li>
+              <li>Built a Playwright-based QA automation tool with a Tkinter UI, covering registered and guest checkout, asset validation, content checks and navigation across 20+ storefronts.</li>
+              <li>Primary business-facing contact for the PEDRO storefront, <strong>managing 89 change requests</strong>, incidents and bug reports from intake through developer handoff and resolution.</li>
+              <li>Partnered with backend engineering on feature scoping, implementation planning and platform improvements.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="job">
+          <div>
+            <p class="job-when">Aug – Dec 2023</p>
+            <p class="job-org">NCS</p>
+            <p class="job-where">Singapore</p>
+          </div>
+          <div>
+            <h3>Data Analyst Intern, SAP Developer Team</h3>
+            <p class="job-summary">ABAP development, structured data and release tasks in a large-scale SAP environment supporting government digital services.</p>
+            <ul>
+              <li><strong>Delivered 11 change requests in 17 weeks</strong> across services including Career@Gov and the Payroll Admin Portal, with zero rollbacks.</li>
+              <li>Performed ABAP backend development and structured data management in an enterprise SAP environment.</li>
+              <li>Managed workload independently in a fast-paced team with minimal supervision.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="job">
+          <div>
+            <p class="job-when">Apr – Jul 2019</p>
+            <p class="job-org">Ngee Ann Polytechnic</p>
+            <p class="job-where">Singapore</p>
+          </div>
+          <div>
+            <h3>Project Engineer</h3>
+            <p class="job-summary">Sole developer of a live multi-drone synchronisation system built for public demonstration.</p>
+            <ul>
+              <li>Built real-time multi-drone synchronisation using Python, Packet Sender and the Tello Edu SDK.</li>
+              <li>Demonstrated the system live to more than 30 attendees at Innopoly Forum 2019.</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="background" aria-label="Skills and education">
+    <div class="wrap">
+      <div>
+        <p class="label">Skills</p>
+        <h2 class="display h2">Tools of the trade</h2>
+        <dl class="list">
+          <div><dt>Build</dt><dd>HTML, CSS, JavaScript, Python, Flask</dd></div>
+          <div><dt>Platforms</dt><dd>Salesforce Commerce Cloud, SAP (ABAP)</dd></div>
+          <div><dt>Quality</dt><dd>Playwright, QA automation</dd></div>
+          <div><dt>Analysis</dt><dd>Business analysis, requirements gathering, Jira, GA4, GitHub</dd></div>
+        </dl>
+      </div>
+      <div>
+        <p class="label">Education</p>
+        <h2 class="display h2">Where I studied</h2>
+        <dl class="list">
+          <div>
+            <dt>2021 – 2025</dt>
+            <dd><strong>B.Comp. Computer Science</strong>Nanyang Technological University<span>Project work across software development, data analysis, AI-assisted tools and digital product implementation.</span></dd>
+          </div>
+          <div>
+            <dt>2016 – 2019</dt>
+            <dd><strong>Diploma in Aerospace Electronics</strong>Ngee Ann Polytechnic<span>Director's List (2017), Edusave Merit Bursary (2017–2019), finalist in the Lee Hsien Loong Interactive Digital Smart Nation Award 2019.</span></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="work" aria-labelledby="work-title">
+    <div class="wrap">
+      <div class="work-head">
+        <div>
+          <p class="label">Selected work</p>
+          <h2 class="display h2" id="work-title">Editorial builds</h2>
         </div>
-        <div class="resume-item">
-          <div class="resume-kicker">Apr 2016 - May 2019</div>
-          <h3 class="resume-title">Diploma in Aerospace Electronics</h3>
-          <div class="resume-subtitle">Ngee Ann Polytechnic - Singapore</div>
-          <p class="resume-text">Recognitions include Director's List (2017), Edusave Merit Bursary (2017-2019), and finalist placement in the Lee Hsien Loong Interactive Digital Smart Nation Award 2019.</p>
-        </div>
+        <a href="myportfolio/" class="link">All 37 projects &rarr;</a>
       </div>
 
-      <div class="resume-card">
-        <span class="resume-card-label">Projects</span>
-        <div class="resume-item">
-          <div class="resume-kicker">Portfolio Highlights</div>
-          <p class="resume-text">Selected work in this portfolio reflects experience across responsive layout, multimedia presentation, interaction patterns, and user-facing implementation. Other technical projects include a COVID-19 contact network analyser (Python, DASH, Cytoscape) for identifying hidden spreaders, and a computer-vision automation bot (Python, OpenCV, PyAutoGUI) with fault-tolerant retry logic.</p>
+      <div class="work-grid">
+        <a href="myportfolio/editorials/design-philosophy.html" class="project">
+          <div class="project-media">
+            <img src="myportfolio/editorials/images/design-philosophy/dp-landing-a1.webp" alt="A tan leather bag with a braided handle" width="2732" height="1672" loading="lazy" style="object-position: 0% 50%;">
+          </div>
+          <p class="project-title">Design Philosophy</p>
+          <p class="project-desc">Video, Splide carousels, editorial layout</p>
+        </a>
+        <a href="myportfolio/editorials/in-dialogue-with-ana-kras.html" class="project">
+          <div class="project-media">
+            <img src="myportfolio/editorials/images/in-dialogue-with-ana-kras/dialogue-anakras-editorial-journal-banner.webp" alt="Portrait of Ana Kraš behind a sheet of textured metal" width="676" height="916" loading="lazy">
+          </div>
+          <p class="project-title">In Dialogue With Ana Kraš</p>
+          <p class="project-desc">Interview, custom video controls</p>
+        </a>
+        <a href="myportfolio/editorials/versatility-in-one-v1.html" class="project">
+          <div class="project-media">
+            <img src="myportfolio/editorials/images/versatility-in-one/main-banner.webp" alt="Model in a navy suit carrying a large soft shoulder bag" width="1366" height="1708" loading="lazy">
+          </div>
+          <p class="project-title">Versatility in One</p>
+          <p class="project-desc">Video, hover states, Splide</p>
+        </a>
+      </div>
+
+      <div class="side-projects">
+        <div>
+          <h3>COVID-19 contact network analyser</h3>
+          <p>Identifies hidden spreaders in a contact network. Python, Dash, Cytoscape.</p>
+        </div>
+        <div>
+          <h3>Computer-vision automation bot</h3>
+          <p>Screen automation with fault-tolerant retry logic. Python, OpenCV, PyAutoGUI.</p>
         </div>
       </div>
     </div>
+  </section>
 
-    <div class="resume-main">
-      <div class="resume-card">
-        <span class="resume-card-label">Experience</span>
-
-        <div class="resume-item">
-          <div class="resume-kicker">Jul 2025 - Present</div>
-          <h3 class="resume-title">IT Business Analyst</h3>
-          <div class="resume-subtitle">Charles &amp; Keith - Singapore</div>
-          <p class="resume-text">Work across e-commerce delivery, platform administration, and stakeholder requirement gathering, with direct involvement in storefront content and campaign implementation on Salesforce Commerce Cloud.</p>
-          <ul class="resume-list">
-            <li>Developed and maintained homepage, editorial, and campaign storefront experiences through HTML, CSS, and JavaScript on Salesforce Commerce Cloud, delivering 129 front-end content tickets end-to-end across 20+ international storefronts.</li>
-            <li>Owned SFCC Business Manager administration — catalog, pricing, site configuration, and campaign setup — executing 540+ operational tickets while maintaining zero-downtime platform configuration.</li>
-            <li>Built a Playwright-based QA test automation tool with a Tkinter UI, covering registered and guest checkout flows, asset validation, content text checks, and navigation verification across 20+ international storefronts.</li>
-            <li>Served as primary business-facing point of contact for the PEDRO storefront, managing 89 change requests, incidents, and bug reports from requirement intake through developer handoff and resolution.</li>
-            <li>Partnered with backend engineering teams on feature scoping, implementation planning, and platform improvements.</li>
-          </ul>
-        </div>
-
-        <div class="resume-item">
-          <div class="resume-kicker">Aug - Dec 2023</div>
-          <h3 class="resume-title">Data Analyst Intern (SAP Developer Team)</h3>
-          <div class="resume-subtitle">NCS - Singapore</div>
-          <p class="resume-text">Worked within a large-scale SAP environment supporting government digital services, combining ABAP development work with structured data and release-related tasks.</p>
-          <ul class="resume-list">
-            <li>Delivered 11 Change Requests in 17 weeks across services including Career@Gov and the Payroll Admin Portal, with zero rollbacks.</li>
-            <li>Performed ABAP backend development and structured data management tasks in an enterprise SAP environment.</li>
-            <li>Managed workload independently in a fast-paced team setting with minimal supervision.</li>
-          </ul>
-        </div>
-
-        <div class="resume-item">
-          <div class="resume-kicker">Apr - Jul 2019</div>
-          <h3 class="resume-title">Project Engineer</h3>
-          <div class="resume-subtitle">Ngee Ann Polytechnic - Singapore</div>
-          <p class="resume-text">Served as sole developer for a live multi-drone synchronisation system built for public demonstration.</p>
-          <ul class="resume-list">
-            <li>Built a real-time multi-drone synchronisation system using Python, Packet Sender, and the Tello Edu SDK.</li>
-            <li>Demonstrated the system live to more than 30 attendees at Innopoly Forum 2019.</li>
-          </ul>
-        </div>
+  <section class="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <div>
+        <p class="label">Contact</p>
+        <h2 class="display" id="contact-title">Let's work together</h2>
+        <p>Interested in roles close to the product, whether that's frontend, business analysis, or somewhere in between.</p>
       </div>
-
-      <div class="resume-card">
-        <span class="resume-card-label">Selected Front-End Work</span>
-
-        <div class="resume-item">
-          <div class="resume-kicker">Portfolio-Based Experience</div>
-          <h3 class="resume-title">User-Facing Digital Projects</h3>
-          <p class="resume-text">This portfolio serves as supporting work for front-end experience, showing practice in responsive page construction, interaction-led layouts, and polished digital presentation developed alongside my broader technical and business analysis background.</p>
-          <ul class="resume-list">
-            <li>Built and refined HTML pages with attention to structure, layout, responsiveness, and on-brand execution.</li>
-            <li>Worked with campaign and editorial page formats that required careful positioning, responsive behaviour, and visual consistency across screen sizes.</li>
-            <li>Applied richer user-facing patterns including sliders, multimedia sections, campaign storytelling, and more interactive page behaviours.</li>
-          </ul>
-        </div>
-      </div>
+      <ul class="contact-links">
+        <li><a href="mailto:luatan68@hotmail.com">Email <span>luatan68@hotmail.com</span></a></li>
+        <li><a href="https://linkedin.com/in/brian-lua-40237a134" target="_blank" rel="noopener">LinkedIn <span>&nearr;</span></a></li>
+        <li><a href="https://github.com/Sealpillow" target="_blank" rel="noopener">GitHub <span>&nearr;</span></a></li>
+        <li><a href="brianlua-resume.pdf" download>Résumé <span>PDF</span></a></li>
+      </ul>
     </div>
-  </div>
-</section>
-
-<section class="cta-section" id="section-contact">
-  <div class="cta-left">
-    <h2 class="cta-heading">Open to <br><em>opportunities</em></h2>
-    <p class="cta-sub">Interested in roles close to the product, whether that's frontend, business analysis, or somewhere in between.<br>View selected projects or get in touch.</p>
-  </div>
-  <div class="cta-actions">
-    <a href="mailto:luatan68@hotmail.com" class="btn-primary">Get in Touch -></a>
-    <a href="myportfolio/" class="btn-secondary">View Work</a>
-    <a href="brianlua-resume.pdf" class="btn-secondary" download>Download CV</a>
-  </div>
-</section>
-
-<button class="back-to-top" id="backToTop" aria-label="Back to top">
-  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-</button>
+  </section>
+</main>
 
 <footer class="site-footer">
-  <span class="footer-mark">About</span>
-  <a href="myportfolio/" class="footer-back">View My Work &rarr;</a>
+  <div class="wrap">
+    <span>&copy; 2026 Brian Lua</span>
+    <span>Built by hand in HTML, CSS and JavaScript</span>
+  </div>
 </footer>
 
 <script>
-  // ── Back-to-top button
-  // Becomes visible after scrolling 300px; clicking smooth-scrolls back to the top.
-  (function(){
-    const backToTop = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      backToTop.classList.toggle('visible', window.scrollY > 300);
-    }, { passive: true });
-    backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-  })();
-
-  // ── Section progress navigation (desktop: fixed left dots | mobile: fixed bottom bar)
-  // Both navs share the same 4-section list and active-index logic.
-  (function(){
-    const dots         = Array.from(document.querySelectorAll('.section-nav-dot'));
-    const progress     = document.querySelector('.section-nav-progress');       // vertical gold line (desktop)
-    const mobileDots   = Array.from(document.querySelectorAll('.section-nav-mobile-dot'));
-    const mobileProgress = document.querySelector('.section-nav-mobile-progress'); // horizontal gold line (mobile)
-    const sections     = dots.map(d => document.getElementById(d.dataset.target)); // actual <section> elements
-
-    // Clicking any dot (desktop or mobile) smooth-scrolls to the matching section
-    [...dots, ...mobileDots].forEach(dot => {
-      dot.addEventListener('click', () => {
-        const target = document.getElementById(dot.dataset.target);
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-
-    function update() {
-      const scrollY = window.scrollY;
-      const winH = window.innerHeight;
-      let activeIndex = 0;
-
-      // A section becomes active when its top edge passes 40% from the top of the viewport
-      sections.forEach((sec, i) => {
-        if (!sec) return;
-        if (scrollY >= sec.offsetTop - winH * 0.4) activeIndex = i;
-      });
-
-      // Force the last section active if the user has scrolled to the very bottom
-      if (scrollY + winH >= document.documentElement.scrollHeight - 20) {
-        activeIndex = sections.length - 1;
-      }
-
-      // Update desktop dot active states
-      dots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
-
-      // Fill the vertical progress line proportionally between the first and last dot positions
-      const navH = dots[dots.length - 1].offsetTop - dots[0].offsetTop;
-      const filled = navH > 0 ? (dots[activeIndex].offsetTop - dots[0].offsetTop) / navH * 100 : 0;
-      progress.style.height = filled + '%';
-
-      // Update mobile dot/label active states
-      const mobileLabels = Array.from(document.querySelectorAll('.section-nav-mobile-label'));
-      mobileDots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
-      mobileLabels.forEach((lbl, i) => lbl.classList.toggle('active', i === activeIndex));
-
-      // Fill the horizontal mobile progress line as a percentage of sections traversed
-      const mobileStep = activeIndex / (mobileDots.length - 1) * 100;
-      mobileProgress.style.width = mobileStep + '%';
-    }
-
-    window.addEventListener('scroll', update, { passive: true });
-    update(); // run once on load to set initial state
-  })();
-</script>
-<script>
-  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank)
+  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank, downloads, modifier clicks)
+  var fadeOut = null;
   document.addEventListener('click', function(e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var link = e.target.closest('a');
     if (!link) return;
     var href = link.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank') return;
+    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank' || link.hasAttribute('download')) return;
     e.preventDefault();
-    document.body.style.transition = 'opacity 0.2s ease';
-    document.body.style.opacity = '0';
+    // Web Animations API: an inline opacity would lose to the pgFadeIn fill, which pins opacity at 1
+    fadeOut = document.body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease', fill: 'forwards' });
     setTimeout(function() { window.location.href = href; }, 200);
   });
+
+  // Undo the fade when the page is restored from the back/forward cache
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted && fadeOut) { fadeOut.cancel(); fadeOut = null; }
+  });
+
+  // Theme toggle: an explicit choice is remembered; otherwise the page follows the system setting
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    function label() {
+      btn.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    btn.addEventListener('click', function () {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      label();
+    });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (err) {}
+      if (saved !== 'light' && saved !== 'dark') { root.dataset.theme = e.matches ? 'dark' : 'light'; label(); }
+    });
+    label();
+  })();
 </script>
 </body>
 </html>

@@ -3,415 +3,382 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brian Lua</title>
-<meta name="description" content="Brian Lua — IT Business Analyst and frontend developer based in Singapore. SFCC storefront delivery, QA automation, and business analysis at Charles &amp; Keith.">
+<title>Brian Lua — Frontend Developer &amp; IT Business Analyst</title>
+<meta name="description" content="Brian Lua — IT Business Analyst and frontend developer at Charles &amp; Keith, Singapore. Portfolio, about, and layout library.">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sealpillow.github.io/">
-<meta property="og:title" content="Brian Lua">
-<meta property="og:description" content="IT Business Analyst and frontend developer based in Singapore. SFCC storefront delivery, QA automation, and business analysis at Charles &amp; Keith.">
+<meta property="og:title" content="Brian Lua — Frontend Developer &amp; IT Business Analyst">
+<meta property="og:description" content="IT Business Analyst and frontend developer at Charles &amp; Keith, Singapore.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
 
 <style>
-  *, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+  /* Site palette (identical token block in about.html) */
   :root {
-    --cream: #ffffff;
-    --bone: #f0f0f0;
-    --ink: #000000;
-    --charcoal: #1a1a1a;
-    --gold: #c8a96e;
-    --muted: #888888;
-    --surface: #111111;
-    --rule-light: rgba(255, 255, 255, 0.1);
+    --bg: #f6f4f0;
+    --surface: #ece8e1;
+    --ink: #151413;
+    --text: #2e2b28;
+    --text-2: #5c5751;
+    --line: rgba(21, 20, 19, 0.12);
+    --accent: #7a2e24;
+    --on-ink: #f6f4f0;
+    --on-ink-2: #b4ada4;
+    --accent-on-ink: #e0aa9c;
+    --btn-line: rgba(21, 20, 19, 0.28);
+    --media-bg: #dcd7cf;
+    --ok: #3f7a4a;
+    color-scheme: light;
+
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --pad: clamp(24px, 5vw, 72px);
+    --max: 1280px;
   }
 
-  html {
-    scroll-behavior: smooth;
+  /* Dark theme: set by the toggle (data-theme), or by the system when no script has run */
+  :root[data-theme="dark"] {
+    --bg: #161412;
+    --surface: #211e1b;
+    --ink: #f3efe8;
+    --text: #dcd6cd;
+    --text-2: #a8a095;
+    --line: rgba(243, 239, 232, 0.14);
+    --accent: #e09c8c;
+    --on-ink: #161412;
+    --on-ink-2: #5c5751;
+    --accent-on-ink: #7a2e24;
+    --btn-line: rgba(243, 239, 232, 0.3);
+    --media-bg: #2a2622;
+    --ok: #6fb07d;
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg: #161412;
+      --surface: #211e1b;
+      --ink: #f3efe8;
+      --text: #dcd6cd;
+      --text-2: #a8a095;
+      --line: rgba(243, 239, 232, 0.14);
+      --accent: #e09c8c;
+      --on-ink: #161412;
+      --on-ink-2: #5c5751;
+      --accent-on-ink: #7a2e24;
+      --btn-line: rgba(243, 239, 232, 0.3);
+      --media-bg: #2a2622;
+      --ok: #6fb07d;
+      color-scheme: dark;
+    }
   }
 
   body {
-    font-family: 'Montserrat', sans-serif;
-    background: var(--ink);
-    color: var(--cream);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.6;
-  }
+  a { color: inherit; }
 
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #000; }
-  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 0; }
-
-  .nav-bar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(0, 0, 0, 0.96);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--rule-light);
-    padding: 0 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 56px;
-  }
-
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    font-weight: 300;
-    letter-spacing: 0.15em;
-    color: var(--cream);
-    text-decoration: none;
-  }
-
-  .nav-link {
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .nav-link:hover {
-    color: var(--gold);
-  }
-
-  .hero {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 80px 60px 60px;
-    text-align: center;
-    animation: fadeDown 1.2s ease both;
-  }
-
-  .eyebrow {
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 24px;
-  }
-
-  .hero-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(3rem, 7vw, 6rem);
-    font-weight: 300;
-    letter-spacing: 0.08em;
-    line-height: 0.9;
-    color: var(--cream);
-  }
-
-  .hero-title em {
-    font-style: italic;
-    color: var(--gold);
-  }
-
-  .header-rule {
-    width: 60px;
-    height: 1px;
-    background: var(--gold);
-    margin: 36px auto 24px;
-  }
-
-  .hero-sub {
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 64px;
-  }
-
-  .nav-cards {
+  /* One screen: intro and navigation centred, contact pinned to the bottom */
+  .page {
+    min-height: 100svh;
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 var(--pad);
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2px;
-    width: 100%;
-    max-width: 1100px;
-    animation: fadeUp 1s ease 0.3s both;
+    grid-template-rows: auto 1fr auto;
   }
 
-  .nav-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 40px 36px;
-    min-height: 260px;
-    background: var(--surface);
-    text-decoration: none;
-    overflow: hidden;
-    transition: box-shadow 0.4s ease, transform 0.4s ease;
-    border: 1px solid var(--rule-light);
-  }
-
-  .nav-card:hover {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    transform: translateY(-4px);
-  }
-
-  .nav-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(184, 154, 106, 0.06) 0%, transparent 60%);
-    transition: opacity 0.4s ease;
-    opacity: 0;
-  }
-
-  .nav-card:hover::before {
-    opacity: 1;
-  }
-
-  .card-num {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 72px;
-    font-weight: 300;
-    letter-spacing: -0.02em;
-    color: rgba(184, 154, 106, 0.12);
-    line-height: 1;
-    position: absolute;
-    top: 24px;
-    right: 28px;
-    transition: color 0.4s ease;
-  }
-
-  .nav-card:hover .card-num {
-    color: rgba(184, 154, 106, 0.28);
-  }
-
-  .card-label {
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 10px;
-  }
-
-  .card-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
-    font-weight: 400;
-    letter-spacing: 0.03em;
-    line-height: 1.1;
-    color: var(--cream);
-    margin-bottom: 12px;
-  }
-
-  .card-desc {
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.04em;
-    line-height: 1.8;
-    color: var(--muted);
-    max-width: 30ch;
-  }
-
-  .card-arrow {
-    margin-top: 24px;
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--cream);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: gap 0.25s ease, color 0.25s ease;
-  }
-
-  .nav-card:hover .card-arrow {
-    gap: 14px;
-    color: var(--gold);
-  }
-
-  .site-footer {
-    border-top: 1px solid var(--rule-light);
-    padding: 28px 60px;
+  .top {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 68px;
+    font-size: 14px;
+    color: var(--text-2);
   }
 
-  .footer-mark {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 13px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: var(--muted);
+  .top-right { display: flex; align-items: center; gap: 20px; }
+
+  .status::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ok);
+    margin-right: 8px;
+    vertical-align: 1px;
   }
 
-  .footer-about {
-    font-size: 10px;
+  .hub {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(40px, 7vw, 120px);
+    align-items: center;
+    padding: clamp(40px, 6vw, 72px) 0;
+  }
+
+  /* Easter egg trigger: the accent rule, with a larger invisible hit area */
+  .header-rule {
+    position: relative;
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+    margin-bottom: 28px;
+  }
+
+  .header-rule::before { content: ''; position: absolute; inset: -12px -6px; }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(3.4rem, 7vw, 6.4rem);
     font-weight: 400;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--gold);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    animation: rise 0.8s ease both;
+  }
+
+  h1 em { font-style: italic; }
+
+  .role {
+    margin-top: 24px;
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--text);
+    max-width: 30ch;
+    animation: rise 0.8s ease 0.08s both;
+  }
+
+  .role span { color: var(--text-2); }
+
+  /* Navigation list (same row language as the facts list on about) */
+  .nav-list {
+    list-style: none;
+    border-top: 2px solid var(--ink);
+    animation: rise 0.8s ease 0.16s both;
+  }
+
+  .nav-list a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 4px 24px;
+    padding: 26px 0;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+  }
+
+  .nav-title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 3.4vw, 2.8rem);
+    line-height: 1.1;
+    color: var(--ink);
+    transition: color 0.2s ease, transform 0.25s ease;
+  }
+
+  .nav-desc { grid-column: 1; font-size: 15px; color: var(--text-2); }
+
+  .nav-arrow {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: 22px;
+    color: var(--text-2);
+    transition: color 0.2s ease, transform 0.25s ease;
+  }
+
+  .nav-list a:hover .nav-title,
+  .nav-list a:focus-visible .nav-title { color: var(--accent); transform: translateX(6px); }
+
+  .nav-list a:hover .nav-arrow,
+  .nav-list a:focus-visible .nav-arrow { color: var(--accent); transform: translateX(4px); }
+
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding: 22px 0 26px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    color: var(--text-2);
+  }
+
+  .contact { display: flex; flex-wrap: wrap; gap: 8px 28px; }
+
+  .contact a {
+    color: var(--text);
     text-decoration: none;
     transition: color 0.2s ease;
   }
 
-  .footer-about:hover {
-    color: var(--cream);
-  }
+  .contact a:hover { color: var(--accent); }
 
-  @keyframes pgFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-
-  body { animation: pgFadeIn 0.25s ease both; }
-
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @media (max-width: 640px) {
-    .nav-bar    { padding: 0 24px; }
-    .hero       { padding: 60px 24px 40px; }
-    .nav-cards  { grid-template-columns: 1fr; }
-    .nav-card   { min-height: 200px; }
-    .site-footer { padding: 24px; flex-direction: column; gap: 10px; text-align: center; }
-  }
-
-  /* Secret panel */
+  /* ── Secret panel (easter egg) */
   .secret-panel {
     position: fixed;
-    bottom: 72px;
+    bottom: 32px;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
-    background: #080808;
-    border: 1px solid rgba(200, 169, 110, 0.2);
+    background: var(--ink);
+    color: var(--on-ink);
     padding: 24px 36px;
     min-width: 220px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s ease, transform 0.35s ease;
-    z-index: 500;
     text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+    z-index: 500;
   }
 
   .secret-panel.active {
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
     transform: translateX(-50%) translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s;
   }
 
-  .secret-eyebrow {
-    font-size: 8px;
-    letter-spacing: 0.5em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 20px;
-  }
+  .secret-eyebrow { font-size: 12px; color: var(--accent-on-ink); margin-bottom: 16px; }
+  .secret-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .secret-links a { color: var(--on-ink-2); text-decoration: none; }
+  .secret-links a:hover { color: var(--on-ink); }
+  .secret-close { margin-top: 18px; font-size: 12px; color: var(--on-ink-2); cursor: pointer; user-select: none; }
 
-  .secret-links {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .secret-links a {
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .secret-links a:hover { color: var(--cream); }
-
-  .secret-close {
-    margin-top: 20px;
-    font-size: 8px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(136, 136, 136, 0.3);
+  /* Theme toggle: moon in light mode, sun in dark mode */
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--text-2);
     cursor: pointer;
-    transition: color 0.2s ease;
-    user-select: none;
+    transition: color 0.2s ease, border-color 0.2s ease;
   }
 
-  .secret-close:hover { color: var(--muted); }
+  .theme-toggle:hover { color: var(--ink); border-color: var(--text-2); }
+
+  .theme-toggle svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .theme-toggle .icon-sun,
+  :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pgFadeIn { from { opacity: 0; } to { opacity: 1; } }
+  body { animation: pgFadeIn 0.25s ease both; }
+
+  @media (max-width: 900px) {
+    .hub { grid-template-columns: 1fr; align-items: start; }
+    .nav-list a { padding: 22px 0; }
+  }
+
+  @media (max-width: 600px) {
+    .bottom { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
 </style>
+<script>
+  // Apply the saved theme, or the system one, before first paint
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
 </head>
 <body>
 
-<nav class="nav-bar">
-  <a href="index.html" class="nav-logo">Brian Lua</a>
-  <div style="display:flex;gap:32px;align-items:center;">
-    <a href="about.html" class="nav-link">About</a>
-    <a href="myportfolio/" class="nav-link">Work</a>
-    <a href="mylayouts/" class="nav-link">Layouts</a>
-  </div>
-</nav>
+<div class="page">
+  <header class="top">
+    <span>Singapore</span>
+    <div class="top-right">
+      <span class="status">Open to new roles</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    </div>
+  </header>
 
-<main class="hero">
-  <div class="eyebrow">Portfolio</div>
-  <h1 class="hero-title">Brian <em>Lua</em></h1>
-  <div class="header-rule"></div>
-  <p class="hero-sub">IT Business Analyst &amp; Frontend Developer</p>
+  <main class="hub">
+    <div>
+      <div class="header-rule"></div>
+      <h1>Brian <em>Lua</em></h1>
+      <p class="role">IT Business Analyst &amp; Frontend Developer <span>at Charles &amp; Keith</span></p>
+    </div>
 
-  <div class="nav-cards">
-    <a href="about.html" class="nav-card">
-      <span class="card-num">01</span>
-      <span class="card-label">Profile</span>
-      <h2 class="card-title">About Me</h2>
-      <p class="card-desc">Background, approach, and the thinking behind the work.</p>
-      <span class="card-arrow">Learn More &rarr;</span>
-    </a>
+    <nav aria-label="Main">
+      <ul class="nav-list">
+        <li>
+          <a href="about.html">
+            <span class="nav-title">About</span>
+            <span class="nav-desc">Background, experience and how I work</span>
+            <span class="nav-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+        <li>
+          <a href="myportfolio/">
+            <span class="nav-title">Work</span>
+            <span class="nav-desc">Editorial pages, campaign layouts and interactive builds</span>
+            <span class="nav-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+        <li>
+          <a href="mylayouts/">
+            <span class="nav-title">Layouts</span>
+            <span class="nav-desc">Reusable HTML snippets and layout patterns</span>
+            <span class="nav-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </main>
 
-    <a href="myportfolio/" class="nav-card">
-      <span class="card-num">02</span>
-      <span class="card-label">Work</span>
-      <h2 class="card-title">My Portfolio</h2>
-      <p class="card-desc">Editorial pages, campaign layouts, and interactive builds.</p>
-      <span class="card-arrow">View Work &rarr;</span>
-    </a>
-
-    <a href="mylayouts/" class="nav-card">
-      <span class="card-num">03</span>
-      <span class="card-label">Reference</span>
-      <h2 class="card-title">My Layouts</h2>
-      <p class="card-desc">Reusable HTML snippets and layout patterns.</p>
-      <span class="card-arrow">View Layouts &rarr;</span>
-    </a>
-  </div>
-</main>
+  <footer class="bottom">
+    <div class="contact">
+      <a href="mailto:luatan68@hotmail.com">luatan68@hotmail.com</a>
+      <a href="https://linkedin.com/in/brian-lua-40237a134" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/Sealpillow" target="_blank" rel="noopener">GitHub</a>
+      <a href="brianlua-resume.pdf" download>Résumé</a>
+    </div>
+    <span>&copy; 2026 Brian Lua</span>
+  </footer>
+</div>
 
 <div class="secret-panel" id="secretPanel">
   <p class="secret-eyebrow">You found something.</p>
@@ -423,42 +390,63 @@
   <div class="secret-close" id="secretClose">&#215; close</div>
 </div>
 
-<footer class="site-footer">
-  <span class="footer-mark">Brian Lua</span>
-</footer>
-
 <script>
-  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank)
+  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank, downloads, modifier clicks)
+  var fadeOut = null;
   document.addEventListener('click', function(e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var link = e.target.closest('a');
     if (!link) return;
     var href = link.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank') return;
+    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank' || link.hasAttribute('download')) return;
     e.preventDefault();
-    document.body.style.transition = 'opacity 0.2s ease';
-    document.body.style.opacity = '0';
+    // Web Animations API: an inline opacity would lose to the pgFadeIn fill, which pins opacity at 1
+    fadeOut = document.body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease', fill: 'forwards' });
     setTimeout(function() { window.location.href = href; }, 200);
   });
 
-  // Easter egg: click the gold rule to reveal hidden links
+  // Undo the fade when the page is restored from the back/forward cache
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted && fadeOut) { fadeOut.cancel(); fadeOut = null; }
+  });
+
+  // Easter egg: click the accent rule to reveal hidden links
   var rule = document.querySelector('.header-rule');
   var panel = document.getElementById('secretPanel');
-  var closeBtn = document.getElementById('secretClose');
 
   rule.addEventListener('click', function(e) {
     e.stopPropagation();
     panel.classList.toggle('active');
   });
 
-  closeBtn.addEventListener('click', function() {
+  document.getElementById('secretClose').addEventListener('click', function() {
     panel.classList.remove('active');
   });
 
   document.addEventListener('click', function(e) {
-    if (!panel.contains(e.target)) {
-      panel.classList.remove('active');
-    }
+    if (!panel.contains(e.target)) panel.classList.remove('active');
   });
+
+  // Theme toggle: an explicit choice is remembered; otherwise the page follows the system setting
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    function label() {
+      btn.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    btn.addEventListener('click', function () {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      label();
+    });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (err) {}
+      if (saved !== 'light' && saved !== 'dark') { root.dataset.theme = e.matches ? 'dark' : 'light'; label(); }
+    });
+    label();
+  })();
 </script>
 </body>
 </html>
