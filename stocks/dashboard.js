@@ -7670,7 +7670,7 @@ function panelHowItWorks(data,opts={}){
   const arrows=[0,1,3,4,6,7].map(i=>`<line x1="${col(i)+182}" y1="${row(i)+28}" x2="${col(i)+206}" y2="${row(i)+28}" class="hiw-arr" marker-end="url(#hiwArrow2)"/>`).join("")
     +`<path d="M550 98 L550 116 L130 116 L130 132" class="hiw-arr" fill="none" marker-end="url(#hiwArrow2)"/>`
     +`<path d="M550 194 L550 212 L130 212 L130 228" class="hiw-arr" fill="none" marker-end="url(#hiwArrow2)"/>`;
-  const pipelineSvg=`<svg class="hiw-svg" viewBox="0 0 680 345" role="img" aria-labelledby="hiwPipeTitle hiwPipeDesc">
+  const pipelineSvg=`<svg class="hiw-svg hiw-pipe" viewBox="0 0 680 345" role="img" aria-labelledby="hiwPipeTitle hiwPipeDesc">
     <title id="hiwPipeTitle">Dividend cycle analysis pipeline</title>
     <desc id="hiwPipeDesc">Nine stages in three rows: the Python engine reads price and dividend data, cleans dividends into series, measures each past cycle, builds series statistics, projects the next cycle and runs risk checks; the decision layer turns that into a potential score, a current verdict, and the dashboard views and accuracy log.</desc>
     <defs><marker id="hiwArrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
