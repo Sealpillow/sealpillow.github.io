@@ -5,7 +5,7 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-10-14",
+    "today": "2026-10-18",
     "frequency": "ANNUAL",
     "frequency_display": "Annual",
     "adaptive_window_days": 182,
@@ -14,7 +14,7 @@
     "payments_per_year": 1.0,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -96.4
+    "price_growth_5yr_pct": -97.2
   },
   "parse_preflight": {
     "columns_detected": [
@@ -31,11 +31,11 @@
     "total_rows": 351,
     "price_rows": 346,
     "dividend_rows": 5,
-    "zero_volume_rows": 36,
-    "zero_volume_pct": 10.4,
+    "zero_volume_rows": 35,
+    "zero_volume_pct": 10.1,
     "issues_found": [
       "3 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (36/346, 10.4%) â€” analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (35/346, 10.1%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -488,15 +488,15 @@
   "proj_series": {
     "S1": {
       "proj_exdiv_date": "2027-07-25",
-      "anchor": 0.009,
+      "anchor": 0.007,
       "anchor_source": "provisional_current_price",
       "anchor_provisional": true,
       "window_open_date": "2027-01-24",
-      "zone_bot": 0.008,
-      "zone_top": 0.0084,
+      "zone_bot": 0.0063,
+      "zone_top": 0.0065,
       "zone_degradation_adjusted": false,
       "zone_degradation_widen_pct": 0.0,
-      "est_low_px": 0.0083,
+      "est_low_px": 0.0064,
       "low_timing_track_record": {
         "tested": 1,
         "window_hits": 0,
@@ -506,8 +506,8 @@
         "wide_wks_min": 5.0,
         "wide_wks_max": 25.0
       },
-      "est_exdiv_px": 0.0089,
-      "est_peak_px": 0.0113,
+      "est_exdiv_px": 0.0069,
+      "est_peak_px": 0.0088,
       "est_low_date": null,
       "est_low_date_from": null,
       "est_low_date_to": null,
@@ -523,7 +523,7 @@
       "est_watch_window_note": "Cluster 1: Jan 31 – Feb 7 (best: Feb 3) · Cluster 2: May 27 – Jun 20 (best: Jun 8)",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 12.5,
+      "current_price_vs_zone": 11.1111,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "BIMODAL",
@@ -551,8 +551,8 @@
       "div_trend_display": "Rising",
       "div_amt_lo": 0.0009,
       "div_amt_hi": 0.001,
-      "div_yield_lo": 10.7143,
-      "div_yield_hi": 12.5,
+      "div_yield_lo": 13.8462,
+      "div_yield_hi": 15.873,
       "anchor_extreme_flag": "LOW",
       "historical_frequencies": {
         "entry_zone_hit_rate": 0.0,
@@ -566,22 +566,22 @@
       "scenarios": {
         "base": {
           "description": "Filled around the middle of the projected entry zone",
-          "entry_px": 0.0082,
-          "exit_px": 0.0089,
+          "entry_px": 0.0064,
+          "exit_px": 0.0069,
           "expected_hold_days": 114,
           "historical_frequency": "mid-zone fill"
         },
         "downside": {
           "description": "Filled near the top of the projected entry zone",
-          "entry_px": 0.0084,
-          "exit_px": 0.0089,
+          "entry_px": 0.0065,
+          "exit_px": 0.0069,
           "expected_hold_days": 170,
           "historical_frequency": "higher fill"
         },
         "upside": {
           "description": "Filled near the bottom of the projected entry zone",
-          "entry_px": 0.008,
-          "exit_px": 0.0089,
+          "entry_px": 0.0063,
+          "exit_px": 0.0069,
           "expected_hold_days": 53,
           "historical_frequency": "lower fill"
         }
@@ -2082,10 +2082,10 @@
     },
     {
       "d": "2026-10-16",
-      "c": 0.009
+      "c": 0.007
     }
   ],
-  "current_price": 0.009,
+  "current_price": 0.007,
   "anchor_price": 0.2,
   "anchor_date": "2023-06-16",
   "data_window_start": "2020-03-06",

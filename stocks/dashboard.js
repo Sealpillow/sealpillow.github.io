@@ -1328,6 +1328,9 @@ function toBool(v){return v===true||String(v).toLowerCase()==="true"}
 function monthName(m){return["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][(m-1)]||"-"}
 function doy(ds){const d=new Date(ds);return Number.isNaN(d.getTime())?null:Math.floor((d-new Date(d.getFullYear(),0,0))/86400000)}
 function dayMonth(ds){const d=new Date(ds);return Number.isNaN(d.getTime())?ds:d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})}
+// Registry/file names use underscores ("Hongkong_Land_Holdings"); show them
+// as normal words everywhere in the UI.
+function displayStockName(name){return String(name??"").replace(/_/g," ").replace(/\s+/g," ").trim()}
 function tipLabel(label,text){return`${label}<span class="help" title="${esc(text)}">i</span>`}
 function anchorSourceText(source,windowOpenDate){
   if(source==="window_open_close")return"Window-open price";
@@ -1349,24 +1352,6 @@ function lowTimingRecordHtml(proj){
   if(r.wide_from&&r.wide_to)parts.push(`Typical range ${dtShort(r.wide_from)} – ${dtShort(r.wide_to)} <span class="small muted">(${n(r.wide_wks_min,0)}–${n(r.wide_wks_max,0)} wks before ex-div)</span>: low landed in range <strong>${r.wide_hits} of ${r.tested}</strong> past cycles`);
   if(proj.est_low_date_from&&proj.est_low_date_to&&!proj.est_low_date_cluster1)parts.push(`Middle-50% window above: <strong>${r.window_hits} of ${r.tested}</strong>`);
   return parts.map(p=>`<div class="small">${p}</div>`).join("");
-}
-
-function syncMobileTopbarActions(){
-  const actions=document.querySelector(".topbar-actions");
-  const toggle=document.getElementById("mobileActionsToggle");
-  if(!actions||!toggle)return;
-  const mobile=window.matchMedia("(max-width: 640px)").matches;
-  if(!mobile){
-    actions.classList.remove("collapsed","expanded");
-    toggle.style.display="none";
-    toggle.setAttribute("aria-expanded","false");
-    return;
-  }
-  toggle.style.display="inline-flex";
-  if(!actions.classList.contains("collapsed") && !actions.classList.contains("expanded")){
-    actions.classList.add("collapsed");
-  }
-  toggle.setAttribute("aria-expanded",actions.classList.contains("expanded")?"true":"false");
 }
 
 function tagClass(v){
@@ -1449,9 +1434,9 @@ function cleanCyclesForSeries(data,sid){
 
 function renderHeroDataset(data){
   const m=data.meta||{};
-  return`<div class="hero-section">
-    <h2>Dataset Overview</h2>
-    <div class="kv">
+  return`<details class="hero-section hero-details">
+    <summary>Dataset details</summary>
+    <div class="kv" style="margin-top:10px">
       <div>Exchange</div><div>${esc(m.exchange||"-")}</div>
       <div>Currency</div><div>${esc(m.currency||"-")}</div>
       <div>Data window</div><div>${dt(data.data_window_start)} to ${dt(data.data_window_end)}</div>
@@ -1461,8 +1446,7 @@ function renderHeroDataset(data){
       <div>${tipLabel("Mean interval","Average number of days between dividend events after noisy cases are cleaned out.")}</div>
       <div>${n(m.mean_interval_days,1)} days</div>
     </div>
-    ${(data.edge_case_flags_display||[]).length?`<div class="chips">${data.edge_case_flags_display.map(x=>`<span class="chip bad">${esc(x)}</span>`).join("")}</div>`:""}
-  </div>`
+  </details>`
 }
 
 /* -- TAB 0: SERIES ------------------------------------------------------- */
@@ -2111,7 +2095,7 @@ function panelProgressStrip(data){
   if(specialIsAnchor){
     // Special dividend is the most recent price-reset event — use it as the left anchor
     events.push({
-      label:'Last Ex-Div',sub:mostRecentSpecial.date,date:mostRecentSpecial.date,color:'#a78bfa',special:true,
+      label:'Last Ex-Div',sub:mostRecentSpecial.date,date:mostRecentSpecial.date,color:'#94a3b8',special:true,
       detail:[
         `Type: Special / excluded dividend (price anchor)`,
         `Date: ${mostRecentSpecial.date}`,
@@ -2125,7 +2109,7 @@ function panelProgressStrip(data){
       .filter(a=>a.date<mostRecentSpecial.date&&a.date>_lastRegularDate)
       .forEach(sd=>{
         events.push({
-          label:'Special Div',sub:sd.date,date:sd.date,color:'#a78bfa',special:true,
+          label:'Special Div',sub:sd.date,date:sd.date,color:'#94a3b8',special:true,
           detail:[`Type: Special / excluded dividend`,`Date: ${sd.date}`,`Amount: ${ccy(sd.amount,data.meta?.currency||'')}`,`Note: ${sd.reason||'-'}`]
         });
       });
@@ -2137,7 +2121,7 @@ function panelProgressStrip(data){
         label:'Last Ex-Div',
         sub:last.exdiv_date,
         date:last.exdiv_date,
-        color:lastSeriesMeta.color||'#3b82f6',
+        color:lastSeriesMeta.color||'#4f8ef7',
         detail:[
           `Series: ${last.series||'-'}`,
           `Date: ${last.exdiv_date}`,
@@ -2151,20 +2135,20 @@ function panelProgressStrip(data){
       .filter(a=>a.date>_lastRegularDate)
       .forEach(sd=>{
         events.push({
-          label:'Special Div',sub:sd.date,date:sd.date,color:'#a78bfa',special:true,
+          label:'Special Div',sub:sd.date,date:sd.date,color:'#94a3b8',special:true,
           detail:[`Type: Special / excluded dividend`,`Date: ${sd.date}`,`Amount: ${ccy(sd.amount,data.meta?.currency||'')}`,`Note: ${sd.reason||'-'}`]
         });
       });
   }
   const stripAnchorDate=specialIsAnchor?mostRecentSpecial.date:(_lastRegularDate||'');
   if(proj.timing_rating==='BIMODAL'){
-    if(proj.est_low_date_cluster1&&proj.est_low_date_cluster1>stripAnchorDate)events.push({label:'Cluster 1',sub:proj.est_low_date_cluster1,date:proj.est_low_date_cluster1,color:'#f5c542',detail:[`Timing: ${proj.timing_rating_display || '-'}`,`Early cluster: ${proj.est_low_date_cluster1}`,`Est. low: ${ccy(proj.est_low_px,data.meta?.currency||'')}`]});
-    if(proj.est_low_date_cluster2&&proj.est_low_date_cluster2>stripAnchorDate)events.push({label:'Cluster 2',sub:proj.est_low_date_cluster2,date:proj.est_low_date_cluster2,color:'#e8a838',detail:[`Timing: ${proj.timing_rating_display || '-'}`,`Late cluster: ${proj.est_low_date_cluster2}`,`Est. low: ${ccy(proj.est_low_px,data.meta?.currency||'')}`]});
+    if(proj.est_low_date_cluster1&&proj.est_low_date_cluster1>stripAnchorDate)events.push({label:'Cluster 1',sub:proj.est_low_date_cluster1,date:proj.est_low_date_cluster1,color:'#22d3ee',detail:[`Timing: ${proj.timing_rating_display || '-'}`,`Early cluster: ${proj.est_low_date_cluster1}`,`Est. low: ${ccy(proj.est_low_px,data.meta?.currency||'')}`]});
+    if(proj.est_low_date_cluster2&&proj.est_low_date_cluster2>stripAnchorDate)events.push({label:'Cluster 2',sub:proj.est_low_date_cluster2,date:proj.est_low_date_cluster2,color:'#7dd3fc',detail:[`Timing: ${proj.timing_rating_display || '-'}`,`Late cluster: ${proj.est_low_date_cluster2}`,`Est. low: ${ccy(proj.est_low_px,data.meta?.currency||'')}`]});
   }else if(proj.timing_rating==='RELIABLE'&&proj.est_low_date){
-    if(proj.est_low_date>stripAnchorDate)events.push({label:'Est. Low',sub:proj.est_low_date,date:proj.est_low_date,color:'#00e5ff',detail:[`Timing: ${proj.timing_rating_display || '-'}`,`Est. low date: ${proj.est_low_date}`,`Est. low px: ${ccy(proj.est_low_px,data.meta?.currency||'')}`]});
+    if(proj.est_low_date>stripAnchorDate)events.push({label:'Est. Low',sub:proj.est_low_date,date:proj.est_low_date,color:'#22d3ee',detail:[`Timing: ${proj.timing_rating_display || '-'}`,`Est. low date: ${proj.est_low_date}`,`Est. low px: ${ccy(proj.est_low_px,data.meta?.currency||'')}`]});
   }else{
     const watchSub=cal.cal_window_rating&&cal.cal_window_rating!=='CALENDAR_WIDE'?(cal.cal_window_label||'Monitor'):'Monitor';
-    events.push({label:'Watch Zone',sub:watchSub,date:todayStr,color:'#f5c542',detail:[`Entry status: ${proj.entry_status_display || '-'}`,`Current price: ${ccy(data.current_price,data.meta?.currency||'')}`,`Zone: ${ccy(proj.zone_bot,data.meta?.currency||'')} - ${ccy(proj.zone_top,data.meta?.currency||'')}`,`Calendar window: ${cal.cal_window_label||'-'}`]});
+    events.push({label:'Watch Zone',sub:watchSub,date:todayStr,color:'#c084fc',detail:[`Entry status: ${proj.entry_status_display || '-'}`,`Current price: ${ccy(data.current_price,data.meta?.currency||'')}`,`Zone: ${ccy(proj.zone_bot,data.meta?.currency||'')} - ${ccy(proj.zone_top,data.meta?.currency||'')}`,`Calendar window: ${cal.cal_window_label||'-'}`]});
   }
   if(
     exitProfile.exit_mode_verdict==='PRE_EXDIV_PREFERRED' &&
@@ -2180,7 +2164,7 @@ function panelProgressStrip(data){
         label:'Peak Exit Ref',
         sub:`${n(exitProfile.pre_exdiv_peak_window_days_p25,0)}-${n(exitProfile.pre_exdiv_peak_window_days_p75,0)}d pre`,
         date:peakExitDate.toISOString().slice(0,10),
-        color:'#9f8cc9',
+        color:'#ff8a65',
         detail:[
           `Exit mode: ${exitProfile.exit_mode_verdict_display || '-'}`,
           `Historical reference only`,
@@ -2198,7 +2182,7 @@ function panelProgressStrip(data){
       label:isExitDatePreferred?'Ex-Div Exit':'Proj Ex-Div',
       sub:proj.proj_exdiv_date,
       date:proj.proj_exdiv_date,
-      color:sm.color||'#3b82f6',
+      color:sm.color||'#4f8ef7',
       detail:[
         `Series: ${sid}`,
         `Projected ex-div: ${proj.proj_exdiv_date}`,
@@ -2296,14 +2280,14 @@ function panelFullCalendar(data){
   const events=[];
   meta.forEach((sm,seriesIdx)=>{
     cleanCyclesForSeries(data,sm.id).forEach((c,idx)=>{
-    if(c.low_date)events.push({date:c.low_date,label:'Low',series:sm.id,color:'#00e5ff',top:-50-(idx%4)*20,bottom:pctRaw(c.low_vs_prevdp,1),detail:[`Cycle: ${c.id}`,`Series: ${sm.id}`,`Low date: ${c.low_date}`,`Low vs PrevDP: ${pctRaw(c.low_vs_prevdp,1)}`,`Success: ${toBool(c.success)?'Yes':'No'}`]});
-      if(c.exdiv_date)events.push({date:c.exdiv_date,label:`${sm.id} Ex-Div`,series:sm.id,color:sm.color||'#3b82f6',top:-90-((idx+seriesIdx)%3)*20,bottom:ccy(c.div_amt,currency),detail:[`Cycle: ${c.id}`,`Series: ${sm.id}`,`Ex-div: ${c.exdiv_date}`,`Dividend: ${ccy(c.div_amt,currency)}`]});
+    if(c.low_date)events.push({date:c.low_date,label:'Low',series:sm.id,color:'#22d3ee',top:-50-(idx%4)*20,bottom:pctRaw(c.low_vs_prevdp,1),detail:[`Cycle: ${c.id}`,`Series: ${sm.id}`,`Low date: ${c.low_date}`,`Low vs PrevDP: ${pctRaw(c.low_vs_prevdp,1)}`,`Success: ${toBool(c.success)?'Yes':'No'}`]});
+      if(c.exdiv_date)events.push({date:c.exdiv_date,label:`${sm.id} Ex-Div`,series:sm.id,color:sm.color||'#4f8ef7',top:-90-((idx+seriesIdx)%3)*20,bottom:ccy(c.div_amt,currency),detail:[`Cycle: ${c.id}`,`Series: ${sm.id}`,`Ex-div: ${c.exdiv_date}`,`Dividend: ${ccy(c.div_amt,currency)}`]});
     });
     const proj=projForSeries(data,sm.id);
-    if(proj.est_low_date)events.push({date:proj.est_low_date,label:`${sm.id} Low Proj`,series:sm.id,color:'#f5c542',top:-70,bottom:ccy(proj.est_low_px,currency),detail:[`Series: ${sm.id}`,`Projected low: ${proj.est_low_date}`,`Est. low px: ${ccy(proj.est_low_px,currency)}`]});
-    if(proj.est_low_date_cluster1)events.push({date:proj.est_low_date_cluster1,label:`${sm.id} C1`,series:sm.id,color:'#f5c542',top:-70,bottom:ccy(proj.est_low_px,currency),detail:[`Series: ${sm.id}`,`Cluster 1: ${proj.est_low_date_cluster1}`,`Est. low px: ${ccy(proj.est_low_px,currency)}`]});
-    if(proj.est_low_date_cluster2)events.push({date:proj.est_low_date_cluster2,label:`${sm.id} C2`,series:sm.id,color:'#e8a838',top:-90,bottom:ccy(proj.est_low_px,currency),detail:[`Series: ${sm.id}`,`Cluster 2: ${proj.est_low_date_cluster2}`,`Est. low px: ${ccy(proj.est_low_px,currency)}`]});
-    if(proj.proj_exdiv_date)events.push({date:proj.proj_exdiv_date,label:`${sm.id} Proj`,series:sm.id,color:'#f5c542',top:-50-(seriesIdx%2)*20,bottom:ccy(proj.med_div_amt??proj.div_amt_lo,currency),detail:[`Series: ${sm.id}`,`Projected ex-div: ${proj.proj_exdiv_date}`,`Projected dividend: ${ccy(proj.med_div_amt??proj.div_amt_lo,currency)}`]});
+    if(proj.est_low_date)events.push({date:proj.est_low_date,label:`${sm.id} Low Proj`,series:sm.id,color:'#22d3ee',top:-70,bottom:ccy(proj.est_low_px,currency),detail:[`Series: ${sm.id}`,`Projected low: ${proj.est_low_date}`,`Est. low px: ${ccy(proj.est_low_px,currency)}`]});
+    if(proj.est_low_date_cluster1)events.push({date:proj.est_low_date_cluster1,label:`${sm.id} C1`,series:sm.id,color:'#22d3ee',top:-70,bottom:ccy(proj.est_low_px,currency),detail:[`Series: ${sm.id}`,`Cluster 1: ${proj.est_low_date_cluster1}`,`Est. low px: ${ccy(proj.est_low_px,currency)}`]});
+    if(proj.est_low_date_cluster2)events.push({date:proj.est_low_date_cluster2,label:`${sm.id} C2`,series:sm.id,color:'#7dd3fc',top:-90,bottom:ccy(proj.est_low_px,currency),detail:[`Series: ${sm.id}`,`Cluster 2: ${proj.est_low_date_cluster2}`,`Est. low px: ${ccy(proj.est_low_px,currency)}`]});
+    if(proj.proj_exdiv_date)events.push({date:proj.proj_exdiv_date,label:`${sm.id} Proj`,series:sm.id,color:'#f472b6',top:-50-(seriesIdx%2)*20,bottom:ccy(proj.med_div_amt??proj.div_amt_lo,currency),detail:[`Series: ${sm.id}`,`Projected ex-div: ${proj.proj_exdiv_date}`,`Projected dividend: ${ccy(proj.med_div_amt??proj.div_amt_lo,currency)}`]});
   });
   const todayStr=data.meta?.today||new Date().toISOString().slice(0,10);
   events.push({date:todayStr,label:'TODAY',series:'',color:'#d4daf0',top:-70,bottom:todayStr,detail:[`Today: ${todayStr}`,`Current price: ${ccy(data.current_price,currency)}`]});
@@ -2358,14 +2342,14 @@ function panelStrategy(data){
       <text class="sr-th" x="340" y="132" text-anchor="middle">2. How much can timing help?</text>
       <text class="sr-ts" x="340" y="150" text-anchor="middle">RELIABLE helps; otherwise price leads</text>
     </g>
-    <path d="M215 138 L122 138" class="sr-arr" style="stroke:#2fa37d" marker-end="url(#sr-arrow)"></path>
+    <path d="M215 138 L122 138" class="sr-arr" style="stroke:#3ed9a0" marker-end="url(#sr-arrow)"></path>
   <text class="sr-ts" x="168" y="132" text-anchor="middle" style="fill:#8ef0c4">Reliable</text>
     <g class="sr-callout sr-enter">
       <rect x="14" y="118" width="104" height="40" rx="8"></rect>
       <text class="sr-ts" x="66" y="132" text-anchor="middle">Zone + timing</text>
       <text class="sr-ts" x="66" y="148" text-anchor="middle">both active</text>
     </g>
-    <path d="M465 138 L550 138" class="sr-arr" style="stroke:#d29235" marker-end="url(#sr-arrow)"></path>
+    <path d="M465 138 L550 138" class="sr-arr" style="stroke:#f5c542" marker-end="url(#sr-arrow)"></path>
   <text class="sr-ts" x="507" y="128" text-anchor="middle" style="fill:#f6df92">Bimodal / Unreliable</text>
     <g class="sr-callout sr-caution">
       <rect x="556" y="116" width="110" height="44" rx="8"></rect>
@@ -2385,7 +2369,7 @@ function panelStrategy(data){
       <rect x="14" y="204" width="104" height="40" rx="8"></rect>
       <text class="sr-ts" x="66" y="228" text-anchor="middle">Wait for reset</text>
     </g>
-    <path d="M465 224 L550 224" class="sr-arr" style="stroke:#d86160" marker-end="url(#sr-arrow)"></path>
+    <path d="M465 224 L550 224" class="sr-arr" style="stroke:#f07070" marker-end="url(#sr-arrow)"></path>
     <text class="sr-ts" x="507" y="218" text-anchor="middle" style="fill:#f3b0b0">Above</text>
     <g class="sr-callout sr-stop">
       <rect x="556" y="204" width="110" height="40" rx="8"></rect>
@@ -2399,7 +2383,7 @@ function panelStrategy(data){
       <text class="sr-th" x="340" y="304" text-anchor="middle">4. Do risk overrides reduce conviction?</text>
   <text class="sr-ts" x="340" y="322" text-anchor="middle">Tail, fragility, or degrading trend</text>
     </g>
-    <path d="M465 310 L550 310" class="sr-arr" style="stroke:#d29235" marker-end="url(#sr-arrow)"></path>
+    <path d="M465 310 L550 310" class="sr-arr" style="stroke:#f5c542" marker-end="url(#sr-arrow)"></path>
     <text class="sr-ts" x="507" y="304" text-anchor="middle" style="fill:#f6df92">Any Yes</text>
     <g class="sr-callout sr-caution">
       <rect x="556" y="290" width="110" height="40" rx="8"></rect>
@@ -2450,9 +2434,9 @@ function panelStrategy(data){
     <text class="sr-ts" x="704" y="319" text-anchor="middle">cycle</text>
   </svg>
   <div class="sr-note-row">
-    <span><i style="background:#2fa37d"></i> Valid Setup</span>
-    <span><i style="background:#d29235"></i> Smaller Size / Weaker Timing Confidence</span>
-    <span><i style="background:#d86160"></i> Not Actionable</span>
+    <span><i style="background:#3ed9a0"></i> Valid Setup</span>
+    <span><i style="background:#f5c542"></i> Smaller Size / Weaker Timing Confidence</span>
+    <span><i style="background:#f07070"></i> Not Actionable</span>
   </div>
 </div>
 <p class="sr-section-head">Pillar 1 — The Core Thesis</p>
@@ -2727,9 +2711,9 @@ function panelPriceHTML(){
     <div class="legend">
       <span><i style="background:#4f8ef7"></i>Price</span>
       <span><i style="background:rgba(62,217,160,.35);border:1px solid var(--gn)"></i>Zone bot</span>
-      <span><i style="background:#f5c542"></i>Ex-div</span>
-      <span><i style="background:#00e5ff"></i>Cycle low</span>
-      <span><i style="background:#ff6b35"></i>Cycle peak</span>
+      <span><i style="background:#f472b6"></i>Ex-div</span>
+      <span><i style="background:#22d3ee"></i>Cycle low</span>
+      <span><i style="background:#ff8a65"></i>Cycle peak</span>
     </div>
     <div class="section-note">Hover markers to inspect date and value. Scroll to zoom, drag to pan. Zone band shows entry zone bot for each series, calculated from the ex-dividend adjusted anchor (anchor minus dividend paid).</div>
   </div>`
@@ -2800,11 +2784,11 @@ function renderPriceChart(data){
   html+=priceData.map((p,i)=>`<circle class="price-hit" cx="${xAt(i)}" cy="${yAt(p.c)}" r="8" fill="transparent" data-meta="${esc(JSON.stringify({kind:"Price",date:p.d,value:`${currency} ${n(p.c,4)}`}))}"></circle>`).join("");
 
   // ex-div
-  html+=`<g id="layerDivs">${divs.map(d=>{const hit=nearestPriceHit(d.date);if(!hit)return"";const px=hit.row?.c!=null?`${currency} ${n(hit.row.c,4)}`:"-";return circle(hit.x,hit.y,"#f5c542",5,{kind:"Ex-div",date:d.date,value:`${currency} ${n(d.amount,4)}`,extra:`${d.series||"-"} | Price ${px}`})}).join("")}</g>`;
+  html+=`<g id="layerDivs">${divs.map(d=>{const hit=nearestPriceHit(d.date);if(!hit)return"";const px=hit.row?.c!=null?`${currency} ${n(hit.row.c,4)}`:"-";return circle(hit.x,hit.y,"#f472b6",5,{kind:"Ex-div",date:d.date,value:`${currency} ${n(d.amount,4)}`,extra:`${d.series||"-"} | Price ${px}`})}).join("")}</g>`;
   // lows
-  html+=`<g id="layerLows">${cycles.map(c=>{const hit=nearestPriceMap.get(c.low_date);if(!hit||c.low_px==null)return"";return circle(hit.x,hit.y,"#00e5ff",5,{kind:"Cycle low",date:c.low_date,value:`${currency} ${n(c.low_px,4)}`,extra:`${c.id} | ${n(c.low_vs_prevdp,2)}% vs PrevDP`})}).join("")}</g>`;
+  html+=`<g id="layerLows">${cycles.map(c=>{const hit=nearestPriceMap.get(c.low_date);if(!hit||c.low_px==null)return"";return circle(hit.x,hit.y,"#22d3ee",5,{kind:"Cycle low",date:c.low_date,value:`${currency} ${n(c.low_px,4)}`,extra:`${c.id} | ${n(c.low_vs_prevdp,2)}% vs PrevDP`})}).join("")}</g>`;
   // peaks
-  html+=`<g id="layerPeaks">${cycles.map(c=>{const hit=nearestPriceMap.get(c.peak_date);if(!hit||c.peak_px==null)return"";return circle(hit.x,hit.y,"#ff6b35",5,{kind:"Cycle peak",date:c.peak_date,value:`${currency} ${n(c.peak_px,4)}`,extra:`${c.id} | ${n(c.peak_vs_prevdp,2)}% vs PrevDP`})}).join("")}</g>`;
+  html+=`<g id="layerPeaks">${cycles.map(c=>{const hit=nearestPriceMap.get(c.peak_date);if(!hit||c.peak_px==null)return"";return circle(hit.x,hit.y,"#ff8a65",5,{kind:"Cycle peak",date:c.peak_date,value:`${currency} ${n(c.peak_px,4)}`,extra:`${c.id} | ${n(c.peak_vs_prevdp,2)}% vs PrevDP`})}).join("")}</g>`;
 
   svg.innerHTML=html;
 
@@ -3129,6 +3113,7 @@ function persistPlannerState(){
     zoneOutcomeFilterKeys:Array.isArray(state.zoneOutcomeFilterKeys)?state.zoneOutcomeFilterKeys:["all"],
     setupMapFilterKeys:Array.isArray(state.setupMapFilterKeys)?state.setupMapFilterKeys:["all"],
     setupMapViewMode:state.setupMapViewMode||"map",
+    miniCardSort:state.miniCardSort||"verdict",
     setupListSort:state.setupListSort||{below:{field:"gain",dir:"desc"},inside:{field:"gain",dir:"desc"},above:{field:"gain",dir:"desc"}},
     rememberLoadedStocks:state.rememberLoadedStocks!==false,
     serverLoadedFiles:state.rememberLoadedStocks===false?[]:normalizedServerLoadedFiles(),
@@ -3169,6 +3154,7 @@ function hydratePlannerState(){
         if(!entry||typeof entry!=="object"||!entry.data)return;
         try{
           validateData(entry.data);
+          if(entry.data.meta?.stock_name)entry.data.meta.stock_name=displayStockName(entry.data.meta.stock_name);
           const key=entry.key||stockKey(entry.data,entry.label||entry.data?.meta?.ticker||"saved");
           state.stocks[key]={
             key,
@@ -3179,7 +3165,7 @@ function hydratePlannerState(){
       });
       state.planner=parsed.planner&&typeof parsed.planner==="object"?parsed.planner:{};
       state.plannerActiveKey=parsed.plannerActiveKey||null;
-      if(["overview","grouped","compare","planner","review","portfolio"].includes(parsed.overviewMode)){
+      if(["overview","grouped","compare","modelcheck","planner","review","portfolio"].includes(parsed.overviewMode)){
         state.overviewMode=parsed.overviewMode;
       }
       if(["current","recent"].includes(parsed.zoneOutcomeMode)){
@@ -3207,6 +3193,7 @@ function hydratePlannerState(){
       state.zoneOutcomeFilterKeys=Array.isArray(parsed.zoneOutcomeFilterKeys)?parsed.zoneOutcomeFilterKeys:["all"];
       state.setupMapFilterKeys=Array.isArray(parsed.setupMapFilterKeys)?parsed.setupMapFilterKeys:["all"];
       if(["map","list"].includes(parsed.setupMapViewMode))state.setupMapViewMode=parsed.setupMapViewMode;
+      if(["verdict","days","winrate","ticker"].includes(parsed.miniCardSort))state.miniCardSort=parsed.miniCardSort;
       if(parsed.setupListSort&&typeof parsed.setupListSort==="object"){
         const zones=["below","inside","above"];
         const restored={};
@@ -3942,6 +3929,24 @@ function scatterLabelPlacement(cx,cy,idx,bounds){
     anchor,
   };
 }
+// Greedy label de-cluttering for the scatter maps: walk points in priority
+// order and keep a label only if its box doesn't collide with a label already
+// kept. Hidden labels still show on hover/focus (see .setup-map-point CSS).
+function scatterVisibleLabels(points){
+  const kept=[];
+  const visible=new Set();
+  points.slice().sort((a,b)=>a.priority-b.priority).forEach(p=>{
+    const w=String(p.text||"").length*6.3+4,h=12;
+    const x0=p.anchor==="end"?p.x-w:p.x;
+    const box={x0,x1:x0+w,y0:p.y-h+2,y1:p.y+2};
+    if(kept.some(k=>box.x0<k.x1&&box.x1>k.x0&&box.y0<k.y1&&box.y1>k.y0))return;
+    // Also skip a label that would sit on top of another stock's dot.
+    if(points.some(o=>o.idx!==p.idx&&o.cx!=null&&o.cx+6>box.x0&&o.cx-6<box.x1&&o.cy+6>box.y0&&o.cy-6<box.y1))return;
+    kept.push(box);
+    visible.add(p.idx);
+  });
+  return visible;
+}
 function renderPlannerTimeline(plan, compact=false){
   const model=plannerTimelineModel(plan);
   if(!model)return"";
@@ -4173,7 +4178,12 @@ function updateStockBar(){
     status.classList.remove("is-loaded");
     return;
   }
-  status.textContent=`${stocks.length} stock${stocks.length>1?"s":""} loaded`;
+  const active=activeStockList().length;
+  const monitor=stocks.length-active;
+  status.textContent=monitor
+    ?`${active} active · ${monitor} monitor-only`
+    :`${stocks.length} stock${stocks.length>1?"s":""} loaded`;
+  status.title=`${stocks.length} stocks loaded. Monitor-only stocks are tracked in the stock list but hidden from the overview tabs.`;
   status.classList.add("is-loaded");
 }
 
@@ -4196,9 +4206,11 @@ function syncBackendButtons(){
   const registryBtn=document.getElementById("manageRegistryBtn");
   if(!loadBtn||!runBtn||!registryBtn)return;
   const mode=BACKEND_CONFIG.enabled && backendAvailable;
-  loadBtn.style.display=mode?"inline-flex":"none";
-  runBtn.style.display=mode?"inline-flex":"none";
-  registryBtn.style.display=mode?"inline-flex":"none";
+  loadBtn.style.display=mode?"flex":"none";
+  runBtn.style.display=mode?"flex":"none";
+  registryBtn.style.display=mode?"flex":"none";
+  const sep=document.getElementById("dataMenuSep");
+  if(sep)sep.style.display=mode?"block":"none";
 }
 
 async function backendJsonFiles(){
@@ -4219,6 +4231,33 @@ async function backendJsonPayload(filename){
   return await res.json();
 }
 
+// Fetches analysis JSONs a few at a time and adds them without re-rendering
+// per file -- rendering the whole overview once per stock is what made a
+// 137-file load take ~25s and made the stock count jump around mid-load.
+async function loadAnalysisFiles(filenames,onProgress){
+  const CONCURRENCY=8;
+  let next=0,done=0,loaded=0;
+  const worker=async()=>{
+    while(next<filenames.length){
+      const filename=filenames[next++];
+      try{
+        const data=await backendJsonPayload(filename);
+        addStock(data,filename,{render:false});
+        loaded++;
+      }catch(_){}
+      done++;
+      onProgress?.(done,loaded);
+    }
+  };
+  await Promise.all(Array.from({length:Math.min(CONCURRENCY,filenames.length)},worker));
+  ensurePlannerActive();
+  persistPlannerState();
+  if(Object.keys(state.stocks).length===1)state.view="drill";
+  renderApp();
+  if(pendingRoute&&!state.stocks[pendingRoute.key]){pendingRoute=null;renderApp();}
+  return loaded;
+}
+
 async function staticAutoLoad(){
   const status=document.getElementById("loadStatus");
   try{
@@ -4231,16 +4270,13 @@ async function staticAutoLoad(){
     const payload=await res.json();
     const files=(Array.isArray(payload?.files)?payload.files:[]).filter(f=>f&&f!=="manifest.json");
     if(!files.length){if(status)status.textContent="No stock data found";return;}
-    let loaded=0;
     showProgress(0,files.length);
-    for(const filename of files){
-      if(status)status.textContent=`Loading ${loaded+1} / ${files.length}…`;
-      try{const data=await backendJsonPayload(filename);addStock(data,filename);loaded++;}catch(_){}
-      showProgress(loaded,files.length);
-    }
+    await loadAnalysisFiles(files,(done)=>{
+      if(status)status.textContent=`Loading ${done} / ${files.length}…`;
+      showProgress(done,files.length);
+    });
     hideProgress();
-    if(status)status.textContent=`Loaded ${loaded} stock${loaded===1?"":"s"}`;
-    renderApp();
+    updateStockBar();
   }catch(err){
     hideProgress();
     if(status)status.textContent=`Load failed: ${err.message}`;
@@ -4299,24 +4335,18 @@ async function loadStocksFromServer(filenames,options={}){
   if(!names.length)return 0;
   const status=document.getElementById("loadStatus");
   const {persistFiles=true,replaceServerFiles=false}=options;
-  let loaded=0;
   showProgress(0,names.length);
-  for(const filename of names){
-    status.textContent=`Loading ${loaded+1} / ${names.length}…`;
-    try{
-      const data=await backendJsonPayload(filename);
-      addStock(data,filename);
-      loaded+=1;
-    }catch(_){}
-    showProgress(loaded,names.length);
-  }
+  const loaded=await loadAnalysisFiles(names,(done)=>{
+    status.textContent=`Loading ${done} / ${names.length}…`;
+    showProgress(done,names.length);
+  });
   hideProgress();
   if(persistFiles){
     const nextFiles=replaceServerFiles?names:[...normalizedServerLoadedFiles(),...names];
     state.serverLoadedFiles=Array.from(new Set(nextFiles));
     persistPlannerState();
   }
-  status.textContent=`Loaded ${loaded} server stock${loaded===1?"":"s"}`;
+  updateStockBar();
   return loaded;
 }
 
@@ -4785,20 +4815,6 @@ function closeRegistryOverlay(){
   resetRegistryForm();
 }
 
-function openQuickGuideOverlay(){
-  const overlay=document.getElementById("quickGuideOverlay");
-  if(!overlay)return;
-  overlay.classList.add("open");
-  overlay.setAttribute("aria-hidden","false");
-}
-
-function closeQuickGuideOverlay(){
-  const overlay=document.getElementById("quickGuideOverlay");
-  if(!overlay)return;
-  overlay.classList.remove("open");
-  overlay.setAttribute("aria-hidden","true");
-}
-
 async function fetchRegistryEntries(){
   const res=await fetch(BACKEND_CONFIG.stockRegistryUrl,{cache:"no-store"});
   const payload=await res.json().catch(()=>({ok:false,error:"Registry response could not be read"}));
@@ -5051,9 +5067,31 @@ function groupedWarningLine(values){
   return `<div class="small" style="margin-top:8px;color:var(--am);line-height:1.5"><strong style="color:var(--am)">Main caution:</strong> ${esc(values[0])}</div>`
 }
 
+// Every verdict tone gets a shape as well as a colour, so the chips and the
+// map markers still read correctly for colour-blind viewers. The same shape
+// set is used everywhere: check = good, triangle = caution, cross = bad,
+// diamond = watch only, ring = on radar / neutral.
+const VERDICT_ICONS={good:"✓",warn:"▲",bad:"✕",pu:"◆",muted:"○"};
+function verdictIcon(tone){return VERDICT_ICONS[tone]||VERDICT_ICONS.muted}
 function verdictPill(label,tone){
-  const cls=tone==="good"?"good":tone==="warn"?"warn":tone==="bad"?"bad":"";
-  return `<span class="chip ${cls}" style="font-size:10px">${esc(label||"-")}</span>`
+  const cls=tone==="good"?"good":tone==="warn"?"warn":tone==="bad"?"bad":tone==="pu"?"pu":"";
+  return `<span class="chip verdict-chip ${cls}"><span class="verdict-icon" aria-hidden="true">${verdictIcon(tone)}</span>${esc(label||"-")}</span>`
+}
+// SVG marker for one point on the Setup Map / Zone Outcome Map, drawn in the
+// shape that matches its verdict icon. A transparent disc underneath keeps
+// the hover/click target the same size whatever the shape.
+function verdictMarkerSvg(tone,cx,cy,fill,size=7){
+  const x=Number(cx),y=Number(cy),r=size;
+  const f=v=>n(v,1);
+  const hit=`<circle cx="${f(x)}" cy="${f(y)}" r="${r+3}" fill="transparent"></circle>`;
+  if(tone==="good")return hit+`<circle cx="${f(x)}" cy="${f(y)}" r="${r}" fill="${fill}"></circle><path d="M${f(x-r*.5)} ${f(y+r*.05)} L${f(x-r*.12)} ${f(y+r*.45)} L${f(x+r*.55)} ${f(y-r*.4)}" fill="none" stroke="#0c0f1a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>`;
+  if(tone==="warn")return hit+`<polygon points="${f(x)},${f(y-r*1.15)} ${f(x+r*1.05)},${f(y+r*.8)} ${f(x-r*1.05)},${f(y+r*.8)}" fill="${fill}" stroke-linejoin="round"></polygon>`;
+  if(tone==="bad")return hit+`<path d="M${f(x-r*.75)} ${f(y-r*.75)} L${f(x+r*.75)} ${f(y+r*.75)} M${f(x+r*.75)} ${f(y-r*.75)} L${f(x-r*.75)} ${f(y+r*.75)}" stroke="${fill}" stroke-width="3.6" stroke-linecap="round"></path>`;
+  if(tone==="pu")return hit+`<polygon points="${f(x)},${f(y-r*1.1)} ${f(x+r*1.1)},${f(y)} ${f(x)},${f(y+r*1.1)} ${f(x-r*1.1)},${f(y)}" fill="${fill}"></polygon>`;
+  return hit+`<circle cx="${f(x)}" cy="${f(y)}" r="${r*.8}" fill="none" stroke="${fill}" stroke-width="2.4"></circle>`;
+}
+function verdictLegendSwatch(tone,fill){
+  return `<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="flex-shrink:0">${verdictMarkerSvg(tone,7,7,fill,5)}</svg>`;
 }
 
 function groupedMetric(label,value){
@@ -5070,7 +5108,7 @@ function plannerExitModeChipLabel(label){
   return label;
 }
 function setupMapVerdictFill(tone){
-  const fills={good:"#3ed9a0",warn:"#f5c542",bad:"#f07070",pu:"#a78bfa",muted:"#7a829a"};
+  const fills={good:"#3ed9a0",warn:"#f5c542",bad:"#f07070",pu:"#a78bfa",muted:"#8a92aa"};
   return fills[tone]||fills.muted;
 }
 function growthCls(v){return v==null?"":v>=15?"good":v>=0?"warn":"bad"}
@@ -5092,9 +5130,12 @@ function seriesExpectedGainPct(proj){
   if(entry!=null&&exitPx!=null&&entry>0)return ((exitPx-entry)/entry)*100;
   return readNumber(proj?.historical_frequencies?.avg_win_pct);
 }
+function zoneOutcomeTone(outcome){
+  return {"Above zone":"warn","Inside zone":"good","Below zone":"bad"}[outcome]||"muted";
+}
 function zoneOutcomeFill(outcome){
-  const fills={"Above zone":"#6ba8ff","Inside zone":"#3ed9a0","Below zone":"#f07070"};
-  return fills[outcome]||"#7a829a";
+  const fills={"Above zone":"#f5c542","Inside zone":"#3ed9a0","Below zone":"#f07070"};
+  return fills[outcome]||"#8a92aa";
 }
 function pctShare(part,total){
   if(!total)return "0.0%";
@@ -5326,7 +5367,7 @@ function setupMapListView(items){
       ? rows.map(item=>{
           const gainColor=item.possibleGainPct>=5?"var(--hit)":item.possibleGainPct>=2?"var(--warn)":"var(--mu)";
           return `<div class="setup-list-row" data-key="${esc(item.key)}">
-            <span class="setup-list-dot" style="background:${setupMapVerdictFill(item.finalVerdictTone)}"></span>
+            <span title="${esc(item.finalVerdict)}">${verdictLegendSwatch(item.finalVerdictTone,setupMapVerdictFill(item.finalVerdictTone))}</span>
             <span class="setup-list-ticker">${esc(item.ticker)}</span>
             <span class="setup-list-name">${esc(item.stockName)}</span>
             <span style="font-size:10px;font-family:var(--mono);color:${growthColor(item.growth5yr)};white-space:nowrap">${growthFmt(item.growth5yr)}</span>
@@ -5356,7 +5397,10 @@ function panelSetupMap(){
   const items=activeKeys.includes("all")
     ? allItems
     : allItems.filter(item=>activeKeys.includes(item.key));
-  const viewMode=state.setupMapViewMode||"map";
+  // On a phone the scatter is too small to read, so List is the default there
+  // unless Map was picked this session.
+  const narrow=window.matchMedia("(max-width: 700px)").matches;
+  const viewMode=narrow&&!state.setupMapMapForced?"list":(state.setupMapViewMode||"map");
   const viewToggle=`<div class="view-seg" style="margin:0 0 12px"><button class="view-seg-btn${viewMode==="map"?" active":""}" id="setupMapViewMap">Map</button><button class="view-seg-btn${viewMode==="list"?" active":""}" id="setupMapViewList">List</button></div>`;
   if(!items.length)return `<div class="panel"><h2>Setup Map</h2>${viewToggle}${filterControl}<div class="empty">No stocks are selected for this chart.</div></div>`;
   if(viewMode==="list")return `<div class="panel"><h2>Setup Map</h2>${viewToggle}${filterControl}${setupMapListView(items)}</div>`;
@@ -5378,10 +5422,16 @@ function panelSetupMap(){
     const y=yPx(v);
     return `<g><line x1="${margin.left}" y1="${n(y,1)}" x2="${margin.left+plotW}" y2="${n(y,1)}" stroke="rgba(255,255,255,.06)" stroke-dasharray="4 6"></line><text class="setup-map-value-label" x="${margin.left-10}" y="${n(y+4,1)}" text-anchor="end">${n(v,0)}%</text></g>`;
   }).join("");
+  const verdictPriority={good:0,warn:1,secondary:2,muted:3,bad:4};
+  const placements=items.map((item,idx)=>{
+    const cx=xPx(item.zonePosition),cy=yPx(item.possibleGainPct);
+    return {idx,cx,cy,...scatterLabelPlacement(cx,cy,idx,{left:margin.left,right:margin.left+plotW,top:margin.top,bottom:margin.top+plotH}),text:item.ticker,
+      priority:(verdictPriority[item.finalVerdictTone]??3)*1000-item.possibleGainPct};
+  });
+  const visibleLabels=scatterVisibleLabels(placements);
   const points=items.map((item,idx)=>{
-    const cx=xPx(item.zonePosition);
-    const cy=yPx(item.possibleGainPct);
-    const labelPos=scatterLabelPlacement(cx,cy,idx,{left:margin.left,right:margin.left+plotW,top:margin.top,bottom:margin.top+plotH});
+    const {cx,cy}=placements[idx];
+    const labelPos=placements[idx];
     const tipMeta=esc(JSON.stringify({
       ticker:item.ticker,
       stockName:item.stockName,
@@ -5390,9 +5440,9 @@ function panelSetupMap(){
       possibleGain:`${n(item.possibleGainPct,1)}%`,
       zone:`${n(item.entryZoneLow,4)} - ${n(item.entryZoneHigh,4)}`
     }));
-    return `<g class="setup-map-point" data-key="${esc(item.key)}" data-meta="${tipMeta}" tabindex="0"><circle cx="${n(cx,1)}" cy="${n(cy,1)}" r="7" fill="${setupMapVerdictFill(item.finalVerdictTone)}" stroke="none"></circle><text class="setup-map-point-label" x="${n(labelPos.x,1)}" y="${n(labelPos.y,1)}" text-anchor="${labelPos.anchor}">${esc(item.ticker)}</text></g>`;
+    return `<g class="setup-map-point" data-key="${esc(item.key)}" data-meta="${tipMeta}" tabindex="0" role="button" aria-label="${esc(`${item.ticker}: ${item.finalVerdict}`)}">${verdictMarkerSvg(item.finalVerdictTone,cx,cy,setupMapVerdictFill(item.finalVerdictTone))}<text class="setup-map-point-label${visibleLabels.has(idx)?"":" is-hidden"}" x="${n(labelPos.x,1)}" y="${n(labelPos.y,1)}" text-anchor="${labelPos.anchor}">${esc(item.ticker)}</text></g>`;
   }).join("");
-  return `<div class="panel"><h2>Setup Map</h2>${viewToggle}<p class="small muted" style="margin:0 0 12px">Each point is one loaded stock. Left means price is below the projected zone, the shaded band is inside the zone, and right means price is above it. Higher points have higher possible next-cycle gain.</p>${filterControl}<div class="setup-map-shell"><div class="setup-map-stage"><svg class="setup-map-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatter plot of price position versus possible gain"><rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" rx="12" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.05)"></rect><rect x="${n(bandX,1)}" y="${margin.top}" width="${n(bandW,1)}" height="${plotH}" fill="rgba(79,142,247,.10)"></rect>${yGrid}<line x1="${margin.left}" y1="${margin.top+plotH}" x2="${margin.left+plotW}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.12)"></line><line x1="${n(xPx(0),1)}" y1="${margin.top}" x2="${n(xPx(0),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><line x1="${n(xPx(1),1)}" y1="${margin.top}" x2="${n(xPx(1),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><text class="setup-map-band-label" x="${n(bandX+bandW/2,1)}" y="${margin.top+16}" text-anchor="middle">Projected entry zone</text>${points}<text class="setup-map-axis-label" x="${n((margin.left+xPx(0))/2,1)}" y="${height-18}" text-anchor="middle">Below zone</text><text class="setup-map-axis-label" x="${n((xPx(0)+xPx(1))/2,1)}" y="${height-18}" text-anchor="middle">Inside zone</text><text class="setup-map-axis-label" x="${n((xPx(1)+margin.left+plotW)/2,1)}" y="${height-18}" text-anchor="middle">Above zone</text><text class="setup-map-axis-label" x="16" y="${margin.top-6}">Possible gain</text></svg><div class="tooltip" id="setupMapTip"></div></div><div class="setup-map-legend"><span><i style="background:#3ed9a0"></i>Actionable now</span><span><i style="background:#f5c542"></i>Watch or small trades advised</span><span><i style="background:#a78bfa"></i>Watch only</span><span><i style="background:#7a829a"></i>On radar</span><span><i style="background:#f07070"></i>Too risky</span></div><div class="setup-map-note">All visible stocks are labelled here. Hover still gives the full detail for every stock, then click any point to drill in.</div></div></div>`
+  return `<div class="panel"><h2>Setup Map</h2>${viewToggle}<p class="small muted" style="margin:0 0 12px">Each point is one loaded stock. Left means price is below the projected zone, the shaded band is inside the zone, and right means price is above it. Higher points have higher possible next-cycle gain.</p>${filterControl}<div class="setup-map-shell"><div class="setup-map-stage"><svg class="setup-map-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatter plot of price position versus possible gain"><rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" rx="12" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.05)"></rect><rect x="${n(bandX,1)}" y="${margin.top}" width="${n(bandW,1)}" height="${plotH}" fill="rgba(79,142,247,.10)"></rect>${yGrid}<line x1="${margin.left}" y1="${margin.top+plotH}" x2="${margin.left+plotW}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.12)"></line><line x1="${n(xPx(0),1)}" y1="${margin.top}" x2="${n(xPx(0),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><line x1="${n(xPx(1),1)}" y1="${margin.top}" x2="${n(xPx(1),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><text class="setup-map-band-label" x="${n(bandX+bandW/2,1)}" y="${margin.top+16}" text-anchor="middle">Projected entry zone</text>${points}<text class="setup-map-axis-label" x="${n((margin.left+xPx(0))/2,1)}" y="${height-18}" text-anchor="middle">Below zone</text><text class="setup-map-axis-label" x="${n((xPx(0)+xPx(1))/2,1)}" y="${height-18}" text-anchor="middle">Inside zone</text><text class="setup-map-axis-label" x="${n((xPx(1)+margin.left+plotW)/2,1)}" y="${height-18}" text-anchor="middle">Above zone</text><text class="setup-map-axis-label" x="16" y="${margin.top-6}">Possible gain</text></svg><div class="tooltip" id="setupMapTip"></div></div><div class="setup-map-legend"><span>${verdictLegendSwatch("good","#3ed9a0")}Actionable now</span><span>${verdictLegendSwatch("warn","#f5c542")}Wait, watch closely or small trades</span><span>${verdictLegendSwatch("pu","#a78bfa")}Watch only</span><span>${verdictLegendSwatch("muted","#8a92aa")}On radar</span><span>${verdictLegendSwatch("bad","#f07070")}Too risky or structurally weak</span></div><div class="setup-map-note">Labels are hidden where points overlap — hover any point for its ticker and details, or switch to List. Click a point to open the stock.</div></div></div>`
 }
 function panelZoneOutcomeMap(){
   const mode=state.zoneOutcomeMode||"current";
@@ -5429,10 +5479,15 @@ function panelZoneOutcomeMap(){
     const x=xPx(v);
     return `<g><line x1="${n(x,1)}" y1="${margin.top+plotH}" x2="${n(x,1)}" y2="${margin.top+plotH+6}" stroke="rgba(255,255,255,.12)"></line><text class="setup-map-value-label" x="${n(x,1)}" y="${height-34}" text-anchor="middle">${n(v*100,0)}%</text></g>`;
   }).join("");
+  const zonePlacements=items.map((item,idx)=>{
+    const cx=xPx(item.zonePosition),cy=yPx(item.strengthDeltaPct||0);
+    return {idx,cx,cy,...scatterLabelPlacement(cx,cy,idx,{left:margin.left,right:margin.left+plotW,top:margin.top,bottom:margin.top+plotH}),text:item.ticker,
+      priority:-Math.abs(item.strengthDeltaPct||0)};
+  });
+  const zoneVisibleLabels=scatterVisibleLabels(zonePlacements);
   const points=items.map((item,idx)=>{
-    const cx=xPx(item.zonePosition);
-    const cy=yPx(item.strengthDeltaPct||0);
-    const labelPos=scatterLabelPlacement(cx,cy,idx,{left:margin.left,right:margin.left+plotW,top:margin.top,bottom:margin.top+plotH});
+    const {cx,cy}=zonePlacements[idx];
+    const labelPos=zonePlacements[idx];
     const tipMeta=esc(JSON.stringify({
       ticker:item.ticker,
       stockName:item.stockName,
@@ -5449,7 +5504,7 @@ function panelZoneOutcomeMap(){
       delta:`${item.strengthDeltaPct>0?"+":""}${pctRaw(item.strengthDeltaPct,1)}`,
       performance:item.performanceLabel
     }));
-    return `<g class="zone-outcome-point" data-key="${esc(item.key)}" data-meta="${tipMeta}" tabindex="0"><circle cx="${n(cx,1)}" cy="${n(cy,1)}" r="7" fill="${zoneOutcomeFill(item.zoneOutcome)}" stroke="none"></circle><text class="setup-map-point-label secondary" x="${n(labelPos.x,1)}" y="${n(labelPos.y,1)}" text-anchor="${labelPos.anchor}">${esc(item.ticker)}</text></g>`;
+    return `<g class="zone-outcome-point" data-key="${esc(item.key)}" data-meta="${tipMeta}" tabindex="0" role="button" aria-label="${esc(`${item.ticker}: ${item.zoneOutcome}`)}">${verdictMarkerSvg(zoneOutcomeTone(item.zoneOutcome),cx,cy,zoneOutcomeFill(item.zoneOutcome))}<text class="setup-map-point-label secondary${zoneVisibleLabels.has(idx)?"":" is-hidden"}" x="${n(labelPos.x,1)}" y="${n(labelPos.y,1)}" text-anchor="${labelPos.anchor}">${esc(item.ticker)}</text></g>`;
   }).join("");
   const aboveCount=items.filter(i=>i.zoneOutcome==="Above zone").length;
   const insideCount=items.filter(i=>i.zoneOutcome==="Inside zone").length;
@@ -5480,7 +5535,7 @@ function panelZoneOutcomeMap(){
           : `No current testable cycles are currently classified as overperforming vs expected in this loaded set.`,
         `Use the x-axis as a normalized zone scale: <strong>0 = projected zone bottom</strong>, <strong>1 = projected zone top</strong>. Below 0 means the cycle pushed under the zone; above 1 means it never got down into it.`
       ]).map(text=>`<div class="setup-map-keypoint">${text}</div>`).join("");
-  return `<div class="panel"><h2>Zone Outcome Map</h2>${modeToggle}${filterControl}<p class="small muted" style="margin:0 0 12px">${intro}</p><div class="setup-map-summary" style="margin:0 0 12px"><div class="card"><div class="label">${mode==="recent"?"Recent Cycles":"Testable Cycles"}</div><div class="value" style="font-size:18px">${items.length}</div></div><div class="card"><div class="label">Above Zone</div><div class="value" style="font-size:18px;color:#6ba8ff">${aboveCount}</div></div><div class="card"><div class="label">Inside Zone</div><div class="value" style="font-size:18px;color:var(--gn)">${insideCount}</div></div><div class="card"><div class="label">Below Zone</div><div class="value" style="font-size:18px;color:var(--rd)">${belowCount}</div></div></div><div class="setup-map-keypoints">${keypoints}</div><div class="setup-map-shell"><div class="setup-map-stage"><svg class="setup-map-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatter plot of actual cycle outcome versus rebound strength"><rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" rx="12" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.05)"></rect><rect x="${n(bandX,1)}" y="${margin.top}" width="${n(bandW,1)}" height="${plotH}" fill="rgba(79,142,247,.10)"></rect>${yGrid}${xGrid}<line x1="${margin.left}" y1="${margin.top+plotH}" x2="${margin.left+plotW}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.12)"></line><line x1="${n(xPx(0),1)}" y1="${margin.top}" x2="${n(xPx(0),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><line x1="${n(xPx(1),1)}" y1="${margin.top}" x2="${n(xPx(1),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><text class="setup-map-band-label" x="${n(bandX+bandW/2,1)}" y="${margin.top+16}" text-anchor="middle">Projected entry zone reached</text>${points}<text class="setup-map-axis-label" x="${n((margin.left+xPx(0))/2,1)}" y="${height-18}" text-anchor="middle">Below zone</text><text class="setup-map-axis-label" x="${n((xPx(0)+xPx(1))/2,1)}" y="${height-18}" text-anchor="middle">Inside zone</text><text class="setup-map-axis-label" x="${n((xPx(1)+margin.left+plotW)/2,1)}" y="${height-18}" text-anchor="middle">Above zone</text><text class="setup-map-axis-label" x="${n(margin.left+plotW/2,1)}" y="${height-8}" text-anchor="middle">Normalized low vs zone (0 = bottom, 1 = top)</text><text class="setup-map-axis-label" x="16" y="${margin.top-6}">${mode==="recent"?"Peak vs expected":"Rebound vs expected"}</text></svg><div class="tooltip" id="zoneOutcomeTip"></div></div><div class="setup-map-legend"><span><i style="background:#6ba8ff"></i>Stayed above zone</span><span><i style="background:#3ed9a0"></i>Touched zone</span><span><i style="background:#f07070"></i>Went below zone</span></div><div class="setup-map-note">${foot}</div></div></div>`;
+  return `<div class="panel"><h2>Zone Outcome Map</h2>${modeToggle}${filterControl}<p class="small muted" style="margin:0 0 12px">${intro}</p><div class="setup-map-summary" style="margin:0 0 12px"><div class="card"><div class="label">${mode==="recent"?"Recent Cycles":"Testable Cycles"}</div><div class="value" style="font-size:18px">${items.length}</div></div><div class="card"><div class="label">Above Zone</div><div class="value" style="font-size:18px;color:var(--am)">${aboveCount}</div></div><div class="card"><div class="label">Inside Zone</div><div class="value" style="font-size:18px;color:var(--gn)">${insideCount}</div></div><div class="card"><div class="label">Below Zone</div><div class="value" style="font-size:18px;color:var(--rd)">${belowCount}</div></div></div><div class="setup-map-keypoints">${keypoints}</div><div class="setup-map-shell"><div class="setup-map-stage"><svg class="setup-map-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatter plot of actual cycle outcome versus rebound strength"><rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" rx="12" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.05)"></rect><rect x="${n(bandX,1)}" y="${margin.top}" width="${n(bandW,1)}" height="${plotH}" fill="rgba(79,142,247,.10)"></rect>${yGrid}${xGrid}<line x1="${margin.left}" y1="${margin.top+plotH}" x2="${margin.left+plotW}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.12)"></line><line x1="${n(xPx(0),1)}" y1="${margin.top}" x2="${n(xPx(0),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><line x1="${n(xPx(1),1)}" y1="${margin.top}" x2="${n(xPx(1),1)}" y2="${margin.top+plotH}" stroke="rgba(255,255,255,.1)" stroke-dasharray="4 6"></line><text class="setup-map-band-label" x="${n(bandX+bandW/2,1)}" y="${margin.top+16}" text-anchor="middle">Projected entry zone reached</text>${points}<text class="setup-map-axis-label" x="${n((margin.left+xPx(0))/2,1)}" y="${height-18}" text-anchor="middle">Below zone</text><text class="setup-map-axis-label" x="${n((xPx(0)+xPx(1))/2,1)}" y="${height-18}" text-anchor="middle">Inside zone</text><text class="setup-map-axis-label" x="${n((xPx(1)+margin.left+plotW)/2,1)}" y="${height-18}" text-anchor="middle">Above zone</text><text class="setup-map-axis-label" x="${n(margin.left+plotW/2,1)}" y="${height-8}" text-anchor="middle">Normalized low vs zone (0 = bottom, 1 = top)</text><text class="setup-map-axis-label" x="16" y="${margin.top-6}">${mode==="recent"?"Peak vs expected":"Rebound vs expected"}</text></svg><div class="tooltip" id="zoneOutcomeTip"></div></div><div class="setup-map-legend"><span>${verdictLegendSwatch("warn","#f5c542")}Stayed above zone</span><span>${verdictLegendSwatch("good","#3ed9a0")}Touched zone</span><span>${verdictLegendSwatch("bad","#f07070")}Went below zone</span></div><div class="setup-map-note">${foot}</div></div></div>`;
 }
 function renderGroupedStockCard(item,type){
   const key=stockKeyByTicker(item.ticker);
@@ -5511,25 +5566,30 @@ function renderGroupedStockCard(item,type){
       </div>
     </div>
     <div class="mini-card-stats">
-      ${groupedMetric("Next ex-div",metrics.nextExDiv?dt(metrics.nextExDiv):"-")}
-      ${groupedMetric("Days",days!=null?`${days}d`:"-")}
-      ${groupedMetric("Frequency",metrics.frequencyDisplay || "-")}
-      ${groupedMetric("Next Cycle",metrics.nextCycle?esc(metrics.nextCycle):"-")}
-      ${groupedDualMetric("Current Price",currentPrice,"Zone",zone)}
-      ${groupedMetric("Est. Ex-Div Px",metrics.estExDivPx!=null?ccy(metrics.estExDivPx,currency):"-")}
-      ${groupedMetric("Est. Yield",metrics.yieldRange&&metrics.yieldRange.length===2?`${pctRaw(metrics.yieldRange[0],2)} - ${pctRaw(metrics.yieldRange[1],2)}`:"-")}
+      ${groupedMetric("Next ex-div",`${metrics.nextExDiv?dt(metrics.nextExDiv):"-"}${days!=null?` <span class="${days<=30?"warn":"muted"}">(${days}d)</span>`:""}`)}
+      ${groupedMetric("Price",currentPrice)}
+      ${groupedMetric("Zone",zone)}
       ${groupedMetric("Entry",metrics.entryStatus?`<span class="${tagClass(metrics.entryStatus)}">${esc(metrics.entryStatusDisplay||"-")}</span>`:"-")}
-      ${groupedMetric("Timing",metrics.timingNext?`<span class="${tagClass(metrics.timingNext)}">${esc(metrics.timingDisplay||"-")}</span>`:"-")}
-      ${groupedMetric("Tail Risk",metrics.tailRiskLevel?`<span class="${tagClass(metrics.tailRiskLevel)}">${esc(metrics.tailRiskDisplay||"-")}</span>`:"-")}
-      ${groupedMetric("Exit Mode",esc(metrics.exitModeDisplay || "-"))}
-      ${metrics.exitMode==="PRE_EXDIV_PREFERRED" ? groupedMetric("Usual Pre-Exdiv Peak Window",metrics.preExdivPeakWindowDaysP25!=null&&metrics.preExdivPeakWindowDaysP75!=null?`${n(metrics.preExdivPeakWindowDaysP25,1)}d - ${n(metrics.preExdivPeakWindowDaysP75,1)}d`:"-") : ""}
-      ${groupedMetric("Avg Gain (Pre-Exdiv Peak Exit)",metrics.avgGainPreExdiv!=null?pctRaw(metrics.avgGainPreExdiv,1):"-")}
-      ${groupedMetric("Avg Gain (Ex-Div Date Exit)",metrics.avgGainPostExdivExit!=null?pctRaw(metrics.avgGainPostExdivExit,1):"-")}
-      ${groupedMetric("Possible Gain (Next Cycle)",metrics.possibleGainPct!=null?pctRaw(metrics.possibleGainPct,1):"-")}
+      ${groupedMetric("Possible gain",metrics.possibleGainPct!=null?`<strong>${pctRaw(metrics.possibleGainPct,1)}</strong>`:"-")}
+      ${groupedMetric("Tail risk",metrics.tailRiskLevel?`<span class="${tagClass(metrics.tailRiskLevel)}">${esc(metrics.tailRiskDisplay||"-")}</span>`:"-")}
     </div>
     ${groupedDecisionSummary(item,type)}
-    ${groupedWhyIncludedLine(item.reasons,type)}
     ${groupedWarningLine(item.warnings)}
+    <details class="card-more">
+      <summary>More details</summary>
+      <div class="mini-card-stats" style="margin-top:8px">
+        ${groupedMetric("Frequency",metrics.frequencyDisplay || "-")}
+        ${groupedMetric("Next cycle",metrics.nextCycle?esc(metrics.nextCycle):"-")}
+        ${groupedMetric("Est. ex-div px",metrics.estExDivPx!=null?ccy(metrics.estExDivPx,currency):"-")}
+        ${groupedMetric("Est. yield",metrics.yieldRange&&metrics.yieldRange.length===2?`${pctRaw(metrics.yieldRange[0],2)} - ${pctRaw(metrics.yieldRange[1],2)}`:"-")}
+        ${groupedMetric("Timing",metrics.timingNext?`<span class="${tagClass(metrics.timingNext)}">${esc(metrics.timingDisplay||"-")}</span>`:"-")}
+        ${groupedMetric("Exit mode",esc(metrics.exitModeDisplay || "-"))}
+        ${metrics.exitMode==="PRE_EXDIV_PREFERRED" ? groupedMetric("Usual pre-exdiv peak window",metrics.preExdivPeakWindowDaysP25!=null&&metrics.preExdivPeakWindowDaysP75!=null?`${n(metrics.preExdivPeakWindowDaysP25,1)}d - ${n(metrics.preExdivPeakWindowDaysP75,1)}d`:"-") : ""}
+        ${groupedMetric("Avg gain (pre-exdiv peak exit)",metrics.avgGainPreExdiv!=null?pctRaw(metrics.avgGainPreExdiv,1):"-")}
+        ${groupedMetric("Avg gain (ex-div date exit)",metrics.avgGainPostExdivExit!=null?pctRaw(metrics.avgGainPostExdivExit,1):"-")}
+      </div>
+      ${groupedWhyIncludedLine(item.reasons,type)}
+    </details>
     ${key?`<button class="planner-action" type="button" data-planner-toggle="${esc(key)}">${plannerHas(key)?"Remove from Planner":"Add to Planner"}</button>`:""}
   </div>`
 }
@@ -5760,7 +5820,7 @@ async function revConfirmYes(btn){
     const wrap=btn.closest(".rev-remove-confirm");
     if(wrap){const existing=wrap.querySelector(".rev-err");
       if(existing)existing.textContent=err.message;
-      else wrap.insertAdjacentHTML("beforeend",`<span class="rev-err" style="font-size:10px;color:#e05a5a;white-space:normal;max-width:140px;word-break:break-word">${esc(err.message)}</span>`);
+      else wrap.insertAdjacentHTML("beforeend",`<span class="rev-err" style="font-size:10px;color:#f07070;white-space:normal;max-width:140px;word-break:break-word">${esc(err.message)}</span>`);
     }
   }
 }
@@ -6114,7 +6174,7 @@ function panelReview(){
         <p style="margin-bottom:8px"><strong>Eligible</strong> means the stock passed all minimum criteria: &ge;3 clean cycles, win rate &ge;50%, &ge;2 years of data, dividend frequency is Quarterly/Semi-Annual/Monthly (Annual and Irregular excluded by default), and tail risk is not SEVERE. Failing any gate removes the potential score. An ineligible stock can still appear in Worth Watching if its zone hit rate or growth signal is strong enough, but it cannot be assigned To Keep.</p>
         <div class="rev-help-rule">
           <strong>To Keep</strong> &mdash; eligible + zone hit &gt; 15% + pattern not Degrading<br>
-          <strong style="color:#c9a227">Worth Watching</strong> &mdash; any of:<br>
+          <strong style="color:#f5c542">Worth Watching</strong> &mdash; any of:<br>
           <span style="padding-left:12px;display:block">· Eligible + zone hit &gt; 15% + Degrading (good entry access, weakening pattern)</span>
           <span style="padding-left:12px;display:block">· Eligible + zone hit 1&ndash;15% + quality signal (score &ge;65, Improving, or avg gain &ge;6%)</span>
           <span style="padding-left:12px;display:block">· Eligible + zone hit 0% + strong signal (score &ge;70, Improving, growth &ge;15% with score &ge;65, or currently Inside)</span>
@@ -6146,7 +6206,7 @@ function panelReview(){
         <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${keepHtml}</div>
       </div>
       <div class="rev-col">
-        <h3 style="font-size:13px;font-weight:700;margin:0 0 6px;color:#c9a227">Worth Watching <span style="font-weight:400;font-size:11px;color:var(--mu)">${revQ&&watchList.length!==watchTotal?`${watchList.length} / ${watchTotal}`:watchList.length} stock${watchList.length!==1?"s":""}</span></h3>
+        <h3 style="font-size:13px;font-weight:700;margin:0 0 6px;color:#f5c542">Worth Watching <span style="font-weight:400;font-size:11px;color:var(--mu)">${revQ&&watchList.length!==watchTotal?`${watchList.length} / ${watchTotal}`:watchList.length} stock${watchList.length!==1?"s":""}</span></h3>
         <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${sortBar("watch",revSort.watch||"zoneHit")}</div>
         <div class="rev-list" style="max-height:65vh;overflow-y:auto;padding-right:4px">${watchHtml}</div>
       </div>
@@ -6206,7 +6266,6 @@ function panelComparison(){
   ];
   const rows=rowGroups.flatMap(group=>group.rows);
 
-  const sortOptions=[{key:"none",label:"Manual order"},...rows.map(r=>({key:r.key,label:r.label}))];
   const selectedSort=rows.find(r=>r.key===state.cmpSortKey);
   if(selectedSort){
     stocks=[...stocks].sort((a,b)=>{
@@ -6218,32 +6277,95 @@ function panelComparison(){
     });
   }
 
-  const colHeaders=stocks.map((s,i)=>`<th class="cmp-stock-head" data-key="${esc(s.key)}" data-col-index="${i+1}" style="cursor:pointer;user-select:none" title="Open ${esc(s.data.meta?.ticker||s.key)}"><div style="font-family:var(--mono);font-weight:700;font-size:12px;color:var(--tx)">${esc(s.data.meta?.ticker||s.key)}</div><div style="font-size:10px;color:var(--mu);font-weight:400;text-transform:none;letter-spacing:0">${esc(s.data.meta?.stock_name||"")}</div></th>`).join("");
-  const tableRows=rowGroups.map(group=>{
-    const sectionRow=`<tr class="cmp-section-row"><td colspan="${stocks.length+1}">${esc(group.label)}</td></tr>`;
-    const metricRows=group.rows.map(r=>`<tr><td class="metric-label no-drag">${tipLabel(r.label,r.tip||"")}</td>${stocks.map((s,i)=>`<td data-col-index="${i+1}">${r.raw?r.fn(s):esc(r.fn(s))}</td>`).join("")}</tr>`).join("");
-    return sectionRow+metricRows;
+  // One row per stock, one column per metric -- scanning down a column to
+  // compare stocks is far easier than reading across 70 stock columns.
+  const groupHeaders=rowGroups.map(group=>`<th class="cmp-group-head" colspan="${group.rows.length}">${esc(group.label)}</th>`).join("");
+  const metricHeaders=rows.map(r=>{
+    const active=state.cmpSortKey===r.key;
+    const arrow=active?(state.cmpSortDir==="desc"?"▼":"▲"):"↕";
+    return`<th class="cmp-sort-head${active?" is-sorted":""}" data-cmp-sort="${esc(r.key)}" title="${esc(r.tip||"")}">${esc(r.label)} <span class="cmp-sort-arrow">${arrow}</span></th>`;
   }).join("");
-  const metricColHeaders=`<th class="metric-label no-drag">Metric</th>`;
+  const q=(state.cmpSearch||"").trim().toLowerCase();
+  const bodyRows=stocks.map(s=>{
+    const ticker=s.data.meta?.ticker||s.key;
+    const name=displayStockName(s.data.meta?.stock_name||"");
+    const hidden=q&&!(`${ticker} ${name}`.toLowerCase().includes(q));
+    return`<tr class="cmp-row" data-key="${esc(s.key)}" data-search="${esc(`${ticker} ${name}`.toLowerCase())}"${hidden?' style="display:none"':""}>
+      <td class="metric-label cmp-stock-cell no-drag"><div class="cmp-ticker">${esc(ticker)}</div><div class="cmp-name">${esc(name)}</div></td>
+      ${rows.map(r=>`<td>${r.raw?r.fn(s):esc(r.fn(s))}</td>`).join("")}
+    </tr>`;
+  }).join("");
   const sectorOptions=`<option value="all">All sectors</option>${allSectors.map(sec=>`<option value="${esc(sec)}" ${state.cmpFilterSector===sec?"selected":""}>${esc(sec)}</option>`).join("")}`;
   const entryStatusOptions=`<option value="all">All</option><option value="INSIDE" ${state.cmpFilterEntryStatus==="INSIDE"?"selected":""}>Inside zone</option><option value="BELOW" ${state.cmpFilterEntryStatus==="BELOW"?"selected":""}>Below zone</option><option value="ABOVE" ${state.cmpFilterEntryStatus==="ABOVE"?"selected":""}>Above zone</option>`;
-  const sortUI=`<div class="stock-selector" style="margin-bottom:8px"><span class="small muted">Sort by</span><select id="cmpSortKey">${sortOptions.map(opt=>`<option value="${opt.key}" ${state.cmpSortKey===opt.key?"selected":""}>${opt.label}</option>`).join("")}</select><select id="cmpSortDir" ${state.cmpSortKey==='none'?'disabled':''}><option value="asc" ${state.cmpSortDir==='asc'?'selected':''}>Ascending</option><option value="desc" ${state.cmpSortDir==='desc'?'selected':''}>Descending</option></select><span class="small muted" style="margin-left:10px">Sector</span><select id="cmpFilterSector">${sectorOptions}</select><span class="small muted" style="margin-left:10px">Entry status</span><select id="cmpFilterEntryStatus">${entryStatusOptions}</select></div><input id="cmpSearch" type="text" placeholder="Search by ticker or name…" autocomplete="off" value="${(state.cmpSearch||'').replace(/"/g,'&quot;')}">`;
+  const filterUI=`<div class="stock-selector" style="margin-bottom:8px"><span class="small muted">Sector</span><select id="cmpFilterSector">${sectorOptions}</select><span class="small muted" style="margin-left:10px">Entry status</span><select id="cmpFilterEntryStatus">${entryStatusOptions}</select>${selectedSort?`<button class="planner-small-btn" id="cmpClearSort" type="button">Clear sort</button>`:""}</div><input id="cmpSearch" type="search" placeholder="Search by ticker or name…" autocomplete="off" value="${esc(state.cmpSearch||"")}">`;
 
-  return`<div class="panel"><h2>Comparison &mdash; All Loaded Stocks</h2><p class="small muted" style="margin:0 0 12px">Rows show next projected ex-div series. Use the sort controls for ordering. Drag to scroll horizontally from the stock columns area. Click any stock header or stock chip to drill in.</p>${sortUI}<div class="cmp-table-wrap drag-scroll"><table><thead><tr>${metricColHeaders}${colHeaders}</tr></thead><tbody>${tableRows}</tbody></table></div></div>`
+  return`<div class="panel"><h2>Comparison</h2><p class="small muted" style="margin:0 0 12px">One row per stock, using each stock's next projected ex-div series. Click a column heading to sort; click a row to open the stock.</p>${filterUI}<div class="cmp-table-wrap cmp-rows"><table><thead><tr class="cmp-group-row"><th class="metric-label" rowspan="2">Stock <span class="muted" style="font-weight:400">(${stocks.length})</span></th>${groupHeaders}</tr><tr class="cmp-head-row">${metricHeaders}</tr></thead><tbody>${bodyRows}</tbody></table></div></div>`
 }
 
 /* ?? MINI CARDS GRID ??????????????????????????????????????????????????? */
-function panelMiniCards(){
-  const stocks=activeStockList().slice().sort((a,b)=>{
-    const aTicker=(a?.data?.meta?.ticker||a?.key||"").toUpperCase();
-    const bTicker=(b?.data?.meta?.ticker||b?.key||"").toUpperCase();
-    return aTicker.localeCompare(bTicker);
-  });
+const VERDICT_SORT_ORDER={"Actionable Now":0,"Watch Closely":1,"Small Trades Advised":2,"Wait":3,"Watch Only":4,"On Radar":5,"Structurally Weak":6,"Too Risky":7};
+function miniCardSortValue(s,mode){
+  const data=s.data;
+  const ticker=(data?.meta?.ticker||s.key||"").toUpperCase();
+  if(mode==="ticker")return ticker;
+  const up=upcomingSeries(data);
+  if(mode==="days"){const d=up?daysFrom(up.proj.proj_exdiv_date):null;return d==null||d<0?Infinity:d;}
+  if(mode==="winrate"){const w=Number(up?.proj.historical_frequencies?.win_rate);return Number.isFinite(w)?-w:Infinity;}
+  const normalized=window.DividendGroupedStocks?.normalizeStock?.(data,{});
+  const verdict=normalized?getFinalVerdict(normalized)?.label:null;
+  return VERDICT_SORT_ORDER[verdict]??8;
+}
+// One-row "what needs attention today" summary at the top of the Watchlist.
+// Each tile jumps to the view that answers it.
+function panelTodayStrip(){
+  const stocks=activeStockList();
   if(!stocks.length)return"";
+  let actionable=0,soon=0;
+  stocks.forEach(s=>{
+    const up=upcomingSeries(s.data);
+    const d=up?daysFrom(up.proj.proj_exdiv_date):null;
+    if(d!=null&&d>=0&&d<=30)soon++;
+    const norm=window.DividendGroupedStocks?.normalizeStock?.(s.data,{});
+    if(norm&&getFinalVerdict(norm)?.label==="Actionable Now")actionable++;
+  });
+  const plannerItems=plannerKeys().length?buildPlannerItems():[];
+  const nextWatch=plannerItems
+    .map(item=>plannerTimelineModel(item.plan)?.watchDate)
+    .filter(Boolean)
+    .map(v=>({raw:v,ts:isoDateParts(v)?.getTime()}))
+    .filter(v=>Number.isFinite(v.ts))
+    .sort((a,b)=>a.ts-b.ts)[0]?.raw;
+  const nextWatchDays=nextWatch?daysFrom(nextWatch):null;
+  const rows=(state.portfolio||[]).length?portfolioRows():[];
+  const priced=rows.filter(r=>r.loaded&&r.currentValue!=null);
+  const cost=priced.reduce((a,r)=>a+r.totalCost,0);
+  const value=priced.reduce((a,r)=>a+r.currentValue,0);
+  const pnl=value-cost;
+  const pnlPct=cost>0?pnl/cost*100:null;
+  const tile=(key,label,value,sub,tone="")=>`<button type="button" class="today-tile" data-today="${key}"><span class="today-label">${label}</span><span class="today-value ${tone}">${value}</span><span class="today-sub">${sub}</span></button>`;
+  return`<div class="today-strip" role="group" aria-label="Today at a glance">
+    ${tile("actionable","Actionable now",`${actionable?`<span class="verdict-icon" aria-hidden="true">✓</span>`:""}${actionable}`,actionable?"Show them first":"Nothing in its zone yet",actionable?"good":"")}
+    ${tile("soon","Ex-div in 30 days",String(soon),soon?"Sorted soonest first":"None coming up",soon?"warn":"")}
+    ${tile("planner","Next planner date",nextWatch?dt(nextWatch):"—",plannerItems.length?`${plannerItems.length} planned${nextWatchDays!=null?` · ${nextWatchDays}d away`:""}`:"Nothing planned yet")}
+    ${tile("portfolio","Portfolio P&amp;L",priced.length?pfCcy(pnl,"SGD"):"—",priced.length?(pnlPct!=null?`${pct(pnlPct)} on cost`:"Unrealized"):"No holdings yet",priced.length?(pnl>=0?"good":"bad"):"")}
+  </div>`;
+}
+
+function panelMiniCards(){
+  const mode=state.miniCardSort||"verdict";
+  const stocks=activeStockList().map(s=>({s,v:miniCardSortValue(s,mode),t:(s?.data?.meta?.ticker||s?.key||"").toUpperCase()}))
+    .sort((a,b)=>{
+      if(a.v!==b.v)return typeof a.v==="string"?a.v.localeCompare(b.v):a.v-b.v;
+      return a.t.localeCompare(b.t);
+    })
+    .map(x=>x.s);
+  if(!stocks.length)return"";
+  const opt=(v,l)=>`<option value="${v}" ${mode===v?"selected":""}>${l}</option>`;
   return`<div class="panel">
-    <h2>Portfolio Overview — Mini Cards</h2>
+    <h2>All Stocks</h2>
     <div class="mini-search-row">
       <input type="search" id="miniCardSearch" placeholder="Search by ticker or name…" autocomplete="off" spellcheck="false">
+      <label class="mini-sort"><span>Sort</span><select id="miniCardSort">${opt("verdict","Verdict (actionable first)")}${opt("days","Next ex-div (soonest)")}${opt("winrate","Win rate (highest)")}${opt("ticker","Ticker A–Z")}</select></label>
       <span class="mini-search-count" id="miniCardCount">${stocks.length} stock${stocks.length!==1?"s":""}</span>
     </div>
     <div class="mini-grid" id="miniGrid">
@@ -6668,9 +6790,9 @@ function panelPortfolio(){
   const summary=`<div class="planner-summary-grid">
     <div class="planner-summary-card"><div class="label">Total cost</div><div class="value">${pfCcy(totalCost,"SGD")}</div><div class="small muted">${loadedRows.length} holding${loadedRows.length===1?"":"s"} with a live price</div></div>
     <div class="planner-summary-card"><div class="label">Current value</div><div class="value">${pfCcy(totalValue,"SGD")}</div><div class="small muted">${unloadedCount?`${unloadedCount} holding${unloadedCount===1?"":"s"} excluded — not loaded`:"All holdings priced"}</div></div>
-    <div class="planner-summary-card"><div class="label">Unrealized P&amp;L</div><div class="value ${pnlTone(totalPnl)}">${totalCost>0?pfCcy(totalPnl,"SGD"):"-"}${totalPnlPct!=null?`<span style="font-size:12px;font-weight:400;margin-left:8px;opacity:.75">· ${pct(totalPnlPct)}</span>`:""}</div></div>
-    <div class="planner-summary-card"><div class="label">Expected dividends (12 mo)</div><div class="value good">${divOutlook.est>0?pfCcy(divOutlook.est,"SGD"):"-"}</div><div class="small muted">${divOutlook.est>0?`Range ${pfCcy(divOutlook.lo)}–${pfCcy(divOutlook.hi)}${divYieldOnValue!=null?` · ${pctRaw(divYieldOnValue,2)} on value`:""}${divYieldOnCost!=null?` · ${pctRaw(divYieldOnCost,2)} on cost`:""}`:"No projected ex-div dates in the next 12 months"}</div><div class="small muted">${nextDiv?`Next: ${esc(nextDiv.ticker)} ${dt(nextDiv.date)} ≈ ${pfCcy(nextDiv.est,nextDiv.currency)}`:""}${divOutlook.ttm>0?`${nextDiv?" · ":""}Last 12 mo payouts: ${pfCcy(divOutlook.ttm,"SGD")}`:""}</div></div>
-    <div class="planner-summary-card"><div class="label">Holdings tracked</div><div class="value">${rows.length}</div><div class="small muted">Stored only in this browser</div></div>
+    <div class="planner-summary-card"><div class="label">Unrealized P&amp;L</div><div class="value ${pnlTone(totalPnl)}">${totalCost>0?pfCcy(totalPnl,"SGD"):"-"}</div><div class="small ${pnlTone(totalPnl)}">${totalPnlPct!=null?`${pct(totalPnlPct)} on cost`:"&nbsp;"}</div></div>
+    <div class="planner-summary-card" title="${divOutlook.est>0?esc(`Range ${pfCcy(divOutlook.lo)}–${pfCcy(divOutlook.hi)}`):""}"><div class="label">Dividends, next 12 mo</div><div class="value good">${divOutlook.est>0?pfCcy(divOutlook.est,"SGD"):"-"}</div><div class="small muted">${divOutlook.est>0?[divYieldOnValue!=null?`${pctRaw(divYieldOnValue,2)} on value`:"",divYieldOnCost!=null?`${pctRaw(divYieldOnCost,2)} on cost`:""].filter(Boolean).join(" · "):"No projected ex-div dates"}</div>${nextDiv?`<div class="small muted">Next: ${esc(nextDiv.ticker)} ${dtShort(nextDiv.date)} ≈ ${pfCcy(nextDiv.est,nextDiv.currency)}</div>`:""}</div>
+    <div class="planner-summary-card"><div class="label">Dividends, last 12 mo</div><div class="value">${divOutlook.ttm>0?pfCcy(divOutlook.ttm,"SGD"):"-"}</div><div class="small muted">At current holdings · ${rows.length} stock${rows.length===1?"":"s"}</div></div>
   </div>`;
 
   const datedHoldingCount=(state.portfolio||[]).filter(h=>h.purchaseDate).length;
@@ -6706,9 +6828,11 @@ function panelPortfolio(){
     <td><button class="btn btn-compact" type="button" data-portfolio-edit="${esc(r.ticker)}">Edit</button> <button class="btn btn-compact" type="button" data-portfolio-delete="${esc(r.ticker)}">Delete</button></td>
   </tr>`).join("");
 
-  return header+`${summary}
-  ${chartSection}
+  // Holdings (and the add form) come before the chart: it's what you act on,
+  // and with no holdings yet the summary cards and chart would just be empty.
+  return header+`${rows.length?summary:""}
   <div class="panel">
+    <h2>Holdings</h2>
     <div class="portfolio-form">
       <label>Stock<select id="pfTicker">${tickerOptions}</select></label>
       <label>Quantity<input type="number" id="pfQuantity" min="0" step="1" placeholder="e.g. 500"></label>
@@ -6724,8 +6848,9 @@ function panelPortfolio(){
         </tr></thead>
         <tbody>${tableRows}</tbody>
       </table>
-    </div>`:`<div class="empty">No holdings yet. Add one above, or load a backup.</div>`}
+    </div>`:`<div class="empty">No holdings yet. Add your first one above, or use <strong>Load backup</strong> to restore from another device.</div>`}
   </div>
+  ${rows.length?chartSection:""}
   ${divOutlook.upcoming.length?`<div class="panel">
     <h2>Upcoming Dividends</h2>
     <p class="small muted" style="margin:0 0 10px">Projected ex-div dates and amounts for your current quantities over the next 12 months, from each stock's dividend series (median of the last 4 same-series payments, with its low–high band). These are estimates until the company announces; special dividends aren't projected.${divOutlook.lapsedTickers.length?` Not projected (no recent dividend): ${divOutlook.lapsedTickers.map(esc).join(", ")}.`:""}</p>
@@ -6753,6 +6878,34 @@ function panelPortfolio(){
 // P&L -- they're already netted into Unrealized P&L (holdings cost price is
 // fee-inclusive) and Realized P&L (the broker's own figure is net of fees on
 // that trade), so subtracting them again here would double-count.
+// Annualised, money-weighted return (XIRR): the yearly rate at which every
+// net deposit (money in, on its date) grows into today's value -- holdings
+// at their live price plus cash on hand. Unlike Total P&L %, it accounts for
+// how long each deposit has been invested. Same "full history tracked"
+// assumption as Cash on hand. Returns {rate, since, months} or {reason}.
+function portfolioAnnualisedReturn(cashOnHand){
+  const deposits=(state.portfolioNetDeposits||[]).filter(d=>d&&d.date&&Number.isFinite(Number(d.amount))&&Number(d.amount)!==0);
+  if(!deposits.length)return{reason:"No deposit records yet"};
+  const rows=portfolioRows();
+  if(rows.some(r=>r.currentValue==null))return{reason:"Some holdings have no live price loaded"};
+  const endValue=rows.reduce((a,r)=>a+r.currentValue,0)+cashOnHand;
+  if(!(endValue>0))return{reason:"Today's value isn't positive — deposit history may be incomplete"};
+  const today=new Date();today.setHours(0,0,0,0);
+  const since=deposits.map(d=>d.date).sort()[0];
+  const days=(today-new Date(since+"T00:00:00"))/86400000;
+  if(days<182)return{reason:"Under 6 months of history — too short to annualise",since};
+  // Investor's cash flows: deposits are money out (negative), today's value comes back (positive).
+  const flows=deposits.map(d=>({t:(new Date(d.date+"T00:00:00")-today)/86400000/365,v:-Number(d.amount)}));
+  flows.push({t:0,v:endValue});
+  const npv=r=>flows.reduce((a,f)=>a+f.v/Math.pow(1+r,f.t),0);
+  let lo=-0.99,hi=10,fLo=npv(lo),fHi=npv(hi);
+  if(!(fLo*fHi<0))return{reason:"Couldn't solve for a rate from these cash flows",since};
+  for(let i=0;i<200&&hi-lo>1e-9;i++){
+    const mid=(lo+hi)/2,fMid=npv(mid);
+    if(fLo*fMid<=0){hi=mid;fHi=fMid;}else{lo=mid;fLo=fMid;}
+  }
+  return{rate:(lo+hi)/2,since,months:Math.round(days/30.44)};
+}
 function panelPortfolioHistory({totalPnl,totalCost}){
   const realized=state.portfolioRealized||[];
   const dividends=state.portfolioDividends||[];
@@ -6791,17 +6944,19 @@ function panelPortfolioHistory({totalPnl,totalCost}){
   // caveat as Reconcile -- a partial history will throw this off.
   const allHeldCostBasis=portfolioRows().reduce((a,r)=>a+r.totalCost,0);
   const cashOnHand=netDepositsTotal+rebatesTotal+realizedTotal+dividendsTotal-allHeldCostBasis;
+  const annualised=portfolioAnnualisedReturn(cashOnHand);
 
   const summary=`<div class="planner-summary-grid">
     <div class="planner-summary-card"><div class="label">Net Deposited</div><div class="value">${netDeposits.length?pfCcy(netDepositsTotal,"SGD"):"-"}</div><div class="small muted">${netDeposits.length?"Actual cash in, from outside the account":"No deposit records yet"}</div></div>
     <div class="planner-summary-card"><div class="label">Withdrawn</div><div class="value">${withdrawals.length?pfCcy(withdrawalsTotal,"SGD"):"-"}</div><div class="small muted">${withdrawals.length?"Already netted into Net Deposited above":"No withdrawal records yet"}</div></div>
     <div class="planner-summary-card"><div class="label">Rebates</div><div class="value ${rebatesTotal?"good":""}">${rebates.length?pfCcy(rebatesTotal,"SGD"):"-"}</div><div class="small muted">Broker cashback — not your money, not investment return</div></div>
     <div class="planner-summary-card"><div class="label">Cash on hand</div><div class="value ${cashOnHand<0?"bad":""}">${pfCcy(cashOnHand,"SGD")}</div><div class="small muted">Deposited/earned but not put into a stock — assumes full history tracked</div></div>
-    <div class="planner-summary-card"><div class="label">Unrealized P&amp;L</div><div class="value ${pnlTone(unrealizedTotal)}">${unrealizedTotal!=null?pfCcy(unrealizedTotal,"SGD"):"-"}${unrealizedPct!=null?`<span style="font-size:12px;font-weight:400;margin-left:8px;opacity:.75">· ${pct(unrealizedPct)}</span>`:""}</div><div class="small muted">Current holdings only</div></div>
-    <div class="planner-summary-card"><div class="label">Realized P&amp;L</div><div class="value ${pnlTone(realizedTotal)}">${realized.length?pfCcy(realizedTotal,"SGD"):"-"}${realizedPct!=null?`<span style="font-size:12px;font-weight:400;margin-left:8px;opacity:.75">· ${pct(realizedPct)}</span>`:""}</div><div class="small muted">${realized.length} closed position${realized.length===1?"":"s"}</div></div>
-    <div class="planner-summary-card"><div class="label">Dividends received</div><div class="value ${dividendsTotal?"good":""}">${dividends.length?pfCcy(dividendsTotal,"SGD"):"-"}${dividendsPct!=null?`<span style="font-size:12px;font-weight:400;margin-left:8px;opacity:.75">· ${n(dividendsPct,1)}% yield</span>`:""}</div><div class="small muted">${dividends.length} payout${dividends.length===1?"":"s"}</div></div>
+    <div class="planner-summary-card"><div class="label">Unrealized P&amp;L</div><div class="value ${pnlTone(unrealizedTotal)}">${unrealizedTotal!=null?pfCcy(unrealizedTotal,"SGD"):"-"}${unrealizedPct!=null?`<span class="value-sub">${pct(unrealizedPct)}</span>`:""}</div><div class="small muted">Current holdings only</div></div>
+    <div class="planner-summary-card"><div class="label">Realized P&amp;L</div><div class="value ${pnlTone(realizedTotal)}">${realized.length?pfCcy(realizedTotal,"SGD"):"-"}${realizedPct!=null?`<span class="value-sub">${pct(realizedPct)}</span>`:""}</div><div class="small muted">${realized.length} closed position${realized.length===1?"":"s"}</div></div>
+    <div class="planner-summary-card"><div class="label">Dividends received</div><div class="value ${dividendsTotal?"good":""}">${dividends.length?pfCcy(dividendsTotal,"SGD"):"-"}${dividendsPct!=null?`<span class="value-sub">${n(dividendsPct,1)}% yield</span>`:""}</div><div class="small muted">${dividends.length} payout${dividends.length===1?"":"s"}</div></div>
     <div class="planner-summary-card"><div class="label">Fees paid</div><div class="value">${fees.length?pfCcy(feesTotal,"SGD"):"-"}</div><div class="small muted">Informational — already netted in above</div></div>
-    <div class="planner-summary-card"><div class="label">Total P&amp;L</div><div class="value ${pnlTone(grandTotal)}">${pfCcy(grandTotal,"SGD")}${grandPct!=null?`<span style="font-size:12px;font-weight:400;margin-left:8px;opacity:.75">· ${pct(grandPct)}</span>`:""}</div><div class="small muted">Unrealized + realized + dividends</div></div>
+    <div class="planner-summary-card"><div class="label">Total P&amp;L</div><div class="value ${pnlTone(grandTotal)}">${pfCcy(grandTotal,"SGD")}${grandPct!=null?`<span class="value-sub">${pct(grandPct)}</span>`:""}</div><div class="small muted">Unrealized + realized + dividends</div></div>
+    <div class="planner-summary-card"><div class="label">${tipLabel("Annualised return","Money-weighted yearly return (XIRR): the yearly rate at which each net deposit, on its date, grows into today's value (holdings at live prices + cash on hand). Unlike Total P&L %, it accounts for how long each deposit has been invested. Assumes your full deposit history is recorded.")}</div><div class="value ${annualised.rate!=null?pnlTone(annualised.rate):""}">${annualised.rate!=null?`${pct(annualised.rate*100)}<span style="font-size:12px;font-weight:400;margin-left:6px;opacity:.75">/ yr</span>`:"-"}</div><div class="small muted">${annualised.rate!=null?`Money-weighted, since ${dt(annualised.since)}${annualised.months<12?` · only ${annualised.months} months of history, so it can swing a lot`:""}`:esc(annualised.reason)}</div></div>
   </div>`;
 
   const returnByStock=portfolioReturnByStock();
@@ -7236,8 +7391,8 @@ function renderPortfolioHistoryChart(){
   }
   if(recorded.length>=2){
     const pts=recorded.map(p=>`${xAt(p.date).toFixed(2)},${yAt(p.totalValue).toFixed(2)}`).join(" ");
-    html+=`<polyline fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-dasharray="6,4" points="${pts}"/>`;
-    html+=recorded.map(p=>`<circle cx="${xAt(p.date)}" cy="${yAt(p.totalValue)}" r="3.5" fill="#00e5ff" stroke="var(--bg)" stroke-width="1.2"/>`).join("");
+    html+=`<polyline fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-dasharray="6,4" points="${pts}"/>`;
+    html+=recorded.map(p=>`<circle cx="${xAt(p.date)}" cy="${yAt(p.totalValue)}" r="3.5" fill="#22d3ee" stroke="var(--bg)" stroke-width="1.2"/>`).join("");
     html+=recorded.map(p=>`<circle class="pf-hit" cx="${xAt(p.date)}" cy="${yAt(p.totalValue)}" r="8" fill="transparent" data-meta="${esc(JSON.stringify({kind:"Recorded",date:p.date,value:pfCcy(p.totalValue,"SGD"),extra:`Cost ${pfCcy(p.totalCost,"SGD")}`}))}"></circle>`).join("");
   }
 
@@ -7287,8 +7442,8 @@ function renderMiniCard(s){
       <div class="mini-stat"><span class="ms-label">Next ex-div: </span>${up?dt(up.proj.proj_exdiv_date):"-"}</div>
       <div class="mini-stat"><span class="ms-label">Days away: </span><span class="${daysTo!==null&&daysTo<=30?"warn":""}">${daysTo!==null?daysTo+"d":"-"}</span></div>
       <div class="mini-stat"><span class="ms-label">Zone: </span>${up?zoneInline(up.proj.zone_bot,up.proj.zone_top,m.currency):"-"}</div>
-      <div class="mini-stat"><span class="ms-label">Win rate: </span><span class="${Number(winRate)>=70?"good":Number(winRate)>=50?"warn":"bad"}">${winRate!=null?pctRaw(winRate,0):"-"}</span>${winRateAll!=null?`<span class="muted" style="font-size:10px"> / ${pctRaw(winRateAll,0)}</span>`:""}</div>
-      <div class="mini-stat"><span class="ms-label">CGC #1: </span>${cgcTop?esc(cgcTop.series_id):"-"}</div>
+      <div class="mini-stat" title="Clean-cycle win rate / win rate across all cycles"><span class="ms-label">Win rate: </span><span class="${Number(winRate)>=70?"good":Number(winRate)>=50?"warn":"bad"}">${winRate!=null?pctRaw(winRate,0):"-"}</span>${winRateAll!=null?`<span class="muted" style="font-size:10px"> / ${pctRaw(winRateAll,0)}</span>`:""}</div>
+      <div class="mini-stat" title="Historically strongest dividend series (CGC rank #1)"><span class="ms-label">Best series: </span>${cgcTop?esc(cgcTop.series_id):"-"}</div>
       <div class="mini-stat"><span class="ms-label">Cycles: </span>${(data.cycles||[]).length}</div>
       <div class="mini-stat"><span class="ms-label">Div trend: </span>${divTrend?`<span class="${divTrend==="RISING"?"good":divTrend==="FALLING"||divTrend==="DECLINING"?"bad":""}">${esc(divTrendDisplay||divTrend)}</span>`:"-"}</div>
       <div class="mini-stat"><span class="ms-label">5yr growth: </span><span class="${growthCls(m.price_growth_5yr_pct)}">${growthFmt(m.price_growth_5yr_pct)}</span></div>
@@ -7299,8 +7454,365 @@ function renderMiniCard(s){
 }
 
 /* -- DRILL VIEW (single stock tabs) ----------------------------------- */
+// The 12 single-stock panels are grouped into 5 top-level tabs, with a small
+// segmented control for the panels inside a group. state.tab stays an index
+// into the flat panel list so routing and persistence keep working.
 function renderTabs(panels){
-  return`<div class="tabs">${panels.map((p,i)=>`<button class="tab ${state.tab===i?"active":""}" data-tab="${i}">${p.name}</button>`).join("")}</div>`
+  const groups=[...new Set(panels.map(p=>p.group))];
+  const current=panels[state.tab]||panels[0];
+  const groupTabs=`<div class="tabs drill-tabs" role="tablist">${groups.map(g=>{
+    const first=panels.findIndex(p=>p.group===g);
+    return`<button class="tab ${current.group===g?"active":""}" data-tab="${first}" role="tab" aria-selected="${current.group===g}">${esc(g)}</button>`;
+  }).join("")}</div>`;
+  const inGroup=panels.map((p,i)=>({p,i})).filter(x=>x.p.group===current.group);
+  const subTabs=inGroup.length>1?`<div class="view-seg drill-subtabs">${inGroup.map(({p,i})=>`<button class="view-seg-btn ${state.tab===i?"active":""}" data-tab="${i}">${esc(p.name)}</button>`).join("")}</div>`:"";
+  return groupTabs+subTabs;
+}
+
+// "How it works" (Guide tab): two diagrams explaining the analysis -- what is
+// measured in one dividend cycle, and the pipeline from raw data to the
+// verdict -- plus this stock's own numbers for the next setup. Pipeline
+// stages link to the tab that shows that stage for this stock.
+// Small copy of the cycle drawing used on each "key point" card. Every part
+// carries a role; the card's own role is drawn bright and the rest dimmed,
+// so each card shows exactly which point it is explaining.
+function keyPointMiniSvg(focus){
+  const f=role=>role.split(" ").includes(focus)?"kp-el is-focus":"kp-el";
+  return`<svg class="kp-mini" viewBox="40 36 600 280" aria-hidden="true" focusable="false">
+    <rect x="100" y="205" width="420" height="40" rx="4" class="${f("zone")} kp-zone"/>
+    <line x1="100" y1="50" x2="100" y2="300" class="${f("anchor")} kp-guide"/>
+    <line x1="520" y1="50" x2="520" y2="300" class="${f("exdiv exitB")} kp-guide"/>
+    <line x1="100" y1="120" x2="300" y2="120" class="${f("anchor low")} kp-ref"/>
+    <polyline class="kp-price" points="60,125 100,120 140,140 180,150 220,185 260,200 300,230 340,205 380,170 420,140 470,110 512,128 522,128 530,178 570,170 620,160"/>
+    <line x1="300" y1="126" x2="300" y2="220" class="${f("low")} kp-measure"/>
+    <line x1="306" y1="290" x2="514" y2="290" class="${f("lowdate")} kp-measure"/>
+    <line x1="300" y1="230" x2="512" y2="230" class="${f("win")} kp-ref"/>
+    <line x1="512" y1="226" x2="512" y2="134" class="${f("win")} kp-measure"/>
+    <circle cx="100" cy="120" r="9" class="${f("anchor")} kp-dot-anchor"/>
+    <circle cx="300" cy="230" r="9" class="${f("low lowdate win")} kp-dot-low"/>
+    <circle cx="470" cy="110" r="9" class="${f("exitA prefer")} kp-dot-exit"/>
+    <circle cx="530" cy="178" r="9" class="${f("exitB prefer")} kp-dot-exit"/>
+    <rect x="510" y="40" width="20" height="14" rx="3" class="${f("exdiv")} kp-flag"/>
+  </svg>`;
+}
+
+// Recent clean same-series dips (low vs window-open close) plotted as dots,
+// with the projected zone's percentile band shaded -- the zone calculation
+// for this stock, drawn from its own history.
+function keyPointZoneDotsSvg(dips,botPct,topPct){
+  if(!dips.length||botPct==null||topPct==null)return"";
+  const vmin=Math.min(...dips,botPct)*1.15,vmax=0;
+  const x=v=>24+(v-vmin)/(vmax-vmin||1)*252;
+  const dots=dips.map((v,i)=>`<circle cx="${n(x(v),1)}" cy="${34+((i%2)?-5:5)}" r="5" class="kp-dip"><title>${n(v,1)}%</title></circle>`).join("");
+  return`<svg class="kp-dots" viewBox="0 0 300 74" role="img" aria-label="Recent dips and the entry zone band">
+    <rect x="${n(x(botPct),1)}" y="20" width="${n(Math.max(2,x(topPct)-x(botPct)),1)}" height="28" rx="3" class="kp-zone-band"/>
+    <line x1="24" y1="34" x2="276" y2="34" class="kp-axis"/>
+    ${dots}
+    <text x="276" y="66" text-anchor="end" class="kp-axis-label">0% = anchor</text>
+    <text x="24" y="66" class="kp-axis-label">${n(vmin,0)}%</text>
+    <text x="${n(Math.min(214,Math.max(86,(x(botPct)+x(topPct))/2)),1)}" y="14" text-anchor="middle" class="kp-axis-label kp-band-label">zone ${n(botPct,1)}% to ${n(topPct,1)}%</text>
+  </svg>`;
+}
+
+function keyPointPercentile(sorted,p){
+  if(!sorted.length)return null;
+  const idx=(sorted.length-1)*p/100,lo=Math.floor(idx),hi=Math.ceil(idx);
+  return sorted[lo]+(sorted[hi]-sorted[lo])*(idx-lo);
+}
+
+// "How each key point is calculated" -- one card per point: mini diagram,
+// the inputs it uses, the rule, and this stock's actual result.
+function panelKeyPoints(data,opts={}){
+  const m=data.meta||{},cur=m.currency||"";
+  const up=upcomingSeries(data);
+  if(!up)return"";
+  const sid=up.id,proj=up.proj||{};
+  const ep=data.ss_series?.[sid]?.exit_profile||{};
+  const hf=proj.historical_frequencies||{};
+  const adequacy=data.series_adequacy?.[sid]||{};
+  const nEff=adequacy.n_effective;
+  const clean=(data.cycles||[]).filter(c=>c.series===sid&&!c.degen&&!c.macro&&!c.outlier&&c.low_vs_wopen!=null);
+  const recent=clean.slice(-5);
+  const dips=recent.map(c=>Number(c.low_vs_wopen)).filter(Number.isFinite);
+  const median=a=>{const s=[...a].sort((x,y)=>x-y);return s.length?keyPointPercentile(s,50):null;};
+  const wks=clean.map(c=>Number(c.wks_before)).filter(Number.isFinite);
+  const anchor=Number(proj.anchor);
+  const botPct=Number.isFinite(anchor)&&anchor>0&&proj.zone_bot!=null?(proj.zone_bot/anchor-1)*100:null;
+  const topPct=Number.isFinite(anchor)&&anchor>0&&proj.zone_top!=null?(proj.zone_top/anchor-1)*100:null;
+  const band=nEff>=8?"10th–90th":nEff>=5?"20th–80th":nEff>=3?"30th–70th":"min–max";
+  const provisional=proj.anchor_source==="provisional_current_price";
+  const lowDateText=proj.est_low_date_cluster1
+    ?`${dtShort(proj.est_low_date_cluster1)} or ${dtShort(proj.est_low_date_cluster2)}`
+    :proj.est_low_date
+      ?(proj.est_low_date_from&&proj.est_low_date_to?`${dtShort(proj.est_low_date_from)} – ${dtShort(proj.est_low_date_to)}`:dtShort(proj.est_low_date))
+      :"Not projected";
+
+  const card=(num,focus,title,uses,rule,result,extra="")=>`<article class="kp-card">
+      <div class="kp-head"><span class="kp-num">${num}</span><h4>${title}</h4></div>
+      ${keyPointMiniSvg(focus)}
+      <dl class="kp-rows">
+        <dt>Uses</dt><dd>${uses}</dd>
+        <dt>Rule</dt><dd>${rule}</dd>
+      </dl>
+      ${extra}
+      <div class="kp-result"><span>${esc(m.ticker||"This stock")}</span><strong>${result}</strong></div>
+    </article>`;
+
+  const cards=[
+    card(1,"exdiv","Projected ex-div date",
+      `Past ex-div dates in this series (${esc(sid)})`,
+      `Last ${esc(sid)} date + the series' typical gap between payments (odd gaps removed). If that lands in the past, step forward one more gap.`,
+      dt(proj.proj_exdiv_date)),
+    card(2,"anchor","Anchor price",
+      `Projected ex-div date; how far before ex-div past windows opened`,
+      `Window opens = ex-div − median past window length. Anchor = first close on or after that day. Until then it's provisional: today's price.`,
+      `${ccy(proj.anchor,cur)}<small>${provisional?`provisional · window opens ${dt(proj.window_open_date)}`:`set ${dt(proj.window_open_date)}`}</small>`),
+    card(3,"low","Cycle low (each past cycle)",
+      `Weekly closes between window open and ex-div`,
+      `Lowest close in that window. Dip = low ÷ window-open close − 1. Projected low = anchor × (1 + median dip).`,
+      `${ccy(proj.est_low_px,cur)}<small>median dip ${median(clean.map(c=>Number(c.low_vs_wopen)))!=null?n(median(clean.map(c=>Number(c.low_vs_wopen))),1)+"%":"-"} over ${clean.length} clean cycles</small>`),
+    card(4,"zone","Projected entry zone",
+      `Last ${dips.length||5} clean dips; effective sample size (n_eff ${nEff!=null?n(nEff,1):"-"})`,
+      `Trim extremes (5th/95th pct) → take the ${band} percentile band (wider when there's less data) → apply to the anchor.${proj.zone_degradation_adjusted?" Widened 10% each side because the pattern is degrading.":""}`,
+      `${ccy(proj.zone_bot,cur)} – ${n(proj.zone_top,4)}`,
+      keyPointZoneDotsSvg(dips,botPct,topPct)),
+    card(5,"lowdate","Expected low timing",
+      `Weeks between each past low and its ex-div; timing rating (${esc(proj.timing_rating_display||"-")})`,
+      `Reliable: ex-div − median weeks, with a p25–p75 window. Bimodal: one date per timing cluster. Unreliable: no date — watch the zone instead.`,
+      `${esc(lowDateText)}<small>median ${median(wks)!=null?n(median(wks),1):"-"} weeks before ex-div</small>`),
+    card(6,"exitA","Exit A: pre-ex-div peak",
+      `Closes after the low but before ex-div`,
+      `Past cycles: highest close in that stretch. Projected = anchor × (1 + median peak move), never below the expected pre-ex-div close.`,
+      `${ccy(proj.est_peak_px,cur)}<small>${ep.pre_exdiv_peak_window_days_p25!=null?`usually ${n(ep.pre_exdiv_peak_window_days_p25,0)}–${n(ep.pre_exdiv_peak_window_days_p75,0)} days before ex-div`:"peak window not available"}</small>`),
+    card(7,"exitB","Exit B: ex-div date exit",
+      `First close on or after ex-div; dividend amount`,
+      `Past cycles: that close. Projected = anchor × (1 + median pre-ex-div move), less the dividend's usual share of price.`,
+      `${ccy(proj.est_exdiv_px,cur)}<small>after a ${ccy(proj.med_div_amt,cur)} dividend</small>`),
+    card(8,"win","Win rate",
+      `Each clean cycle's low and pre-ex-div close`,
+      `A cycle wins if the rebound from the low back to the pre-ex-div close is more than 3%. Win rate = wins ÷ clean cycles.`,
+      `${hf.win_rate!=null?pctRaw(hf.win_rate,0):"-"}<small>${hf.win_rate_all!=null?`${pctRaw(hf.win_rate_all,0)} counting every cycle`:""}</small>`),
+    card(9,"prefer","Preferred exit",
+      `Average gain of exit A vs exit B across complete cycles`,
+      `A is preferred if its average gain is at least 95% of B's. B is preferred if the best price usually came after ex-div and beat B by more than 5%. Otherwise undecided.`,
+      `${esc(ep.exit_mode_verdict_display||"-")}<small>${ep.avg_gain_pre_exdiv!=null?`A ${pctRaw(ep.avg_gain_pre_exdiv,1)} vs B ${pctRaw(ep.avg_gain_post_exdiv_exit,1)} average gain`:""}</small>`),
+  ].join("");
+
+  return`<div class="hiw-block">
+    <h3>3. How each key point is calculated</h3>
+    <p class="small muted" style="margin:0 0 12px">Each card highlights one point on the cycle drawing, then shows what it uses, the rule, and the result ${opts.general?"in the worked example: a semi-annual payer with a $1.00 anchor and recent dips of −2% to −7%.":`for ${esc(m.ticker||"this stock")}'s next ${esc(sid)} setup.`} All percentages are measured from the window-open close (the anchor), so price drift between cycles doesn't move the zone.</p>
+    <div class="kp-grid">${cards}</div>
+  </div>`;
+}
+
+function panelHowItWorks(data,opts={}){
+  const general=!!opts.general;
+  const m=data.meta||{};
+  const up=upcomingSeries(data);
+  const proj=up?.proj||{};
+  const hf=proj.historical_frequencies||{};
+  const lowTiming=proj.est_low_date_cluster1
+    ? `${dtShort(proj.est_low_date_cluster1)} or ${dtShort(proj.est_low_date_cluster2)} (two timing clusters)`
+    : proj.est_low_date
+      ? (proj.est_low_date_from&&proj.est_low_date_to?`${dtShort(proj.est_low_date_from)} – ${dtShort(proj.est_low_date_to)}`:dtShort(proj.est_low_date))
+      : "No single date (timing unreliable)";
+  const fact=(label,value)=>`<div class="hiw-fact"><span>${label}</span><strong>${value}</strong></div>`;
+  const facts=up?`<div class="hiw-facts">
+      ${fact("Next ex-div",`${esc(up.id)} · ${dt(proj.proj_exdiv_date)}`)}
+      ${fact("Entry zone",proj.zone_bot!=null?`${ccy(proj.zone_bot,m.currency)} – ${n(proj.zone_top,4)}`:"-")}
+      ${fact("Expected low",esc(lowTiming))}
+      ${fact("Win rate (dip &gt; 3%)",hf.win_rate!=null?pctRaw(hf.win_rate,0):"-")}
+      ${fact("Timing",esc(proj.timing_rating_display||"-"))}
+    </div>`:"";
+
+  const cycleSvg=`<svg class="hiw-svg" viewBox="0 0 680 320" role="img" aria-labelledby="hiwCycleTitle hiwCycleDesc">
+    <title id="hiwCycleTitle">Anatomy of one dividend cycle</title>
+    <desc id="hiwCycleDesc">The window opens and sets the anchor price. Price dips into the projected entry zone to a cycle low, rebounds to a pre-ex-div peak (exit A), then drops on the ex-div date; exit B is the first close after it.</desc>
+    <defs><marker id="hiwArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+    <rect x="100" y="205" width="420" height="40" rx="4" class="hiw-zone"/>
+    <text class="hiw-ts" x="385" y="229">Projected entry zone</text>
+    <line x1="100" y1="58" x2="100" y2="300" class="hiw-guide"/>
+    <line x1="520" y1="58" x2="520" y2="300" class="hiw-guide"/>
+    <text class="hiw-ts" x="106" y="50">Window opens: anchor price</text>
+    <text class="hiw-ts" x="528" y="50">Ex-div date</text>
+    <line x1="100" y1="120" x2="300" y2="120" class="hiw-ref"/>
+    <polyline class="hiw-price" points="60,125 100,120 140,140 180,150 220,185 260,200 300,230 340,205 380,170 420,140 470,110 512,128 522,128 530,178 570,170 620,160"/>
+    <line x1="300" y1="124" x2="300" y2="222" class="hiw-arr" marker-end="url(#hiwArrow)"/>
+    <text class="hiw-ts" x="292" y="140" text-anchor="end">Dip vs anchor</text>
+    <circle cx="300" cy="230" r="6" class="hiw-low"/>
+    <text class="hiw-th" x="300" y="268" text-anchor="middle">Cycle low</text>
+    <circle cx="470" cy="110" r="6" class="hiw-exit"/>
+    <text class="hiw-ts" x="460" y="100" text-anchor="end">Exit A: pre-ex-div peak</text>
+    <circle cx="530" cy="178" r="6" class="hiw-exit"/>
+    <text class="hiw-ts" x="545" y="200">Exit B</text>
+    <line x1="306" y1="290" x2="514" y2="290" class="hiw-arr" marker-start="url(#hiwArrow)" marker-end="url(#hiwArrow)"/>
+    <text class="hiw-ts" x="410" y="310" text-anchor="middle">Weeks before ex-div (timing)</text>
+  </svg>`;
+
+  const stages=[
+    ["Price + dividend data","Weekly Yahoo history","engine","price"],
+    ["Clean dividends","Drop specials, find series","engine","dividends"],
+    ["Measure each cycle","Dip, timing, rebound","engine","cycles"],
+    ["Series statistics","Win rate, timing type","engine","series"],
+    ["Project next cycle","Ex-div date, entry zone","engine","projections"],
+    ["Risk checks","Tail risk, fragility","engine","series"],
+    ["Potential score","Pattern strength","decision","ranking"],
+    ["Current verdict","Act, wait or avoid","decision","strategy"],
+    ["Dashboard + log","Views, accuracy check","decision",null],
+  ];
+  const col=i=>[40,250,460][i%3], row=i=>[40,136,232][Math.floor(i/3)];
+  const nodes=stages.map(([title,sub,kind,slug],i)=>{
+    const x=col(i),y=row(i);
+    const linked=slug&&!general;
+    const link=linked?` data-hiw-goto="${slug}" tabindex="0" role="link" aria-label="${esc(`${title}: open the related view`)}"`:"";
+    return`<g class="hiw-node ${kind}${linked?" is-link":""}"${link}><rect x="${x}" y="${y}" width="180" height="56" rx="8"/><text class="hiw-th" x="${x+90}" y="${y+22}" text-anchor="middle">${esc(title)}</text><text class="hiw-ts" x="${x+90}" y="${y+41}" text-anchor="middle">${esc(sub)}</text></g>`;
+  }).join("");
+  const arrows=[0,1,3,4,6,7].map(i=>`<line x1="${col(i)+182}" y1="${row(i)+28}" x2="${col(i)+206}" y2="${row(i)+28}" class="hiw-arr" marker-end="url(#hiwArrow2)"/>`).join("")
+    +`<path d="M550 98 L550 116 L130 116 L130 132" class="hiw-arr" fill="none" marker-end="url(#hiwArrow2)"/>`
+    +`<path d="M550 194 L550 212 L130 212 L130 228" class="hiw-arr" fill="none" marker-end="url(#hiwArrow2)"/>`;
+  const pipelineSvg=`<svg class="hiw-svg" viewBox="0 0 680 345" role="img" aria-labelledby="hiwPipeTitle hiwPipeDesc">
+    <title id="hiwPipeTitle">Dividend cycle analysis pipeline</title>
+    <desc id="hiwPipeDesc">Nine stages in three rows: the Python engine reads price and dividend data, cleans dividends into series, measures each past cycle, builds series statistics, projects the next cycle and runs risk checks; the decision layer turns that into a potential score, a current verdict, and the dashboard views and accuracy log.</desc>
+    <defs><marker id="hiwArrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+    ${arrows}${nodes}
+    <rect x="40" y="314" width="12" height="12" rx="2" class="hiw-key engine"/><text class="hiw-ts" x="60" y="324">Python engine (analyze-stock.py, analyze-batch.py)</text>
+    <rect x="420" y="314" width="12" height="12" rx="2" class="hiw-key decision"/><text class="hiw-ts" x="440" y="324">Decision layer</text>
+  </svg>`;
+
+  return`<div class="panel hiw-panel">
+    ${general?"":"<h2>How it works</h2>"}
+    <p class="hiw-intro">${general
+      ?"The analysis looks at how a stock has behaved around every past ex-dividend date, finds the repeatable part of that pattern, and projects where and when the next dip is likely. It doesn't predict price exactly; it tells you whether the pattern is reliable and whether today's price is in a good spot for it. The worked example below uses round made-up numbers (a $1.00 anchor) so the maths is easy to follow."
+      :"The analysis looks at how this stock has behaved around every past ex-dividend date, finds the repeatable part of that pattern, and projects where and when the next dip is likely. It doesn't predict price exactly; it tells you whether the pattern is reliable and whether today's price is in a good spot for it."}</p>
+    <div class="hiw-block">
+      <h3>1. What is measured in each past cycle</h3>
+      <div class="hiw-svg-wrap">${cycleSvg}</div>
+      <ul class="hiw-notes">
+        <li><strong>Anchor</strong>: the close when the pre-ex-div window opens. Every dip is measured from it, so price drift between cycles doesn't move the zone.</li>
+        <li><strong>Cycle low</strong>: the lowest close before ex-div. Its depth and its timing (weeks before ex-div) are recorded for every cycle.</li>
+        <li><strong>Win</strong>: the rebound from the low back to the pre-ex-div price is more than 3%.</li>
+        <li><strong>Entry zone</strong>: a percentile band of recent dips, applied to the next anchor. Fewer clean cycles means a wider band.</li>
+        <li><strong>Exits</strong>: A sells at the highest close before ex-div; B sells on the first close after it. History decides which one is preferred.</li>
+      </ul>
+    </div>
+    <div class="hiw-block">
+      <h3>2. From raw data to the verdict</h3>
+      <div class="hiw-svg-wrap">${pipelineSvg}</div>
+      <p class="small muted" style="margin:6px 0 0">${general?"On any stock's page, <strong>Guide → How it works</strong> lets you click a stage to open the view that shows it for that stock.":"Click a stage to open the view that shows it for this stock."}</p>
+    </div>
+    ${panelKeyPoints(data,{general})}
+    ${facts&&!general?`<div class="hiw-block"><h3>This stock's next setup</h3>${facts}</div>`:""}
+  </div>`;
+}
+
+// A made-up stock with round numbers ($1.00 anchor, simple dips) shaped like
+// a real analysis JSON, so the general "How it works" page can reuse the same
+// diagrams and key-point cards as a stock page. Values that the cards derive
+// (zone, projected low, timing window) are computed with the same rules, so
+// the worked example is internally consistent. Dates are relative to today so
+// the example setup is always upcoming.
+function howItWorksExampleData(){
+  const day=86400000;
+  const iso=t=>new Date(t).toISOString().slice(0,10);
+  const today=Date.now();
+  const exdiv=today+60*day;
+  const windowOpen=exdiv-91*day;
+  // Clean S1 cycles, oldest first: dip vs window-open close (%) and weeks from low to ex-div.
+  const hist=[[-3.5,7],[-4.5,8],[-6,9],[-4,7],[-2,6],[-7,8],[-3,7],[-5,8]];
+  const cycles=hist.map(([dip,wks],i)=>({
+    id:`S1_${2018+i}`,series:"S1",degen:false,macro:false,outlier:false,incomplete:false,
+    exdiv_date:iso(exdiv-(8-i)*182*day),low_vs_wopen:dip,wks_before:wks,success:dip!==-2,
+  }));
+  const pctl=(arr,p)=>keyPointPercentile([...arr].sort((a,b)=>a-b),p);
+  const median=arr=>pctl(arr,50);
+  // Entry zone: last 5 dips, trimmed at the 5th/95th percentile, then the
+  // 20th-80th band (n_eff 5) applied to the $1.00 anchor.
+  const recent=hist.slice(-5).map(h=>h[0]);
+  const lo5=pctl(recent,5),hi95=pctl(recent,95);
+  const trimmed=recent.map(v=>Math.min(hi95,Math.max(lo5,v)));
+  const anchor=1;
+  const zoneBot=anchor*(1+pctl(trimmed,20)/100);
+  const zoneTop=anchor*(1+pctl(trimmed,80)/100);
+  const wks=hist.map(h=>h[1]);
+  const wksMed=median(wks),wksP25=pctl(wks,25),wksP75=pctl(wks,75);
+  const proj={
+    proj_exdiv_date:iso(exdiv),window_open_date:iso(windowOpen),
+    anchor,anchor_source:"window_open_close",
+    zone_bot:+zoneBot.toFixed(4),zone_top:+zoneTop.toFixed(4),zone_degradation_adjusted:false,
+    est_low_px:+(anchor*(1+median(hist.map(h=>h[0]))/100)).toFixed(4),
+    est_low_date:iso(exdiv-wksMed*7*day),est_low_date_from:iso(exdiv-wksP75*7*day),est_low_date_to:iso(exdiv-wksP25*7*day),
+    timing_rating:"RELIABLE",timing_rating_display:"Reliable",
+    est_peak_px:1.04,est_exdiv_px:1.005,med_div_amt:0.02,
+    historical_frequencies:{win_rate:87.5,win_rate_all:78},
+  };
+  return{
+    meta:{ticker:"Example",stock_name:"Example stock",currency:"$",frequency_display:"Semi-Annual"},
+    cycles,
+    proj_series:{S1:proj},
+    series_meta:[{id:"S1"}],
+    series_adequacy:{S1:{n_clean:8,n_effective:5}},
+    ss_series:{S1:{exit_profile:{
+      pre_exdiv_peak_window_days_p25:5,pre_exdiv_peak_window_days_p75:12,
+      avg_gain_pre_exdiv:7.5,avg_gain_post_exdiv_exit:4.8,
+      exit_mode_verdict_display:"Pre-Exdiv Peak Exit preferred",
+    }}},
+  };
+}
+
+// The general "How it works" page (#/how): the same explanation as a stock's
+// Guide tab, worked through with the round-number example instead of a real
+// stock, plus a stock picker and the getting-started steps.
+function renderHowPage(){
+  document.title="How it works · Dividend Cycle Dashboard";
+  const stocks=activeStockList().slice().sort((a,b)=>(a.data?.meta?.ticker||"").localeCompare(b.data?.meta?.ticker||""));
+  const picker=stocks.length?`<div class="hiw-block">
+      <h3>See it for a real stock</h3>
+      <p class="small muted" style="margin:0 0 10px">Every stock page has this same explanation under <strong>Guide → How it works</strong>, using that stock's real numbers.</p>
+      <div class="stock-selector" style="margin:0"><select id="howStockPicker" aria-label="Choose a stock"><option value="">Choose a stock…</option>${stocks.map(s=>`<option value="${esc(s.key)}">${esc(s.data?.meta?.ticker||s.key)} — ${esc(s.data?.meta?.stock_name||"")}</option>`).join("")}</select></div>
+    </div>`:"";
+  const flask=BACKEND_CONFIG.enabled&&backendAvailable;
+  const steps=flask
+    ? [["Edit stock list","Open <strong>Data → Edit stock list</strong> and choose the stocks you want to track."],
+       ["Update stock data","<strong>Data → Update stock data</strong> fetches the latest prices and company descriptions from Yahoo Finance, then re-runs the analysis."],
+       ["Browse","Loaded stocks are remembered and reload automatically next visit. Use <strong>Data → Reload stock data</strong> only if outputs changed outside the dashboard."]]
+    : [["Browse","This is the published copy: stock data loads automatically. Start from the Watchlist, then open any stock."],
+       ["Update the data","Refreshing prices and the stock list happens in the local Flask version (<code>python flask/app.py</code>), then <code>deploy.ps1</code> republishes it here."]];
+  const gettingStarted=`<div class="hiw-block">
+      <h3>Getting started</h3>
+      <div class="start-steps" style="margin-top:6px">${steps.map(([t,b],i)=>`<div class="start-step"><div class="start-step-num">${i+1}</div><h3>${t}</h3><p>${b}</p></div>`).join("")}</div>
+    </div>`;
+  app.innerHTML=`<div class="view-head"><div><h1>How it works</h1><p class="small muted" style="margin:2px 0 0">The method behind every number on the dashboard, with a worked example.</p></div>${stockList().length?`<button class="btn btn-compact" id="howBackToWatchlist" type="button">&#8592; Watchlist</button>`:""}</div>
+    ${panelHowItWorks(howItWorksExampleData(),{general:true})}
+    ${picker}
+    ${gettingStarted}
+    <div class="foot">All outputs are rule-based from the Dividend Cycle Analysis data — no LLM inference.</div>`;
+  document.getElementById("howBackToWatchlist")?.addEventListener("click",()=>{state.view="overview";renderApp();window.scrollTo(0,0);});
+  document.getElementById("howStockPicker")?.addEventListener("change",e=>{
+    if(!e.target.value)return;
+    state.activeKey=e.target.value;state.view="drill";
+    state.tab=Math.max(0,DRILL_SLUGS.indexOf("how"));
+    persistPlannerState();renderApp();window.scrollTo(0,0);
+  });
+  syncRouteToState();
+}
+
+function drillPanels(data){
+  return[
+    {group:"Setup",      slug:"series",        name:"Series & Risk",   fn:()=>panelSeries(data)},
+    {group:"Setup",      slug:"projections",   name:"Projections",     fn:()=>panelProjections(data)},
+    {group:"Setup",      slug:"ranking",       name:"Series Ranking",  fn:()=>panelCGC(data)},
+    {group:"Timing",     slug:"progress",      name:"Cycle Progress",  fn:()=>`<div class="panel prog-panel">${panelProgressStrip(data)}</div>`},
+    {group:"Timing",     slug:"calendar",      name:"Calendar Window", fn:()=>panelCalendar(data)},
+    {group:"Timing",     slug:"drift",         name:"Dates & Drift",   fn:()=>panelDatesDrift(data)},
+    {group:"Timing",     slug:"full-calendar", name:"Full Calendar",   fn:()=>panelFullCalendar(data)},
+    {group:"History",    slug:"price",         name:"Price History",   fn:()=>panelPriceHTML()},
+    {group:"History",    slug:"cycles",        name:"Cycle Log",       fn:()=>panelCycles(data)},
+    {group:"History",    slug:"dividends",     name:"Dividends",       fn:()=>panelDividends(data)},
+    {group:"Financials", slug:"financials",    name:"Financials",      fn:()=>panelFinancials(data)},
+    {group:"Guide",      slug:"how",           name:"How it works",    fn:()=>panelHowItWorks(data)},
+    {group:"Guide",      slug:"strategy",      name:"Strategy",        fn:()=>panelStrategy(data)},
+    {group:"Guide",      slug:"glossary",      name:"Glossary",        fn:()=>panelGlossary()},
+  ];
 }
 
 function renderDrillView(stockEntry){
@@ -7315,62 +7827,85 @@ function renderDrillView(stockEntry){
   const cleanTotal=(data.series_meta||[]).reduce((a,s)=>a+(data.ss_series?.[s.id]?.clean?.n_clean||0),0);
   const assetTypeChip=assetTypeChipForTicker(m.ticker||stockEntry.key);
   const sectorLabel=sectorLabelForTicker(m.ticker||stockEntry.key);
-  
+  const verdictTone=finalVerdict?({good:"good",warn:"warn",bad:"bad",muted:"muted"}[finalVerdict.tone]||"neutral"):"neutral";
+  const edgeFlags=data.edge_case_flags_display||[];
+
   const desc=(state.stockDescriptions||{})[m.ticker||""]||"";
   const heroHTML=`<section class="hero" style="margin-bottom:18px">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div>
-          <h1 style="margin:0;font-size:24px;font-weight:700">${esc(m.stock_name||"Dashboard")}<span style="font-size:14px;color:var(--mu);font-family:var(--mono);margin-left:8px">${esc(m.ticker||"")}</span></h1>
-    <p class="sub" style="margin:4px 0 0">${esc(m.exchange||"-")} · ${esc(m.currency||"-")} · ${esc(m.frequency_display||"-")}${sectorLabel?` · ${esc(sectorLabel)}`:""} · ${dt(data.data_window_start)} to ${dt(data.data_window_end)}</p>
-        </div>
-      ${stockList().length>1?`<button class="btn" id="backToOverview" style="font-size:12px;padding:7px 12px">&#8592; All stocks</button>`:""}
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <h1 style="margin:0;font-size:24px;font-weight:700">${esc(m.stock_name||"Dashboard")}<span style="font-size:14px;color:var(--mu);font-family:var(--mono);margin-left:8px">${esc(m.ticker||"")}</span></h1>
+        <p class="sub" style="margin:4px 0 0">${esc(m.exchange||"-")} · ${esc(m.currency||"-")} · ${esc(m.frequency_display||"-")}${sectorLabel?` · ${esc(sectorLabel)}`:""}</p>
+      </div>
+      ${stockList().length>1?`<button class="btn" id="backToOverview" type="button" style="font-size:12px;padding:7px 12px">&#8592; Watchlist</button>`:""}
     </div>
+    ${finalVerdict?`<div class="verdict-banner tone-${verdictTone}"><div class="verdict-label"><span class="verdict-icon" aria-hidden="true">${verdictIcon(finalVerdict.tone)}</span>${esc(finalVerdict.label)}</div><div class="verdict-reason">${esc(finalVerdict.reason)}${normalizedForVerdict?.sampleAdequacy?` <span class="muted">Confidence: ${esc(String(normalizedForVerdict.sampleAdequacy).toLowerCase())}${normalizedForVerdict?.nEffective!=null?` (n_eff ${n(normalizedForVerdict.nEffective,2)})`:""}.</span>`:""}</div></div>`:""}
     <div class="chips" style="margin-top:10px">
       ${assetTypeChip}
-      <span class="chip">Price ${ccy(data.current_price,m.currency)}</span>
       <span class="chip ${up?.proj.entry_status==="INSIDE"?"good":up?.proj.entry_status==="ABOVE"?"warn":""}">${up?`Next: ${esc(up.id)} ${dt(up.proj.proj_exdiv_date)}`:"No future proj"}</span>
       ${daysTo!==null?`<span class="chip ${daysTo<=30?"warn":""}">${daysTo}d to ex-div</span>`:""}
       <span class="chip">${(data.series_meta||[]).length} series · ${(data.cycles||[]).length} cycles</span>
+      ${edgeFlags.map(x=>`<span class="chip bad">${esc(x)}</span>`).join("")}
     </div>
-    ${desc?`<p style="font-size:13px;color:var(--mu);line-height:1.65;margin:10px 0 0;padding:10px 12px;background:var(--sf);border-radius:8px;border:1px solid var(--bd)">${esc(desc)}</p>`:""}
-      <div class="section-note" style="margin-top:12px">All outputs are rule-based from uploaded Dividend Cycle Analysis data. No LLM inference is used.</div>
+    ${desc?`<div class="stock-desc" id="stockDesc"><p>${esc(desc)}</p><button type="button" class="stock-desc-toggle" id="stockDescToggle">Show more</button></div>`:""}
     <div style="margin-top:14px">
       <div class="hero-grid hero-top">
         <div class="card"><div class="label">Current Price</div><div class="value">${ccy(data.current_price,m.currency)}</div><div class="small muted">Anchor ${ccy(data.anchor_price,m.currency)}</div></div>
         <div class="card"><div class="label">Next Ex-Div</div><div class="value" style="font-size:16px">${up?dt(up.proj.proj_exdiv_date):"-"}</div><div class="small muted">${up?esc(up.id):"-"} · ${daysTo!==null?daysTo+"d away":"-"}</div></div>
-<div class="card"><div class="label">Frequency</div><div class="value" style="font-size:16px">${esc(m.frequency_display || "-")}</div><div class="small muted">${(data.series_meta||[]).length} series · ${n(m.mean_interval_days,0)}d mean</div></div>
-        <div class="card"><div class="label">Clean Cycles / Total</div><div class="value">${cleanTotal}<span style="font-size:14px;color:var(--mu)"> / ${(data.cycles||[]).length}</span></div><div class="small muted">${n(data.years_covered,1)}y covered</div></div>
-        <div class="card"><div class="label">CGC #1 Series</div><div class="value" style="font-size:16px">${cgcTop?esc(cgcTop.series_id):"-"}</div><div class="small muted">${cgcTop?`Score ${n(cgcTop.score,1)} · Win ${pctRaw(cgcTop.win_rate,0)}`:"-"}</div></div>
+        <div class="card"><div class="label">Frequency</div><div class="value" style="font-size:16px">${esc(m.frequency_display || "-")}</div><div class="small muted">${(data.series_meta||[]).length} series · ${n(m.mean_interval_days,0)}d mean</div></div>
+        <div class="card"><div class="label">Clean Cycles / Total</div><div class="value">${cleanTotal}<span style="font-size:14px;color:var(--mu)"> / ${(data.cycles||[]).length}</span></div><div class="small muted">${n(data.years_covered,1)}y covered · ${dt(data.data_window_start)} to ${dt(data.data_window_end)}</div></div>
+        <div class="card"><div class="label">${tipLabel("Best Series","Historically strongest dividend series for this stock (CGC rank #1: win rate combined with median upside).")}</div><div class="value" style="font-size:16px">${cgcTop?esc(cgcTop.series_id):"-"}</div><div class="small muted">${cgcTop?`Score ${n(cgcTop.score,1)} · Win ${pctRaw(cgcTop.win_rate,0)}`:"-"}</div></div>
       </div>
-      ${finalVerdict?`<div class="section-note" style="margin-top:12px"><strong>Current Verdict:</strong> <span class="${finalVerdict.tone==="good"?"good":finalVerdict.tone==="warn"?"warn":finalVerdict.tone==="bad"?"bad":finalVerdict.tone==="muted"?"muted":""}">${esc(finalVerdict.label)}</span>. ${esc(finalVerdict.reason)}${normalizedForVerdict?.sampleAdequacy?` <strong>Confidence:</strong> ${esc(String(normalizedForVerdict.sampleAdequacy).toLowerCase())}${normalizedForVerdict?.nEffective!=null?` (n_eff ${n(normalizedForVerdict.nEffective,2)})`:""}.`:""}</div>`:""}
       ${renderHeroDataset(data)}
-      ${panelProgressStrip(data)}
     </div>
   </section>`;
 
-  const panels=[
-    {name:"Series & Risk",   fn:()=>panelSeries(data)},
-    {name:"Projections",     fn:()=>panelProjections(data)},
-    {name:"Series Ranking",  fn:()=>panelCGC(data)},
-    {name:"Calendar Window", fn:()=>panelCalendar(data)},
-    {name:"Dates & Drift",   fn:()=>panelDatesDrift(data)},
-    {name:"Full Calendar",   fn:()=>panelFullCalendar(data)},
-    {name:"Strategy",        fn:()=>panelStrategy(data)},
-    {name:"Cycle Log",       fn:()=>panelCycles(data)},
-    {name:"Dividends",       fn:()=>panelDividends(data)},
-    {name:"Financials",      fn:()=>panelFinancials(data)},
-    {name:"Price History",   fn:()=>panelPriceHTML()},
-    {name:"Glossary",        fn:()=>panelGlossary()},
-  ];
-  state.tab=Math.min(state.tab,panels.length-1);
-app.innerHTML=heroHTML+renderTabs(panels)+panels[state.tab].fn()+`<div class="foot">Dividend Cycle Analysis dashboard · No LLM required · All data from JSON</div>`;
-  app.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{state.tab=Number(btn.dataset.tab);renderDrillView(stockEntry);if(panels[state.tab]?.name==="Price History")renderPriceChart(data);if(panels[state.tab]?.name==="Projections")initPositionCalculator(data)}));
+  const panels=drillPanels(data);
+  state.tab=Math.max(0,Math.min(Number(state.tab)||0,panels.length-1));
+  app.innerHTML=heroHTML+`<div class="drill-nav">${renderTabs(panels)}</div>`+panels[state.tab].fn()+`<div class="foot">All outputs are rule-based from the Dividend Cycle Analysis data — no LLM inference.</div>`;
+  app.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{
+    state.tab=Number(btn.dataset.tab);
+    persistPlannerState();
+    const navTop=document.querySelector(".drill-nav")?.getBoundingClientRect().top??0;
+    renderDrillView(stockEntry);
+    // If the tab bar was stuck at the top, keep the new panel's start in view.
+    const nav=document.querySelector(".drill-nav");
+    const stickTop=nav?parseFloat(getComputedStyle(nav).top)||0:0;
+    if(nav&&getComputedStyle(nav).position==="sticky"&&navTop<=stickTop+1){
+      const heroBottom=document.querySelector("#app .hero")?.getBoundingClientRect().bottom??0;
+      window.scrollTo({top:heroBottom+window.scrollY-stickTop+4});
+    }
+  }));
   const backBtn=document.getElementById("backToOverview");
-  if(backBtn)backBtn.addEventListener("click",()=>{state.view="overview";renderApp()});
-document.title=`${m.stock_name||"Dividend Cycle Analysis"} (${m.ticker||""})`;
-  if(panels[state.tab]?.name==="Price History")renderPriceChart(data);
-  if(panels[state.tab]?.name==="Projections")initPositionCalculator(data);
+  if(backBtn)backBtn.addEventListener("click",()=>{state.view="overview";renderApp();window.scrollTo(0,0);});
+  // "How it works" pipeline stages jump to the tab that shows that stage.
+  app.querySelectorAll("[data-hiw-goto]").forEach(node=>{
+    const go=()=>{
+      const idx=panels.findIndex(p=>p.slug===node.dataset.hiwGoto);
+      if(idx<0)return;
+      state.tab=idx;persistPlannerState();renderDrillView(stockEntry);
+      const heroBottom=document.querySelector("#app .hero")?.getBoundingClientRect().bottom??0;
+      window.scrollTo({top:Math.max(0,heroBottom+window.scrollY-(parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--topbar-h"))||66))});
+    };
+    node.addEventListener("click",go);
+    node.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});
+  });
+  const descEl=document.getElementById("stockDesc");
+  const descToggle=document.getElementById("stockDescToggle");
+  if(descEl&&descToggle){
+    const p=descEl.querySelector("p");
+    // Only offer the toggle when the clamped text actually overflows.
+    if(p&&p.scrollHeight<=p.clientHeight+2)descToggle.style.display="none";
+    descToggle.addEventListener("click",()=>{
+      const open=descEl.classList.toggle("is-open");
+      descToggle.textContent=open?"Show less":"Show more";
+    });
+  }
+  document.title=`${m.stock_name||"Dividend Cycle Analysis"} (${m.ticker||""})`;
+  if(panels[state.tab]?.slug==="price")renderPriceChart(data);
+  if(panels[state.tab]?.slug==="projections")initPositionCalculator(data);
   bindDragScroll(app);
+  syncRouteToState();
 }
 
 /* -- OVERVIEW VIEW ----------------------------------------------------- */
@@ -7414,7 +7949,7 @@ function dashboardHelpModalHtml(){
         <div class="rev-help-rule">
           <strong style="color:var(--rd)">Too Risky</strong> &mdash; tail risk is Severe, regardless of anything else<br>
           <strong>Wait</strong> &mdash; price is too far above the zone (&gt;3%), or near it but the next ex-div is more than 90 days out<br>
-          <strong style="color:#c9a227">Small Trades Advised</strong> &mdash; price is inside (or just slightly below) the zone, but tail risk is High or timing is Unreliable<br>
+          <strong style="color:#f5c542">Small Trades Advised</strong> &mdash; price is inside (or just slightly below) the zone, but tail risk is High or timing is Unreliable<br>
           <strong style="color:var(--gn)">Actionable Now</strong> &mdash; price is inside the zone (or slightly below it with Low/Moderate tail risk) and the caution rule above didn't trigger<br>
           <strong>Watch Closely</strong> &mdash; price is within ~3% above the zone and the next ex-div is within 90 days<br>
           <strong>Watch Only</strong> &mdash; next ex-div is within 90 days, but price isn't in position yet<br>
@@ -7444,7 +7979,7 @@ function dashboardHelpModalHtml(){
         <p>A simpler, threshold-only grouping by raw Potential Score &mdash; not the same classification as the Review tab, which weighs zone hit rate, pattern stability, and 5yr growth together through six explicit rules.</p>
         <div class="rev-help-rule">
           <strong style="color:var(--gn)">Strong Potential</strong> &mdash; score &ge; 75<br>
-          <strong style="color:#c9a227">Watchlist</strong> &mdash; score &ge; 60<br>
+          <strong style="color:#f5c542">Watchlist</strong> &mdash; score &ge; 60<br>
           <strong>Borderline</strong> &mdash; score &ge; 50<br>
           <span style="display:block;margin-top:4px;color:var(--mu)">Below n_effective = 3, the raw score still shows but the label is withheld &mdash; too little history to give a confident shortlist tag.</span>
         </div>
@@ -7531,15 +8066,14 @@ function renderOverviewView(){
       <button class="tab ${mode==="overview"?"active":""}" id="ovModeOverview">Overview</button>
       <button class="tab ${mode==="grouped"?"active":""}" id="ovModeGrouped">Potential &amp; Upcoming</button>
       <button class="tab ${mode==="planner"?"active":""}" id="ovModePlanner">Trade Planner</button>
-      <button class="tab ${mode==="review"?"active":""}" id="ovModeReview">Review</button>
       <button class="tab ${mode==="compare"?"active":""}" id="ovModeCompare">Comparison</button>
       <button class="tab ${mode==="portfolio"?"active":""}" id="ovModePortfolio">Portfolio</button>
     </div>`;
 
   // Review already has its own dedicated help button/modal, so this shared one
   // only needs an entry point for the other 4 modes.
-  const helpTabForMode={overview:"overview",grouped:"potential",planner:"planner",compare:"comparison"}[mode];
-  const helpBtn=helpTabForMode?`<button data-dash-help-open="${helpTabForMode}" style="font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid var(--bd);background:var(--sf);color:var(--mu);cursor:pointer;white-space:nowrap;flex-shrink:0">About this view</button>`:"";
+  const helpTabForMode={overview:"overview",grouped:"potential",planner:"planner",compare:"comparison",modelcheck:"comparison"}[mode];
+  const helpBtn=helpTabForMode?`<button class="nav-link" data-dash-help-open="${helpTabForMode}" type="button">About this view</button>`:"";
 
   let body="";
   if(mode==="grouped"){
@@ -7547,27 +8081,40 @@ function renderOverviewView(){
   }else if(mode==="planner"){
     body=panelTradePlanner();
   }else if(mode==="compare"){
-    body=panelZoneOutcomeMap()+panelComparison();
+    body=panelComparison();
+  }else if(mode==="modelcheck"){
+    body=panelZoneOutcomeMap();
   }else if(mode==="review"){
     body=panelReview();
   }else if(mode==="portfolio"){
     body=panelPortfolio();
   }else{
-    body=panelSetupMap()+panelMiniCards();
+    body=panelTodayStrip()+panelSetupMap()+panelMiniCards();
   }
 
+  const backBtn=`<button class="btn btn-compact" id="ovBackToWatchlist" type="button">&#8592; Watchlist</button>`;
+  const header=mode==="review"
+    ? `<div class="view-head"><div><h1>Review stock list</h1><p class="small muted" style="margin:2px 0 0">Decide which tracked stocks to keep, watch or remove.</p></div>${backBtn}</div>`
+    : mode==="modelcheck"
+      ? `<div class="view-head"><div><h1>Model accuracy</h1><div class="view-seg" style="margin-top:8px"><a class="view-seg-btn" href="prediction-log.html">Prediction log</a><span class="view-seg-btn active">Zone outcome map</span></div></div><div style="display:flex;gap:8px">${helpBtn}${backBtn}</div></div>`
+      // Title and tabs share one row. The help control is a fixed-width "?"
+      // that keeps its slot (hidden) on tabs without help, so the row is the
+      // same width on every tab and never flips between 1 and 2 rows.
+      : `<div class="view-head view-head-watchlist"><h1>Watchlist <span style="font-size:14px;color:var(--mu);font-weight:400">${stocks.length} active stock${stocks.length!==1?"s":""}</span></h1>
+    <div class="view-head-tabs">${modeToggle}${helpTabForMode
+      ?`<button class="help-icon-btn" data-dash-help-open="${helpTabForMode}" type="button" aria-label="About this view" title="About this view">?</button>`
+      :`<span class="help-icon-btn is-placeholder" aria-hidden="true"></span>`}</div></div>`;
   app.innerHTML=`
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
-    <h1 style="margin:0;font-size:22px;font-weight:700">Portfolio Overview <span style="font-size:14px;color:var(--mu);font-weight:400">${stocks.length} stock${stocks.length!==1?"s":""}</span></h1>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${modeToggle}${helpBtn}</div>
-  </div>
-  <div class="section-note" style="margin:-4px 0 14px">All outputs are rule-based from uploaded Dividend Cycle Analysis data. No LLM inference is used.</div>
+  ${header}
   ${body}
   ${dashboardHelpModalHtml()}
-  <div class="foot">Dividend Cycle Analysis dashboard · No LLM required · Click any stock to drill in</div>`;
+  <div class="foot">All outputs are rule-based from the Dividend Cycle Analysis data — no LLM inference. Click any stock to open it.</div>`;
 
   app.querySelectorAll(".mini-card[data-key]").forEach(el=>{
-    el.addEventListener("click",()=>setOverviewDrillTarget(el.dataset.key));
+    el.addEventListener("click",e=>{
+      if(e.target.closest("details,button,a,select,input"))return;
+      setOverviewDrillTarget(el.dataset.key);
+    });
   });
   app.querySelectorAll(".setup-list-row[data-key]").forEach(el=>{
     el.addEventListener("click",()=>setOverviewDrillTarget(el.dataset.key));
@@ -7694,7 +8241,7 @@ function renderOverviewView(){
   }
   document.getElementById("zoneOutcomeCurrent")?.addEventListener("click",()=>{state.zoneOutcomeMode="current";persistPlannerState();renderApp()});
   document.getElementById("zoneOutcomeRecent")?.addEventListener("click",()=>{state.zoneOutcomeMode="recent";persistPlannerState();renderApp()});
-  document.getElementById("setupMapViewMap")?.addEventListener("click",()=>{state.setupMapViewMode="map";persistPlannerState();renderApp()});
+  document.getElementById("setupMapViewMap")?.addEventListener("click",()=>{state.setupMapViewMode="map";state.setupMapMapForced=true;persistPlannerState();renderApp()});
   document.getElementById("setupMapViewList")?.addEventListener("click",()=>{state.setupMapViewMode="list";persistPlannerState();renderApp()});
   app.querySelectorAll(".setup-list-col-subhead .sh-sort[data-sort-field]").forEach(el=>{
     el.addEventListener("click",()=>{
@@ -7766,8 +8313,16 @@ function renderOverviewView(){
   document.getElementById("ovModeGrouped")?.addEventListener("click",()=>{state.overviewMode="grouped";persistPlannerState();renderApp()});
   document.getElementById("ovModePlanner")?.addEventListener("click",()=>{state.overviewMode="planner";persistPlannerState();renderApp()});
   document.getElementById("ovModeCompare")?.addEventListener("click",()=>{state.overviewMode="compare";persistPlannerState();renderApp()});
+  document.getElementById("ovBackToWatchlist")?.addEventListener("click",()=>{state.overviewMode="overview";persistPlannerState();renderApp();window.scrollTo(0,0)});
+  app.querySelectorAll("[data-today]").forEach(btn=>btn.addEventListener("click",()=>{
+    const k=btn.dataset.today;
+    if(k==="planner"||k==="portfolio"){state.overviewMode=k;persistPlannerState();renderApp();window.scrollTo(0,0);return;}
+    state.miniCardSort=k==="soon"?"days":"verdict";
+    persistPlannerState();
+    renderApp();
+    document.getElementById("miniGrid")?.closest(".panel")?.scrollIntoView({behavior:"smooth",block:"start"});
+  }));
   document.getElementById("ovModePortfolio")?.addEventListener("click",()=>{state.overviewMode="portfolio";persistPlannerState();renderApp()});
-  document.getElementById("ovModeReview")?.addEventListener("click",()=>{state.overviewMode="review";persistPlannerState();renderApp()});
   if(mode==="portfolio"){
     renderPortfolioHistoryChart();
     renderPortfolioAccountValueChart();
@@ -8130,24 +8685,30 @@ function renderOverviewView(){
     });
   });
 
-  app.querySelectorAll(".cmp-stock-head[data-key]").forEach(th=>{
-    th.addEventListener("click",()=>setOverviewDrillTarget(th.dataset.key));
+  app.querySelectorAll(".cmp-row[data-key]").forEach(tr=>{
+    tr.addEventListener("click",()=>setOverviewDrillTarget(tr.dataset.key));
   });
-
-  bindStateSelect("cmpSortKey","cmpSortKey",value=>{
-    if(value==="none") state.cmpSortDir="asc";
+  app.querySelectorAll("[data-cmp-sort]").forEach(th=>{
+    th.addEventListener("click",()=>{
+      const key=th.dataset.cmpSort;
+      // First click puts the most useful end on top (soonest dates, best
+      // ranks and lowest risk ascending; gains and rates descending), second flips.
+      const ascFirst=["next_exdiv","days_to_exdiv","entry_status","timing","tail_risk","div_trend","exit_mode","pre_exdiv_timing","frequency"];
+      const firstDir=ascFirst.includes(key)?"asc":"desc";
+      state.cmpSortDir=state.cmpSortKey===key?(state.cmpSortDir==="asc"?"desc":"asc"):firstDir;
+      state.cmpSortKey=key;
+      renderApp();
+    });
   });
-  bindStateSelect("cmpSortDir","cmpSortDir");
+  document.getElementById("cmpClearSort")?.addEventListener("click",()=>{state.cmpSortKey="none";state.cmpSortDir="asc";renderApp();});
+  bindStateSelect("miniCardSort","miniCardSort",()=>persistPlannerState());
   bindStateSelect("cmpFilterSector","cmpFilterSector");
   bindStateSelect("cmpFilterEntryStatus","cmpFilterEntryStatus");
   document.getElementById("cmpSearch")?.addEventListener("input",e=>{
     state.cmpSearch=e.target.value;
     const q=e.target.value.trim().toLowerCase();
-    document.querySelectorAll(".cmp-stock-head[data-col-index]").forEach(th=>{
-      const show=!q||th.textContent.toLowerCase().includes(q);
-      const idx=th.dataset.colIndex;
-      th.style.display=show?"":"none";
-      document.querySelectorAll(`[data-col-index="${idx}"]`).forEach(el=>el.style.display=show?"":"none");
+    document.querySelectorAll(".cmp-row[data-search]").forEach(tr=>{
+      tr.style.display=!q||tr.dataset.search.includes(q)?"":"none";
     });
   });
   document.getElementById("groupedSubTabPotential")?.addEventListener("click",()=>{state.groupedSubTab="potential";renderApp()});
@@ -8180,6 +8741,7 @@ bindStateSelect("groupedUpcomingFilterExitMode","groupedUpcomingFilterExitMode")
 bindStateSelect("groupedUpcomingFilterDays","groupedUpcomingFilterDays");
 bindStateSelect("groupedUpcomingFilterGain","groupedUpcomingFilterGain");
   bindDragScroll(app);
+  syncRouteToState();
 }
 
 function bindDragScroll(scope=document){
@@ -8232,22 +8794,84 @@ function bindDragScroll(scope=document){
   });
 }
 
+/* -- URL ROUTING --------------------------------------------------------- */
+// Mirrors the current view in the URL hash (#/review, #/stock/D05.SI/price)
+// so a refresh, a bookmark or the browser Back button returns to the same
+// place instead of dropping you on the default view.
+const OVERVIEW_MODE_SLUGS={overview:"overview",grouped:"potential",planner:"planner",review:"review",compare:"comparison",modelcheck:"model-check",portfolio:"portfolio"};
+const DRILL_SLUGS=drillPanels({}).map(p=>p.slug);
+let pendingRoute=null;   // a #/stock/... link whose stock hasn't loaded yet
+let applyingRoute=false;
+function routeForState(){
+  if(state.view==="how")return"#/how";
+  if(state.view==="drill"&&state.activeKey&&state.stocks[state.activeKey]){
+    return`#/stock/${encodeURIComponent(state.activeKey)}/${DRILL_SLUGS[state.tab]||DRILL_SLUGS[0]}`;
+  }
+  return`#/${OVERVIEW_MODE_SLUGS[state.overviewMode]||"overview"}`;
+}
+function applyRoute(hash){
+  const parts=String(hash||"").replace(/^#\/?/,"").split("/").filter(Boolean).map(decodeURIComponent);
+  if(!parts.length)return;
+  if(parts[0]==="how"){pendingRoute=null;state.view="how";return;}
+  if(parts[0]==="stock"&&parts[1]){
+    const key=parts[1];
+    const tab=Math.max(0,DRILL_SLUGS.indexOf(parts[2]||""));
+    if(!state.stocks[key]){pendingRoute={key,tab};return;}
+    pendingRoute=null;
+    state.activeKey=key;state.view="drill";state.tab=tab;
+    return;
+  }
+  const mode=Object.keys(OVERVIEW_MODE_SLUGS).find(k=>OVERVIEW_MODE_SLUGS[k]===parts[0]);
+  if(mode){pendingRoute=null;state.overviewMode=mode;state.view="overview";}
+}
+function syncRouteToState(){
+  if(pendingRoute)return; // keep the deep link until its stock has loaded
+  const next=routeForState();
+  if(location.hash===next)return;
+  try{
+    if(applyingRoute||!location.hash)history.replaceState(null,"",next);
+    else history.pushState(null,"",next);
+  }catch(_){}
+}
+// Plain #/... links (like the topbar's "How it works") change the hash
+// directly; route them the same way as Back/Forward when they don't match.
+window.addEventListener("hashchange",()=>{
+  if(location.hash===routeForState())return;
+  applyingRoute=true;applyRoute(location.hash);renderApp();applyingRoute=false;window.scrollTo(0,0);
+});
+window.addEventListener("popstate",()=>{
+  applyingRoute=true;
+  applyRoute(location.hash);
+  renderApp();
+  applyingRoute=false;
+  window.scrollTo(0,0);
+});
+
 /* ?? MASTER RENDER ????????????????????????????????????????????????????? */
 function renderApp(){
   updateStockBar();
+  if(pendingRoute&&state.stocks[pendingRoute.key]){
+    state.activeKey=pendingRoute.key;state.view="drill";state.tab=pendingRoute.tab;
+    pendingRoute=null;
+  }
+  const howLink=document.getElementById("howItWorksLink");
+  if(howLink){howLink.classList.toggle("is-current",state.view==="how");howLink.toggleAttribute("aria-current",state.view==="how");}
+  if(state.view==="how"){renderHowPage();return;}
   const stocks=stockList();
   if(!stocks.length){
     const flaskActions=BACKEND_CONFIG.enabled && backendAvailable
       ? `<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px">
         <button class="btn btn-compact" id="emptyManageRegistryBtn" type="button">Edit stock list</button>
         <button class="btn btn-compact" id="emptyRunPipelineBtn" type="button">Update stock data</button>
-        <button class="btn btn-compact" id="emptyLoadServerStocksBtn" type="button">Load existing stock data</button>
+        <button class="btn btn-compact" id="emptyLoadServerStocksBtn" type="button">Load stock data</button>
       </div>`
-      : `<p style="font-size:12px;margin:10px 0 0;color:var(--mu)">Open this dashboard through the local Flask app to edit the stock list, update stock data, and load existing outputs.</p>`;
+      : BACKEND_CONFIG.staticJsonBase
+        ? `<p style="font-size:12px;margin:10px 0 0;color:var(--mu)">Loading the published stock data…</p>`
+        : `<p style="font-size:12px;margin:10px 0 0;color:var(--mu)">The local Flask server isn't reachable. Start it with <code>python flask/app.py</code> and open <code>http://127.0.0.1:5000</code>.</p>`;
     app.innerHTML=`<div class="multi-empty">
       <div class="me-icon"></div>
       <h2>Set up stock data to begin</h2>
-      <p style="font-size:13px;margin:4px 0 0">Use the Flask workflow to prepare tracked stocks, refresh analysis outputs, and load them into the dashboard.</p>
+      <p style="font-size:13px;margin:4px 0 0">Pick the stocks you want to track, refresh their analysis, then load them here.</p>
       <div class="start-steps">
         <div class="start-step">
           <div class="start-step-num">1</div>
@@ -8261,8 +8885,8 @@ function renderApp(){
         </div>
         <div class="start-step">
           <div class="start-step-num">3</div>
-          <h3>Load existing stock data</h3>
-          <p>Open the generated stock data in the dashboard.</p>
+          <h3>Load stock data</h3>
+          <p>Open the generated analysis here. It reloads automatically next visit.</p>
         </div>
       </div>
       ${flaskActions}
@@ -8281,8 +8905,12 @@ function renderApp(){
 }
 
 /* ?? LOAD FUNCTIONS ???????????????????????????????????????????????????? */
-function addStock(data,label){
+function addStock(data,label,{render=true}={}){
   validateData(data);
+  if(data.meta?.stock_name){
+    data.meta.stock_name_raw=data.meta.stock_name_raw||data.meta.stock_name;
+    data.meta.stock_name=displayStockName(data.meta.stock_name);
+  }
   const key=stockKey(data,label);
   const isUpdate=key in state.stocks;
   state.rememberLoadedStocks=true;
@@ -8291,6 +8919,7 @@ function addStock(data,label){
   if(isUpdate){
     document.getElementById("loadStatus").textContent=`Refreshed: ${data.meta?.ticker||label}`;
   }
+  if(!render)return;
   ensurePlannerActive();
   persistPlannerState();
   // If only 1 stock, auto-drill; if multiple stay in overview
@@ -8306,19 +8935,37 @@ document.getElementById("loadServerStocksBtn")?.addEventListener("click",async()
     document.getElementById("loadStatus").textContent=`Existing stock data load failed: ${err.message}`;
   }
 });
-document.getElementById("quickGuideBtn")?.addEventListener("click",()=>openQuickGuideOverlay());
-document.getElementById("mobileActionsToggle")?.addEventListener("click",()=>{
-  const actions=document.querySelector(".topbar-actions");
-  const toggle=document.getElementById("mobileActionsToggle");
-  if(!actions||!toggle)return;
-  const expanded=actions.classList.contains("expanded");
-  actions.classList.toggle("expanded",!expanded);
-  actions.classList.toggle("collapsed",expanded);
-  toggle.setAttribute("aria-expanded",expanded?"false":"true");
+// The stock page's tab bar sticks just under the topbar, whose height
+// changes with wrapping, so expose its live height as a CSS variable.
+function syncTopbarHeight(){
+  const t=document.querySelector(".topbar");
+  if(t)document.documentElement.style.setProperty("--topbar-h",`${t.offsetHeight}px`);
+}
+syncTopbarHeight();
+window.addEventListener("resize",syncTopbarHeight);
+// "Data" menu in the topbar: groups the maintenance actions so they don't
+// sit beside navigation looking like peers of it.
+function setDataMenuOpen(open){
+  const list=document.getElementById("dataMenuList");
+  const btn=document.getElementById("dataMenuBtn");
+  if(!list||!btn)return;
+  list.hidden=!open;
+  btn.setAttribute("aria-expanded",open?"true":"false");
+}
+document.getElementById("dataMenuBtn")?.addEventListener("click",e=>{
+  e.stopPropagation();
+  setDataMenuOpen(document.getElementById("dataMenuList")?.hidden);
 });
-document.getElementById("closeQuickGuideBtn")?.addEventListener("click",()=>closeQuickGuideOverlay());
-document.getElementById("quickGuideOverlay")?.addEventListener("click",e=>{
-  if(e.target.id==="quickGuideOverlay")closeQuickGuideOverlay();
+document.getElementById("reviewListMenuBtn")?.addEventListener("click",()=>{
+  if(!stockList().length)return;
+  state.overviewMode="review";state.view="overview";
+  persistPlannerState();renderApp();window.scrollTo(0,0);
+});
+document.getElementById("dataMenuList")?.addEventListener("click",e=>{
+  if(e.target.closest(".topbar-menu-item"))setDataMenuOpen(false);
+});
+document.addEventListener("click",e=>{
+  if(!e.target.closest("#dataMenu"))setDataMenuOpen(false);
 });
 document.getElementById("manageRegistryBtn")?.addEventListener("click",async()=>{
   openRegistryOverlay();
@@ -8428,11 +9075,14 @@ document.querySelector(".registry-tabs")?.addEventListener("click",e=>{
   if(tab)setRegistryTab(tab);
 });
 document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"&&document.getElementById("registryOverlay")?.classList.contains("open")){
-    closeRegistryOverlay();
-  }
+  if(e.key!=="Escape")return;
+  setDataMenuOpen(false);
+  if(document.getElementById("registryOverlay")?.classList.contains("open"))closeRegistryOverlay();
+  document.querySelectorAll("#dashboardHelpModal,#reviewHelpModal").forEach(m=>{m.style.display="none";});
+  document.querySelectorAll("#setupMapFilterMenu,#zoneOutcomeFilterMenu").forEach(m=>{m.style.display="none";});
 });
 document.getElementById("forgetSavedStocksBtn")?.addEventListener("click",()=>{
+  if(!confirm("Stop auto-loading your stocks on future visits? Your stock list, planner and portfolio are not affected."))return;
   state.rememberLoadedStocks=false;
   state.serverLoadedFiles=[];
   persistPlannerState();
@@ -8440,8 +9090,6 @@ document.getElementById("forgetSavedStocksBtn")?.addEventListener("click",()=>{
     ? "Saved stock cache cleared for future refreshes"
     : "Saved stock cache cleared";
 });
-syncMobileTopbarActions();
-window.addEventListener("resize",syncMobileTopbarActions);
 bindDragScroll(document);
 
 // Delegated handler for dynamically-rendered buttons
@@ -8484,7 +9132,9 @@ hydratePortfolioRebates();
 hydratePortfolioNetDeposits();
 hydratePortfolioWithdrawals();
 hydratePortfolioAccountValue();
+if(location.hash){applyingRoute=true;applyRoute(location.hash);}
 renderApp();
+applyingRoute=false;
 initBackendMode();
 
 document.addEventListener("input",function(e){

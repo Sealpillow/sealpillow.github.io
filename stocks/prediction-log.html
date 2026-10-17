@@ -7,42 +7,46 @@
 <style>
 /* ── TOKENS ─────────────────────────────────────────────── */
 :root {
-  --bg:   #0d1520;
-  --sf:   #131d2e;
-  --sf2:  #1b2740;
-  --sf3:  #223058;
-  --bd:   #243452;
-  --tx:   #dbe6fb;
-  --mu:   #7a93c0;
-  --mu2:  #4a6490;
+  /* Dark values match main/dashboard.css so both pages read as one product. */
+  --bg:   #0c0f1a;
+  --sf:   #131724;
+  --sf2:  #1a1f30;
+  --sf3:  #222842;
+  --bd:   #252a3d;
+  --tx:   #d4daf0;
+  --mu:   #8a92aa;
+  --mu2:  #5d6580;
   --ac:   #4f8ef7;
   --ac2:  #2b5ec9;
-  --hit:  #22c55e;
-  --warn: #f59e0b;
-  --miss: #ef4444;
+  --hit:  #3ed9a0;
+  --warn: #f5c542;
+  --miss: #f07070;
   --pend: #64748b;
   --hit-bg:  rgba(34,197,94,.08);
   --warn-bg: rgba(245,158,11,.08);
   --miss-bg: rgba(239,68,68,.08);
   --pend-bg: rgba(100,116,139,.06);
   --radius: 10px;
-  --mono: "SF Mono","Consolas","Menlo","Courier New",monospace;
+  --mono: 'IBM Plex Mono',Consolas,monospace;
 }
 @media(prefers-color-scheme:light){:root{
   --bg:#f0f4fb; --sf:#fff; --sf2:#e8edf8; --sf3:#d4ddf0;
   --bd:#c5cfe8; --tx:#1a2744; --mu:#5570a0; --mu2:#8aa0c8;
+  --hit:#0f8a5f; --warn:#a16207; --miss:#c53030; --ac:#2563eb;
   --hit-bg:rgba(34,197,94,.1); --warn-bg:rgba(245,158,11,.1);
   --miss-bg:rgba(239,68,68,.1); --pend-bg:rgba(100,116,139,.08);
 }}
 :root[data-theme="dark"]{
-  --bg:#0d1520; --sf:#131d2e; --sf2:#1b2740; --sf3:#223058;
-  --bd:#243452; --tx:#dbe6fb; --mu:#7a93c0; --mu2:#4a6490;
+  --hit:#3ed9a0; --warn:#f5c542; --miss:#f07070; --ac:#4f8ef7;
+  --bg:#0c0f1a; --sf:#131724; --sf2:#1a1f30; --sf3:#222842;
+  --bd:#252a3d; --tx:#d4daf0; --mu:#8a92aa; --mu2:#5d6580;
   --hit-bg:rgba(34,197,94,.08); --warn-bg:rgba(245,158,11,.08);
   --miss-bg:rgba(239,68,68,.08); --pend-bg:rgba(100,116,139,.06);
 }
 :root[data-theme="light"]{
   --bg:#f0f4fb; --sf:#fff; --sf2:#e8edf8; --sf3:#d4ddf0;
   --bd:#c5cfe8; --tx:#1a2744; --mu:#5570a0; --mu2:#8aa0c8;
+  --hit:#0f8a5f; --warn:#a16207; --miss:#c53030; --ac:#2563eb;
   --hit-bg:rgba(34,197,94,.1); --warn-bg:rgba(245,158,11,.1);
   --miss-bg:rgba(239,68,68,.1); --pend-bg:rgba(100,116,139,.08);
 }
@@ -52,7 +56,7 @@
 html{font-size:14px;-webkit-text-size-adjust:100%}
 body{
   background:var(--bg);color:var(--tx);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-family:'Segoe UI',Arial,sans-serif;
   line-height:1.5;min-height:100vh;
 }
 a{color:var(--ac);text-decoration:none}
@@ -67,7 +71,14 @@ button{cursor:pointer;font:inherit}
   display:flex;align-items:center;gap:16px;min-height:52px;
 }
 .site-header h1{font-size:15px;font-weight:600;letter-spacing:.01em;white-space:nowrap}
-.site-header .sub{font-size:12px;color:var(--mu);flex:1}
+.site-brand{display:flex;flex-direction:column;gap:2px;padding:10px 0}
+.site-header h1{font-size:16px;font-weight:700}
+.site-header .sub{font-size:11px;color:var(--mu);letter-spacing:.04em}
+.site-header-desc{font-size:12px;color:var(--mu);flex:1}
+.sub-nav{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--bd);border-radius:8px;background:var(--sf2)}
+.sub-nav-btn{padding:4px 12px;border-radius:6px;font-size:12px;color:var(--mu);text-decoration:none}
+a.sub-nav-btn:hover{color:var(--tx);background:rgba(255,255,255,.06);text-decoration:none}
+.sub-nav-btn.active{background:#1a2b48;color:#fff;border:1px solid #3f6090}
 .header-actions{display:flex;align-items:center;gap:8px}
 .back-link{
   font-size:12px;color:var(--mu);padding:5px 10px;border:1px solid var(--bd);
@@ -96,6 +107,7 @@ button{cursor:pointer;font:inherit}
 .kpi-value.good{color:var(--hit)}
 .kpi-value.warn{color:var(--warn)}
 .kpi-value.bad {color:var(--miss)}
+.kpi-value.low-sample{color:var(--mu)}
 
 /* ── FILTER BAR ─────────────────────────────────────────── */
 .filter-bar{
@@ -119,9 +131,9 @@ button{cursor:pointer;font:inherit}
 .timing-breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px}
 .timing-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--radius);padding:12px 14px}
 .timing-card-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
-.timing-card-label.reliable{color:#7fb3ff}
-.timing-card-label.bimodal{color:#fbbf24}
-.timing-card-label.unreliable{color:#f87171}
+.timing-card-label.reliable{color:var(--ac)}
+.timing-card-label.bimodal{color:var(--warn)}
+.timing-card-label.unreliable{color:var(--miss)}
 .timing-stat{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;padding:2px 0}
 .timing-stat-label{color:var(--mu)}
 .timing-stat-value{font-family:var(--mono);font-weight:600}
@@ -158,10 +170,13 @@ button{cursor:pointer;font:inherit}
   display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;
   text-transform:uppercase;padding:2px 6px;border-radius:999px;background:var(--sf2);color:var(--tx);
 }
-.analytics-badge.good{background:rgba(34,197,94,.18);color:#4ade80}
-.analytics-badge.warn{background:rgba(245,158,11,.18);color:#fbbf24}
-.analytics-badge.bad{background:rgba(239,68,68,.18);color:#f87171}
-.analytics-badge.info{background:rgba(79,142,247,.18);color:#7fb3ff}
+.analytics-badge.good{background:rgba(34,197,94,.18);color:var(--hit)}
+.analytics-badge.warn{background:rgba(245,158,11,.18);color:var(--warn)}
+.analytics-badge.bad{background:rgba(239,68,68,.18);color:var(--miss)}
+.analytics-badge.info{background:rgba(79,142,247,.18);color:var(--ac)}
+.analytics-badge.pu{background:rgba(167,139,250,.16);color:#a78bfa}
+.analytics-badge.neutral{background:rgba(138,146,170,.16);color:var(--mu)}
+.verdict-icon{display:inline-block;margin-right:4px;font-size:9px}
 .analytics-table-wrap{overflow:auto;border:1px solid var(--bd);border-radius:10px}
 .analytics-table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
 .analytics-table th,.analytics-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
@@ -259,12 +274,12 @@ td.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
   text-transform:uppercase;padding:2px 7px;border-radius:4px;
   white-space:nowrap;
 }
-.chip-reliable{background:rgba(79,142,247,.18);color:#7fb3ff}
-.chip-bimodal {background:rgba(245,158,11,.18);color:#fbbf24}
-.chip-unreliable{background:rgba(239,68,68,.15);color:#f87171}
-.chip-hit  {background:rgba(34,197,94,.18);color:#4ade80}
-.chip-miss-below{background:rgba(239,68,68,.18);color:#f87171}
-.chip-miss-above{background:rgba(245,158,11,.18);color:#fbbf24}
+.chip-reliable{background:rgba(79,142,247,.18);color:var(--ac)}
+.chip-bimodal {background:rgba(245,158,11,.18);color:var(--warn)}
+.chip-unreliable{background:rgba(239,68,68,.15);color:var(--miss)}
+.chip-hit  {background:rgba(34,197,94,.18);color:var(--hit)}
+.chip-miss-below{background:rgba(239,68,68,.18);color:var(--miss)}
+.chip-miss-above{background:rgba(245,158,11,.18);color:var(--warn)}
 .chip-unresolved{background:rgba(100,116,139,.18);color:#94a3b8}
 
 /* date range display -- intentionally not flex/grid: the content returned by
@@ -303,7 +318,9 @@ td.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
 /* ── RESPONSIVE ─────────────────────────────────────────── */
 @media(max-width:600px){
-  .site-header{padding:0 14px}
+  .site-header{padding:0 14px;flex-wrap:wrap;gap:8px}
+  .site-header-desc{display:none}
+  .header-actions{padding-bottom:10px}
   .page{padding:14px 12px 40px}
   .kpi-value{font-size:22px}
   .filter-bar{gap:8px}
@@ -383,10 +400,17 @@ thead th.sortable{cursor:pointer}
 <body>
 
 <header class="site-header">
-  <h1>Prediction Log</h1>
-  <span class="sub">Estimated low dates vs actuals — Dividend Cycle Analysis</span>
+  <div class="site-brand">
+    <span class="sub">SGX Dividend Cycle Dashboard</span>
+    <h1>Model accuracy</h1>
+  </div>
+  <nav class="sub-nav" aria-label="Model accuracy views">
+    <span class="sub-nav-btn active" aria-current="page">Prediction log</span>
+    <a class="sub-nav-btn" href="./index.html#/model-check">Zone outcome map</a>
+  </nav>
+  <span class="site-header-desc">Estimated low dates vs actuals</span>
   <div class="header-actions">
-    <a class="back-link" href="./index.html">← Dashboard</a>
+    <a class="back-link" href="./index.html">← Watchlist</a>
     <button class="help-btn" id="helpBtn">How this works?</button>
     <button class="theme-btn" id="themeBtn" title="Toggle theme">◑</button>
   </div>
@@ -526,7 +550,7 @@ thead th.sortable{cursor:pointer}
         </thead>
         <tbody id="tableBody">
           <tr><td colspan="14">
-            <div class="state-msg"><div class="spinner"></div><p>Loading prediction log…</p></div>
+            <div class="state-msg"><div class="spinner"></div><p id="loadMsg">Loading prediction log…</p></div>
           </td></tr>
         </tbody>
       </table>
@@ -780,10 +804,10 @@ function hindsightChip(r){
     : "";
 }
 function outcomeChip(o){
-  if(o==="ZONE_HIT")    return`<span class="chip chip-hit">Zone hit</span>`;
-  if(o==="ZONE_MISS_BELOW") return`<span class="chip chip-miss-below">Miss below</span>`;
-  if(o==="ZONE_MISS_ABOVE") return`<span class="chip chip-miss-above">Miss above</span>`;
-  return`<span class="chip chip-unresolved">Pending</span>`;
+  if(o==="ZONE_HIT")    return`<span class="chip chip-hit"><span class="verdict-icon" aria-hidden="true">✓</span>Zone hit</span>`;
+  if(o==="ZONE_MISS_BELOW") return`<span class="chip chip-miss-below"><span class="verdict-icon" aria-hidden="true">✕</span>Miss below</span>`;
+  if(o==="ZONE_MISS_ABOVE") return`<span class="chip chip-miss-above"><span class="verdict-icon" aria-hidden="true">▲</span>Miss above</span>`;
+  return`<span class="chip chip-unresolved"><span class="verdict-icon" aria-hidden="true">○</span>Pending</span>`;
 }
 function timingChip(t){
   if(t==="RELIABLE")   return`<span class="chip chip-reliable">Reliable</span>`;
@@ -1157,8 +1181,25 @@ function renderDecisionLens(rows){
     .slice(0,5);
   const topSet=new Set(topPicks.map(s=>s.ticker));
   const watchList=candidates.filter(s=>!topSet.has(s.ticker) && !s.structuralHealthOverride && (s.potentialEligible || s.watchCandidate)).slice(0,5);
-  const avoidList=candidates.filter(s=>s.structuralHealthOverride || s.timing==="UNRELIABLE" || (s.coreHitRate ?? s.hitRate ?? 0) < 0.5 || (s.meanBias ?? 0) < -5).slice(0,5);
+  const rankScore=s=>Number.isFinite(s.mergedScore)?s.mergedScore:s.score;
+  const watchSet=new Set(watchList.map(s=>s.ticker));
+  // A stock with no resolved cycles has an unknown hit rate, not a 0% one --
+  // only count the hit-rate test once there is validation history to judge.
+  // Weakest first, and never a name already shown as a Top 5 / watchlist pick.
+  const validatedRate=s=>s.coreHitRate ?? s.hitRate;
+  const avoidList=candidates
+    .filter(s=>!topSet.has(s.ticker) && !watchSet.has(s.ticker))
+    .filter(s=>s.structuralHealthOverride || s.timing==="UNRELIABLE" || (validatedRate(s)!=null && validatedRate(s) < 0.5) || (s.meanBias ?? 0) < -5
+      || s.finalVerdictLabel==="Too Risky" || s.finalVerdictLabel==="Structurally Weak")
+    .sort((a,b)=>rankScore(a) - rankScore(b))
+    .slice(0,5);
 
+  // Same tone and icon per verdict as the dashboard's chips (shape + colour).
+  function verdictBadge(label){
+    const tone={"Actionable Now":"good","Watch Closely":"warn","Small Trades Advised":"warn","Wait":"warn","Watch Only":"pu","On Radar":"neutral","Structurally Weak":"bad","Too Risky":"bad"}[label]||"neutral";
+    const icon={good:"✓",warn:"▲",bad:"✕",pu:"◆",neutral:"○"}[tone];
+    return label?`<span class="analytics-badge ${tone}"><span class="verdict-icon" aria-hidden="true">${icon}</span>${esc(label)}</span>`:"";
+  }
   function listHtml(list, emptyText){
     if(!list.length) return `<div class="analytics-empty">${emptyText}</div>`;
     return list.map((s,idx)=>`<div class="analytics-row">
@@ -1171,7 +1212,7 @@ function renderDecisionLens(rows){
         ${s.potentialScore!=null?`<span class="analytics-badge ${s.potentialScore>=75?"good":s.potentialScore>=60?"warn":"bad"}">${Math.round(s.potentialScore)} potential</span>`:""}
         ${s.coreHitRate!=null?`<span class="analytics-badge ${(s.coreHitRate)>=0.7?"good":(s.coreHitRate)>=0.5?"warn":"bad"}">${Math.round(s.coreHitRate*100)}% validated hit rate</span>`:""}
         ${s.baseGainPct!=null?`<span class="analytics-badge ${s.baseGainPct>=8?"good":s.baseGainPct>=5?"warn":"bad"}">${pctFmt(s.baseGainPct)} base gain</span>`:""}
-        <span class="analytics-badge ${s.finalVerdictLabel==="Actionable Now"?"good":s.finalVerdictLabel==="Watch Closely"?"warn":s.finalVerdictLabel==="Small Trades Advised"?"warn":"bad"}">${esc(s.finalVerdictLabel)}</span>
+        ${verdictBadge(s.finalVerdictLabel)}
       </div>
     </div>`).join("");
   }
@@ -1191,14 +1232,16 @@ function renderDecisionLens(rows){
   ].map(([title,body])=>`<div class="analytics-row"><div><div class="analytics-name">${title}</div><div class="analytics-sub">${body}</div></div></div>`).join("");
   setHtml("insightNotes", notesHtml);
 
-  const boardRows=candidates.slice(0,12);
+  // Rank strictly by the same merged score that is shown in the Score column,
+  // so the rank order and the number beside it always agree.
+  const boardRows=candidates.slice().sort((a,b)=>rankScore(b) - rankScore(a)).slice(0,12);
   const boardHtml=boardRows.length?`<div class="analytics-table-wrap">
     <table class="analytics-table">
       <thead>
         <tr>
-          ${thTip("Rank","Higher rows are the stronger upcoming candidates after combining hit quality, timing trust, stability, bias, and revision churn.")}
+          ${thTip("Rank","Ordered by Score, highest first.")}
           ${thTip("Ticker","Ticker symbol and stock name for the candidate.")}
-          ${thTip("Score","Internal ranking score for triage. Higher is better, but it is a prioritization aid rather than a buy signal.","num")}
+          ${thTip("Score","Combined triage score: mostly the dashboard potential score, plus walk-forward validation, timing trust, stability, bias, revision churn and the current verdict. Higher is better, but it is a prioritization aid rather than a buy signal.","num")}
           ${thTip("Timing","Current setup’s timing class: RELIABLE, BIMODAL, or UNRELIABLE.")}
           ${thTip("Reliable+Bimodal Hit Rate","Price zone hit rate using only the stronger timing sample, excluding UNRELIABLE rows where possible.","num")}
           ${thTip("Med Low Date Err","Median absolute low date error, in days, across resolved rows in the stronger timing sample. Lower means tighter timing.","num")}
@@ -1214,7 +1257,7 @@ function renderDecisionLens(rows){
           return `<tr>
             <td class="num">${idx+1}</td>
             <td><strong>${esc(s.ticker)}</strong>${s.name?`<br><span class="analytics-sub">${esc(s.name)}</span>`:""}</td>
-            <td class="num">${Math.round(s.score)}</td>
+            <td class="num">${Math.round(rankScore(s))}</td>
             <td>${esc(s.timing)}</td>
             <td class="num">${s.coreHitRate!=null?`${Math.round(s.coreHitRate*100)}%`:"—"}</td>
             <td class="num">${fmtDays(s.medDate)}</td>
@@ -1268,39 +1311,51 @@ function renderKPIs(rows){
   );
   const combinedHitRate=resolved.length?Math.round(combinedHits.length/resolved.length*100):null;
 
+  // Below this many resolved cycles a rate is too noisy to colour as
+  // good/bad -- it is shown greyed with a "small sample" note instead, so a
+  // 0% or 75% built on a handful of cycles doesn't read as a verdict.
+  const MIN_KPI_SAMPLE=10;
+  const kpiTone=(value,n,goodAt,warnAt,lowerIsBetter=false)=>{
+    if(value==null) return "kpi-value";
+    if(n<MIN_KPI_SAMPLE) return "kpi-value low-sample";
+    if(lowerIsBetter) return "kpi-value"+(value<=goodAt?" good":value<=warnAt?" warn":" bad");
+    return "kpi-value"+(value>=goodAt?" good":value>=warnAt?" warn":" bad");
+  };
+  const sampleNote=n=>n>0&&n<MIN_KPI_SAMPLE?" · small sample":"";
+
   document.getElementById("kpiTotal").textContent=total;
   document.getElementById("kpiResolved").textContent=resolved.length;
   document.getElementById("kpiResolvedSub").textContent=`${total-resolved.length-hindsightCount} pending · ${hindsightCount} hindsight excluded`;
 
   const hrEl=document.getElementById("kpiHitRate");
   hrEl.textContent=hitRate!=null?hitRate+"%":"—";
-  hrEl.className="kpi-value"+(hitRate==null?"":(hitRate>=70?" good":hitRate>=50?" warn":" bad"));
+  hrEl.className=kpiTone(hitRate,resolved.length,70,50);
   document.getElementById("kpiHitSub").textContent=
-    resolved.length?`${hits.length} / ${resolved.length} cycles`:"no resolved cycles yet";
+    resolved.length?`${hits.length} / ${resolved.length} cycles${sampleNote(resolved.length)}`:"no resolved cycles yet";
 
   const coreEl=document.getElementById("kpiCoreHitRate");
   coreEl.textContent=coreHitRate!=null?coreHitRate+"%":"—";
-  coreEl.className="kpi-value"+(coreHitRate==null?"":(coreHitRate>=70?" good":coreHitRate>=50?" warn":" bad"));
+  coreEl.className=kpiTone(coreHitRate,coreResolved.length,70,50);
   document.getElementById("kpiCoreHitSub").textContent=
-    coreResolved.length?`${coreHits.length} / ${coreResolved.length} resolved · excludes unreliable`:"no reliable/bimodal resolved rows";
+    coreResolved.length?`${coreHits.length} / ${coreResolved.length} resolved · excludes unreliable${sampleNote(coreResolved.length)}`:"no reliable/bimodal resolved rows";
 
   const dhrEl=document.getElementById("kpiDateHitRate");
   dhrEl.textContent=dateHitRate!=null?dateHitRate+"%":"—";
-  dhrEl.className="kpi-value"+(dateHitRate==null?"":(dateHitRate>=70?" good":dateHitRate>=50?" warn":" bad"));
+  dhrEl.className=kpiTone(dateHitRate,errors.length,70,50);
   document.getElementById("kpiDateHitSub").textContent=
-    errors.length?`${dateHitCount} / ${errors.length} within ${DATE_HIT_THRESHOLD_DAYS}d`:"no date data yet";
+    errors.length?`${dateHitCount} / ${errors.length} within ${DATE_HIT_THRESHOLD_DAYS}d${sampleNote(errors.length)}`:"no date data yet";
 
   const chrEl=document.getElementById("kpiCombinedHitRate");
   chrEl.textContent=combinedHitRate!=null?combinedHitRate+"%":"—";
-  chrEl.className="kpi-value"+(combinedHitRate==null?"":(combinedHitRate>=70?" good":combinedHitRate>=50?" warn":" bad"));
+  chrEl.className=kpiTone(combinedHitRate,resolved.length,70,50);
   document.getElementById("kpiCombinedHitSub").textContent=
-    resolved.length?`${combinedHits.length} / ${resolved.length} cycles`:"no resolved cycles yet";
+    resolved.length?`${combinedHits.length} / ${resolved.length} cycles${sampleNote(resolved.length)}`:"no resolved cycles yet";
 
   const deEl=document.getElementById("kpiDateErr");
   deEl.textContent=medErr!=null?medErr+"d":"—";
-  deEl.className="kpi-value"+(medErr==null?"":(medErr<=7?" good":medErr<=21?" warn":" bad"));
+  deEl.className=kpiTone(medErr,errors.length,7,21,true);
   document.getElementById("kpiDateErrSub").textContent=
-    errors.length?`${errors.length} resolved with date data`:"no date data yet";
+    errors.length?`${errors.length} resolved with date data${sampleNote(errors.length)}`:"no date data yet";
 
   /* ── Timing breakdown ── */
   const TIMINGS=[
@@ -1449,23 +1504,30 @@ async function loadData(){
     }
 
     // 2. Fetch stock names + per-stock CSVs in parallel
+    const loadMsg=document.getElementById("loadMsg");
+    const totalFiles=tickers.length*2;
+    let filesDone=0;
+    const tick=p=>p.finally(()=>{
+      filesDone++;
+      if(loadMsg) loadMsg.textContent=`Loading ${tickers.length} stocks… ${Math.round(filesDone/totalFiles*100)}%`;
+    });
     const [nameResults,results]=await Promise.all([
       Promise.allSettled(
-        tickers.map(t=>fetchStockJson(t)
+        tickers.map(t=>tick(fetchStockJson(t)
           .then(r=>r.ok?r.json():Promise.reject())
-          .then(d=>({ticker:t,data:d})))
+          .then(d=>({ticker:t,data:d}))))
       ),
       Promise.allSettled(
-        tickers.map(t=>fetchPredictlogCsv(t)
+        tickers.map(t=>tick(fetchPredictlogCsv(t)
           .then(r=>r.ok?r.text():Promise.reject(new Error(`HTTP ${r.status}`)))
-          .then(parseCSV))
+          .then(parseCSV)))
       )
     ]);
     nameResults.forEach(r=>{
       if(r.status!=="fulfilled") return;
       const ticker=r.value.ticker;
       const data=r.value.data||{};
-      tickerNameMap[ticker]=data?.meta?.stock_name||"";
+      tickerNameMap[ticker]=String(data?.meta?.stock_name||"").replace(/_/g," ");
       const projSeries=data?.proj_series||{};
       const ssSeries=data?.ss_series||{};
       const seriesAdequacy=data?.series_adequacy||{};

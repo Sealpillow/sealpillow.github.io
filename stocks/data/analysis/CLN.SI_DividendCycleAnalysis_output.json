@@ -5,7 +5,7 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-10-14",
+    "today": "2026-10-18",
     "frequency": "ANNUAL",
     "frequency_display": "Annual",
     "adaptive_window_days": 182,
@@ -14,7 +14,7 @@
     "payments_per_year": 1.0,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -26.5
+    "price_growth_5yr_pct": -33.8
   },
   "parse_preflight": {
     "columns_detected": [
@@ -807,15 +807,15 @@
   "proj_series": {
     "S1": {
       "proj_exdiv_date": "2027-04-28",
-      "anchor": 0.505,
+      "anchor": 0.455,
       "anchor_source": "provisional_current_price",
       "anchor_provisional": true,
       "window_open_date": "2026-10-29",
-      "zone_bot": 0.3931,
-      "zone_top": 0.5138,
+      "zone_bot": 0.3541,
+      "zone_top": 0.4629,
       "zone_degradation_adjusted": true,
       "zone_degradation_widen_pct": 10.0,
-      "est_low_px": 0.4685,
+      "est_low_px": 0.4221,
       "low_timing_track_record": {
         "tested": 6,
         "window_hits": 1,
@@ -825,8 +825,8 @@
         "wide_wks_min": 4.6,
         "wide_wks_max": 25.9
       },
-      "est_exdiv_px": 0.5079,
-      "est_peak_px": 0.5969,
+      "est_exdiv_px": 0.4576,
+      "est_peak_px": 0.5378,
       "est_low_date": null,
       "est_low_date_from": null,
       "est_low_date_to": null,
@@ -842,7 +842,7 @@
       "est_watch_window_note": "Cluster 1: Oct 29 – Nov 8 (best: Nov 3) · Cluster 2: Mar 11",
       "est_watch_window_primary_note": "Primary cluster: Late (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 28.466,
+      "current_price_vs_zone": 28.4948,
       "entry_status": "INSIDE",
       "entry_status_display": "Inside",
       "timing_rating": "BIMODAL",
@@ -870,8 +870,8 @@
       "div_trend_display": "Stable",
       "div_amt_lo": 0.0171,
       "div_amt_hi": 0.0189,
-      "div_yield_lo": 3.3281,
-      "div_yield_hi": 4.8079,
+      "div_yield_lo": 3.6941,
+      "div_yield_hi": 5.3375,
       "anchor_extreme_flag": "NORMAL",
       "historical_frequencies": {
         "entry_zone_hit_rate": 66.7,
@@ -885,22 +885,22 @@
       "scenarios": {
         "base": {
           "description": "Filled around the middle of the projected entry zone",
-          "entry_px": 0.4535,
-          "exit_px": 0.5079,
+          "entry_px": 0.4085,
+          "exit_px": 0.4576,
           "expected_hold_days": 132,
           "historical_frequency": "mid-zone fill"
         },
         "downside": {
           "description": "Filled near the top of the projected entry zone",
-          "entry_px": 0.5138,
-          "exit_px": 0.5079,
+          "entry_px": 0.4629,
+          "exit_px": 0.4576,
           "expected_hold_days": 173,
           "historical_frequency": "higher fill"
         },
         "upside": {
           "description": "Filled near the bottom of the projected entry zone",
-          "entry_px": 0.3931,
-          "exit_px": 0.5079,
+          "entry_px": 0.3541,
+          "exit_px": 0.4576,
           "expected_hold_days": 88,
           "historical_frequency": "lower fill"
         }
@@ -929,9 +929,9 @@
         "fragility_percentile_band": "TOP_25",
         "fragility_percentile_band_display": "Top 25%"
       },
-      "final_verdict": "Too Risky",
+      "final_verdict": "Structurally Weak",
       "final_verdict_tone": "bad",
-      "final_verdict_reason": "Tail risk is too severe for a live setup.",
+      "final_verdict_reason": "Structural health override: pattern stability has been degrading in recent cycles; 5-year price growth is severely negative.",
       "potential_score": 74.8,
       "potential_eligible": false,
       "potential_ineligible_reasons": [
@@ -939,9 +939,10 @@
         "Tail risk is severe"
       ],
       "structural_health_flags": [
-        "DEGRADING"
+        "DEGRADING",
+        "PRICE_DECLINE"
       ],
-      "structural_health_override_applied": false
+      "structural_health_override_applied": true
     }
   },
   "annual_payouts": [
@@ -2992,10 +2993,10 @@
     },
     {
       "d": "2026-10-16",
-      "c": 0.505
+      "c": 0.455
     }
   ],
-  "current_price": 0.505,
+  "current_price": 0.455,
   "anchor_price": 0.57,
   "anchor_date": "2026-04-28",
   "data_window_start": "2017-09-29",

@@ -16,45 +16,23 @@
   </div>
   <div class="topbar-actions">
     <span class="topbar-status" id="loadStatus">No stocks loaded</span>
-    <button class="nav-link topbar-mobile-toggle" id="mobileActionsToggle" type="button" aria-expanded="false">Actions</button>
-    <a href="prediction-log.html" class="nav-link">Prediction Log →</a>
-    <button class="nav-link" id="quickGuideBtn" type="button">Quick guide</button>
-    <button class="nav-link" id="manageRegistryBtn" type="button" style="display:none">Edit stock list</button>
-    <button class="nav-link" id="loadServerStocksBtn" type="button" style="display:none">Load existing stock data</button>
-    <button class="nav-link" id="runPipelineBtn" type="button" style="display:none">Update stock data</button>
-    <button class="nav-link" id="forgetSavedStocksBtn" type="button" style="opacity:.6">Forget saved stocks</button>
+    <a href="prediction-log.html" class="nav-link" title="Prediction log and zone outcome map">Model accuracy</a>
+    <a href="#/how" class="nav-link" id="howItWorksLink">How it works</a>
+    <div class="topbar-menu" id="dataMenu">
+      <button class="nav-link topbar-menu-btn" id="dataMenuBtn" type="button" aria-haspopup="true" aria-expanded="false">Data <span aria-hidden="true">▾</span></button>
+      <div class="topbar-menu-list" id="dataMenuList" role="menu" hidden>
+        <button class="topbar-menu-item" id="runPipelineBtn" type="button" role="menuitem" style="display:none">Update stock data<small>Fetch latest prices, re-run analysis</small></button>
+        <button class="topbar-menu-item" id="manageRegistryBtn" type="button" role="menuitem" style="display:none">Edit stock list<small>Choose which stocks are tracked</small></button>
+        <button class="topbar-menu-item" id="loadServerStocksBtn" type="button" role="menuitem" style="display:none">Reload stock data<small>Load existing outputs without re-running</small></button>
+        <button class="topbar-menu-item" id="reviewListMenuBtn" type="button" role="menuitem">Review stock list<small>Keep, watch or remove tracked stocks</small></button>
+        <div class="topbar-menu-sep" id="dataMenuSep" style="display:none"></div>
+        <button class="topbar-menu-item is-danger" id="forgetSavedStocksBtn" type="button" role="menuitem">Forget saved stocks<small>Don't auto-load stocks next visit</small></button>
+      </div>
+    </div>
   </div>
   <div id="loadProgressWrap"><div id="loadProgressBar"></div></div>
 </div><!-- STOCK CHIPS BAR (shown when stocks loaded) -->
 <div id="loadProgressPill"><div id="loadProgressPillBar"><div id="loadProgressPillFill"></div></div><span id="loadProgressPillText">Loading…</span></div>
-<div class="overlay" id="quickGuideOverlay" aria-hidden="true">
-  <div class="panel modal-card modal-card-compact">
-    <div class="registry-head">
-      <div class="registry-head-copy">
-        <h2>Quick Guide</h2>
-        <p>Use this flow when you want to refresh the dashboard with tracked stocks.</p>
-      </div>
-      <button class="btn btn-compact" id="closeQuickGuideBtn" type="button">Close</button>
-    </div>
-    <div class="start-steps">
-      <div class="start-step">
-        <div class="start-step-num">1</div>
-        <h3>Edit stock list</h3>
-        <p>Choose the stocks you want to track.</p>
-      </div>
-      <div class="start-step">
-        <div class="start-step-num">2</div>
-        <h3>Update stock data</h3>
-        <p>Fetches latest price data and company descriptions from Yahoo Finance, then regenerates analysis outputs. A progress bar tracks file loading on completion.</p>
-      </div>
-      <div class="start-step">
-        <div class="start-step-num">3</div>
-        <h3>Load existing stock data</h3>
-        <p>Loads generated analysis outputs into the dashboard. A progress bar tracks each file as it loads.</p>
-      </div>
-    </div>
-  </div>
-</div>
 <div class="overlay" id="registryOverlay" aria-hidden="true">
   <div class="panel modal-card">
     <div class="registry-head">

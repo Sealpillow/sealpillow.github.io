@@ -5,7 +5,7 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-10-14",
+    "today": "2026-10-18",
     "frequency": "IRREGULAR",
     "frequency_display": "Irregular",
     "adaptive_window_days": 152,
@@ -14,7 +14,7 @@
     "payments_per_year": 0.0,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -29.9
+    "price_growth_5yr_pct": -31.2
   },
   "parse_preflight": {
     "columns_detected": [
@@ -28,13 +28,13 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 534,
-    "price_rows": 523,
+    "total_rows": 533,
+    "price_rows": 522,
     "dividend_rows": 11,
     "zero_volume_rows": 276,
-    "zero_volume_pct": 52.8,
+    "zero_volume_pct": 52.9,
     "issues_found": [
-      "Zero-volume rows exceed 5% (276/523, 52.8%) â€” analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (276/522, 52.9%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -356,15 +356,15 @@
   "proj_series": {
     "S1": {
       "proj_exdiv_date": "2028-07-18",
-      "anchor": 0.27,
+      "anchor": 0.265,
       "anchor_source": "provisional_current_price",
       "anchor_provisional": true,
       "window_open_date": "2028-03-03",
-      "zone_bot": 0.2334,
-      "zone_top": 0.253,
+      "zone_bot": 0.2291,
+      "zone_top": 0.2483,
       "zone_degradation_adjusted": false,
       "zone_degradation_widen_pct": 0.0,
-      "est_low_px": 0.2432,
+      "est_low_px": 0.2387,
       "low_timing_track_record": {
         "tested": 0,
         "window_hits": 0,
@@ -374,8 +374,8 @@
         "wide_wks_min": 12.7,
         "wide_wks_max": 19.4
       },
-      "est_exdiv_px": 0.5143,
-      "est_peak_px": 0.5541,
+      "est_exdiv_px": 0.5047,
+      "est_peak_px": 0.5439,
       "est_low_date": null,
       "est_low_date_from": null,
       "est_low_date_to": null,
@@ -391,7 +391,7 @@
       "est_watch_window_note": "Bimodal - monitor zone",
       "est_watch_window_primary_note": null,
       "est_peak_date": null,
-      "current_price_vs_zone": 15.6812,
+      "current_price_vs_zone": 15.67,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "BIMODAL",
@@ -419,8 +419,8 @@
       "div_trend_display": "Stable",
       "div_amt_lo": 0.0084,
       "div_amt_hi": 0.0092,
-      "div_yield_lo": 3.3202,
-      "div_yield_hi": 3.9417,
+      "div_yield_lo": 3.383,
+      "div_yield_hi": 4.0157,
       "anchor_extreme_flag": "NORMAL",
       "historical_frequencies": {
         "entry_zone_hit_rate": 0.0,
@@ -434,22 +434,22 @@
       "scenarios": {
         "base": {
           "description": "Filled around the middle of the projected entry zone",
-          "entry_px": 0.2432,
-          "exit_px": 0.5143,
+          "entry_px": 0.2387,
+          "exit_px": 0.5047,
           "expected_hold_days": 112,
           "historical_frequency": "mid-zone fill"
         },
         "downside": {
           "description": "Filled near the top of the projected entry zone",
-          "entry_px": 0.253,
-          "exit_px": 0.5143,
+          "entry_px": 0.2483,
+          "exit_px": 0.5047,
           "expected_hold_days": 124,
           "historical_frequency": "higher fill"
         },
         "upside": {
           "description": "Filled near the bottom of the projected entry zone",
-          "entry_px": 0.2334,
-          "exit_px": 0.5143,
+          "entry_px": 0.2291,
+          "exit_px": 0.5047,
           "expected_hold_days": 101,
           "historical_frequency": "lower fill"
         }
@@ -480,7 +480,7 @@
       },
       "final_verdict": "Structurally Weak",
       "final_verdict_tone": "bad",
-      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-06-30).",
+      "final_verdict_reason": "Structural health override: the projected zone is in the bottom 25% of the tracked universe for reliability; 5-year price growth is severely negative; free cash flow covers less than 0.7x of the dividend paid (financials as of 2025-06-30).",
       "potential_score": 62.3,
       "potential_eligible": false,
       "potential_ineligible_reasons": [
@@ -489,6 +489,7 @@
       ],
       "structural_health_flags": [
         "FRAGILE_ZONE",
+        "PRICE_DECLINE",
         "DIVIDEND_NOT_COVERED"
       ],
       "structural_health_override_applied": true
@@ -618,10 +619,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-10-14",
-      "c": 0.162
-    },
     {
       "d": "2016-10-21",
       "c": 0.162
@@ -2708,15 +2705,15 @@
     },
     {
       "d": "2026-10-16",
-      "c": 0.27
+      "c": 0.265
     }
   ],
-  "current_price": 0.27,
+  "current_price": 0.265,
   "anchor_price": 0.275,
   "anchor_date": "2026-03-18",
-  "data_window_start": "2016-10-14",
+  "data_window_start": "2016-10-21",
   "data_window_end": "2026-10-16",
-  "years_covered": 10.0,
+  "years_covered": 9.98,
   "series_adequacy": {
     "S1": {
       "n_clean": 2,
