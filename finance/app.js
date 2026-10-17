@@ -38,12 +38,16 @@ function svg(tag, attrs, ...children) {
   return e;
 }
 
-function toast(msg) {
+// action: optional { label, run } shown as a button (e.g. Undo); such toasts stay up longer.
+function toast(msg, action) {
   const t = $('#toast');
-  t.textContent = msg;
+  const hide = () => { t.classList.remove('toast--show'); toast.action = null; };
+  t.replaceChildren(el('span', { text: msg }), ...(action ? [el('button', { class: 'toast__btn', type: 'button', text: action.label, onclick: () => { hide(); action.run(); } })] : []));
+  toast.action = action || null;
   t.classList.add('toast--show');
   clearTimeout(toast._t);
-  toast._t = setTimeout(() => t.classList.remove('toast--show'), 2600);
+  toast._t = setTimeout(hide, action ? 7000 : 2600);
+  toast.hide = hide;
 }
 
 /* =====================================================================
@@ -170,7 +174,13 @@ const VAULT = {
   },
 };
 
-const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+// Chunked: spreading a whole buffer into fromCharCode hits Safari's ~65k argument limit on large vaults.
+function b64(buf) {
+  const u = new Uint8Array(buf);
+  let s = '';
+  for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000));
+  return btoa(s);
+}
 const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 
 async function deriveKey(pass, salt, iter) {
@@ -205,17 +215,18 @@ const DEFAULT_TAX = [
 ].map(([lower, rate]) => ({ id: uid(), lower, rate }));
 
 // CPF contribution & allocation schedule (private sector, SC / 3rd-yr SPR). Editable in Settings.
+// oa / ma are shares of the total contribution; SA (or RA from 55) gets the rest.
 function cpfRows(from, rows) {
-  return rows.map(([ageAbove, ageUpTo, ee, er, oa]) => ({ id: uid(), from, ageAbove, ageUpTo, ee, er, oa, oaRate: 0.025, samaRate: 0.04 }));
+  return rows.map(([ageAbove, ageUpTo, ee, er, oa, ma]) => ({ id: uid(), from, ageAbove, ageUpTo, ee, er, oa, ma, oaRate: 0.025, samaRate: 0.04 }));
 }
 const DEFAULT_CPF = [
   ...cpfRows('2025-01-01', [
-    [-1, 35, 0.2, 0.17, 0.622], [35, 45, 0.2, 0.17, 0.568], [45, 50, 0.2, 0.17, 0.514], [50, 55, 0.2, 0.17, 0.406],
-    [55, 60, 0.17, 0.155, 0.369], [60, 65, 0.115, 0.12, 0.149], [65, 70, 0.075, 0.09, 0.061], [70, 200, 0.05, 0.075, 0.08],
+    [-1, 35, 0.2, 0.17, 0.622, 0.2162], [35, 45, 0.2, 0.17, 0.568, 0.2432], [45, 50, 0.2, 0.17, 0.514, 0.2703], [50, 55, 0.2, 0.17, 0.406, 0.2838],
+    [55, 60, 0.17, 0.155, 0.369, 0.3231], [60, 65, 0.115, 0.12, 0.149, 0.4468], [65, 70, 0.075, 0.09, 0.061, 0.6364], [70, 200, 0.05, 0.075, 0.08, 0.84],
   ]),
   ...cpfRows('2026-01-01', [
-    [-1, 35, 0.2, 0.17, 0.622], [35, 45, 0.2, 0.17, 0.568], [45, 50, 0.2, 0.17, 0.514], [50, 55, 0.2, 0.17, 0.406],
-    [55, 60, 0.18, 0.16, 0.353], [60, 65, 0.125, 0.125, 0.14], [65, 70, 0.075, 0.09, 0.061], [70, 200, 0.05, 0.075, 0.08],
+    [-1, 35, 0.2, 0.17, 0.622, 0.2162], [35, 45, 0.2, 0.17, 0.568, 0.2432], [45, 50, 0.2, 0.17, 0.514, 0.2703], [50, 55, 0.2, 0.17, 0.406, 0.2838],
+    [55, 60, 0.18, 0.16, 0.353, 0.3088], [60, 65, 0.125, 0.125, 0.14, 0.42], [65, 70, 0.075, 0.09, 0.061, 0.6364], [70, 200, 0.05, 0.075, 0.08, 0.84],
   ]),
 ];
 
@@ -242,24 +253,26 @@ function defaultData() {
       goalName: 'Savings goal',
       goalAmount: 0,
       cpfStart: { oa: 0, sa: 0, ma: 0 },
+      birthMonth: '', // 'YYYY-MM'; when set, age is worked out per month instead of read from Assumptions
       cpfExtraRate: 0.01,
-      maAlloc: 0.2162,
       owCeiling: 8000,
       bankBalance: null,
       bankBalanceDate: '',
       autoLockMin: 10,
+      ledgerCompact: true, // ledger shows key columns; the full spreadsheet view is one click away
       lastBackup: null,
       reliefCap: 80000,
       donationMultiplier: 2.5,
     },
     assumptions: [],
-    cpfSchedule: DEFAULT_CPF,
+    // Copies, so editing a vault's tables never changes the built-in defaults.
+    cpfSchedule: structuredClone(DEFAULT_CPF),
     ledger: [],
     deposits: [],
     portfolio: [],
     liabilities: [],
     policies: [],
-    taxBrackets: DEFAULT_TAX,
+    taxBrackets: structuredClone(DEFAULT_TAX),
     reliefs: {}, // { "2026": [{id, name, amount}] }
     donations: {}, // { "2026": amount }
     checks: {}, // { "2026-10": { key: true } } manual ticks
@@ -271,8 +284,17 @@ function migrate(d) {
   const out = { ...base, ...d, settings: { ...base.settings, ...(d.settings || {}) } };
   out.settings.cpfStart = { ...base.settings.cpfStart, ...(d.settings?.cpfStart || {}) };
   for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'liabilities', 'policies']) if (!Array.isArray(out[k])) out[k] = [];
-  if (!Array.isArray(out.cpfSchedule) || !out.cpfSchedule.length) out.cpfSchedule = DEFAULT_CPF;
-  if (!Array.isArray(out.taxBrackets) || !out.taxBrackets.length) out.taxBrackets = DEFAULT_TAX;
+  if (!Array.isArray(out.cpfSchedule) || !out.cpfSchedule.length) out.cpfSchedule = base.cpfSchedule;
+  if (!Array.isArray(out.taxBrackets) || !out.taxBrackets.length) out.taxBrackets = base.taxBrackets;
+  // Older vaults had one MA allocation for every age (settings.maAlloc). Give each schedule row its band's
+  // default; rows that match no default band keep the old single value.
+  const oldMa = out.settings.maAlloc ?? 0.2162;
+  for (const r of out.cpfSchedule) {
+    if (r.ma != null) continue;
+    const match = DEFAULT_CPF.find((x) => x.from === r.from && x.ageAbove === r.ageAbove && x.ageUpTo === r.ageUpTo);
+    r.ma = match ? match.ma : oldMa;
+  }
+  delete out.settings.maAlloc;
   return out;
 }
 
@@ -291,6 +313,32 @@ function assumptionFor(ym) {
   return best || rows[0];
 }
 
+/**
+ * Age used for a month. With a birth month set it is worked out every month and is fractional on
+ * purpose: CPF moves you to the next band from the month *after* your birthday month, so someone born
+ * in March is exactly 35 in March 2025 (still "35 and below") and just above 35 from April.
+ * Without a birth month, the Age typed on the Assumptions row is used.
+ */
+function ageAt(ym, a) {
+  const b = S.settings.birthMonth;
+  return b ? monthDiff(b, ym) / 12 : num(a?.age);
+}
+/** IRAS age-based reliefs go by the age reached during the income year. */
+function ageInYear(yy, a) {
+  const b = S.settings.birthMonth;
+  return b ? +yy - +b.slice(0, 4) : num(a?.age);
+}
+/** First month after `ym` (within 40 years) where the CPF age band changes, or null. */
+function nextBandChange(ym) {
+  const bandOf = (m) => cpfFor(m, ageAt(m)).ageAbove;
+  const now = bandOf(ym);
+  for (let k = 1; k <= 480; k++) {
+    const m = addMonths(ym, k);
+    if (bandOf(m) !== now) return { month: m, band: cpfFor(m, ageAt(m)) };
+  }
+  return null;
+}
+
 /** CPF rates for an age at a month: latest schedule whose "from" ≤ month, with ageAbove < age ≤ ageUpTo. */
 function cpfFor(ym, age) {
   const first = ym + '-01';
@@ -298,7 +346,7 @@ function cpfFor(ym, age) {
   const pool = sched.length ? sched : S.cpfSchedule;
   const latest = pool.reduce((m, r) => (r.from > m ? r.from : m), '');
   const band = pool.find((r) => r.from === latest && num(age) > num(r.ageAbove) && num(age) <= num(r.ageUpTo));
-  return band || { ee: 0, er: 0, oa: 0, oaRate: 0, samaRate: 0 };
+  return band || { ee: 0, er: 0, oa: 0, ma: 0, oaRate: 0, samaRate: 0 };
 }
 
 function taxTable() {
@@ -356,8 +404,8 @@ function computeLedger(extraMonth) {
   for (const e of entries) {
     const a = assumptionFor(e.month) || {};
     const ov = (k, dflt) => (e[k] != null && e[k] !== '' ? num(e[k]) : dflt);
-    const age = num(a.age);
-    const c = st.cpfEnabled ? cpfFor(e.month, age) : { ee: 0, er: 0, oa: 0, oaRate: 0, samaRate: 0 };
+    const age = ageAt(e.month, a);
+    const c = st.cpfEnabled ? cpfFor(e.month, age) : { ee: 0, er: 0, oa: 0, ma: 0, oaRate: 0, samaRate: 0 };
     const salary = ov('salary', num(a.salary));
     const bonus = num(e.bonus);
     const ceiling = num(st.owCeiling);
@@ -378,7 +426,7 @@ function computeLedger(extraMonth) {
     const [yy, mm] = e.month.split('-').map(Number);
     ytdAfter[yy] = (ytdAfter[yy] || 0) + after;
     const projected = ytdAfter[yy] + (ceiling > 0 ? Math.min(salary, ceiling) * (1 - num(c.ee)) + Math.max(0, salary - ceiling) : salary * (1 - num(c.ee))) * (12 - mm);
-    const chargeable = Math.max(0, projected - earnedIncomeRelief(age) - reliefTotal(yy));
+    const chargeable = Math.max(0, projected - earnedIncomeRelief(ageInYear(yy, a)) - reliefTotal(yy));
     const tax = e.tax != null && e.tax !== '' ? num(e.tax) : round2(taxOn(chargeable, table) / 12);
 
     const expenditure = food + transport + parents + others + tax + prem.total + extras;
@@ -387,7 +435,7 @@ function computeLedger(extraMonth) {
     // CPF balances (monthly approximation of CPF interest incl. 1% extra on first $60k, max $20k from OA)
     const total = ee + er;
     const x = num(st.cpfExtraRate) / 12;
-    const maAlloc = num(st.maAlloc);
+    const maAlloc = num(c.ma);
     const eOA = Math.min(oa, 20000);
     const eSA = Math.min(sa, 60000 - eOA);
     const eMA = Math.min(ma, Math.max(60000 - eOA - sa, 0));
@@ -466,20 +514,20 @@ function checklist(sm) {
   const lastWorked = addMonths(now, -1);
   const has = (ym) => S.ledger.some((e) => e.month === ym);
   if (S.assumptions.length === 0) {
-    items.push({ ok: false, text: 'Add your first assumptions row', detail: 'Salary, CPF age, daily food/transport, investment % — on the Assumptions page.', go: 'assumptions' });
+    items.push({ ok: false, text: 'Add your first assumptions row', detail: 'Salary, CPF age, daily food/transport, investment % — on the Assumptions page.', go: 'assumptions', cta: 'Add' });
   }
   items.push(has(lastWorked)
     ? { ok: true, text: `Ledger row for ${monthLabel(lastWorked)} added` }
-    : { ok: false, text: `Add the ledger row for ${monthLabel(lastWorked)}`, detail: 'Do this when the payslip for that month arrives.', go: 'ledger' });
+    : { ok: false, text: `Add the ledger row for ${monthLabel(lastWorked)}`, detail: 'Do this when the payslip for that month arrives.', go: 'ledger', cta: 'Add month' });
   const depThisMonth = S.deposits.some((d) => (d.date || '').slice(0, 7) === now);
   items.push(depThisMonth
     ? { ok: true, text: `Investment deposit logged for ${monthLabel(now)}` }
-    : { ok: false, text: `Log this month's investment deposit`, detail: 'Skip if you did not invest this month.', go: 'investments' });
+    : { ok: false, text: `Log this month's investment deposit`, detail: 'Skip if you did not invest this month.', go: 'investments', cta: 'Log' });
   if (S.portfolio.length) {
     const age = daysBetween(sm.portfolioDate, todayISO());
     items.push(age <= 35
       ? { ok: true, text: 'Portfolio value is up to date', detail: `Last updated ${dateLabel(sm.portfolioDate)}` }
-      : { ok: false, text: 'Update your portfolio value', detail: `Last updated ${dateLabel(sm.portfolioDate)} (${age} days ago)`, go: 'investments' });
+      : { ok: false, text: 'Update your portfolio value', detail: `Last updated ${dateLabel(sm.portfolioDate)} (${age} days ago)`, go: 'investments', cta: 'Update' });
   }
   for (const p of S.policies) {
     if (!p.start) continue;
@@ -489,20 +537,20 @@ function checklist(sm) {
       const diff = monthDiff(now, due);
       const paid = p.actual?.[k] != null && p.actual[k] !== '';
       if (diff >= -2 && diff <= 1 && !paid) {
-        items.push({ ok: false, text: `${p.name || 'Policy'}: premium ${diff >= 0 ? 'due' : 'was due'} ${monthLabel(due)}`, detail: `Expected ${money(num(p.premium))}. Log Actual Paid when you pay.`, go: 'insurance' });
+        items.push({ ok: false, text: `${p.name || 'Policy'}: premium ${diff >= 0 ? 'due' : 'was due'} ${monthLabel(due)}`, detail: `Expected ${money(num(p.premium))}. Log Actual Paid when you pay.`, go: 'insurance', cta: 'Log' });
       }
     }
   }
   if (S.settings.bankBalance != null && S.settings.bankBalance !== '') {
     const diff = num(S.settings.bankBalance) - sm.expectedCash;
     const ok = Math.abs(diff) < Math.max(100, Math.abs(sm.expectedCash) * 0.02);
-    items.push({ ok, text: ok ? 'Bank balance matches expected cash' : 'Bank balance differs from expected cash', detail: `Actual ${money(num(S.settings.bankBalance))} vs expected ${money(sm.expectedCash)} (${diff >= 0 ? '+' : ''}${money(diff)})`, go: ok ? null : 'networth' });
+    items.push({ ok, text: ok ? 'Bank balance matches expected cash' : 'Bank balance differs from expected cash', detail: `Actual ${money(num(S.settings.bankBalance))} vs expected ${money(sm.expectedCash)} (${diff >= 0 ? '+' : ''}${money(diff)})`, go: ok ? null : 'networth', cta: 'Review' });
   }
   const lb = S.settings.lastBackup;
   const bAge = lb ? daysBetween(lb.slice(0, 10), todayISO()) : null;
   items.push(lb && bAge <= 30
     ? { ok: true, text: 'Encrypted backup is recent', detail: `Last exported ${dateLabel(lb.slice(0, 10))}` }
-    : { ok: false, text: 'Export an encrypted backup', detail: lb ? `Last backup ${bAge} days ago.` : 'Clearing browser data would erase everything without one.', go: 'data' });
+    : { ok: false, text: 'Export an encrypted backup', detail: lb ? `Last backup ${bAge} days ago.` : 'Clearing browser data would erase everything without one.', go: 'data', cta: 'Back up now' });
   return items;
 }
 
@@ -515,11 +563,23 @@ let META = null; // { salt, iter }
 let saveTimer = null;
 let lastActivity = Date.now();
 
-function commit({ rerender = true } = {}) {
+// defer: re-render after the current event finishes, so a Tab/click that triggered a
+// change event has already moved focus — render() then puts focus back on that field.
+function commit({ rerender = true, defer = false } = {}) {
   clearTimeout(saveTimer);
   setStatus('Saving…');
   saveTimer = setTimeout(persist, 300);
-  if (rerender) render();
+  // An Undo snapshot is only safe while nothing else has changed since.
+  if (toast.action) toast.hide();
+  if (rerender) defer ? setTimeout(render) : render();
+}
+
+// Runs a destructive change and offers Undo, instead of asking "are you sure?" first.
+function undoable(msg, mutate) {
+  const before = structuredClone(S);
+  mutate();
+  commit();
+  toast(msg, { label: 'Undo', run: () => { if (!S) return; S = before; commit(); toast('Restored'); } });
 }
 async function persist() {
   if (!S || !KEY) return;
@@ -539,6 +599,7 @@ function lock() {
   pending.finally(() => {
     S = null; KEY = null; META = null;
     $('#dlg').open && $('#dlg').close();
+    if (toast.action) toast.hide();
     renderLock();
   });
 }
@@ -710,6 +771,14 @@ function openDialog(title, body, buttons) {
   if (!d.open) d.showModal();
 }
 
+function confirmDialog(title, message, okLabel) {
+  return new Promise((res) => {
+    let ok = false;
+    $('#dlg').addEventListener('close', () => res(ok), { once: true });
+    openDialog(title, [el('p', { text: message })], [{ label: 'Cancel' }, { label: okLabel, primary: true, run: () => { ok = true; } }]);
+  });
+}
+
 /* =====================================================================
  * 9. Generic editable table
  * ===================================================================== */
@@ -728,10 +797,11 @@ function editTable({ cols, rows, onDelete, emptyText = 'Nothing here yet.', tota
       }
       return el('td', { class: 'table__td table__td--edit' }, inputFor(r, c));
     }),
-    onDelete ? el('td', { class: 'table__td' }, el('button', { class: 'btn btn--icon btn--small btn--danger', type: 'button', title: 'Delete row', 'aria-label': 'Delete row', text: '×', onclick: () => onDelete(r) })) : null,
+    onDelete ? el('td', { class: 'table__td' }, el('button', { class: 'btn btn--icon btn--danger', type: 'button', title: 'Delete row', 'aria-label': 'Delete row', text: '×', onclick: () => onDelete(r) })) : null,
   ));
   const foot = totals ? el('tr', { class: 'table__row table__row--total' }, cols.map((c, i) => el('td', { class: 'table__td' + (i === 0 ? ' table__td--left' : '') }, totals[c.key] != null ? (totals[c.key] instanceof Node ? totals[c.key] : fmtCell(totals[c.key], c.type)) : (i === 0 ? 'Total' : ''))), onDelete ? el('td', { class: 'table__td' }) : null) : null;
-  return el('div', { class: 'table-wrap' }, el('table', { class: 'table' },
+  // Long tables scroll inside their own box so the header row stays visible.
+  return el('div', { class: 'table-wrap' + (rows.length > 12 ? ' table-wrap--tall' : '') }, el('table', { class: 'table' },
     el('thead', null, head),
     el('tbody', null, rows.length ? body : el('tr', null, el('td', { class: 'table__empty', colspan: cols.length + (onDelete ? 1 : 0), text: emptyText })), foot),
   ));
@@ -759,12 +829,17 @@ function inputFor(r, c, { onChange } = {}) {
     if (t === 'text' || t === 'date' || t === 'month') v = raw;
     else v = raw === '' ? (c.nullable ? null : 0) : t === 'pct' ? parseFloat(raw) / 100 : parseFloat(raw);
     r[c.key] = v;
-    onChange ? onChange(v) : commit();
+    onChange ? onChange(v) : commit({ defer: true });
   };
   return el('input', attrs);
 }
 function field(label, input, hint) {
-  return el('div', { class: 'field' }, el('label', { class: 'field__label', text: label }), input, hint ? el('div', { class: 'field__hint', text: hint }) : null);
+  // Tie the visible label (and hint) to the control so screen readers announce them.
+  const ctl = input.matches?.('input, select, textarea') ? input : null;
+  if (ctl && !ctl.id) ctl.id = 'f-' + uid();
+  const hintEl = hint ? el('div', { class: 'field__hint', id: ctl ? ctl.id + '-hint' : null, text: hint }) : null;
+  if (ctl) { ctl.removeAttribute('aria-label'); if (hintEl) ctl.setAttribute('aria-describedby', hintEl.id); }
+  return el('div', { class: 'field' }, el('label', { class: 'field__label', for: ctl?.id, text: label }), input, hintEl);
 }
 function settingInput(obj, key, type, label, hint, extra = {}) {
   return field(label, inputFor(obj, { key, type, label, ...extra }), hint);
@@ -773,49 +848,94 @@ function settingInput(obj, key, type, label, hint, extra = {}) {
 /* =====================================================================
  * 10. Charts (inline SVG, no libraries)
  * ===================================================================== */
-function lineChart(series, labels, { height = 220, format = (v) => money(v, { compact: true }) } = {}) {
-  const W = 640, H = height, L = 64, R = 26, T = 12, B = 28;
-  const all = series.flatMap((s) => s.values).filter((v) => isFinite(v));
-  if (!all.length || labels.length < 2) return el('p', { class: 'muted', text: 'Add at least two months to see a trend.' });
-  let min = Math.min(0, ...all), max = Math.max(...all);
-  if (max === min) max = min + 1;
+// Charts are drawn at the box's real pixel width (redrawn on resize), so axis text stays
+// at its CSS size instead of shrinking with a scaled viewBox on phones.
+function chartBox(draw, label) {
+  const box = el('div', { class: 'chart-box', role: 'img', 'aria-label': label });
+  let w = 0;
+  const ro = new ResizeObserver(() => {
+    if (!box.isConnected) { ro.disconnect(); return; }
+    const nw = Math.round(box.clientWidth);
+    if (nw && nw !== w) { w = nw; box.replaceChildren(draw(w)); }
+  });
+  ro.observe(box);
+  return box;
+}
+// Label indices that fit the width; always ends on the last one without colliding with it.
+function tickIndices(n, plotW, minGap = 58) {
+  const every = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(plotW / minGap))));
+  const out = [];
+  for (let i = 0; i < n - 1; i += every) if (n - 1 - i >= every) out.push(i);
+  out.push(n - 1);
+  return out;
+}
+function yScale(values, top, bottom, floor = Math.min(0, ...values), ceil = Math.max(...values)) {
+  let min = floor, max = ceil === floor ? floor + 1 : ceil;
   const step = niceStep((max - min) / 4);
   min = Math.floor(min / step) * step; max = Math.ceil(max / step) * step;
-  const x = (i) => L + (i * (W - L - R)) / (labels.length - 1);
-  const y = (v) => T + (H - T - B) * (1 - (v - min) / (max - min));
-  const grid = [];
-  for (let v = min; v <= max + 1e-9; v += step) {
-    grid.push(svg('line', { class: 'chart__grid', x1: L, x2: W - R, y1: y(v), y2: y(v) }));
-    grid.push(svg('text', { class: 'chart__axis', x: L - 6, y: y(v) + 4, 'text-anchor': 'end' }, format(v)));
+  return { min, max, step, y: (v) => top + (bottom - top) * (1 - (v - min) / (max - min)) };
+}
+function axisY(sc, L, W, R, format) {
+  const out = [];
+  for (let v = sc.min; v <= sc.max + 1e-9; v += sc.step) {
+    out.push(svg('line', { class: 'chart__grid', x1: L, x2: W - R, y1: sc.y(v), y2: sc.y(v) }));
+    out.push(svg('text', { class: 'chart__axis', x: L - 8, y: sc.y(v) + 4, 'text-anchor': 'end' }, format(v)));
   }
-  const every = Math.max(1, Math.ceil(labels.length / 7));
-  const xl = labels.map((lb, i) => ((i % every === 0 && labels.length - 1 - i >= every / 2) || i === labels.length - 1) ? svg('text', { class: 'chart__axis', x: x(i), y: H - 8, 'text-anchor': i === labels.length - 1 ? 'end' : 'middle' }, lb) : null);
-  const lines = series.map((s, si) => svg('polyline', { class: `chart__line chart__line--${si + 1}`, points: s.values.map((v, i) => `${x(i)},${y(v)}`).join(' ') }, svg('title', null, s.name)));
+  return out;
+}
+
+function lineChart(series, labels, { height = 220, format = (v) => money(v, { compact: true }) } = {}) {
+  const all = series.flatMap((s) => s.values).filter((v) => isFinite(v));
+  if (!all.length || labels.length < 2) return el('p', { class: 'muted', text: 'Add at least two months to see a trend.' });
+  // Values for the hovered/tapped month (defaults to the latest).
+  const readout = el('div', { class: 'chart-readout' });
+  const showAt = (i) => readout.replaceChildren(el('strong', { text: labels[i] }), ...
+    series.map((s, si) => el('span', { title: s.name }, el('span', { class: `legend__swatch legend__swatch--${si + 1}` }), money(s.values[i]))));
+  const draw = (W) => {
+    const H = height, L = 58, R = 12, T = 12, B = 28;
+    const sc = yScale(all, T, H - B);
+    const x = (i) => L + (i * (W - L - R)) / (labels.length - 1);
+    const xl = tickIndices(labels.length, W - L - R).map((i) => svg('text', { class: 'chart__axis', x: x(i), y: H - 8, 'text-anchor': i === labels.length - 1 ? 'end' : i === 0 ? 'start' : 'middle' }, labels[i]));
+    const lines = series.map((s, si) => svg('polyline', { class: `chart__line chart__line--${si + 1}`, points: s.values.map((v, i) => `${x(i)},${sc.y(v)}`).join(' ') }));
+    const guide = svg('line', { class: 'chart__guide', y1: T, y2: H - B, visibility: 'hidden' });
+    const dots = series.map((s, si) => svg('circle', { class: `chart__dot chart__dot--${si + 1}`, r: 4, visibility: 'hidden' }));
+    const hit = svg('rect', { class: 'chart__hit', x: 0, y: 0, width: W, height: H });
+    const pick = (e) => {
+      const left = hit.getBoundingClientRect().left;
+      const i = Math.max(0, Math.min(labels.length - 1, Math.round((e.clientX - left - L) / ((W - L - R) / (labels.length - 1)))));
+      for (const [k, v] of [['x1', x(i)], ['x2', x(i)], ['visibility', 'visible']]) guide.setAttribute(k, v);
+      dots.forEach((d, si) => { d.setAttribute('cx', x(i)); d.setAttribute('cy', sc.y(series[si].values[i])); d.setAttribute('visibility', 'visible'); });
+      showAt(i);
+    };
+    hit.addEventListener('pointermove', pick);
+    hit.addEventListener('pointerdown', pick);
+    return svg('svg', { class: 'chart', width: W, height: H, viewBox: `0 0 ${W} ${H}` }, axisY(sc, L, W, R, format), xl, lines, guide, dots, hit);
+  };
+  showAt(labels.length - 1);
   return el('div', null,
-    svg('svg', { class: 'chart', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': series.map((s) => s.name).join(', ') + ' over time' }, grid, xl, lines),
+    chartBox(draw, series.map((s) => s.name).join(', ') + ' over time'),
+    readout,
     el('div', { class: 'legend' }, series.map((s, si) => el('span', null, el('span', { class: `legend__swatch legend__swatch--${si + 1}` }), s.name))),
   );
 }
 function barChart(values, labels, { height = 180, format = (v) => pct(v, 0) } = {}) {
-  const W = 640, H = height, L = 44, R = 8, T = 10, B = 26;
   if (!values.length) return el('p', { class: 'muted', text: 'No months yet.' });
-  let min = Math.min(0, ...values), max = Math.max(0.01, ...values);
-  const step = niceStep((max - min) / 4);
-  min = Math.floor(min / step) * step; max = Math.ceil(max / step) * step;
-  const y = (v) => T + (H - T - B) * (1 - (v - min) / (max - min));
-  const bw = (W - L - R) / values.length;
-  const parts = [];
-  for (let v = min; v <= max + 1e-9; v += step) {
-    parts.push(svg('line', { class: 'chart__grid', x1: L, x2: W - R, y1: y(v), y2: y(v) }));
-    parts.push(svg('text', { class: 'chart__axis', x: L - 6, y: y(v) + 4, 'text-anchor': 'end' }, format(v)));
-  }
-  const every = Math.max(1, Math.ceil(values.length / 8));
-  values.forEach((v, i) => {
-    const y0 = y(0), y1 = y(v);
-    parts.push(svg('rect', { class: 'chart__bar' + (v < 0 ? ' chart__bar--neg' : ''), x: L + i * bw + bw * 0.15, width: bw * 0.7, y: Math.min(y0, y1), height: Math.max(1, Math.abs(y1 - y0)), rx: 2 }, svg('title', null, `${labels[i]}: ${format(v)}`)));
-    if (i % every === 0) parts.push(svg('text', { class: 'chart__axis', x: L + i * bw + bw / 2, y: H - 8, 'text-anchor': 'middle' }, labels[i]));
-  });
-  return svg('svg', { class: 'chart', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Savings rate by month' }, parts);
+  const draw = (W) => {
+    const H = height, L = 44, R = 8, T = 18, B = 26;
+    const sc = yScale(values, T, H - B, Math.min(0, ...values), Math.max(0.01, ...values));
+    const bw = (W - L - R) / values.length;
+    const ticks = new Set(tickIndices(values.length, W - L - R, 52));
+    const parts = axisY(sc, L, W, R, format);
+    values.forEach((v, i) => {
+      const y0 = sc.y(0), y1 = sc.y(v), cx = L + i * bw + bw / 2;
+      parts.push(svg('rect', { class: 'chart__bar' + (v < 0 ? ' chart__bar--neg' : ''), x: L + i * bw + bw * 0.15, width: bw * 0.7, y: Math.min(y0, y1), height: Math.max(1, Math.abs(y1 - y0)), rx: 2 }, svg('title', null, `${labels[i]}: ${format(v)}`)));
+      // Value labels when the bars are wide enough to hold them.
+      if (bw >= 34) parts.push(svg('text', { class: 'chart__value', x: cx, y: v < 0 ? y1 + 12 : y1 - 4, 'text-anchor': 'middle' }, format(v)));
+      if (ticks.has(i)) parts.push(svg('text', { class: 'chart__axis', x: cx, y: H - 8, 'text-anchor': 'middle' }, labels[i]));
+    });
+    return svg('svg', { class: 'chart', width: W, height: H, viewBox: `0 0 ${W} ${H}` }, parts);
+  };
+  return chartBox(draw, 'Savings rate by month: ' + values.map((v, i) => `${labels[i]} ${format(v)}`).join(', '));
 }
 function niceStep(raw) {
   if (!(raw > 0)) return 1;
@@ -864,17 +984,38 @@ const PAGES = [
 const route = () => (location.hash.replace(/^#\/?/, '') || 'dashboard').split('?')[0];
 addEventListener('hashchange', () => S && render());
 
+// Phone layout: these pages get a bottom tab each; the rest live under "More".
+const TABS = ['dashboard', 'ledger', 'investments', 'networth'];
+const TAB_LABEL = { dashboard: 'Home', ledger: 'Ledger', investments: 'Invest', networth: 'Net worth' };
+const ICONS = {
+  dashboard: 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z',
+  ledger: 'M4 5h16M4 10h16M4 15h16M4 20h10',
+  investments: 'M3 17l6-6 4 4 8-8M15 7h6v6',
+  networth: 'M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5M12 11a1 1 0 1 0 1 1',
+  more: 'M4 6h16M4 12h16M4 18h16',
+};
+const icon = (k) => svg('svg', { class: 'icon', viewBox: '0 0 24 24', 'aria-hidden': 'true' }, svg('path', { d: ICONS[k] }));
+
+function openMenu() {
+  const links = PAGES.map(([id, label]) => el('a', { class: 'nav__link' + (route() === id ? ' nav__link--active' : ''), href: '#/' + id, text: label, onclick: () => $('#dlg').close() }));
+  openDialog('Menu', [el('nav', { class: 'menu', 'aria-label': 'All sections' }, links)], [{ label: 'Close' }]);
+}
+
 function renderShell() {
   const app = $('#app');
   app.replaceChildren(el('div', { class: 'shell' },
     el('nav', { class: 'shell__nav', 'aria-label': 'Sections' },
       el('div', { class: 'shell__brand' }, el('span', { class: 'shell__brand-dot' }), 'Ledger Local'),
-      PAGES.map(([id, label]) => el('a', { class: 'nav__link', href: '#/' + id, 'data-page': id, text: label })),
+      el('div', { class: 'shell__links' }, PAGES.map(([id, label]) => el('a', { class: 'nav__link', href: '#/' + id, 'data-page': id, text: label }))),
       el('div', { class: 'shell__spacer' }),
       el('div', { class: 'status' }, el('span', { class: 'status__dot' }), el('span', { id: 'save-status', text: 'Encrypted on this device' })),
-      el('button', { class: 'btn', type: 'button', text: 'Lock', onclick: lock }),
+      el('button', { class: 'btn shell__lock', type: 'button', text: 'Lock', onclick: lock }),
     ),
     el('main', { class: 'shell__main', id: 'main' }),
+    el('nav', { class: 'tabbar', 'aria-label': 'Main sections' },
+      TABS.map((id) => el('a', { class: 'tabbar__item', href: '#/' + id, 'data-page': id }, icon(id), el('span', { text: TAB_LABEL[id] }))),
+      el('button', { class: 'tabbar__item', type: 'button', 'data-page': 'more', onclick: openMenu }, icon('more'), el('span', { text: 'More' })),
+    ),
   ));
   render();
 }
@@ -882,13 +1023,45 @@ function renderShell() {
 function render() {
   if (!S) return;
   const p = route();
-  document.querySelectorAll('.nav__link').forEach((a) => a.classList.toggle('nav__link--active', a.dataset.page === p));
+  const page = PAGES.some(([id]) => id === p) ? p : 'dashboard';
+  document.querySelectorAll('[data-page]').forEach((a) => {
+    const on = a.dataset.page === page || (a.dataset.page === 'more' && !TABS.includes(page));
+    a.classList.toggle('nav__link--active', on);
+    if (a.dataset.page === page) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
   const main = $('#main');
   if (!main) return renderShell();
-  const scroll = main.scrollTop, wy = scrollY;
-  const view = ({ dashboard: pageDashboard, ledger: pageLedger, assumptions: pageAssumptions, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[p] || pageDashboard)();
+  // Same page re-rendering after an edit: keep window/table scroll and the focused field.
+  const same = main.dataset.view === page;
+  const wy = scrollY;
+  const tableScroll = same ? [...main.querySelectorAll('.table-wrap')].map((w) => [w.scrollLeft, w.scrollTop]) : [];
+  const focus = same ? focusKey(main) : null;
+  const view = ({ dashboard: pageDashboard, ledger: pageLedger, assumptions: pageAssumptions, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
   main.replaceChildren(view);
-  main.scrollTop = scroll; scrollTo(0, wy);
+  main.dataset.view = page;
+  main.querySelectorAll('.table-wrap').forEach((w, i) => { if (tableScroll[i]) [w.scrollLeft, w.scrollTop] = tableScroll[i]; });
+  if (focus) restoreFocus(main, focus);
+  scrollTo(0, same ? wy : 0);
+}
+
+// Identify the focused control by tag + label + position among controls with that label,
+// which survives a full re-render (element identity does not).
+const FOCUSABLE = 'input, select, textarea, button, a[href]';
+const ctlLabel = (c) => c.tagName + '|' + (c.getAttribute('aria-label') || c.labels?.[0]?.textContent || c.textContent || c.name || '');
+function focusKey(root) {
+  const a = document.activeElement;
+  if (!a || !root.contains(a)) return null;
+  const key = ctlLabel(a);
+  const n = [...root.querySelectorAll(FOCUSABLE)].filter((c) => ctlLabel(c) === key).indexOf(a);
+  let sel = null;
+  try { sel = a.selectionStart != null ? [a.selectionStart, a.selectionEnd] : null; } catch { /* number inputs have no selection */ }
+  return { key, n, sel };
+}
+function restoreFocus(root, { key, n, sel }) {
+  const c = [...root.querySelectorAll(FOCUSABLE)].filter((x) => ctlLabel(x) === key)[n];
+  if (!c) return;
+  c.focus({ preventScroll: true });
+  try { if (sel) c.setSelectionRange(...sel); } catch { /* not a text field */ }
 }
 
 function pageHead(title, sub, ...actions) {
@@ -955,7 +1128,7 @@ function pageDashboard() {
     checks.map((c) => el('div', { class: 'check' },
       el('div', { class: 'check__icon ' + (c.ok ? 'check__icon--ok' : 'check__icon--due'), text: c.ok ? '✓' : '!' }),
       el('div', { class: 'check__text' }, el('div', { text: c.text }), c.detail ? el('div', { class: 'check__detail', text: c.detail }) : null),
-      c.go ? el('button', { class: 'btn btn--small', type: 'button', text: 'Open', onclick: () => go(c.go) }) : null,
+      c.go ? el('button', { class: 'btn btn--small', type: 'button', text: c.cta || 'Go', onclick: () => (c.go === 'data' ? exportBackup() : go(c.go)) }) : null,
     )));
 
   frag.append(el('div', { class: 'grid grid--two' }, el('div', null, goal, chk), month));
@@ -965,7 +1138,7 @@ function pageDashboard() {
     const series = [{ name: 'Cash (start + cumulative savings)', values: rows.map((r) => r.cash) }];
     if (S.settings.cpfEnabled) series.push({ name: 'Total CPF', values: rows.map((r) => r.cpfTotal) });
     series.push({ name: 'Cumulative invested (planned)', values: rows.map((r) => r.cum.invest) });
-    frag.append(el('div', { class: 'grid grid--two' },
+    frag.append(el('div', { class: 'grid grid--two grid--top' },
       el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Balances over time' }), lineChart(series, labels)),
       el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Savings rate by month' }), barChart(rows.map((r) => r.savingsRate), labels),
         el('div', { class: 'card__title section-gap', text: 'Where the money went (all months)' }),
@@ -991,18 +1164,21 @@ function pageLedger() {
   };
   const mark = (r, k) => (r.overrides.includes(k) ? el('span', { class: 'table__mark', title: 'Adjusted for this month', text: '•' }) : null);
   const cell = (r, k) => el('span', null, money(r[k]), mark(r, k));
+  // Mostly-zero columns read better as a dash than a wall of $0.00.
+  const orDash = (v) => (num(v) ? money(v) : el('span', { class: 'muted', text: '–' }));
+  const full = !S.settings.ledgerCompact;
   const cols = [
-    { key: 'month', label: 'Month (worked)', type: 'month', get: (r) => monthLabel(r.month) },
+    { key: 'month', label: 'Month (worked)', type: 'month', get: (r) => el('button', { class: 'table__link', type: 'button', text: monthLabel(r.month), 'aria-label': `Edit ${monthLabel(r.month)}`, onclick: () => editMonth(r.entry) }) },
     { key: 'salary', label: 'Salary', type: 'money', get: (r) => cell(r, 'salary') },
-    { key: 'bonus', label: 'Bonus', type: 'money', get: (r) => money(r.bonus) },
+    { key: 'bonus', label: 'Bonus', type: 'money', get: (r) => orDash(r.bonus) },
     ...(S.settings.cpfEnabled ? [{ key: 'ee', label: 'CPF', type: 'money', get: (r) => money(r.ee) }, { key: 'er', label: 'Employer CPF', type: 'money', get: (r) => money(r.er) }] : []),
     { key: 'after', label: 'After CPF', type: 'money', get: (r) => money(r.after) },
     { key: 'food', label: 'Food', type: 'money', get: (r) => cell(r, 'food') },
     { key: 'transport', label: 'Transport', type: 'money', get: (r) => cell(r, 'transport') },
     { key: 'parents', label: 'Parents', type: 'money', get: (r) => cell(r, 'parents') },
     { key: 'others', label: 'Others', type: 'money', get: (r) => cell(r, 'others') },
-    { key: 'extras', label: 'One-offs', type: 'money', get: (r) => money(r.extras) },
-    { key: 'insurance', label: 'Insurance', type: 'money', get: (r) => money(r.insurance) },
+    { key: 'extras', label: 'One-offs', type: 'money', get: (r) => orDash(r.extras) },
+    { key: 'insurance', label: 'Insurance', type: 'money', get: (r) => orDash(r.insurance) },
     { key: 'tax', label: 'Income tax', type: 'money', get: (r) => cell(r, 'tax') },
     { key: 'invest', label: 'Investment', type: 'money', get: (r) => cell(r, 'invest') },
     { key: 'savings', label: 'Savings', type: 'money', get: (r) => money(r.savings), cls: (r) => sign(r.savings) },
@@ -1013,8 +1189,15 @@ function pageLedger() {
       { key: 'sa', label: 'CPF SA', type: 'money', get: (r) => money(r.sa) },
       { key: 'ma', label: 'CPF MA', type: 'money', get: (r) => money(r.ma) },
     ] : []),
-    { key: 'edit', label: '', type: 'text', get: (r) => el('button', { class: 'btn btn--small', type: 'button', text: 'Edit', onclick: () => editMonth(r.entry) }) },
   ];
+  const KEY_COLS = ['month', 'salary', 'after', 'spend', 'tax', 'invest', 'savings', 'rate', 'cumsav'];
+  const shown = full ? cols : [...cols, { key: 'spend', label: 'Spending', type: 'money', get: (r) => money(r.expenditure - r.tax) }]
+    .filter((c) => KEY_COLS.includes(c.key)).sort((a, b) => KEY_COLS.indexOf(a.key) - KEY_COLS.indexOf(b.key));
+  const viewToggle = el('div', { class: 'segmented', role: 'group', 'aria-label': 'Columns' },
+    [['Key columns', true], ['All columns', false]].map(([label, compact]) => el('button', {
+      class: 'segmented__btn', type: 'button', text: label, 'aria-pressed': String(!!S.settings.ledgerCompact === compact),
+      onclick: () => { S.settings.ledgerCompact = compact; commit(); },
+    })));
   const last = rows[rows.length - 1];
   return el('div', null,
     pageHead('Monthly ledger', 'One row per worked month. Everything fills in from your assumptions — edit a month only if it was unusual.',
@@ -1025,8 +1208,9 @@ function pageLedger() {
       stat('Cumulative expenditure', money(last.cum.exp)),
       stat('Cumulative CPF (you + employer)', money(last.cum.ee + last.cum.er)),
     ) : null,
-    el('div', { class: 'section-gap' }, editTable({ cols, rows: [...rows].reverse(), emptyText: 'No months yet — click “Add next month”.' })),
-    el('p', { class: 'card__hint section-gap' }, el('span', { class: 'table__mark', text: '•' }), ' = value adjusted for that month only. Income tax is your projected annual tax for that calendar year ÷ 12.'),
+    el('div', { class: 'table-toolbar section-gap' }, el('span', { class: 'card__hint', text: 'Select a month to edit it.' }), viewToggle),
+    editTable({ cols: shown, rows: [...rows].reverse(), emptyText: 'No months yet — select “Add next month”.' }),
+    el('p', { class: 'card__hint section-gap' }, el('span', { class: 'table__mark', text: '•' }), ' = value adjusted for that month only. ', full ? null : 'Spending = food, transport, parents, others, one-offs and insurance. ', 'Income tax is your projected annual tax for that calendar year ÷ 12.'),
   );
 }
 
@@ -1064,7 +1248,7 @@ function editMonth(e) {
     extrasBox,
     field('Note', inputFor(tmp, { key: 'note', type: 'text', label: 'Note' }, { onChange: () => {} })),
   ], [
-    { label: 'Delete month', danger: true, run: () => { S.ledger = S.ledger.filter((x) => x.id !== e.id); commit(); } },
+    { label: 'Delete month', danger: true, run: () => undoable(`${monthLabel(e.month)} deleted`, () => { S.ledger = S.ledger.filter((x) => x.id !== e.id); }) },
     { label: 'Cancel' },
     {
       label: 'Save', primary: true, run: () => {
@@ -1085,10 +1269,20 @@ function pageAssumptions() {
     S.assumptions.push(last ? { ...JSON.parse(JSON.stringify(last)), id: uid(), effective: todayISO(), notes: '' } : { id: uid(), effective: thisMonth() + '-01', salary: 0, age: 30, workDays: 22, foodDay: 0, transportDay: 0, parents: 0, investPct: 0, others: 0, notes: '' });
     commit();
   };
+  const birth = S.settings.birthMonth;
+  const effMonth = (a) => a.effective?.slice(0, 7) || thisMonth();
+  const next = S.settings.cpfEnabled && birth ? nextBandChange(thisMonth()) : null;
+  const birthHint = birth
+    ? `You are ${Math.floor(ageAt(thisMonth()))}. Age updates every month, so the Age column is filled in for you.`
+      + (next ? ` Next CPF rate change: ${monthLabel(next.month)} (above ${next.band.ageAbove}).` : '')
+      + ' Clear the field to type ages yourself.'
+    : 'Optional. Set it and your age — and CPF age band — update on their own each month. The new band starts the month after your birthday month.';
   const cols = [
     { key: 'effective', label: 'Effective date', type: 'date' },
     { key: 'salary', label: 'Salary', type: 'money' },
-    ...(S.settings.cpfEnabled ? [{ key: 'age', label: 'Age', type: 'number', step: '1' }] : []),
+    ...(S.settings.cpfEnabled ? [birth
+      ? { key: 'age', label: 'Age', type: 'number', get: (a) => String(Math.floor(ageAt(effMonth(a)))) }
+      : { key: 'age', label: 'Age', type: 'number', step: '1' }] : []),
     { key: 'workDays', label: 'Work days/mo', type: 'number', step: '1' },
     { key: 'foodDay', label: 'Food/day', type: 'money' },
     { key: 'transportDay', label: 'Transport/day', type: 'money' },
@@ -1096,9 +1290,10 @@ function pageAssumptions() {
     { key: 'others', label: 'Others/month', type: 'money' },
     { key: 'investPct', label: 'Investment %', type: 'pct' },
     ...(S.settings.cpfEnabled ? [
-      { key: 'cpfEE', label: 'CPF rate', type: 'pct', get: (a) => pct(cpfFor(a.effective?.slice(0, 7) || thisMonth(), a.age).ee) },
-      { key: 'cpfER', label: 'Employer CPF', type: 'pct', get: (a) => pct(cpfFor(a.effective?.slice(0, 7) || thisMonth(), a.age).er) },
-      { key: 'cpfOA', label: 'OA alloc.', type: 'pct', get: (a) => pct(cpfFor(a.effective?.slice(0, 7) || thisMonth(), a.age).oa) },
+      { key: 'cpfEE', label: 'CPF rate', type: 'pct', get: (a) => pct(cpfFor(effMonth(a), ageAt(effMonth(a), a)).ee) },
+      { key: 'cpfER', label: 'Employer CPF', type: 'pct', get: (a) => pct(cpfFor(effMonth(a), ageAt(effMonth(a), a)).er) },
+      { key: 'cpfOA', label: 'OA alloc.', type: 'pct', get: (a) => pct(cpfFor(effMonth(a), ageAt(effMonth(a), a)).oa) },
+      { key: 'cpfMA', label: 'MA alloc.', type: 'pct', get: (a) => pct(cpfFor(effMonth(a), ageAt(effMonth(a), a)).ma) },
     ] : []),
     { key: 'notes', label: 'Notes', type: 'text' },
   ];
@@ -1106,7 +1301,8 @@ function pageAssumptions() {
     pageHead('Assumptions history', 'Every input that can change over time. When something changes (a raise, costs going up), add a new row — past months stay untouched.',
       el('button', { class: 'btn btn--primary', type: 'button', text: rows.length ? '+ Copy last row' : '+ Add first row', onclick: add })),
     el('div', { class: 'notice notice--info', text: 'A row applies from the first month that starts on or after its effective date. Example: effective 30 May → used from June. CPF rates come from the age band in Settings → CPF schedule.' }),
-    editTable({ cols, rows, onDelete: (r) => { S.assumptions = S.assumptions.filter((x) => x !== r); commit(); }, emptyText: 'No assumptions yet.' }),
+    el('div', { class: 'card birth-card' }, field('Birth month', inputFor(S.settings, { key: 'birthMonth', type: 'month', label: 'Birth month' }), birthHint)),
+    editTable({ cols, rows, onDelete: (r) => undoable('Assumptions row deleted', () => { S.assumptions = S.assumptions.filter((x) => x !== r); }), emptyText: 'No assumptions yet.' }),
   );
 }
 
@@ -1127,11 +1323,11 @@ function pageInvestments() {
     el('div', { class: 'grid grid--two section-gap' },
       el('div', null,
         el('div', { class: 'card__title' }, el('span', { text: 'Deposits' }), el('button', { class: 'btn btn--small btn--primary', type: 'button', text: '+ Deposit', onclick: () => { S.deposits.push({ id: uid(), date: todayISO().slice(0, 8) + '01', amount: 0, notes: '' }); commit(); } })),
-        editTable({ cols: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'amount', label: 'Amount', type: 'money' }, { key: 'notes', label: 'Notes', type: 'text' }], rows: dep, onDelete: (r) => { S.deposits = S.deposits.filter((x) => x !== r); commit(); }, totals: dep.length ? { amount: sm.deposits } : null }),
+        editTable({ cols: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'amount', label: 'Amount', type: 'money' }, { key: 'notes', label: 'Notes', type: 'text' }], rows: dep, onDelete: (r) => undoable('Deposit deleted', () => { S.deposits = S.deposits.filter((x) => x !== r); }), totals: dep.length ? { amount: sm.deposits } : null }),
       ),
       el('div', null,
         el('div', { class: 'card__title' }, el('span', { text: 'Portfolio value log' }), el('button', { class: 'btn btn--small btn--primary', type: 'button', text: '+ Value', onclick: () => { S.portfolio.push({ id: uid(), date: todayISO(), value: sm.portfolio, notes: '' }); commit(); } })),
-        editTable({ cols: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'value', label: 'Value', type: 'money' }, { key: 'notes', label: 'Notes', type: 'text' }], rows: pv, onDelete: (r) => { S.portfolio = S.portfolio.filter((x) => x !== r); commit(); } }),
+        editTable({ cols: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'value', label: 'Value', type: 'money' }, { key: 'notes', label: 'Notes', type: 'text' }], rows: pv, onDelete: (r) => undoable('Portfolio value deleted', () => { S.portfolio = S.portfolio.filter((x) => x !== r); }) }),
       ),
     ),
     pv.length > 1 ? el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: 'Portfolio value' }), lineChart([{ name: 'Portfolio value', values: pv.map((p) => num(p.value)) }], pv.map((p) => dateLabel(p.date).replace(/^\d+ /, '')))) : null,
@@ -1154,8 +1350,8 @@ function pageLiabilities() {
     pageHead('Liabilities', 'Loans or debts. They are subtracted from net worth.',
       el('button', { class: 'btn btn--primary', type: 'button', text: '+ Liability', onclick: () => { S.liabilities.push({ id: uid(), name: '', balance: 0, rate: 0, payment: 0, notes: '' }); commit(); } })),
     el('div', { class: 'grid grid--stats' }, stat('Total liabilities', money(total), null, true)),
-    el('div', { class: 'section-gap' }, editTable({ cols, rows: S.liabilities, onDelete: (r) => { S.liabilities = S.liabilities.filter((x) => x !== r); commit(); }, emptyText: 'No liabilities — nice.', totals: S.liabilities.length ? { balance: total } : null })),
-    el('p', { class: 'card__hint section-gap', text: 'Payoff uses NPER(rate/12, −payment, balance). Update the balance, rate or payment when they change.' }),
+    el('div', { class: 'section-gap' }, editTable({ cols, rows: S.liabilities, onDelete: (r) => undoable('Liability deleted', () => { S.liabilities = S.liabilities.filter((x) => x !== r); }), emptyText: 'No liabilities — nice.', totals: S.liabilities.length ? { balance: total } : null })),
+    el('p', { class: 'card__hint section-gap', text: 'Payoff assumes the same monthly payment and interest rate until the loan is cleared. Update the balance, rate or payment when they change.' }),
   );
 }
 
@@ -1175,7 +1371,7 @@ function pageInsurance() {
       { key: 'var', label: 'Variance', type: 'money', get: (r) => (r.actual != null && r.actual !== '' ? money(num(r.actual) - r.expected) : '–'), cls: (r) => (r.actual != null && r.actual !== '' ? sign(num(r.actual) - r.expected) : '') },
     ];
     return el('div', { class: 'card' },
-      el('div', { class: 'card__title' }, el('span', { text: p.name || 'Policy' }), el('button', { class: 'btn btn--small btn--danger', type: 'button', text: 'Delete policy', onclick: () => { if (confirm('Delete this policy and its payment log?')) { S.policies = S.policies.filter((x) => x !== p); commit(); } } })),
+      el('div', { class: 'card__title' }, el('span', { text: p.name || 'Policy' }), el('button', { class: 'btn btn--small btn--danger', type: 'button', text: 'Delete policy', onclick: () => undoable(`${p.name || 'Policy'} deleted`, () => { S.policies = S.policies.filter((x) => x !== p); }) })),
       el('div', { class: 'form-grid' },
         settingInput(p, 'name', 'text', 'Policy name'),
         settingInput(p, 'start', 'date', 'Policy start date'),
@@ -1203,7 +1399,7 @@ function pageTax() {
   const table = taxTable();
 
   const list = (S.reliefs[year] = S.reliefs[year] || []);
-  const age = lastRow ? lastRow.age : num(assumptionFor(thisMonth())?.age);
+  const age = ageInYear(year, lastRow ? lastRow.assumption : assumptionFor(thisMonth()));
   const eir = earnedIncomeRelief(age);
   const projected = lastRow ? lastRow.projected : 0;
   const base = Math.max(0, projected - eir);
@@ -1224,6 +1420,17 @@ function pageTax() {
   const taxWith = taxOn(cur, table);
 
   const yearSel = el('select', { class: 'select', 'aria-label': 'Income year', onchange: (e) => { location.hash = '#/tax?y=' + e.target.value; } }, years.map((y) => el('option', { value: y, selected: y === year, text: `Income year ${y} (YA ${+y + 1})` })));
+
+  const reliefPicker = el('select', {
+    class: 'select select--inline', 'aria-label': 'Add a relief',
+    onchange: (e) => {
+      const p = RELIEF_PRESETS[+e.target.value];
+      if (!p) return;
+      list.push({ id: uid(), name: p.name, amount: p.amount });
+      commit();
+      toast(`Added ${p.name}${p.amount ? '' : ' — enter the amount'}`);
+    },
+  }, el('option', { value: '', text: '+ Add a relief…', selected: true }), RELIEF_PRESETS.map((p, i) => el('option', { value: i, text: p.amount ? `${p.name} · ${money(p.amount, { compact: true })}` : p.name })));
 
   const reliefCols = [
     { key: 'name', label: 'Relief', type: 'text' },
@@ -1254,26 +1461,26 @@ function pageTax() {
         el('p', { class: 'card__hint section-gap', text: 'Reliefs are applied one after another from the top, so each one’s share adds up to the total saved. Later reliefs save less once earlier ones push income into a lower band. CPF relief is already included by using after-CPF pay.' }),
       ),
       el('div', { class: 'card' },
-        el('div', { class: 'card__title', text: `Reliefs for ${year}` }),
-        el('div', { class: 'chips' }, RELIEF_PRESETS.map((p) => el('button', { class: 'btn btn--small', type: 'button', text: '+ ' + p.name, onclick: () => { list.push({ id: uid(), name: p.name, amount: p.amount }); commit(); } }))),
-        editTable({ cols: reliefCols, rows: list, onDelete: (r) => { S.reliefs[year] = list.filter((x) => x !== r); commit(); }, emptyText: 'No reliefs added for this year.' }),
-        el('div', { class: 'form-grid section-gap' },
-          field('Donations to approved IPCs (amount given)', inputFor(S.donations, { key: year, type: 'money', label: 'Donations' }), `Deducted at ${num(S.settings.donationMultiplier) * 100}%. Not part of the relief cap.`),
-          field('Donation tax saving', el('div', { class: 'stat__value pos', text: money(donSaved) })),
-        ),
-        el('p', { class: 'card__hint', text: 'Relief amounts and caps change — check the current rules on the IRAS website. This is an estimate, not tax advice.' }),
+        el('div', { class: 'card__title', text: 'Donations' }),
+        field('Donations to approved IPCs (amount given)', inputFor(S.donations, { key: year, type: 'money', label: 'Donations' }), `Deducted at ${num(S.settings.donationMultiplier) * 100}%. Not part of the relief cap.`),
+        kv([['Donation tax saving', money(donSaved), true, 'pos']]),
+        el('p', { class: 'card__hint section-gap', text: 'Relief amounts and caps change — check the current rules on the IRAS website. This is an estimate, not tax advice.' }),
       ),
+    ),
+    el('div', { class: 'card section-gap' },
+      el('div', { class: 'card__title' }, el('span', { text: `Reliefs for ${year}` }), reliefPicker),
+      editTable({ cols: reliefCols, rows: list, onDelete: (r) => undoable('Relief removed', () => { S.reliefs[year] = list.filter((x) => x !== r); }), emptyText: 'No reliefs yet — use “Add a relief” to pick one.' }),
     ),
     el('h2', { class: 'section-gap', text: 'Tax brackets' }),
     el('p', { class: 'card__hint', text: 'Default: Singapore resident rates, YA2024 onwards. Edit lower bound or rate if they change — base tax recalculates itself. Non-Singapore users can replace the whole table.' }),
     el('div', { class: 'page__actions' },
       el('button', { class: 'btn btn--small', type: 'button', text: '+ Bracket', onclick: () => { S.taxBrackets.push({ id: uid(), lower: 0, rate: 0 }); commit(); } }),
-      el('button', { class: 'btn btn--small', type: 'button', text: 'Reset to SG defaults', onclick: () => { if (confirm('Replace the bracket table with Singapore defaults?')) { S.taxBrackets = DEFAULT_TAX.map((r) => ({ ...r, id: uid() })); commit(); } } }),
+      el('button', { class: 'btn btn--small', type: 'button', text: 'Reset to SG defaults', onclick: () => undoable('Tax brackets reset to Singapore defaults', () => { S.taxBrackets = DEFAULT_TAX.map((r) => ({ ...r, id: uid() })); }) }),
     ),
     el('div', { class: 'section-gap' }, editTable({
       cols: [{ key: 'lower', label: 'Lower bound', type: 'money' }, { key: 'rate', label: 'Rate', type: 'pct' }, { key: 'base', label: 'Base tax (auto)', type: 'money', get: (r) => money(table.find((t) => t.id === r.id)?.base) }],
       rows: [...S.taxBrackets].sort((a, b) => a.lower - b.lower),
-      onDelete: (r) => { S.taxBrackets = S.taxBrackets.filter((x) => x !== r); commit(); },
+      onDelete: (r) => undoable('Tax bracket deleted', () => { S.taxBrackets = S.taxBrackets.filter((x) => x !== r); }),
     })),
   );
 }
@@ -1324,7 +1531,6 @@ function pageNetWorth() {
             settingInput(st.cpfStart, 'sa', 'money', 'Starting SA balance'),
             settingInput(st.cpfStart, 'ma', 'money', 'Starting MA balance'),
             settingInput(st, 'cpfExtraRate', 'pct', 'Extra interest rate', '1% on the first $60k combined (max $20k from OA).'),
-            settingInput(st, 'maAlloc', 'pct', 'MA allocation %', 'Share of total contributions going to MediSave for your age band.'),
           ),
           sm.last ? kv([['OA', money(sm.last.oa)], ['SA', money(sm.last.sa)], ['MA', money(sm.last.ma)], ['Total CPF', money(sm.cpf), true]]) : null,
           el('p', { class: 'card__hint section-gap', text: 'Planning approximation: CPF credits interest yearly in January, while this accrues monthly. Re-calibrate the starting balances if they drift from your statement.' }),
@@ -1369,6 +1575,8 @@ function pageData() {
           settingInput(st, 'currency', 'text', 'Currency code', 'e.g. SGD, MYR, TWD, HKD, USD'),
           settingInput(st, 'locale', 'text', 'Number format locale', 'e.g. en-SG, zh-TW, en-US'),
           settingInput(st, 'autoLockMin', 'number', 'Auto-lock after (minutes idle)', '0 = never', { step: '1' }),
+          field('Appearance', el('select', { class: 'select', 'aria-label': 'Appearance', onchange: (e) => setTheme(e.target.value) },
+            [['system', 'Match device'], ['light', 'Light'], ['dark', 'Dark']].map(([v, t]) => el('option', { value: v, selected: getTheme() === v, text: t }))), 'Saved on this device only.'),
           field('Track CPF', el('select', { class: 'select', onchange: (e) => { st.cpfEnabled = e.target.value === 'yes'; commit(); } },
             el('option', { value: 'yes', selected: st.cpfEnabled, text: 'Yes — Singapore CPF' }), el('option', { value: 'no', selected: !st.cpfEnabled, text: 'No' }))),
           settingInput(st, 'owCeiling', 'money', 'CPF ordinary wage ceiling / month', '0 = no ceiling. S$8,000 from 2026.'),
@@ -1383,17 +1591,17 @@ function pageData() {
       ),
       el('div', { class: 'card' },
         el('div', { class: 'card__title' }, el('span', { text: 'CPF contribution schedule' }), el('button', { class: 'btn btn--small', type: 'button', text: '+ Row', onclick: () => { const last = S.cpfSchedule[S.cpfSchedule.length - 1]; S.cpfSchedule.push({ ...last, id: uid() }); commit(); } })),
-        el('p', { class: 'card__hint', text: 'Rows with the latest “From” date on or before a month are used. To add a new year, add one row per age band with the new From date. Rates as % of wages.' }),
+        el('p', { class: 'card__hint', text: 'Rows with the latest “From” date on or before a month are used. To add a new year, add one row per age band with the new From date. Contribution rates are % of wages; OA and MA allocations are shares of the total contribution, and SA/RA gets the rest.' }),
       ),
     ),
     el('div', { class: 'section-gap' }, editTable({
       cols: [
         { key: 'from', label: 'From', type: 'date' }, { key: 'ageAbove', label: 'Age above', type: 'number', step: '1' }, { key: 'ageUpTo', label: 'Age up to', type: 'number', step: '1' },
-        { key: 'ee', label: 'Employee', type: 'pct' }, { key: 'er', label: 'Employer', type: 'pct' }, { key: 'oa', label: 'OA allocation', type: 'pct' },
+        { key: 'ee', label: 'Employee', type: 'pct' }, { key: 'er', label: 'Employer', type: 'pct' }, { key: 'oa', label: 'OA allocation', type: 'pct' }, { key: 'ma', label: 'MA allocation', type: 'pct' },
         { key: 'oaRate', label: 'OA interest', type: 'pct' }, { key: 'samaRate', label: 'SA/MA interest', type: 'pct' },
       ],
-      rows: [...S.cpfSchedule].sort((a, b) => (a.from + String(1000 + num(a.ageAbove))).localeCompare(b.from + String(1000 + num(b.ageAbove)))),
-      onDelete: (r) => { S.cpfSchedule = S.cpfSchedule.filter((x) => x !== r); commit(); },
+      rows: [...S.cpfSchedule].sort((a, b) => String(a.from).localeCompare(String(b.from)) || num(a.ageAbove) - num(b.ageAbove)),
+      onDelete: (r) => undoable('CPF schedule row deleted', () => { S.cpfSchedule = S.cpfSchedule.filter((x) => x !== r); }),
     })),
     el('p', { class: 'card__hint section-gap', text: 'Ledger Local is a tracking tool, not financial or tax advice. Figures are estimates.' }),
   );
@@ -1416,13 +1624,13 @@ async function exportBackup() {
   commit();
   toast('Encrypted backup downloaded');
 }
-function exportPlainJSON() {
-  if (!confirm('This file will NOT be encrypted. Anyone who gets it can read your finances. Continue?')) return;
+async function exportPlainJSON() {
+  if (!await confirmDialog('Export unencrypted data?', 'This file will NOT be encrypted. Anyone who gets it can read your finances.', 'Export JSON')) return;
   download(`ledger-local-plain-${todayISO()}.json`, JSON.stringify(S, null, 2), 'application/json');
 }
 function csvCell(v) { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
-function exportLedgerCSV() {
-  if (!confirm('This CSV will NOT be encrypted. Continue?')) return;
+async function exportLedgerCSV() {
+  if (!await confirmDialog('Export unencrypted CSV?', 'This CSV will NOT be encrypted. Anyone who gets it can read your ledger.', 'Export CSV')) return;
   const rows = computeLedger();
   const head = ['Month', 'Salary', 'Bonus', 'CPF', 'Employer CPF', 'After CPF', 'Food', 'Transport', 'Parents', 'Others', 'One-offs', 'Insurance', 'Income Tax', 'Investment', 'Savings', 'Cumulative Savings', 'CPF OA', 'CPF SA', 'CPF MA', 'MA Deductions', 'Savings Rate'];
   const lines = [head.join(',')].concat(rows.map((r) => [r.month, r.salary, r.bonus, r.ee, r.er, r.after, r.food, r.transport, r.parents, r.others, r.extras, r.insurance, r.tax, r.invest, r.savings, r.cum.savings, r.oa, r.sa, r.ma, r.maDed, r.savingsRate].map((v) => csvCell(typeof v === 'number' ? round2(v) : v)).join(',')));
@@ -1619,6 +1827,17 @@ function sampleData() {
 /* =====================================================================
  * 15. Boot
  * ===================================================================== */
+// Theme is a device preference kept outside the vault, so the lock screen can use it too.
+function getTheme() { try { return localStorage.getItem('ledger-theme') || 'system'; } catch { return 'system'; } }
+function applyTheme(t) {
+  if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  else delete document.documentElement.dataset.theme;
+}
+function setTheme(t) {
+  try { localStorage.setItem('ledger-theme', t); } catch { /* private mode: applies for this visit only */ }
+  applyTheme(t);
+}
+applyTheme(getTheme());
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
