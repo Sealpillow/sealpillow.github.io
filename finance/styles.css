@@ -1,23 +1,26 @@
+/* Light: warm neutrals with the site's gold. --accent is for text and buttons (AA on every surface);
+   --accent-deco is the lighter gold for fills only (bars, progress, brand dot), never text. */
 :root {
-  --bg: #f6f7f5;
+  --bg: #f7f6f3;
   --surface: #ffffff;
-  --surface-2: #f0f2ef;
-  --text: #1b1f1d;
-  --muted: #5d6662;
-  --border: #dde1dd;
-  --accent: #0f6b5c;
-  --accent-soft: #e2f1ed;
+  --surface-2: #f1efea;
+  --text: #1c1b19;
+  --muted: #5f5d58;
+  --border: #e2dfd8;
+  --accent: #7d5f26;
+  --accent-soft: #f4eddf;
   --accent-text: #ffffff;
+  --accent-deco: #b08d55;
   --pos: #1d7a3e;
   --neg: #b3261e;
-  --warn: #9a6200;
-  --warn-soft: #fff4dc;
-  --series-1: #0f6b5c;
+  --warn: #a34a08;
+  --warn-soft: #fdf0e1;
+  --series-1: #b08d55;
   --series-2: #3b6fd1;
-  --series-3: #c2702b;
+  --series-3: #1f8a77;
   --series-4: #8a5cc4;
-  --field: #f4f6f3;
-  --field-hover: #eceeea;
+  --field: #f5f4f0;
+  --field-hover: #edebe5;
   --radius: 10px;
   --tabbar-h: 60px;
   --shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 2px 8px rgba(0, 0, 0, .04);
@@ -25,51 +28,54 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+/* Dark: graphite and gold (matches the site's gold accent). Keep both dark blocks in sync. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111413;
-    --surface: #191d1b;
-    --surface-2: #212624;
-    --text: #e6eae7;
-    --muted: #9aa49f;
-    --border: #2e3431;
-    --accent: #4fb7a2;
-    --accent-soft: #1c302b;
-    --accent-text: #0b1512;
-    --pos: #5cc27f;
-    --neg: #f08a80;
-    --warn: #e0b04f;
-    --warn-soft: #2e2615;
-    --field: #1f2422;
-    --field-hover: #262c29;
-    --series-1: #4fb7a2;
-    --series-2: #7ea4ec;
-    --series-3: #e39a5b;
-    --series-4: #b293e0;
+    --bg: #121212;
+    --surface: #1b1b1a;
+    --surface-2: #242423;
+    --text: #ecebe8;
+    --muted: #a9a7a1;
+    --border: #363532;
+    --accent: #c8a96e;
+    --accent-soft: #2a2418;
+    --accent-text: #17130a;
+    --accent-deco: #c8a96e;
+    --pos: #7fcf97;
+    --neg: #ff9a8f;
+    --warn: #f2a65a;
+    --warn-soft: #33240f;
+    --field: #222221;
+    --field-hover: #2b2b29;
+    --series-1: #c8a96e;
+    --series-2: #8fb2f2;
+    --series-3: #6fc7b4;
+    --series-4: #d79bc4;
     --shadow: none;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #111413;
-  --surface: #191d1b;
-  --surface-2: #212624;
-  --text: #e6eae7;
-  --muted: #9aa49f;
-  --border: #2e3431;
-  --accent: #4fb7a2;
-  --accent-soft: #1c302b;
-  --accent-text: #0b1512;
-  --pos: #5cc27f;
-  --neg: #f08a80;
-  --warn: #e0b04f;
-  --warn-soft: #2e2615;
-  --field: #1f2422;
-  --field-hover: #262c29;
-  --series-1: #4fb7a2;
-  --series-2: #7ea4ec;
-  --series-3: #e39a5b;
-  --series-4: #b293e0;
+  --bg: #121212;
+  --surface: #1b1b1a;
+  --surface-2: #242423;
+  --text: #ecebe8;
+  --muted: #a9a7a1;
+  --border: #363532;
+  --accent: #c8a96e;
+  --accent-soft: #2a2418;
+  --accent-text: #17130a;
+  --accent-deco: #c8a96e;
+  --pos: #7fcf97;
+  --neg: #ff9a8f;
+  --warn: #f2a65a;
+  --warn-soft: #33240f;
+  --field: #222221;
+  --field-hover: #2b2b29;
+  --series-1: #c8a96e;
+  --series-2: #8fb2f2;
+  --series-3: #6fc7b4;
+  --series-4: #d79bc4;
   --shadow: none;
 }
 
@@ -108,7 +114,7 @@ a { color: var(--accent); }
   gap: 2px;
 }
 .shell__brand { font-weight: 700; padding: 4px 10px 14px; display: flex; align-items: center; gap: 8px; }
-.shell__brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.shell__brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-deco); }
 .shell__main { flex: 1; min-width: 0; padding: 20px 24px 60px; max-width: 1180px; }
 .shell__spacer { flex: 1; }
 
@@ -223,7 +229,7 @@ a { color: var(--accent); }
 .stat__label { color: var(--muted); font-size: .8rem; }
 .stat__value { font-size: 1.35rem; font-weight: 650; font-variant-numeric: tabular-nums; }
 .stat__note { color: var(--muted); font-size: .8rem; }
-.stat--key { background: var(--accent-soft); border-color: transparent; }
+.stat--key { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
 
 .kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; font-variant-numeric: tabular-nums; }
 .kv__k { color: var(--muted); }
@@ -318,9 +324,9 @@ a { color: var(--accent); }
 .bar { margin-bottom: 8px; }
 .bar__head { display: flex; justify-content: space-between; font-size: .85rem; font-variant-numeric: tabular-nums; }
 .bar__track { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin-top: 3px; }
-.bar__fill { height: 100%; background: var(--accent); border-radius: 4px; }
+.bar__fill { height: 100%; background: var(--accent-deco); border-radius: 4px; }
 .progress { height: 12px; background: var(--surface-2); border-radius: 6px; overflow: hidden; margin: 8px 0; }
-.progress__fill { height: 100%; background: var(--accent); }
+.progress__fill { height: 100%; background: var(--accent-deco); }
 
 .chart-box { width: 100%; min-height: 40px; }
 .chart { display: block; touch-action: pan-y; }
@@ -399,3 +405,16 @@ dialog::backdrop { background: rgba(0, 0, 0, .45); }
 .birth-card { margin-bottom: 14px; max-width: 560px; }
 .birth-card .field { margin: 0; }
 .birth-card .input { max-width: 220px; }
+
+/* Theme toggle (nav, phone top bar, lock screen) */
+.shell__actions { display: flex; gap: 8px; }
+.shell__actions .shell__lock { flex: 1; }
+.theme-toggle { display: inline-grid; place-items: center; padding: 0; width: 36px; min-height: 36px; color: var(--muted); }
+.theme-toggle:hover { color: var(--text); }
+.theme-toggle .icon { width: 18px; height: 18px; }
+.lock__title .theme-toggle { margin-left: auto; }
+@media (max-width: 860px) {
+  .shell__actions { flex: none; }
+  .shell__actions .shell__lock { flex: none; }
+}
+@media (max-width: 380px) { .shell__actions { margin-left: auto; } }

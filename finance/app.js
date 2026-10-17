@@ -616,7 +616,7 @@ async function renderLock() {
   app.replaceChildren();
   const rec = await VAULT.get().catch(() => null);
   const err = el('div', { class: 'lock__error' });
-  const brand = el('div', { class: 'lock__title' }, el('span', { class: 'shell__brand-dot' }), 'Ledger Local');
+  const brand = el('div', { class: 'lock__title' }, el('span', { class: 'shell__brand-dot' }), 'Ledger Local', themeButton());
 
   if (rec) {
     const pass = el('input', { class: 'input', type: 'password', autocomplete: 'current-password', placeholder: 'Passphrase', 'aria-label': 'Passphrase' });
@@ -993,6 +993,8 @@ const ICONS = {
   investments: 'M3 17l6-6 4 4 8-8M15 7h6v6',
   networth: 'M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5M12 11a1 1 0 1 0 1 1',
   more: 'M4 6h16M4 12h16M4 18h16',
+  moon: 'M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z',
+  sun: 'M12 7.5a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9zM12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8',
 };
 const icon = (k) => svg('svg', { class: 'icon', viewBox: '0 0 24 24', 'aria-hidden': 'true' }, svg('path', { d: ICONS[k] }));
 
@@ -1009,7 +1011,7 @@ function renderShell() {
       el('div', { class: 'shell__links' }, PAGES.map(([id, label]) => el('a', { class: 'nav__link', href: '#/' + id, 'data-page': id, text: label }))),
       el('div', { class: 'shell__spacer' }),
       el('div', { class: 'status' }, el('span', { class: 'status__dot' }), el('span', { id: 'save-status', text: 'Encrypted on this device' })),
-      el('button', { class: 'btn shell__lock', type: 'button', text: 'Lock', onclick: lock }),
+      el('div', { class: 'shell__actions' }, themeButton(), el('button', { class: 'btn shell__lock', type: 'button', text: 'Lock', onclick: lock })),
     ),
     el('main', { class: 'shell__main', id: 'main' }),
     el('nav', { class: 'tabbar', 'aria-label': 'Main sections' },
@@ -1575,7 +1577,7 @@ function pageData() {
           settingInput(st, 'currency', 'text', 'Currency code', 'e.g. SGD, MYR, TWD, HKD, USD'),
           settingInput(st, 'locale', 'text', 'Number format locale', 'e.g. en-SG, zh-TW, en-US'),
           settingInput(st, 'autoLockMin', 'number', 'Auto-lock after (minutes idle)', '0 = never', { step: '1' }),
-          field('Appearance', el('select', { class: 'select', 'aria-label': 'Appearance', onchange: (e) => setTheme(e.target.value) },
+          field('Appearance', el('select', { class: 'select', id: 'theme-select', onchange: (e) => setTheme(e.target.value) },
             [['system', 'Match device'], ['light', 'Light'], ['dark', 'Dark']].map(([v, t]) => el('option', { value: v, selected: getTheme() === v, text: t }))), 'Saved on this device only.'),
           field('Track CPF', el('select', { class: 'select', onchange: (e) => { st.cpfEnabled = e.target.value === 'yes'; commit(); } },
             el('option', { value: 'yes', selected: st.cpfEnabled, text: 'Yes — Singapore CPF' }), el('option', { value: 'no', selected: !st.cpfEnabled, text: 'No' }))),
@@ -1828,15 +1830,29 @@ function sampleData() {
  * 15. Boot
  * ===================================================================== */
 // Theme is a device preference kept outside the vault, so the lock screen can use it too.
+const darkQuery = matchMedia('(prefers-color-scheme: dark)');
 function getTheme() { try { return localStorage.getItem('ledger-theme') || 'system'; } catch { return 'system'; } }
+const effectiveTheme = () => { const t = getTheme(); return t === 'system' ? (darkQuery.matches ? 'dark' : 'light') : t; };
 function applyTheme(t) {
   if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
   else delete document.documentElement.dataset.theme;
+  // Browser/OS chrome (address bar, installed-app title bar) follows the page.
+  $('meta[name="theme-color"]')?.setAttribute('content', effectiveTheme() === 'dark' ? '#121212' : '#7d5f26');
+  document.querySelectorAll('.theme-toggle').forEach((b) => b.replaceWith(themeButton()));
+  const sel = $('#theme-select');
+  if (sel) sel.value = t;
 }
 function setTheme(t) {
   try { localStorage.setItem('ledger-theme', t); } catch { /* private mode: applies for this visit only */ }
   applyTheme(t);
 }
+// One-tap switch between light and dark; "Match device" stays available in Settings.
+function themeButton() {
+  const dark = effectiveTheme() === 'dark';
+  const label = dark ? 'Switch to light theme' : 'Switch to dark theme';
+  return el('button', { class: 'btn btn--icon theme-toggle', type: 'button', 'aria-label': label, title: label, onclick: () => setTheme(dark ? 'light' : 'dark') }, icon(dark ? 'sun' : 'moon'));
+}
+darkQuery.addEventListener('change', () => applyTheme(getTheme()));
 applyTheme(getTheme());
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
