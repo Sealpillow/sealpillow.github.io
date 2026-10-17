@@ -4,45 +4,121 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Layout Snippet Library</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<script>
+  // Apply the saved theme, or the system one, before first paint (shares the 'theme' key with the rest of the site)
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
 <style>
+  /* Site palette (same values as index.html and about.html); dark theme below */
   :root {
-    --bg: #000000;
-    --surface: #161616;
-    --border: #2a2a2a;
-    --border-active: #3a3a3a;
-    --text-primary: #f0f0f0;
-    --text-secondary: #888;
-    --text-muted: #4a4a4a;
-    --accent: #c8a96e;
-    --accent-dim: rgba(200,169,110,0.1);
-    --tag-desktop: #1a2a1a; --tag-desktop-text: #6fcf97;
-    --tag-mobile:  #1a1a2a; --tag-mobile-text:  #7eb8f7;
-    --tag-web:     #2a1a2a; --tag-web-text:     #c77dff;
+    --bg: #f6f4f0;
+    --surface: #fdfcfa;
+    --surface-2: #ece8e1;
+    --stage: #e3dfd8;
+    --border: rgba(21, 20, 19, 0.12);
+    --border-active: rgba(21, 20, 19, 0.3);
+    --text-primary: #151413;
+    --text-secondary: #5c5751;
+    --text-muted: #6b655e;
+    --accent: #7a2e24;
+    --accent-dim: rgba(122, 46, 36, 0.08);
+    --accent-hover: #5f231b;
+    --on-accent: #f6f4f0;
+    --overlay: rgba(21, 20, 19, 0.45);
+    --header-bg: rgba(246, 244, 240, 0.92);
+    --shadow: rgba(21, 20, 19, 0.12);
     --radius: 6px;
     --mono: 'SF Mono','Fira Code','Cascadia Code',monospace;
-    --sans: 'Inter',system-ui,-apple-system,sans-serif;
+    --sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    color-scheme: light;
   }
+
+  :root[data-theme="dark"] {
+    --bg: #161412;
+    --surface: #211e1b;
+    --surface-2: #1b1916;
+    --stage: #0f0e0c;
+    --border: rgba(243, 239, 232, 0.12);
+    --border-active: rgba(243, 239, 232, 0.28);
+    --text-primary: #f3efe8;
+    --text-secondary: #a8a095;
+    --text-muted: #918a7f;
+    --accent: #e09c8c;
+    --accent-dim: rgba(224, 156, 140, 0.12);
+    --accent-hover: #ecb6a9;
+    --on-accent: #161412;
+    --overlay: rgba(0, 0, 0, 0.6);
+    --header-bg: rgba(22, 20, 18, 0.92);
+    --shadow: rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg: #161412;
+      --surface: #211e1b;
+      --surface-2: #1b1916;
+      --stage: #0f0e0c;
+      --border: rgba(243, 239, 232, 0.12);
+      --border-active: rgba(243, 239, 232, 0.28);
+      --text-primary: #f3efe8;
+      --text-secondary: #a8a095;
+      --text-muted: #918a7f;
+      --accent: #e09c8c;
+      --accent-dim: rgba(224, 156, 140, 0.12);
+      --accent-hover: #ecb6a9;
+      --on-accent: #161412;
+      --overlay: rgba(0, 0, 0, 0.6);
+      --header-bg: rgba(22, 20, 18, 0.92);
+      --shadow: rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+  }
+
+  /* Code view stays dark in both themes so the syntax colours keep their contrast */
+  .code-panel {
+    --border: rgba(243, 239, 232, 0.1);
+    --border-active: rgba(243, 239, 232, 0.25);
+    --text-primary: #f3efe8;
+    --text-secondary: #a8a095;
+    --accent: #e09c8c;
+    --accent-dim: rgba(224, 156, 140, 0.12);
+  }
+
+  /* Visible keyboard focus everywhere */
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #search:focus-visible, textarea:focus-visible { outline: none; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text-primary); font-family: var(--sans); min-height: 100vh; }
+  body { background: var(--bg); color: var(--text-primary); font-family: var(--sans); min-height: 100vh; transition: background-color 0.3s ease, color 0.3s ease; }
 
   /* HEADER */
   header {
     padding: 20px 32px;
     border-bottom: 1px solid var(--border);
     position: sticky; top: 0;
-    background: #000000;
+    background: var(--header-bg);
     backdrop-filter: blur(12px);
     z-index: 50;
     display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
   }
   .header-title h1 {
-    font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
-    text-transform: uppercase; color: var(--accent);
+    font-family: var(--serif); font-size: 24px; font-weight: 400; line-height: 1.1;
+    color: var(--text-primary);
   }
   .header-title p { font-size: 11px; color: var(--text-muted); font-family: var(--mono); margin-top: 1px; }
   .back-link {
-    font-size: 10px; font-weight: 500; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--text-secondary);
+    font-size: 14px; font-weight: 400;
+    color: var(--text-secondary);
     text-decoration: none; font-family: var(--sans);
     transition: color 0.15s; flex-shrink: 0;
   }
@@ -52,11 +128,12 @@
   #search {
     width: 100%; background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 7px 28px 7px 30px;
-    color: var(--text-primary); font-size: 12px; font-family: var(--sans); outline: none;
+    color: var(--text-primary); font-size: 14px; font-family: var(--sans); outline: none;
     transition: border-color 0.15s;
   }
   #search:focus { border-color: var(--accent); }
   #search::placeholder { color: var(--text-secondary); }
+  #search::-webkit-search-cancel-button { display: none; } /* the page has its own clear button */
   .search-clear {
     position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
     background: none; border: none; cursor: pointer; color: var(--text-secondary);
@@ -72,7 +149,7 @@
   }
   .filter-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
   .filter-label {
-    flex: 0 0 64px; font-size: 10px; color: var(--text-secondary);
+    flex: 0 0 72px; font-size: 11px; color: var(--text-secondary);
     text-transform: uppercase; letter-spacing: 0.1em;
   }
   .pill-scroll { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
@@ -84,13 +161,13 @@
   .pill-clear:hover { color: var(--text-primary); }
   .pill-clear[hidden] { display: none; }
   .pill {
-    padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 500;
+    padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500;
     border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
     cursor: pointer; transition: all 0.12s; font-family: var(--sans);
   }
   .pill:hover { border-color: var(--border-active); color: var(--text-primary); }
   .pill.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-  .count-badge { margin-left: auto; font-size: 11px; color: var(--text-secondary); font-family: var(--mono); }
+  .count-badge { margin-left: auto; font-size: 13px; color: var(--text-secondary); }
   .view-toggle { display: flex; gap: 2px; margin-left: 12px; }
   .view-btn {
     padding: 4px 7px; background: transparent; border: 1px solid var(--border);
@@ -122,8 +199,6 @@
   .grid.list-mode .card-name {
     flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; word-break: normal;
   }
-  .grid.list-mode .card-footer { border-top: none; padding: 9px 14px 9px 0; flex-shrink: 0; }
-  .grid.list-mode .card-filename { display: none; }
 
   /* CARD */
   .card {
@@ -132,7 +207,8 @@
     transition: border-color 0.15s, box-shadow 0.15s;
     display: flex; flex-direction: column;
   }
-  .card.hovered { border-color: var(--border-active); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+  .card { position: relative; }
+  .card:hover, .card:focus-within { border-color: var(--border-active); box-shadow: 0 6px 20px var(--shadow); }
 
   /* THUMBNAIL — a pre-rendered image (layouts/thumbs/); a live iframe only if the image is missing */
   .card-thumb {
@@ -141,7 +217,7 @@
   }
   .card-preview {
     position: relative; width: 100%; height: 180px;
-    overflow: hidden; background: #111;
+    overflow: hidden; background: var(--surface-2);
     border-bottom: 1px solid var(--border); flex-shrink: 0;
   }
   .card-preview.mobile-preview { height: 300px; }
@@ -153,100 +229,72 @@
   }
   .card-preview::before {
     content: ''; position: absolute; inset: 0;
-    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--stage) 50%, var(--surface-2) 75%);
     background-size: 200% 100%; animation: shimmer 1.4s infinite;
     z-index: 1; transition: opacity 0.3s;
   }
   .card-preview.loaded::before { opacity: 0; pointer-events: none; }
+  /* Mouse users get an "open in new tab" link on hover; every other click falls through to the card's button */
   .preview-overlay {
-    position: absolute; inset: 0; z-index: 3;
-    background: rgba(0,0,0,0);
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    display: flex; align-items: flex-start; justify-content: flex-end; padding: 10px;
     transition: background 0.15s;
   }
-  .card.hovered .preview-overlay { background: rgba(0,0,0,0.5); }
   .preview-btn {
-    opacity: 0; transform: translateY(4px);
-    transition: opacity 0.15s, transform 0.15s;
-    padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 600;
-    cursor: pointer; font-family: var(--sans); border: none;
+    display: none; padding: 5px 10px; border-radius: 4px;
+    font-size: 12px; font-weight: 500; font-family: var(--sans); text-decoration: none;
+    background: rgba(21, 20, 19, 0.82); color: #f6f4f0;
   }
-  .card.hovered .preview-btn { opacity: 1; transform: translateY(0); }
-  .preview-btn-expand { background: var(--accent); color: #0e0e0e; }
-  .preview-btn-open   { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2) !important; }
+  @media (hover: hover) {
+    .card:hover .preview-overlay { background: rgba(0, 0, 0, 0.2); }
+    .card:hover .preview-btn { display: inline-block; pointer-events: auto; }
+  }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
   /* CARD BODY */
   .card-body { padding: 12px 14px; flex: 1; }
-  .card-tags { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+  .card-tags { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
   .tag {
-    font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; padding: 2px 6px; border-radius: 3px;
+    font-size: 12px; font-weight: 500; line-height: 1.5; padding: 0 8px; border-radius: 20px;
+    color: var(--text-secondary); border: 1px solid var(--border);
   }
-  .tag-desktop  { background: var(--tag-desktop); color: var(--tag-desktop-text); }
-  .tag-mobile   { background: var(--tag-mobile);  color: var(--tag-mobile-text); }
-  .tag-web      { background: var(--tag-web);     color: var(--tag-web-text); }
-  .tag-layout   { background: #1f1a10; color: #e0b96a; }
-  .tag-media    { background: #0d1f22; color: #4dd0e8; }
-  .tag-interact { background: #1f1020; color: #c084fc; }
-  .tag-cta      { background: #0f1f10; color: #86efac; }
-  .card-name { font-size: 12px; font-weight: 500; color: var(--text-primary); font-family: var(--mono); line-height: 1.4; word-break: break-word; }
-  .card-footer {
-    padding: 8px 14px; border-top: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  }
-  .card-filename { font-size: 9px; color: var(--text-muted); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-  .open-btn {
-    font-size: 10px; font-weight: 600; color: var(--accent);
-    background: var(--accent-dim); border: 1px solid transparent;
-    border-radius: 3px; padding: 3px 8px; cursor: pointer;
-    transition: all 0.12s; font-family: var(--sans); text-decoration: none; white-space: nowrap; flex-shrink: 0;
-  }
-  .open-btn:hover { border-color: var(--accent); }
+  .tag-platform { color: var(--accent); background: var(--accent-dim); border-color: transparent; }
+  .card-name { font-size: 15px; font-weight: 500; line-height: 1.4; word-break: break-word; }
+  /* The title button stretches over the whole card, so a click anywhere on the card opens the drawer */
+  .card-link { all: unset; cursor: pointer; color: var(--text-primary); transition: color 0.15s; }
+  .card-link::after { content: ''; position: absolute; inset: 0; z-index: 2; }
+  .card:hover .card-link { color: var(--accent); }
+  .card-link:focus-visible { outline: none; }
+  .card:has(.card-link:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* SECTION DIVIDER */
   .section-divider {
     grid-column: 1 / -1; padding: 2px 0 6px;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--text-secondary);
     display: flex; align-items: center; gap: 10px; margin-top: 14px;
   }
   .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
   /* EMPTY */
-  .empty { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--text-muted); }
-
-  /* PAGINATION */
-  .pagination { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 28px 0 20px; }
-  #pagination-top { padding: 4px 0 20px; }
-  .page-btn {
-    padding: 5px 14px; font-size: 11px; font-family: var(--mono);
-    border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
-    border-radius: 4px; cursor: pointer; transition: border-color .15s, color .15s;
+  .empty { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--text-secondary); }
+  .empty p { font-size: 15px; margin-bottom: 16px; }
+  .empty-reset {
+    padding: 8px 16px; border-radius: var(--radius); font-size: 14px; font-family: var(--sans);
+    background: transparent; color: var(--text-primary); border: 1px solid var(--border-active); cursor: pointer;
   }
-  .page-btn:hover:not(:disabled) { border-color: var(--border-active); color: var(--text-primary); }
-  .page-btn:disabled { opacity: 0.3; cursor: default; }
-  .page-info { font-size: 11px; font-family: var(--mono); color: var(--text-secondary); padding: 0 2px; }
-  .page-input {
-    width: 36px; text-align: center; font-size: 11px; font-family: var(--mono);
-    background: var(--surface); color: var(--text-primary);
-    border: 1px solid var(--border); border-radius: 4px;
-    padding: 4px 0; outline: none;
-  }
-  .page-input:focus { border-color: var(--accent); }
-  .empty span { display: block; font-size: 28px; margin-bottom: 10px; }
-  .empty p { font-size: 13px; }
+  .empty-reset:hover { border-color: var(--accent); color: var(--accent); }
 
   /* DRAWER */
   .drawer-backdrop {
     display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.7); z-index: 200; backdrop-filter: blur(6px);
+    background: var(--overlay); z-index: 200; backdrop-filter: blur(6px);
   }
   .drawer-backdrop.open { display: block; }
   .drawer {
     position: fixed; top: 0; right: 0; bottom: 0;
     width: min(900px, 100vw);
-    background: #111; border-left: 1px solid var(--border);
+    background: var(--surface); border-left: 1px solid var(--border);
     display: flex; flex-direction: column;
     transform: translateX(100%);
     transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
@@ -259,30 +307,38 @@
   }
   .drawer-header {
     padding: 14px 20px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 12px; flex-shrink: 0; background: #111;
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0; background: var(--surface);
   }
-  .drawer-title { font-size: 13px; font-family: var(--mono); color: var(--text-primary); flex: 1; line-height: 1.4; }
+  .drawer-title { font-size: 15px; font-weight: 500; color: var(--text-primary); flex: 1; line-height: 1.4; min-width: 0; }
   .drawer-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .drawer-nav { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .drawer-step { font-size: 16px; line-height: 1; padding: 3px 10px; }
+  .drawer-step:disabled { opacity: 0.35; cursor: default; }
+  .drawer-pos { min-width: 56px; text-align: center; font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  @media (max-width: 600px) {
+    .drawer-header { flex-wrap: wrap; row-gap: 8px; }
+    .drawer-title { order: 3; flex-basis: 100%; }
+  }
   .drawer-btn {
     padding: 5px 12px; border-radius: 4px; font-size: 11px; font-weight: 600;
     cursor: pointer; font-family: var(--sans); transition: all 0.12s;
   }
-  .drawer-btn-primary { background: var(--accent); color: #0e0e0e; border: none; }
-  .drawer-btn-primary:hover { background: #d9bc82; }
+  .drawer-btn-primary { background: var(--accent); color: var(--on-accent); border: none; text-decoration: none; }
+  .drawer-btn-primary:hover { background: var(--accent-hover); }
   .drawer-btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
   .drawer-btn-ghost:hover { color: var(--text-primary); border-color: var(--border-active); }
   #drawer-reload { color: var(--accent); }
   #drawer-reload.reloading { pointer-events: none; animation: reloadFlash 0.4s ease forwards; }
   @keyframes reloadFlash {
-    0%   { background: var(--accent); color: #0e0e0e; border-color: var(--accent); }
-    60%  { background: var(--accent); color: #0e0e0e; border-color: var(--accent); }
+    0%   { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+    60%  { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
     100% { background: transparent;   color: var(--accent); border-color: var(--border); }
   }
   .drawer-close { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1; }
   .drawer-close:hover { color: var(--text-primary); }
   .drawer-controls {
     padding: 8px 20px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: #0e0e0e;
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: var(--surface-2);
     flex-wrap: wrap;
   }
   @media (max-width: 600px) {
@@ -302,18 +358,18 @@
   .vp-size-display { margin-left: auto; font-size: 10px; color: var(--text-secondary); font-family: var(--mono); }
   .drawer-meta {
     padding: 8px 20px; border-bottom: 1px solid var(--border);
-    display: flex; gap: 20px; flex-shrink: 0; background: #0e0e0e; flex-wrap: wrap;
+    display: flex; gap: 20px; flex-shrink: 0; background: var(--surface-2); flex-wrap: wrap;
   }
   .meta-item label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 2px; }
   .meta-item span  { font-size: 11px; color: var(--text-secondary); font-family: var(--mono); }
   .drawer-stage {
-    flex: 1; min-height: 0; overflow: hidden; position: relative; background: #1a1a1a;
+    flex: 1; min-height: 0; overflow: hidden; position: relative; background: var(--stage);
     display: flex; align-items: stretch; justify-content: center; padding: 16px;
   }
   .stage-inner {
     position: relative; min-height: 0; background: #fff;
     border-radius: 3px; overflow: hidden;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.6);
+    box-shadow: 0 4px 32px var(--shadow);
     transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
   }
   .stage-inner iframe { width: 100%; height: 100%; border: none; display: block; }
@@ -343,10 +399,10 @@
   .code-panel {
     display: none; flex-direction: column;
     flex: 1; overflow: hidden;
-    background: #0a0a0a;
+    background: #12100e;
   }
   .code-panel.visible { display: flex; }
-  .prompt-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; background: #0a0a0a; }
+  .prompt-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; background: var(--surface); }
   .prompt-panel.visible { display: flex; }
   .prompt-scroll { flex: 1; overflow-y: auto; padding: 24px; }
   .prompt-intro { font-family: var(--sans); font-size: 13px; color: var(--text-primary); line-height: 1.7; margin-bottom: 18px; }
@@ -417,6 +473,19 @@
     .grid-wrap   { padding: 16px 32px 60px; }
   }
 
+  /* THEME TOGGLE — moon in light mode, sun in dark mode */
+  .theme-toggle {
+    flex-shrink: 0; width: 28px; height: 28px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--border-active); border-radius: 50%;
+    color: var(--text-secondary); cursor: pointer; transition: color 0.15s, border-color 0.15s;
+  }
+  .theme-toggle:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+  .theme-toggle svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .theme-toggle .icon-sun,
+  :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+
   /* GUIDE BUTTON */
   .guide-btn {
     flex-shrink: 0;
@@ -432,7 +501,7 @@
   /* GUIDE MODAL */
   .guide-overlay {
     display: none; position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    background: var(--overlay); backdrop-filter: blur(4px);
     align-items: center; justify-content: center; padding: 24px;
   }
   .guide-overlay.open { display: flex; }
@@ -505,7 +574,7 @@
   }
   .resp-example-btn:hover { border-color: var(--accent); color: var(--accent); }
   .form-section textarea {
-    width: 100%; background: #111; border: 1px solid var(--border); border-radius: 5px;
+    width: 100%; background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px;
     color: var(--text-primary); font-size: 12px; font-family: var(--mono);
     padding: 10px 12px; resize: vertical; min-height: 72px; line-height: 1.6;
     outline: none; transition: border-color 0.15s;
@@ -524,10 +593,10 @@
   }
   .build-copy-btn {
     padding: 7px 18px; font-size: 12px; font-weight: 500; font-family: var(--sans);
-    background: var(--accent); color: #0e0e0e; border: none; border-radius: 5px;
+    background: var(--accent); color: var(--on-accent); border: none; border-radius: 5px;
     cursor: pointer; transition: background 0.15s;
   }
-  .build-copy-btn:hover { background: #d9bc82; }
+  .build-copy-btn:hover { background: var(--accent-hover); }
   .build-copy-btn.copied { background: #4a7c59; color: #fff; }
   .build-clear-btn {
     padding: 7px 14px; font-size: 12px; font-family: var(--sans);
@@ -566,12 +635,12 @@
   .guide-content ul li::before { content: '·'; position: absolute; left: 0; color: var(--text-muted); }
   .guide-content hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
   .guide-content strong { color: var(--text-primary); font-weight: 600; }
-  .guide-content code { font-family: var(--mono); font-size: 11px; background: #1e1e1e; color: var(--accent); padding: 1px 5px; border-radius: 3px; }
-  .guide-content pre { background: #111; border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; margin: 10px 0 14px; overflow-x: auto; }
+  .guide-content code { font-family: var(--mono); font-size: 11px; background: var(--surface-2); color: var(--accent); padding: 1px 5px; border-radius: 3px; }
+  .guide-content pre { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; margin: 10px 0 14px; overflow-x: auto; }
   .guide-content pre code { background: none; color: var(--text-secondary); padding: 0; font-size: 11px; line-height: 1.6; }
   .guide-content table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0 16px; }
   .guide-content th { text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 6px 10px; border-bottom: 1px solid var(--border); }
-  .guide-content td { padding: 7px 10px; border-bottom: 1px solid #1e1e1e; color: var(--text-secondary); line-height: 1.5; vertical-align: top; }
+  .guide-content td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text-secondary); line-height: 1.5; vertical-align: top; }
   .guide-content td code { font-size: 11px; }
 
   /* Back to top */
@@ -583,7 +652,7 @@
     width: 40px;
     height: 40px;
     border: 1px solid var(--border);
-    background: rgba(17, 17, 17, 0.92);
+    background: var(--header-bg);
     backdrop-filter: blur(8px);
     color: var(--text-secondary);
     cursor: pointer;
@@ -625,10 +694,14 @@
   </div>
   <div class="search-wrap">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    <input id="search" type="text" placeholder="Search layouts..." autocomplete="off">
+    <input id="search" type="search" placeholder="Search layouts (press /)" aria-label="Search layouts" aria-keyshortcuts="/" autocomplete="off">
     <button class="search-clear" id="searchClear" type="button" aria-label="Clear search">✕</button>
   </div>
-  <button class="guide-btn" id="guideBtn" title="Component creation guide">?</button>
+  <button class="guide-btn" id="guideBtn" title="Component creation guide" aria-label="Component creation guide">?</button>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme">
+    <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
 </header>
 
 <!-- GUIDE MODAL -->
@@ -735,10 +808,10 @@
     </div>
     <span class="count-badge" id="count-badge">-- items</span>
     <div class="view-toggle">
-      <button class="view-btn active" data-view="grid" title="Grid view">
+      <button class="view-btn active" data-view="grid" title="Grid view" aria-label="Grid view" aria-pressed="true">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor"/></svg>
       </button>
-      <button class="view-btn" data-view="list" title="List view">
+      <button class="view-btn" data-view="list" title="List view" aria-label="List view" aria-pressed="false">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="1.5" rx="0.75" fill="currentColor"/><rect x="1" y="6.25" width="12" height="1.5" rx="0.75" fill="currentColor"/><rect x="1" y="10.5" width="12" height="1.5" rx="0.75" fill="currentColor"/></svg>
       </button>
     </div>
@@ -762,22 +835,25 @@
   </div>
 </div>
 
-<div class="grid-wrap">
-  <div class="pagination" id="pagination-top"></div>
-  <div class="grid" id="grid"></div>
-  <div class="pagination" id="pagination"></div>
-</div>
+<main class="grid-wrap">
+  <div class="grid" id="grid" aria-live="polite"></div>
+</main>
 
 <div class="drawer-backdrop" id="drawer-backdrop"></div>
-<div class="drawer" id="drawer">
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" inert>
   <div class="drawer-header">
-    <div class="drawer-title" id="drawer-title">--</div>
+    <div class="drawer-nav">
+      <button class="drawer-btn drawer-btn-ghost drawer-step" id="drawer-prev" type="button" aria-label="Previous layout" title="Previous (←)">‹</button>
+      <span class="drawer-pos" id="drawer-pos"></span>
+      <button class="drawer-btn drawer-btn-ghost drawer-step" id="drawer-next" type="button" aria-label="Next layout" title="Next (→)">›</button>
+    </div>
+    <h2 class="drawer-title" id="drawer-title">--</h2>
     <div class="drawer-actions">
       <button class="drawer-btn drawer-btn-ghost" id="drawer-copy">Copy path</button>
       <button class="drawer-btn drawer-btn-ghost" id="drawer-reload" title="Reload preview">↻</button>
       <a class="drawer-btn drawer-btn-primary" id="drawer-open" href="#" target="_blank">Open</a>
     </div>
-    <button class="drawer-close" id="drawer-close">x</button>
+    <button class="drawer-close" id="drawer-close" type="button" aria-label="Close">×</button>
   </div>
   <div class="drawer-controls">
     <div class="view-tabs">
@@ -794,8 +870,8 @@
       <span class="vp-size-display" id="vp-size-display">Full width</span>
     </div>
   </div>
-  <div style="padding:5px 20px;border-bottom:1px solid var(--border);text-align:center;background:#0e0e0e;">
-    <span style="font-size:10px;color:var(--text-secondary);font-family:var(--mono);">Preview blank? Tap <span style="color:var(--accent);">↻</span><span id="drawer-swipe-hint"> &nbsp;·&nbsp; Swipe <span style="color:var(--accent);">→</span> above preview to close.</span></span>
+  <div style="padding:5px 20px;border-bottom:1px solid var(--border);text-align:center;background:var(--surface-2);">
+    <span style="font-size:12px;color:var(--text-secondary);">Preview blank? Tap <span style="color:var(--accent);">↻</span><span id="drawer-swipe-hint"> &nbsp;·&nbsp; Swipe <span style="color:var(--accent);">→</span> above preview to close.</span></span>
   </div>
   <div class="drawer-meta" id="drawer-meta"></div>
   <div class="drawer-stage" id="drawer-stage">
@@ -1102,11 +1178,12 @@ const FEATURE_MAP = {
   image:       ['tag-media',    'Image'],
 };
 
-// Builds the HTML string of extra tag chips for a card, filtering to only FEATURE_MAP-known tags.
+// Up to two extra tag chips per card (only FEATURE_MAP-known tags), after the platform chip
 function extraTagHTML(tags) {
   return tags
     .filter(t => FEATURE_MAP[t])
-    .map(t => `<span class="tag ${FEATURE_MAP[t][0]}">${FEATURE_MAP[t][1]}</span>`)
+    .slice(0, 2)
+    .map(t => `<span class="tag">${FEATURE_MAP[t][1]}</span>`)
     .join('');
 }
 
@@ -1117,7 +1194,6 @@ function extraTagHTML(tags) {
 const IFRAME_W        = 1280; // desktop snippet viewport width
 const IFRAME_W_MOBILE = 375;  // mobile snippet viewport width
 const CARD_W          = 280;  // card thumbnail width (matches CSS minmax)
-const ITEMS_PER_PAGE  = 20;
 const THUMB_BASE      = 'layouts/thumbs/'; // card images, generated by tools/make_thumbs.py
 
 // Card image for a snippet: same relative path as the snippet, .jpg instead of .html
@@ -1141,8 +1217,7 @@ function useLivePreview(item, prevEl) {
   requestAnimationFrame(scaleCardPreviews);
 }
 
-let currentPage       = 1;
-let allFilteredItems  = []; // holds the full sorted+filtered list across all pages
+let allFilteredItems  = []; // the current sorted + filtered list (also drives drawer previous/next)
 
 // Recalculates iframe scale for every card thumbnail after render or window resize.
 // Needed because the grid is fluid (auto-fill minmax) so card width changes with viewport.
@@ -1169,8 +1244,8 @@ window.addEventListener('resize', scaleCardPreviews);
 // Controls the order of section dividers in the grid (top → bottom)
 const PLATFORM_ORDER = ['web','desktop','mobile','fullwidth','hover','sliders','redirects','special'];
 
-// Entry point after any filter/search change.
-// Sorts all matching items by platform order, resets to page 1, then renders the first page.
+// Entry point after any filter/search change: sorts matches into platform sections, then renders them all.
+// Thumbnails are small lazy-loaded images, so the whole list renders at once (no pagination).
 function renderCards(items) {
   allFilteredItems = [...items].sort((a, b) => {
     const pDiff = PLATFORM_ORDER.indexOf(a.platform) - PLATFORM_ORDER.indexOf(b.platform);
@@ -1178,139 +1253,61 @@ function renderCards(items) {
     if (a._score !== b._score) return b._score - a._score; // card-text matches before prompt-only matches
     return a.name.localeCompare(b.name);
   });
-  currentPage = 1;
-  renderPage();
+  renderGrid();
 }
 
-// Renders the current page slice of allFilteredItems into the grid.
-// Groups items by platform and inserts a section-divider heading above each group.
-// Also builds the pagination controls (only shown when totalPages > 1).
-function renderPage() {
-  const grid        = document.getElementById('grid');
-  const badge       = document.getElementById('count-badge');
-  const paginationEl    = document.getElementById('pagination');
-  const paginationTopEl = document.getElementById('pagination-top');
-  grid.innerHTML           = '';
-  paginationEl.innerHTML   = '';
-  paginationTopEl.innerHTML= '';
+const PLATFORM_LABELS = { web:'Web', desktop:'Desktop', mobile:'Mobile', fullwidth:'Full Width', hover:'Hover', sliders:'Carousels', redirects:'Redirects', special:'Special' };
 
-  const total      = allFilteredItems.length;
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-  badge.textContent = `${total} layout${total!==1?'s':''}`;
+// Renders allFilteredItems into the grid with a heading above each platform group
+function renderGrid() {
+  const grid  = document.getElementById('grid');
+  const badge = document.getElementById('count-badge');
+  const total = allFilteredItems.length;
+  grid.innerHTML = '';
+  badge.textContent = `${total} layout${total !== 1 ? 's' : ''}`;
 
   if (!total) {
-    grid.innerHTML = '<div class="empty"><span>&#128269;</span><p>No layouts match your search.</p></div>';
+    grid.innerHTML = `<div class="empty"><p>No layouts match ${currentSearch.trim() ? 'this search' : 'these filters'}.</p>
+      <button type="button" class="empty-reset" id="emptyReset">Clear search and filters</button></div>`;
+    document.getElementById('emptyReset').addEventListener('click', resetFilters);
     return;
   }
 
-  const start     = (currentPage - 1) * ITEMS_PER_PAGE;
-  const end       = Math.min(start + ITEMS_PER_PAGE, total);
-  const pageItems = allFilteredItems.slice(start, end);
-
-  // Group the current page's items by platform so we can render section dividers
-  const grouped = {};
-  pageItems.forEach(item => { (grouped[item.platform]=grouped[item.platform]||[]).push(item); });
-  const order  = ['web','desktop','mobile','fullwidth','hover','sliders','redirects','special'];
-  const labels = { web:'Web', desktop:'Desktop', mobile:'Mobile', fullwidth:'Full Width', hover:'Hover', sliders:'Carousels', redirects:'Redirects', special:'Special' };
-
-  order.forEach(platform => {
-    const group = grouped[platform];
-    if (!group) return;
-    const div = document.createElement('div');
-    div.className = 'section-divider';
-    div.textContent = `${labels[platform]} -- ${group.length}`;
-    grid.appendChild(div);
-
-    group.forEach(item => {
-      const [tagClass, tagLabel] = platformTag(item.platform);
-      const card = document.createElement('div');
-      card.className = 'card';
-
-      card.innerHTML = `
-        <div class="card-preview${item.platform === 'mobile' ? ' mobile-preview' : ''}" id="prev-${CSS.escape(item.file)}">
-          <img class="card-thumb" src="${thumbSrc(item)}" alt="" loading="lazy" decoding="async">
-          <div class="preview-overlay">
-            <button class="preview-btn preview-btn-expand" data-action="expand">Preview</button>
-            <button class="preview-btn preview-btn-open"   data-action="open">Open</button>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="card-tags">
-            <span class="tag ${tagClass}">${tagLabel}</span>
-            ${extraTagHTML(item.tags)}
-          </div>
-          <div class="card-name">${item.name}</div>
-        </div>
-        <div class="card-footer">
-          <span class="card-filename">${item.file}</span>
-          <a class="open-btn" href="${item.file}" target="_blank">Open</a>
-        </div>`;
-
-      const thumb  = card.querySelector('.card-thumb');
-      const prevEl = card.querySelector('.card-preview');
-      thumb.addEventListener('load', () => prevEl.classList.add('loaded'), { once: true });
-      thumb.addEventListener('error', () => useLivePreview(item, prevEl), { once: true });
-
-      card.addEventListener('mouseenter', () => card.classList.add('hovered'));
-      card.addEventListener('mouseleave', () => card.classList.remove('hovered'));
-
-      card.querySelector('[data-action="expand"]').addEventListener('click', e => {
-        e.stopPropagation(); openDrawer(item);
-      });
-      card.querySelector('[data-action="open"]').addEventListener('click', e => {
-        e.stopPropagation(); window.open(item.file, '_blank');
-      });
-      card.querySelector('.open-btn').addEventListener('click', e => e.stopPropagation());
-      card.querySelector('.card-body').addEventListener('click', () => openDrawer(item));
-
-      grid.appendChild(card);
-    });
+  let platform = null;
+  allFilteredItems.forEach(item => {
+    if (item.platform !== platform) {
+      platform = item.platform;
+      const heading = document.createElement('h2');
+      heading.className = 'section-divider';
+      heading.textContent = `${PLATFORM_LABELS[platform]} — ${allFilteredItems.filter(i => i.platform === platform).length}`;
+      grid.appendChild(heading);
+    }
+    grid.appendChild(buildCard(item));
   });
-
   requestAnimationFrame(scaleCardPreviews);
+}
 
-  if (totalPages > 1) {
-    [paginationTopEl, paginationEl].forEach(el => {
-      const prev = document.createElement('button');
-      prev.className = 'page-btn';
-      prev.textContent = '← Prev';
-      prev.disabled = currentPage === 1;
-      prev.addEventListener('click', () => { currentPage--; renderPage(); window.scrollTo({top:0,behavior:'smooth'}); });
-
-      const input = document.createElement('input');
-      input.className = 'page-input';
-      input.type = 'text';
-      input.value = currentPage;
-      input.setAttribute('aria-label', 'Page number');
-      input.addEventListener('keydown', e => {
-        if (e.key !== 'Enter') return;
-        const p = parseInt(input.value);
-        if (p >= 1 && p <= totalPages && p !== currentPage) {
-          currentPage = p;
-          renderPage();
-          window.scrollTo({top:0,behavior:'smooth'});
-        } else {
-          input.value = currentPage;
-        }
-      });
-      input.addEventListener('blur', () => { input.value = currentPage; });
-
-      const total = document.createElement('span');
-      total.className = 'page-info';
-      total.textContent = `/ ${totalPages}`;
-
-      const next = document.createElement('button');
-      next.className = 'page-btn';
-      next.textContent = 'Next →';
-      next.disabled = currentPage === totalPages;
-      next.addEventListener('click', () => { currentPage++; renderPage(); window.scrollTo({top:0,behavior:'smooth'}); });
-
-      el.appendChild(prev);
-      el.appendChild(input);
-      el.appendChild(total);
-      el.appendChild(next);
-    });
-  }
+// One card: thumbnail, platform + up to two tags, and a title button that opens the drawer
+function buildCard(item) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-preview${item.platform === 'mobile' ? ' mobile-preview' : ''}">
+      <img class="card-thumb" src="${thumbSrc(item)}" alt="" loading="lazy" decoding="async">
+      <div class="preview-overlay">
+        <a class="preview-btn" href="${item.file}" target="_blank" rel="noopener" tabindex="-1">Open in new tab ↗</a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-tags"><span class="tag tag-platform">${platformTag(item.platform)[1]}</span>${extraTagHTML(item.tags)}</div>
+      <h3 class="card-name"><button type="button" class="card-link" data-file="${item.file}">${item.name}</button></h3>
+    </div>`;
+  const prevEl = card.querySelector('.card-preview');
+  const thumb  = card.querySelector('.card-thumb');
+  thumb.addEventListener('load', () => prevEl.classList.add('loaded'), { once: true });
+  thumb.addEventListener('error', () => useLivePreview(item, prevEl), { once: true });
+  card.querySelector('.card-link').addEventListener('click', () => openDrawer(item));
+  return card;
 }
 
 // ─────────────────────────────────────────────
@@ -1320,7 +1317,12 @@ let promptsCache = null;
 let currentPrompt = '';
 fetch('layouts/prompts.json')
   .then(r => r.ok ? r.json() : {})
-  .then(data => { promptsCache = data; buildSearchIndex(); if (currentSearch.trim()) applyFilters(); })
+  .then(data => {
+    promptsCache = data;
+    buildSearchIndex();
+    if (currentSearch.trim()) applyFilters();
+    if (drawerItem) setDrawerPrompt(drawerItem); // a snippet opened from the URL before prompts arrived
+  })
   .catch(() => { promptsCache = {}; });
 
 // ─────────────────────────────────────────────
@@ -1328,9 +1330,33 @@ fetch('layouts/prompts.json')
 // ─────────────────────────────────────────────
 const drawer         = document.getElementById('drawer');
 const drawerBackdrop = document.getElementById('drawer-backdrop');
-const drawerIframe   = document.getElementById('drawer-iframe');
+let   drawerIframe   = document.getElementById('drawer-iframe'); // replaced on every load, see loadDrawerIframe
 const stageInner     = document.getElementById('stage-inner');
 const stageLoader    = document.getElementById('stage-loader');
+
+let drawerItem = null;   // the snippet open in the drawer, or null when closed
+let lastFocus  = null;   // element to refocus when the drawer closes
+
+// Loads a URL into the preview by swapping in a fresh iframe. Navigating the existing iframe would add
+// entries to the page's Back history, so Back (and closing) would step the preview instead of closing the drawer.
+function loadDrawerIframe(url) {
+  const fresh = drawerIframe.cloneNode(false); // keeps id, sandbox and the viewport sizing styles
+  fresh.src = url;
+  drawerIframe.replaceWith(fresh);
+  drawerIframe = fresh;
+}
+
+// While the drawer is open, everything behind it is inert, so focus can't leave it (not even out of the preview)
+function setPageInert(on) {
+  [...document.body.children].forEach(el => {
+    if (el !== drawer && el !== drawerBackdrop && el.tagName !== 'SCRIPT') el.inert = on;
+  });
+}
+
+// The card's title button for a snippet (looked up fresh, since the grid re-renders)
+function cardButtonFor(file) {
+  return document.querySelector(`.card-link[data-file="${CSS.escape(file)}"]`);
+}
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -1366,7 +1392,20 @@ function renderPrompt(text) {
   return html;
 }
 
-function openDrawer(item) {
+// Fills the Prompt tab; the tab is hidden when the snippet has no prompt (or prompts.json hasn't loaded yet)
+function setDrawerPrompt(item) {
+  const snippetPrompt = promptsCache && promptsCache[item.file.replace(BASE, '')];
+  currentPrompt = snippetPrompt || '';
+  tabPrompt.style.display = snippetPrompt ? '' : 'none';
+  document.getElementById('prompt-text').innerHTML = snippetPrompt ? renderPrompt(snippetPrompt) : '';
+  if (!snippetPrompt && tabPrompt.classList.contains('active')) setView('preview');
+}
+
+// Opens the drawer on a snippet, or switches it to another one when it's already open.
+// opts.fromURL: called while applying the URL, so don't write history.
+function openDrawer(item, opts = {}) {
+  const wasOpen = !!drawerItem;
+  drawerItem = item;
   document.getElementById('drawer-title').textContent = item.name;
   document.getElementById('drawer-open').href = item.file;
 
@@ -1384,17 +1423,11 @@ function openDrawer(item) {
     });
   };
 
-  const snippetPrompt = promptsCache && promptsCache[item.file.replace(BASE, '')];
-  currentPrompt = snippetPrompt || '';
-  tabPrompt.style.display = snippetPrompt ? '' : 'none';
-  document.getElementById('prompt-text').innerHTML = snippetPrompt ? renderPrompt(snippetPrompt) : '';
-  if (!snippetPrompt && tabPrompt.classList.contains('active')) setView('preview');
+  setDrawerPrompt(item);
 
   stageLoader.classList.remove('hidden');
-  drawerIframe.src = 'about:blank';
-  requestAnimationFrame(() => { drawerIframe.src = item.file; });
+  loadDrawerIframe(item.file);
   drawerIframe.onload = () => {
-    if (drawerIframe.src === 'about:blank') return;
     stageLoader.classList.add('hidden');
     try {
       const doc = drawerIframe.contentDocument;
@@ -1415,35 +1448,100 @@ function openDrawer(item) {
   if      (item.platform === 'mobile')  setViewport('375px',  '375px');
   else if (item.platform === 'desktop') setViewport('1280px', '1280px');
   else                                  setViewport('1280px', '1280px');
-  drawer.classList.add('open');
-  drawerBackdrop.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  updateDrawerNav();
+  if (!wasOpen) {
+    lastFocus = document.activeElement;
+    drawer.inert = false;
+    setPageInert(true);
+    drawer.classList.add('open');
+    drawerBackdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('drawer-close').focus({ preventScroll: true });
+  }
+  if (!opts.fromURL) writeURL(!wasOpen); // opening adds a history entry (Back closes it); switching replaces it
 }
 
-function closeDrawer() {
+// opts.fromURL: called while applying the URL (e.g. the Back button), so don't touch history again
+function closeDrawer(opts = {}) {
+  if (!drawerItem) return;
+  const closedFile = drawerItem.file;
+  drawerItem = null;
   drawer.classList.remove('open');
   drawerBackdrop.classList.remove('open');
+  drawer.inert = true;
+  setPageInert(false);
   document.body.style.overflow = '';
-  setTimeout(() => { drawerIframe.src = 'about:blank'; }, 300);
+  setTimeout(() => { if (!drawerItem) loadDrawerIframe('about:blank'); }, 300);
+  const back = (lastFocus && document.contains(lastFocus)) ? lastFocus : cardButtonFor(closedFile);
+  if (back) back.focus();
+  lastFocus = null;
+  if (!opts.fromURL) {
+    if (history.state && history.state.drawer) history.back(); // undo the entry added on open
+    else writeURL(false);
+  }
 }
 
-document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+// Previous / next walk the current filtered list in on-screen order
+function updateDrawerNav() {
+  const i = allFilteredItems.indexOf(drawerItem);
+  document.getElementById('drawer-prev').disabled = i <= 0;
+  document.getElementById('drawer-next').disabled = i === -1 || i === allFilteredItems.length - 1;
+  document.getElementById('drawer-pos').textContent = i === -1 ? '' : `${i + 1} / ${allFilteredItems.length}`;
+}
+
+function drawerStep(delta) {
+  const i = allFilteredItems.indexOf(drawerItem);
+  const next = i === -1 ? null : allFilteredItems[i + delta];
+  if (!next) return;
+  openDrawer(next);
+  lastFocus = cardButtonFor(next.file) || lastFocus; // closing returns to the card last viewed
+}
+
+document.getElementById('drawer-prev').addEventListener('click', () => drawerStep(-1));
+document.getElementById('drawer-next').addEventListener('click', () => drawerStep(1));
+
+// Keeps Tab / Shift+Tab inside the open drawer
+function trapFocus(e) {
+  const focusable = [...drawer.querySelectorAll('a[href], button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])')]
+    .filter(el => el.offsetParent !== null);
+  if (!focusable.length) return;
+  const first = focusable[0], last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+  else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+}
+
+document.getElementById('drawer-close').addEventListener('click', () => closeDrawer());
 document.getElementById('drawer-reload').addEventListener('click', () => {
   const btn = document.getElementById('drawer-reload');
   btn.classList.add('reloading');
   stageLoader.classList.remove('hidden');
-  const src = drawerIframe.src;
-  drawerIframe.src = 'about:blank';
-  requestAnimationFrame(() => { drawerIframe.src = src; });
-  drawerIframe.addEventListener('load', function onReload() {
-    if (drawerIframe.src !== 'about:blank') {
-      btn.classList.remove('reloading');
-      drawerIframe.removeEventListener('load', onReload);
-    }
-  });
+  const onSnippetLoad = drawerIframe.onload; // the shim/viewport setup from openDrawer
+  loadDrawerIframe(drawerIframe.getAttribute('src'));
+  drawerIframe.onload = () => {
+    btn.classList.remove('reloading');
+    if (onSnippetLoad) onSnippetLoad();
+  };
 });
-drawerBackdrop.addEventListener('click', closeDrawer);
-document.addEventListener('keydown', e => { if (e.key==='Escape') closeDrawer(); });
+drawerBackdrop.addEventListener('click', () => closeDrawer());
+
+// Keyboard: Esc closes, Tab stays inside, ← / → step through snippets while the drawer is open; / focuses search otherwise
+document.addEventListener('keydown', e => {
+  const typing = e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]');
+  if (drawerItem) {
+    if (e.key === 'Escape') { closeDrawer(); return; }
+    if (e.key === 'Tab') { trapFocus(e); return; }
+    if (typing || e.altKey || e.ctrlKey || e.metaKey || e.target.closest('.code-scroll, .prompt-scroll')) return;
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); drawerStep(-1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); drawerStep(1); }
+    return;
+  }
+  if (e.key === '/' && !typing && !document.getElementById('guideOverlay').classList.contains('open')) {
+    e.preventDefault();
+    const input = document.getElementById('search');
+    input.focus();
+    input.select();
+  }
+});
 
 // Swipe right to close on mobile (right-side drawer dismisses when pushed rightward)
 let _swipeStartX = 0, _swipeStartY = 0;
@@ -1605,13 +1703,16 @@ function searchScore(item, words) {
   return words.every(w => item._core.includes(w) || item._prompt.includes(w)) ? 1 : 0;
 }
 
-// Runs after every pill click or search keystroke
-function applyFilters() {
+// Runs after every pill click or search keystroke.
+// opts.fromURL: called while applying the URL, so don't write it back.
+function applyFilters(opts = {}) {
   const words = currentSearch.toLowerCase().split(/\s+/).filter(Boolean);
   let items = layouts.filter(item => matchesShow(item, words.length > 0) && matchesContains(item));
   items.forEach(item => { item._score = words.length ? searchScore(item, words) : 0; });
   if (words.length) items = items.filter(item => item._score > 0);
   renderCards(items);
+  if (drawerItem) updateDrawerNav();
+  if (!opts.fromURL) writeURL(false);
 }
 
 // Keeps pill highlights and aria-pressed in step with the filter state
@@ -1652,6 +1753,58 @@ document.getElementById('containsClear').addEventListener('click', () => {
   syncPillStates();
   applyFilters();
 });
+
+// ─────────────────────────────────────────────
+// URL STATE — ?show=web&contains=video,link&q=slider&view=list&open=<snippet path>
+// Filters, search and view replace the current history entry; opening the drawer adds one, so Back closes it.
+// ─────────────────────────────────────────────
+const SHOW_VALUES = [...document.querySelectorAll('[data-show]')].map(b => b.dataset.show);
+
+function filterKey() {
+  return [showFilter, [...containsFilters].sort().join(','), currentSearch.trim().toLowerCase()].join('|');
+}
+
+function writeURL(push) {
+  const p = new URLSearchParams();
+  if (showFilter !== 'essentials') p.set('show', showFilter);
+  if (containsFilters.size) p.set('contains', [...containsFilters].join(','));
+  if (currentSearch.trim()) p.set('q', currentSearch.trim());
+  if (viewMode === 'list') p.set('view', 'list');
+  if (drawerItem) p.set('open', drawerItem.file.replace(BASE, ''));
+  const qs = p.toString();
+  const url = location.pathname + (qs ? '?' + qs : '');
+  if (!push && url === location.pathname + location.search) return;
+  history[push ? 'pushState' : 'replaceState']({ drawer: !!drawerItem }, '', url);
+}
+
+// Brings the page in line with the URL: on load, and on Back / Forward
+function applyURL() {
+  const p = new URLSearchParams(location.search);
+  const before = filterKey();
+  showFilter = SHOW_VALUES.includes(p.get('show')) ? p.get('show') : 'essentials';
+  containsFilters.clear();
+  (p.get('contains') || '').split(',').filter(f => Object.hasOwn(CONTAINS_TAGS, f)).forEach(f => containsFilters.add(f));
+  currentSearch = p.get('q') || '';
+  document.getElementById('search').value = currentSearch;
+  document.getElementById('searchClear').classList.toggle('visible', currentSearch.length > 0);
+  syncPillStates();
+  setViewMode(p.get('view'));
+  if (filterKey() !== before || !document.querySelector('#grid > *')) applyFilters({ fromURL: true });
+  const item = layouts.find(l => l.file === BASE + p.get('open'));
+  if (item && item !== drawerItem) openDrawer(item, { fromURL: true });
+  else if (!item && drawerItem) closeDrawer({ fromURL: true });
+}
+
+// Back to the default view: Essentials, no Contains filters, empty search
+function resetFilters() {
+  showFilter = 'essentials';
+  containsFilters.clear();
+  currentSearch = '';
+  document.getElementById('search').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  syncPillStates();
+  applyFilters();
+}
 const searchClear = document.getElementById('searchClear');
 document.getElementById('search').addEventListener('input', e => {
   currentSearch = e.target.value;
@@ -1665,20 +1818,22 @@ searchClear.addEventListener('click', () => {
   input.focus();
 });
 
-// VIEW TOGGLE
+// VIEW TOGGLE (grid / list)
 let viewMode = 'grid';
-document.querySelectorAll('.view-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    viewMode = btn.dataset.view;
-    document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b === btn));
-    document.getElementById('grid').classList.toggle('list-mode', viewMode === 'list');
-    if (viewMode === 'grid') requestAnimationFrame(scaleCardPreviews);
+function setViewMode(mode) {
+  viewMode = mode === 'list' ? 'list' : 'grid';
+  document.querySelectorAll('.view-btn').forEach(b => {
+    const on = b.dataset.view === viewMode;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on);
   });
+  document.getElementById('grid').classList.toggle('list-mode', viewMode === 'list');
+  if (viewMode === 'grid') requestAnimationFrame(scaleCardPreviews);
+}
+document.querySelectorAll('.view-btn').forEach(btn => {
+  btn.addEventListener('click', () => { setViewMode(btn.dataset.view); writeURL(false); });
 });
 
-buildSearchIndex();
-syncPillStates();
-applyFilters();
 
 // ─────────────────────────────────────────────
 // CODE VIEW — fetches the raw snippet file and splits it into CSS / HTML / JS tabs
@@ -1816,11 +1971,18 @@ document.getElementById('prompt-copy-btn').addEventListener('click', () => {
 // Wraps the original openDrawer so that switching cards while the Code tab is open
 // immediately loads the new file's code without needing to click the Code tab again.
 const _origOpenDrawer = openDrawer;
-openDrawer = function(item) {
+openDrawer = function(item, opts) {
   currentFile = item.file;
   if (tabCode.classList.contains('active')) loadCode(item.file);
-  _origOpenDrawer(item);
+  _origOpenDrawer(item, opts);
 };
+
+// ─────────────────────────────────────────────
+// START — runs last so everything above (code view, drawer wrapper) exists before a URL opens a snippet
+// ─────────────────────────────────────────────
+buildSearchIndex();
+applyURL();
+window.addEventListener('popstate', applyURL);
 </script>
 <script>
 (function() {
@@ -2093,17 +2255,45 @@ openDrawer = function(item) {
   })();
 </script>
 <script>
-  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank)
+  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank, downloads, modifier clicks)
+  var fadeOut = null;
   document.addEventListener('click', function(e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var link = e.target.closest('a');
     if (!link) return;
     var href = link.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank') return;
+    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank' || link.hasAttribute('download')) return;
     e.preventDefault();
-    document.body.style.transition = 'opacity 0.2s ease';
-    document.body.style.opacity = '0';
+    // Web Animations API: an inline opacity would lose to the pgFadeIn fill, which pins opacity at 1
+    fadeOut = document.body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease', fill: 'forwards' });
     setTimeout(function() { window.location.href = href; }, 200);
   });
+
+  // Undo the fade when the page is restored from the back/forward cache
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted && fadeOut) { fadeOut.cancel(); fadeOut = null; }
+  });
+
+  // Theme toggle: an explicit choice is remembered; otherwise the page follows the system setting
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    function label() {
+      btn.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    btn.addEventListener('click', function () {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      label();
+    });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (err) {}
+      if (saved !== 'light' && saved !== 'dark') { root.dataset.theme = e.matches ? 'dark' : 'light'; label(); }
+    });
+    label();
+  })();
 </script>
 </body>
 </html>
