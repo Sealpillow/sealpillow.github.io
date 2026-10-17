@@ -111,6 +111,18 @@ Add `essential:true` if this is a frequently used snippet. It will appear in the
 
 ---
 
+## Card thumbnail
+
+Library cards show a pre-rendered image from `mylayouts/layouts/thumbs/` (same path as the snippet, `.jpg` instead of `.html`). The live snippet only loads in the preview drawer. After the file and its array entry are in place, generate its thumbnail from the repo root:
+
+```
+python mylayouts/tools/make_thumbs.py category/FileName.html
+```
+
+Run it with no arguments to render every registered snippet that has no thumbnail yet, or with `--force` to re-render them all after changing shared styles. It needs Microsoft Edge plus Playwright and Pillow (`pip install playwright pillow`); add `--channel chrome` to use Google Chrome instead. Until a thumbnail exists, the card falls back to a live preview, so a missing one never breaks the page.
+
+---
+
 ## Filename naming convention
 
 Filenames must describe the **layout pattern**, not the content or campaign it was built for.
@@ -214,7 +226,7 @@ Generate the matching prompt entry ready to paste into `mylayouts/layouts/prompt
 
 ---
 
-Output both entries in clearly labelled code blocks so they can be copied and pasted separately.
+Output both entries in clearly labelled code blocks so they can be copied and pasted separately. Finish with the one-line `make_thumbs.py` command for the new file (see **Card thumbnail** above).
 
 If the snippet code is unclear or could be categorised multiple ways, ask one clarifying question before generating either entry.
 

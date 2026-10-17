@@ -67,10 +67,22 @@
 
   /* FILTER BAR */
   .filter-bar {
-    padding: 10px 32px; display: flex; gap: 6px; flex-wrap: wrap;
-    border-bottom: 1px solid var(--border); align-items: center;
+    padding: 10px 32px; display: flex; flex-direction: column; gap: 8px;
+    border-bottom: 1px solid var(--border);
   }
-  .filter-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-right: 2px; }
+  .filter-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .filter-label {
+    flex: 0 0 64px; font-size: 10px; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .pill-scroll { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
+  .pill-clear {
+    background: none; border: none; padding: 3px 4px; cursor: pointer;
+    font-family: var(--sans); font-size: 11px; color: var(--text-secondary);
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .pill-clear:hover { color: var(--text-primary); }
+  .pill-clear[hidden] { display: none; }
   .pill {
     padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 500;
     border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
@@ -122,7 +134,11 @@
   }
   .card.hovered { border-color: var(--border-active); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
 
-  /* IFRAME THUMBNAIL */
+  /* THUMBNAIL — a pre-rendered image (layouts/thumbs/); a live iframe only if the image is missing */
+  .card-thumb {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; object-position: top center; background: #fff;
+  }
   .card-preview {
     position: relative; width: 100%; height: 180px;
     overflow: hidden; background: #111;
@@ -390,7 +406,14 @@
   @media (max-width: 600px) {
     header       { padding: 14px 32px; gap: 12px; }
     .search-wrap { flex: 1 1 auto; min-width: 0; margin-left: 0; }
-    .filter-bar  { padding: 8px 32px; }
+    .filter-bar  { padding: 8px 0 8px 16px; }
+    .filter-label { flex-basis: 56px; }
+    /* One swipeable line per row instead of five wrapped rows of pills */
+    .pill-scroll { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-right: 16px; }
+    .pill-scroll::-webkit-scrollbar { display: none; }
+    .pill { flex-shrink: 0; }
+    .view-toggle { display: none; }
+    .count-badge { flex-shrink: 0; white-space: nowrap; padding-right: 16px; }
     .grid-wrap   { padding: 16px 32px 60px; }
   }
 
@@ -696,36 +719,46 @@
 </div>
 
 <div class="filter-bar">
-  <span class="filter-label">Filter</span>
-  <button class="pill active" data-filter="essentials">Essentials</button>
-  <button class="pill" data-filter="all">All</button>
-  <button class="pill" data-filter="web">Web</button>
-  <button class="pill" data-filter="desktop">Desktop</button>
-  <button class="pill" data-filter="mobile">Mobile</button>
-  <button class="pill" data-filter="5050">50/50 Split</button>
-  <button class="pill" data-filter="flexi">Flexi</button>
-  <button class="pill" data-filter="collage">Collage/Grid</button>
-  <button class="pill" data-filter="image">Image</button>
-  <button class="pill" data-filter="video">Video</button>
-  <button class="pill" data-filter="text">Text</button>
-  <button class="pill" data-filter="fullwidth">Full Width</button>
-  <button class="pill" data-filter="hover">Hover</button>
-  <button class="pill" data-filter="carousel">Carousel</button>
-  <button class="pill" data-filter="scroll">Scroll</button>
-  <button class="pill" data-filter="editorial">Editorial</button>
-  <button class="pill" data-filter="product">Product</button>
-  <button class="pill" data-filter="link">Link / CTA</button>
-  <button class="pill" data-filter="redirects">Redirects</button>
-  <button class="pill" data-filter="special">Special</button>
-  <button class="pill" data-filter="embed">Embed</button>
-  <span class="count-badge" id="count-badge">-- items</span>
-  <div class="view-toggle">
-    <button class="view-btn active" data-view="grid" title="Grid view">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor"/></svg>
-    </button>
-    <button class="view-btn" data-view="list" title="List view">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="1.5" rx="0.75" fill="currentColor"/><rect x="1" y="6.25" width="12" height="1.5" rx="0.75" fill="currentColor"/><rect x="1" y="10.5" width="12" height="1.5" rx="0.75" fill="currentColor"/></svg>
-    </button>
+  <div class="filter-row" role="group" aria-label="Show">
+    <span class="filter-label">Show</span>
+    <div class="pill-scroll">
+      <button class="pill" data-show="essentials">Essentials</button>
+      <button class="pill" data-show="all">All</button>
+      <button class="pill" data-show="web">Web</button>
+      <button class="pill" data-show="desktop">Desktop</button>
+      <button class="pill" data-show="mobile">Mobile</button>
+      <button class="pill" data-show="fullwidth">Full Width</button>
+      <button class="pill" data-show="hover">Hover</button>
+      <button class="pill" data-show="sliders">Carousel</button>
+      <button class="pill" data-show="redirects">Redirects</button>
+      <button class="pill" data-show="special">Special</button>
+    </div>
+    <span class="count-badge" id="count-badge">-- items</span>
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="grid" title="Grid view">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor"/></svg>
+      </button>
+      <button class="view-btn" data-view="list" title="List view">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="1.5" rx="0.75" fill="currentColor"/><rect x="1" y="6.25" width="12" height="1.5" rx="0.75" fill="currentColor"/><rect x="1" y="10.5" width="12" height="1.5" rx="0.75" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="filter-row" role="group" aria-label="Contains">
+    <span class="filter-label">Contains</span>
+    <div class="pill-scroll">
+      <button class="pill" data-contains="5050">50/50 Split</button>
+      <button class="pill" data-contains="flexi">Flexi</button>
+      <button class="pill" data-contains="collage">Collage/Grid</button>
+      <button class="pill" data-contains="image">Image</button>
+      <button class="pill" data-contains="video">Video</button>
+      <button class="pill" data-contains="text">Text</button>
+      <button class="pill" data-contains="scroll">Scroll</button>
+      <button class="pill" data-contains="editorial">Editorial</button>
+      <button class="pill" data-contains="product">Product</button>
+      <button class="pill" data-contains="link">Link / CTA</button>
+      <button class="pill" data-contains="embed">Embed</button>
+    </div>
+    <button class="pill-clear" id="containsClear" type="button" hidden>Clear</button>
   </div>
 </div>
 
@@ -1085,6 +1118,28 @@ const IFRAME_W        = 1280; // desktop snippet viewport width
 const IFRAME_W_MOBILE = 375;  // mobile snippet viewport width
 const CARD_W          = 280;  // card thumbnail width (matches CSS minmax)
 const ITEMS_PER_PAGE  = 20;
+const THUMB_BASE      = 'layouts/thumbs/'; // card images, generated by tools/make_thumbs.py
+
+// Card image for a snippet: same relative path as the snippet, .jpg instead of .html
+function thumbSrc(item) {
+  return THUMB_BASE + item.file.replace(BASE, '').replace(/\.html$/, '.jpg');
+}
+
+// Swaps a card's missing thumbnail for a scaled live iframe (e.g. a snippet added since thumbnails were generated)
+function useLivePreview(item, prevEl) {
+  const previewW = item.platform === 'mobile' ? IFRAME_W_MOBILE : IFRAME_W;
+  const iframe = document.createElement('iframe');
+  iframe.loading = 'lazy';
+  iframe.src = item.file;
+  iframe.style.cssText = `transform:scale(${(CARD_W / previewW).toFixed(5)});width:${previewW}px;height:900px;`;
+  iframe.dataset.previewW = previewW;
+  iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+  iframe.tabIndex = -1;
+  iframe.setAttribute('aria-hidden', 'true');
+  iframe.addEventListener('load', () => prevEl.classList.add('loaded'), { once: true });
+  prevEl.querySelector('.card-thumb').replaceWith(iframe);
+  requestAnimationFrame(scaleCardPreviews);
+}
 
 let currentPage       = 1;
 let allFilteredItems  = []; // holds the full sorted+filtered list across all pages
@@ -1120,6 +1175,7 @@ function renderCards(items) {
   allFilteredItems = [...items].sort((a, b) => {
     const pDiff = PLATFORM_ORDER.indexOf(a.platform) - PLATFORM_ORDER.indexOf(b.platform);
     if (pDiff !== 0) return pDiff;
+    if (a._score !== b._score) return b._score - a._score; // card-text matches before prompt-only matches
     return a.name.localeCompare(b.name);
   });
   currentPage = 1;
@@ -1170,22 +1226,9 @@ function renderPage() {
       const card = document.createElement('div');
       card.className = 'card';
 
-      // Mobile snippets use a 375px iframe; everything else uses 1280px desktop width
-      const previewW     = item.platform === 'mobile' ? IFRAME_W_MOBILE : IFRAME_W;
-      const previewScale = (CARD_W / previewW).toFixed(5);
-
       card.innerHTML = `
         <div class="card-preview${item.platform === 'mobile' ? ' mobile-preview' : ''}" id="prev-${CSS.escape(item.file)}">
-          <iframe
-            loading="lazy"
-            src="${item.file}"
-            style="transform:scale(${previewScale});width:${previewW}px;height:900px;"
-            data-preview-w="${previewW}"
-            sandbox="allow-same-origin allow-scripts"
-            allow="autoplay"
-            tabindex="-1"
-            aria-hidden="true"
-          ></iframe>
+          <img class="card-thumb" src="${thumbSrc(item)}" alt="" loading="lazy" decoding="async">
           <div class="preview-overlay">
             <button class="preview-btn preview-btn-expand" data-action="expand">Preview</button>
             <button class="preview-btn preview-btn-open"   data-action="open">Open</button>
@@ -1203,20 +1246,10 @@ function renderPage() {
           <a class="open-btn" href="${item.file}" target="_blank">Open</a>
         </div>`;
 
-      const iframe = card.querySelector('iframe');
+      const thumb  = card.querySelector('.card-thumb');
       const prevEl = card.querySelector('.card-preview');
-      iframe.addEventListener('load', function onFirstLoad() {
-        iframe.removeEventListener('load', onFirstLoad);
-        const src = iframe.src;
-        iframe.src = 'about:blank';
-        requestAnimationFrame(() => { iframe.src = src; });
-        iframe.addEventListener('load', function onReady() {
-          if (iframe.src !== 'about:blank') {
-            iframe.removeEventListener('load', onReady);
-            setTimeout(() => prevEl.classList.add('loaded'), 800);
-          }
-        });
-      });
+      thumb.addEventListener('load', () => prevEl.classList.add('loaded'), { once: true });
+      thumb.addEventListener('error', () => useLivePreview(item, prevEl), { once: true });
 
       card.addEventListener('mouseenter', () => card.classList.add('hovered'));
       card.addEventListener('mouseleave', () => card.classList.remove('hovered'));
@@ -1287,7 +1320,7 @@ let promptsCache = null;
 let currentPrompt = '';
 fetch('layouts/prompts.json')
   .then(r => r.ok ? r.json() : {})
-  .then(data => { promptsCache = data; })
+  .then(data => { promptsCache = data; buildSearchIndex(); if (currentSearch.trim()) applyFilters(); })
   .catch(() => { promptsCache = {}; });
 
 // ─────────────────────────────────────────────
@@ -1523,93 +1556,101 @@ document.querySelectorAll('.vp-btn').forEach(btn => {
 });
 
 // ─────────────────────────────────────────────
-// FILTER + SEARCH
-// activeFilters is a Set of currently selected pill values (e.g. {'5050', 'image'}).
-// AND logic: all active filters must match for an item to show (uses .every()).
+// FILTERS & SEARCH
+// "Show" picks one set (Essentials, All, or a platform); "Contains" pills narrow it further (AND).
+// Search is word-based: every word must appear in the name, description, layout, tags, file path or prompt.
 // ─────────────────────────────────────────────
-const activeFilters = new Set();
+let showFilter = 'essentials';
+const containsFilters = new Set();
 let currentSearch = '';
 
-// Returns true if this item satisfies filter f.
-// Some filters check platform (e.g. 'web', 'carousel'), others check item.tags.
-function itemMatchesFilter(item, f) {
-  if (f==='essentials') return item.essential === true;
-  if (f==='web')       return item.platform==='web';
-  if (f==='desktop')   return item.platform==='desktop';
-  if (f==='mobile')    return item.platform==='mobile';
-  if (f==='5050')      return item.tags.includes('5050');
-  if (f==='flexi')     return item.tags.includes('flexi');
-  if (f==='collage')   return item.tags.includes('collage')||item.tags.includes('grid');
-  if (f==='video')     return item.tags.includes('video');
-  if (f==='fullwidth') return item.platform==='fullwidth';
-  if (f==='hover')     return item.platform==='hover';
-  if (f==='carousel')  return item.platform==='sliders';
-  if (f==='special')   return item.platform==='special';
-  if (f==='image') return item.tags.includes('image');
-  if (f==='text')      return item.tags.includes('text');
-  if (f==='scroll')    return item.tags.includes('scroll') || item.tags.includes('sticky');
-  if (f==='editorial') return item.tags.includes('editorial');
-  if (f==='product')   return item.tags.includes('product');
-  if (f==='link')      return item.tags.includes('link');
-  if (f==='redirects') return item.platform==='redirects';
-  if (f==='embed')     return item.tags.includes('embed');
-  return false;
+// Tags each "Contains" pill accepts (any one of them counts as a match)
+const CONTAINS_TAGS = {
+  '5050':    ['5050'],
+  flexi:     ['flexi'],
+  collage:   ['collage', 'grid'],
+  image:     ['image'],
+  video:     ['video'],
+  text:      ['text'],
+  scroll:    ['scroll', 'sticky'],
+  editorial: ['editorial'],
+  product:   ['product'],
+  link:      ['link'],
+  embed:     ['embed'],
+};
+
+// Searching looks across the whole library, so the Essentials preset is ignored while there are search words
+function matchesShow(item, searching) {
+  if (showFilter === 'all' || (showFilter === 'essentials' && searching)) return true;
+  if (showFilter === 'essentials') return item.essential === true;
+  return item.platform === showFilter;
 }
 
-// Runs after every filter pill click or search keystroke.
-// Filters run first (AND across all active pills), then search narrows further.
+function matchesContains(item) {
+  return [...containsFilters].every(f => CONTAINS_TAGS[f].some(t => item.tags.includes(t)));
+}
+
+// Per-item search text: _core is what the card itself describes; _prompt is the longer build prompt
+function buildSearchIndex() {
+  layouts.forEach(item => {
+    const key = item.file.replace(BASE, '');
+    item._core   = [item.name, item.desc, item.layout, key, item.tags.join(' ')].join(' ').toLowerCase();
+    item._prompt = ((promptsCache && promptsCache[key]) || '').toLowerCase();
+  });
+}
+
+// 2 = every word is in the card's own text, 1 = some words only appear in its prompt, 0 = no match
+function searchScore(item, words) {
+  if (words.every(w => item._core.includes(w))) return 2;
+  return words.every(w => item._core.includes(w) || item._prompt.includes(w)) ? 1 : 0;
+}
+
+// Runs after every pill click or search keystroke
 function applyFilters() {
-  let items = layouts;
-  if (activeFilters.size > 0) {
-    // AND logic — item must satisfy every active filter
-    items = items.filter(item => [...activeFilters].every(f => itemMatchesFilter(item, f)));
-  }
-  if (currentSearch.trim()) {
-    // Search matches against file path, display name, layout label, or any tag string
-    const q = currentSearch.toLowerCase();
-    items = items.filter(item =>
-      item.file.toLowerCase().includes(q) ||
-      item.name.toLowerCase().includes(q) ||
-      item.layout.toLowerCase().includes(q) ||
-      item.tags.some(t => t.includes(q))
-    );
-  }
+  const words = currentSearch.toLowerCase().split(/\s+/).filter(Boolean);
+  let items = layouts.filter(item => matchesShow(item, words.length > 0) && matchesContains(item));
+  items.forEach(item => { item._score = words.length ? searchScore(item, words) : 0; });
+  if (words.length) items = items.filter(item => item._score > 0);
   renderCards(items);
 }
 
-// Refreshes the .active class on all pills to match the current activeFilters Set.
-// 'All' pill is active only when no filters are selected.
+// Keeps pill highlights and aria-pressed in step with the filter state
 function syncPillStates() {
-  document.querySelectorAll('.pill').forEach(p => {
-    const f = p.dataset.filter;
-    if (f === 'all') {
-      p.classList.toggle('active', activeFilters.size === 0);
-    } else {
-      p.classList.toggle('active', activeFilters.has(f));
-    }
+  document.querySelectorAll('[data-show]').forEach(p => {
+    const on = p.dataset.show === showFilter;
+    p.classList.toggle('active', on);
+    p.setAttribute('aria-pressed', on);
   });
+  document.querySelectorAll('[data-contains]').forEach(p => {
+    const on = containsFilters.has(p.dataset.contains);
+    p.classList.toggle('active', on);
+    p.setAttribute('aria-pressed', on);
+  });
+  document.getElementById('containsClear').hidden = containsFilters.size === 0;
 }
 
-// Pill click logic:
-// - 'All'       → clears all active filters (shows everything)
-// - 'Essentials'→ clears all others and sets only 'essentials' (mutually exclusive)
-// - Any other   → removes 'essentials', then toggles this filter on/off (multi-select)
-document.querySelectorAll('.pill').forEach(pill => {
+document.querySelectorAll('[data-show]').forEach(pill => {
   pill.addEventListener('click', () => {
-    const f = pill.dataset.filter;
-    if (f === 'all') {
-      activeFilters.clear();
-    } else if (f === 'essentials') {
-      activeFilters.clear();
-      activeFilters.add('essentials');
-    } else {
-      activeFilters.delete('essentials');
-      if (activeFilters.has(f)) activeFilters.delete(f);
-      else activeFilters.add(f);
-    }
+    showFilter = pill.dataset.show;
     syncPillStates();
     applyFilters();
   });
+});
+
+document.querySelectorAll('[data-contains]').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const f = pill.dataset.contains;
+    if (containsFilters.has(f)) containsFilters.delete(f);
+    else containsFilters.add(f);
+    syncPillStates();
+    applyFilters();
+  });
+});
+
+document.getElementById('containsClear').addEventListener('click', () => {
+  containsFilters.clear();
+  syncPillStates();
+  applyFilters();
 });
 const searchClear = document.getElementById('searchClear');
 document.getElementById('search').addEventListener('input', e => {
@@ -1635,7 +1676,8 @@ document.querySelectorAll('.view-btn').forEach(btn => {
   });
 });
 
-activeFilters.add('essentials');
+buildSearchIndex();
+syncPillStates();
 applyFilters();
 
 // ─────────────────────────────────────────────
