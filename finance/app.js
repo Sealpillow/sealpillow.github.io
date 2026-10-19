@@ -422,6 +422,9 @@ function migrate(d) {
       for (const id of Object.keys(LEGACY_LINES)) { if (e[id] != null && e[id] !== '') e.lines[id] = e[id]; delete e[id]; }
     }
   }
+  // The setup used to give its row a default age of 30 (it never asks for an age), which counted as "birth month
+  // done" and set CPF rates for a 30-year-old. Without a birth month, drop that default so it shows as missing.
+  if (!out.settings.birthMonth) for (const a of out.assumptions) if (a.notes === 'From setup' && a.age === 30) delete a.age;
   // Vaults from before the guided setup are already in use, so it counts as done for them.
   out.setup = { done: !!(d.assumptions?.length || d.ledger?.length), skipped: {}, ...(d.setup || {}) };
   out.version = 3;
@@ -1792,7 +1795,7 @@ function pageAssumptions() {
   const rows = [...S.assumptions].sort(byKey('effective'));
   const add = () => {
     const last = rows[rows.length - 1];
-    S.assumptions.push(last ? { ...JSON.parse(JSON.stringify(last)), id: uid(), effective: todayISO(), notes: '' } : { id: uid(), effective: thisMonth() + '-01', salary: 0, age: 30, workDays: 22, lines: {}, investPct: 0, notes: '' });
+    S.assumptions.push(last ? { ...JSON.parse(JSON.stringify(last)), id: uid(), effective: todayISO(), notes: '' } : { id: uid(), effective: thisMonth() + '-01', salary: 0, workDays: 22, lines: {}, investPct: 0, notes: '' }); // no made-up age: set a birth month or type it
     commit();
   };
   const birth = S.settings.birthMonth;
@@ -1953,7 +1956,8 @@ const SETUP_STEPS = [
 ];
 /** The Assumptions row the setup fills in: the latest one, or a new one from this month. */
 function setupRow() {
-  if (!S.assumptions.length) S.assumptions.push({ id: uid(), effective: thisMonth() + '-01', salary: 0, age: 30, workDays: 22, lines: {}, investPct: 0, notes: 'From setup' });
+  // No default age: it would silently set CPF rates and count "birth month" as done in the checklist.
+  if (!S.assumptions.length) S.assumptions.push({ id: uid(), effective: thisMonth() + '-01', salary: 0, workDays: 22, lines: {}, investPct: 0, notes: 'From setup' });
   const a = [...S.assumptions].sort(byKey('effective')).pop();
   a.lines = a.lines || {};
   return a;
