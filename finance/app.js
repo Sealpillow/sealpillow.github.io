@@ -987,30 +987,37 @@ async function renderLock() {
     el('p', { class: 'field__hint', text: 'There is no reset. Forget the passphrase and the data cannot be recovered.' }),
   );
   const usePass = el('input', { type: 'checkbox', id: 'use-pass', onchange: () => { passBox.classList.toggle('hide', !usePass.checked); if (usePass.checked) p1.focus(); } });
-  const sample = el('input', { type: 'checkbox', id: 'sample' });
-  const btn = el('button', { class: 'btn btn--primary', type: 'submit', text: 'Start' });
+  // Two ways in: the guided setup with your own numbers, or fictional sample data to look around first.
+  const btn = el('button', { class: 'btn btn--primary btn--block', type: 'submit', 'data-start': 'setup', text: 'Set up step by step' });
+  const sampleBtn = el('button', { class: 'btn btn--block', type: 'submit', 'data-start': 'sample', text: 'Explore with sample data first' });
   const form = el('form', {
     onsubmit: async (e) => {
       e.preventDefault();
+      const sample = e.submitter?.dataset.start === 'sample';
       err.textContent = '';
       if (usePass.checked) {
         if (p1.value.length < 10) { err.textContent = 'Use at least 10 characters (a short sentence works well).'; return; }
         if (p1.value !== p2.value) { err.textContent = 'The passphrases do not match.'; return; }
       }
-      btn.disabled = true; btn.textContent = 'Starting…';
-      S = sample.checked ? sampleData() : defaultData();
+      btn.disabled = sampleBtn.disabled = true;
+      (sample ? sampleBtn : btn).textContent = 'Starting…';
+      S = sample ? sampleData() : defaultData();
       if (usePass.checked) await setPassphrase(p1.value);
       else { KEY = null; META = null; await persist(); }
       lastActivity = Date.now();
-      // Sample data is ready to explore; a fresh start goes through the guided setup.
-      location.hash = sample.checked ? '#/dashboard' : '#/setup';
+      location.hash = sample ? '#/dashboard' : '#/setup';
       renderShell();
     },
   },
-  el('div', { class: 'field' }, el('label', { class: 'field__hint', for: 'sample' }, sample, ' Start with sample data (fictional numbers, to explore)')),
   el('div', { class: 'field' }, el('label', { class: 'field__hint', for: 'use-pass' }, usePass, ' Protect with a passphrase (encrypts your records)')),
   passBox,
-  err, btn);
+  err,
+  el('div', { class: 'start-choice' },
+    btn,
+    el('p', { class: 'field__hint', text: 'About 5 minutes: income, spending, savings, housing, family, goals and insurance — skip anything that doesn’t apply. Ends with a checklist of what’s missing.' }),
+    sampleBtn,
+    el('p', { class: 'field__hint', text: 'Fictional numbers to look around. To start your own afterwards, use Settings & data → Erase this device.' }),
+  ));
 
   app.append(el('div', { class: 'lock' }, el('div', { class: 'card lock__card' },
     brand,
