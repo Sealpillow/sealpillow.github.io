@@ -820,7 +820,7 @@ const MILESTONES = {
   cpf: { short: 'CPF OA + SA', about: 'What forms your Retirement Account at 55.' },
   dividends: { short: 'Dividends, last 12 months', about: 'Cash dividends from imported statements.' },
   savingsRate: { short: 'Savings rate', about: 'Average share of take-home pay left over, last 12 months.' },
-  fire: { short: 'Savings + investments vs FIRE number', about: 'Retirement spending ÷ safe withdrawal rate, from the Retirement page.' },
+  fire: { short: 'Savings + investments vs FIRE number', about: 'When you could stop working with money lasting past your planned age — the Retirement page’s projection (growth, inflation, CPF LIFE). The bar compares savings + investments with your FIRE number (retirement spending ÷ safe withdrawal rate).' },
 };
 const ROUND_MILESTONES = [10000, 25000, 50000, 100000, 250000, 500000, 1000000, 2000000];
 /** The Full Retirement Sum for the year you turn 55 (current FRS grown at the assumed rate). */
@@ -856,9 +856,13 @@ function milestoneStatus(g, sm) {
   }
   const down = g.metric === 'debt';
   const start = down ? Math.max(num(g.startValue), value) : 0;
-  const reached = down ? value <= 0.005 : target > 0 && value >= target;
+  // Financial independence uses the Retirement page's projection (investment growth, inflation, CPF LIFE from 65):
+  // the date is the earliest you could stop working with money lasting past your planned age.
+  const outlook = g.metric === 'fire' ? retirementOutlook(sm) : null;
+  const reached = down ? value <= 0.005 : g.metric === 'fire' ? !!outlook && outlook.earliest === outlook.ctx.age : target > 0 && value >= target;
   let reach = null;
   if (reached) reach = thisMonth();
+  else if (g.metric === 'fire') reach = outlook?.earliestMonth ?? null;
   else if (down) {
     const plans = S.liabilities.filter((l) => num(l.balance) > 0).map(payoff);
     reach = plans.every((p) => p.months != null) ? plans.map((p) => p.date).sort().pop() : null;
@@ -869,11 +873,12 @@ function milestoneStatus(g, sm) {
     let v = value, n = 0;
     while (v < target && n < 1200) { v = v * (1 + r) + Math.max(0, pace); n++; }
     reach = v >= target ? addMonths(thisMonth(), n) : null;
-  } else if (pace > 0 && ['cash', 'wealth', 'networth', 'portfolio', 'fire'].includes(g.metric)) {
+  } else if (pace > 0 && ['cash', 'wealth', 'networth', 'portfolio'].includes(g.metric)) {
     reach = addMonths(thisMonth(), Math.ceil((target - value) / pace));
   }
   return {
     goal: g, value, target, reached, reach, pct: g.metric === 'savingsRate',
+    fireAge: outlook?.earliest ?? null, noAge: g.metric === 'fire' && !outlook, lifeTo: outlook?.life,
     progress: down ? (start > 0 ? 1 - value / start : 1) : target > 0 ? Math.min(1, Math.max(0, value / target)) : 0,
     onTrack: !g.by || reached || (reach != null && reach <= g.by),
     projects: down || ['cash', 'wealth', 'networth', 'portfolio', 'cpf', 'fire'].includes(g.metric),
@@ -1656,7 +1661,7 @@ function pageDashboard() {
 function goalBlock(p) {
   const g = p.goal;
   const when = p.left <= 0 ? 'Reached.'
-    : p.reach ? `Around ${monthLabel(p.reach)} at your 12-month pace${g.by ? (p.onTrack ? ' — on track.' : ` — after your ${monthLabel(g.by)} target; needs ${money(p.needPerMonth)}/month.`) : '.'}`
+    : p.reach ? `Around ${monthLabel(p.reach)} at your 12-month pace${g.by ? (p.onTrack ? ` — on track for ${monthLabel(g.by)}.` : ` — later than your aim of ${monthLabel(g.by)}. To make it, save ${money(p.needPerMonth)}/month for this.`) : '.'}`
       : 'Not enough saving pace yet to project a date.';
   return el('div', { class: 'goal' },
     el('div', { class: 'bar__head' }, el('span', { text: g.name || 'Goal' }), el('strong', { text: `${money(p.have, { compact: true })} / ${money(p.target, { compact: true })}` })),
@@ -1993,12 +1998,14 @@ function setupChecklist() {
     item('essential', !!st.birthMonth || num(a?.age) > 0, 'Birth month', 'Sets your CPF rates and age-based tax reliefs.', 'you'),
     item('essential', a ? sum(expenseLines(), (l) => num(a.lines?.[l.id])) > 0 : false, 'Monthly spending', 'Food, transport, rent and other regular costs.', 'spending'),
     item('essential', num(st.startCash) !== 0, 'Cash in the bank', 'The starting point for cash, net worth and your emergency fund.', 'saving'),
-    item('essential', S.goals.some((g) => g.kind === 'emergency'), 'Emergency fund goal', '3–6 months of spending is the usual guide.', 'goals'),
+    // Goals are intentions, not inputs the numbers need — so recommended/optional, never essential. The emergency
+    // fund figure (months of spending in cash) shows on the dashboard either way.
+    item('recommended', S.goals.some((g) => g.kind === 'emergency'), 'Emergency fund goal', '3–6 months of spending is the usual guide.', 'goals'),
     ...(st.cpfEnabled ? [item('recommended', num(st.cpfStart.oa) + num(st.cpfStart.sa) + num(st.cpfStart.ma) > 0, 'CPF balances', 'For net worth, housing and retirement.', 'saving')] : []),
     item('recommended', investsMonthly(a) || S.portfolio.length > 0, 'Investing', 'How much you invest each month, or your portfolio value.', 'saving'),
     item('recommended', S.housing.status !== 'none' || !!S.setup?.housingNone, 'Housing', 'Rent, a home loan or a home you plan to buy.', 'housing'),
     item('recommended', S.policies.length > 0, 'Insurance policies', 'To check your cover against the 9× / 4× income guide.', 'insurance'),
-    item('recommended', S.goals.some((g) => g.kind !== 'emergency'), 'A savings goal', 'A home, wedding, car or holiday.', 'goals'),
+    item('optional', S.goals.some((g) => g.kind !== 'emergency'), 'Other goals or milestones', 'A home, wedding or holiday — or a milestone like your first $100k.', 'goals'),
     { ...item('recommended', !!st.lastBackup, 'A backup', 'Browser data can be cleared — keep a copy somewhere safe.', null, 'data'), run: exportBackup, cta: 'Download' },
     item('optional', a ? incomeLines().some((l) => num(a.lines?.[l.id]) > 0) : false, 'Other income', 'Side, rental or dividend income.', 'income'),
     item('optional', S.recurring.length > 0, 'Yearly costs', 'Holidays, festive spending, road tax…', 'spending'),
@@ -2186,7 +2193,7 @@ function setupGoals() {
     S.goals.map((g) => el('div', { class: 'form-grid setup-row' },
       settingInput(g, 'name', 'text', g.kind === 'milestone' ? 'Milestone' : 'Goal'),
       target(g),
-      settingInput(g, 'by', 'month', 'By (optional)'),
+      settingInput(g, 'by', 'month', 'Aim to reach by (optional)', g.metric === 'fire' ? 'When you’d like to be able to stop working.' : 'Leave blank if there’s no date in mind.'),
       field('', el('button', { class: 'btn btn--danger btn--small', type: 'button', text: 'Remove', onclick: () => undoable(`${g.name || 'Goal'} removed`, () => { S.goals = S.goals.filter((x) => x !== g); }) })),
     )),
     picker,
@@ -2299,7 +2306,7 @@ function goalSuggestions(sm) {
     out.push({ title: `Dividend income of ${money(target, { compact: true })} a year`, why: `${money(yearly, { compact: true })} in the last 12 months.`, add: addGoal(newMilestone({ name: 'Dividend income', metric: 'dividends', target })) });
   }
   if (sm.rows.length && !has((g) => g.metric === 'fire')) {
-    out.push({ title: 'Financial independence', why: 'Enough invested that your spending could come from it (the Retirement page’s FIRE number).', add: addGoal(newMilestone(MILESTONE_PRESETS[8])) });
+    out.push({ title: 'Financial independence', why: 'When you could stop working and live off your savings — worked out like the Retirement page. Just add the date you’re aiming for.', add: addGoal(newMilestone(MILESTONE_PRESETS[8])) });
   }
   return out;
 }
@@ -2320,10 +2327,16 @@ function milestoneBlock(st) {
   const g = st.goal;
   const fmt = (v) => (st.pct ? pct(v, 0) : money(v, { compact: true }));
   const head = g.metric === 'debt' ? `${money(st.value, { compact: true })} left` : `${fmt(st.value)} / ${fmt(st.target)}`;
-  const when = st.reached ? 'Reached.'
-    : !st.projects ? (g.by ? `Target ${monthLabel(g.by)}.` : MILESTONES[g.metric]?.about || '')
-      : st.reach ? `Around ${monthLabel(st.reach)} ${g.metric === 'debt' ? 'at your current repayments' : 'at your current pace'}${g.by ? (st.onTrack ? ' — on track.' : ` — after your ${monthLabel(g.by)} target.`) : '.'}`
-        : g.metric === 'debt' ? 'Some debts are never paid off at their current payments.' : 'Not at your current pace.';
+  const aim = g.by ? (st.onTrack ? ` — on track for ${monthLabel(g.by)}.` : ` — later than your aim of ${monthLabel(g.by)}.`) : '.';
+  const when = g.metric === 'fire'
+    ? (st.noAge ? 'Set your birth month to see when.'
+      : st.reached ? `You could stop working now, with money lasting past ${st.lifeTo}.`
+        : st.reach ? `You could stop working around ${monthLabel(st.reach)} (age ${st.fireAge}), with money lasting past ${st.lifeTo}${aim}`
+          : `Not by 75 at your current pace${g.by ? ` — later than your aim of ${monthLabel(g.by)}` : ''}. See the Retirement page.`)
+    : st.reached ? 'Reached.'
+      : !st.projects ? (g.by ? `Aiming to reach it by ${monthLabel(g.by)}.` : MILESTONES[g.metric]?.about || '')
+        : st.reach ? `Around ${monthLabel(st.reach)} ${g.metric === 'debt' ? 'at your current repayments' : 'at your current pace'}${aim}`
+          : g.metric === 'debt' ? 'Some debts are never paid off at their current payments.' : 'Not at your current pace.';
   return el('div', { class: 'goal' },
     el('div', { class: 'bar__head' }, el('span', { text: g.name || MILESTONES[g.metric]?.short }), el('strong', { text: head })),
     progressBar(st.progress),
@@ -2370,7 +2383,7 @@ function pageGoals() {
     { key: 'target', label: 'Target', type: 'money', cls: (g) => (['debt', 'fire'].includes(g.metric) ? '' : 'table__td--edit'), get: (g) => (g.metric === 'debt' ? money(0)
       : g.metric === 'fire' ? el('span', { title: 'From the Retirement page', text: `${money(mstat[g.id]?.target, { compact: true })} (auto)` })
         : inputFor(g, { key: 'target', type: g.metric === 'savingsRate' ? 'pct' : 'money', label: 'Target' })) },
-    { key: 'by', label: 'Target date (optional)', type: 'month' },
+    { key: 'by', label: 'Aim to reach by (optional)', type: 'month' },
     { key: 'now', label: 'Now', type: 'money', get: (g) => { const s = mstat[g.id]; return !s ? '–' : s.pct ? pct(s.value) : money(s.value); } },
     { key: 'reach', label: 'Reached around', type: 'text', get: (g) => { const s = mstat[g.id]; return !s ? '–' : s.reached ? 'Reached' : !s.projects ? '–' : s.reach ? monthLabel(s.reach) : 'Not at current pace'; }, cls: (g) => (mstat[g.id] && !mstat[g.id].onTrack ? 'neg' : '') },
   ];
@@ -2383,7 +2396,7 @@ function pageGoals() {
     { key: 'target', label: 'Target', type: 'money', cls: edit, get: (g) => (g.kind === 'emergency'
       ? el('span', { class: 'goal__months' }, inputFor(g, { key: 'months', type: 'number', label: 'Months of spending', step: '1' }), ` months = ${money(plan[g.id]?.target)}`)
       : inputFor(g, { key: 'target', type: 'money', label: 'Target' })) },
-    { key: 'by', label: 'Target date (optional)', type: 'month' },
+    { key: 'by', label: 'Aim to reach by (optional)', type: 'month' },
     { key: 'have', label: 'Saved', type: 'money', get: (g) => money(plan[g.id]?.have) },
     { key: 'left', label: 'Still to save', type: 'money', get: (g) => money(plan[g.id]?.left) },
     { key: 'need', label: 'Needed / month', type: 'money', get: (g) => (plan[g.id]?.needPerMonth ? money(plan[g.id].needPerMonth) : '–') },
@@ -2403,7 +2416,7 @@ function pageGoals() {
     el('div', { class: 'section-gap' }, editTable({ cols, rows: buckets, onDelete: remove, emptyText: 'Nothing yet — add a goal above.' })),
     el('p', { class: 'card__hint section-gap', text: 'The emergency fund target follows your average spending over the last 6 months (excluding income tax); the usual guide is 3–6 months. Dates assume your last 12 months’ saving pace continues and goes to each goal in turn.' }),
     el('h2', { class: 'section-gap', text: 'Milestones' }),
-    el('p', { class: 'card__hint', text: 'Targets for figures the app already tracks. They don’t set money aside, so they don’t compete with the goals above. Dates use your last 12 months’ pace and leave out investment growth, so they lean cautious; CPF includes its guaranteed interest.' }),
+    el('p', { class: 'card__hint', text: 'Targets for figures the app already tracks. They don’t set money aside, so they don’t compete with the goals above. Dates use your last 12 months’ pace and leave out investment growth, so they lean cautious; CPF includes its guaranteed interest, and financial independence uses the Retirement page’s full projection.' }),
     sm.milestones.length ? el('div', { class: 'card' }, sm.milestones.map(milestoneBlock)) : null,
     el('div', { class: 'section-gap' }, editTable({ cols: mCols, rows: milestones, onDelete: remove, emptyText: 'No milestones yet — pick one from “Add a goal”, or a suggestion above.' })),
     sourceLinks('moneysense', 'cpfPayouts'),
@@ -2516,14 +2529,15 @@ function retireSim(ctx, retireAge) {
   return { years: out, lastsTo, atRetire, payout };
 }
 
-function pageRetirement() {
-  const R = S.retire, st = S.settings, sm = summary(), now = thisMonth();
+/**
+ * Starting point for the retirement projection, and the earliest age you could stop working with money lasting
+ * past your planned age. Shared by the Retirement page and the financial-independence milestone. Null without an age.
+ */
+function retirementOutlook(sm) {
+  const R = S.retire, st = S.settings, now = thisMonth();
   const a = assumptionFor(now) || {};
   const age = st.birthMonth ? ageAt(now) : num(a.age);
-  if (!(age > 0)) {
-    return el('div', null, pageHead('Retirement', 'When you could stop working, and how long your money lasts.'),
-      el('div', { class: 'notice' }, 'Set your birth month (or an age) on ', el('a', { href: '#/assumptions', text: 'Assumptions' }), ' to see a projection.'));
-  }
+  if (!(age > 0)) return null;
   const recent = sm.rows.slice(-12);
   const last = sm.last;
   const po = S.housing.status === 'own' ? payoff({ balance: sm.homeLoan, payment: num(S.housing.cpfMonthly) + num(S.housing.cashMonthly), rate: S.housing.loanRate }) : { months: 0 };
@@ -2538,10 +2552,21 @@ function pageRetirement() {
     housingCpf: num(S.housing.cpfMonthly) * 12, housingYears: po.months == null ? 99 : Math.ceil(num(po.months) / 12),
   };
   if (ctx.ra != null) { ctx.payout = (SG.cpfLifeAtFrs * ctx.ra) / SG.frs2026; ctx.sa = 0; }
-  const plan = retireSim(ctx, num(R.age));
   const life = num(R.lifeExpectancy);
   let earliest = null;
   for (let ra = ctx.age; ra <= 75; ra++) { const s = retireSim(ctx, ra); if (s.lastsTo == null || s.lastsTo > life) { earliest = ra; break; } }
+  return { ctx, life, earliest, earliestMonth: earliest != null ? addMonths(now, (earliest - ctx.age) * 12) : null };
+}
+
+function pageRetirement() {
+  const R = S.retire, st = S.settings, sm = summary();
+  const out = retirementOutlook(sm);
+  if (!out) {
+    return el('div', null, pageHead('Retirement', 'When you could stop working, and how long your money lasts.'),
+      el('div', { class: 'notice' }, 'Set your birth month (or an age) on ', el('a', { href: '#/assumptions', text: 'Assumptions' }), ' to see a projection.'));
+  }
+  const { ctx, life, earliest } = out;
+  const plan = retireSim(ctx, num(R.age));
   const toToday = (v, years) => v / Math.pow(1 + num(R.inflation), years);
   const yrsToRet = Math.max(0, num(R.age) - ctx.age);
   const spendAtRet = ctx.spend * Math.pow(1 + num(R.inflation), yrsToRet);
