@@ -1494,10 +1494,26 @@ function renderShell() {
   render();
 }
 
+// Leaving the setup part-way (a link, the menu) keeps a "Back to setup" bar on other pages until you return,
+// finish, or dismiss it — so you don't lose your place.
+let setupReturn = null;
+let setupFinishing = false;
+function setupReturnBar() {
+  const step = SETUP_STEPS.find(([id]) => setupReturn.includes('step=' + id)) || SETUP_STEPS[0];
+  return el('div', { class: 'notice notice--info setup-return' },
+    el('span', { text: `You’re part-way through setup (${step[1]}). ` }),
+    el('button', { class: 'btn btn--small btn--primary', type: 'button', text: '← Back to setup', onclick: () => { location.hash = setupReturn; } }),
+    el('button', { class: 'btn btn--icon btn--small', type: 'button', text: '×', 'aria-label': 'Hide this', title: 'Hide this', onclick: () => { setupReturn = null; render(); } }));
+}
+
 function render() {
   if (!S) return;
   const p = route();
   const page = PAGES.some(([id]) => id === p) || p === 'setup' ? p : 'dashboard';
+  const prevView = $('#main')?.dataset.view || '';
+  if (page === 'setup') setupReturn = null;
+  else if (prevView.startsWith('#/setup') && !setupFinishing) setupReturn = prevView;
+  setupFinishing = false;
   document.querySelectorAll('[data-page]').forEach((a) => {
     const on = a.dataset.page === page || (a.dataset.page === 'more' && !TABS.includes(page));
     a.classList.toggle('nav__link--active', on);
@@ -1513,7 +1529,7 @@ function render() {
   const tableScroll = same ? [...main.querySelectorAll('.table-wrap')].map((w) => [w.scrollLeft, w.scrollTop]) : [];
   const focus = same ? focusKey(main) : null;
   const view = ({ dashboard: pageDashboard, ledger: pageLedger, setup: pageSetup, assumptions: pageAssumptions, recurring: pageRecurring, goals: pageGoals, housing: pageHousing, kids: pageKids, retirement: pageRetirement, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
-  main.replaceChildren(view);
+  main.replaceChildren(...(setupReturn && page !== 'setup' ? [setupReturnBar()] : []), view);
   main.dataset.view = viewKey;
   main.querySelectorAll('.table-wrap').forEach((w, i) => { if (tableScroll[i]) [w.scrollLeft, w.scrollTop] = tableScroll[i]; });
   if (focus) restoreFocus(main, focus);
@@ -1862,27 +1878,29 @@ function budgetLinesCard() {
   );
 }
 
+/** Add a recurring cost from a preset. Presets tied to a calendar month (e.g. Chinese New Year in Feb) start at its next occurrence. */
+function addRecurring(p) {
+  const now = thisMonth();
+  let start = addMonths(now, 1);
+  if (p.month) { const ym = `${now.slice(0, 4)}-${pad(p.month)}`; start = ym < now ? addMonths(ym, 12) : ym; }
+  S.recurring.push({ id: uid(), name: p.name, amount: p.amount, every: p.every, start, end: '', mode: p.mode });
+  commit();
+  toast(`Added ${p.name}${p.amount ? '' : ' — enter the amount'}`);
+}
+const recurringPicker = () => el('select', {
+  class: 'select select--inline', 'aria-label': 'Add a recurring cost',
+  onchange: (e) => { const v = e.target.value; if (v !== '') addRecurring(v === 'custom' ? { name: 'New recurring cost', amount: 0, every: 12, mode: 'spread' } : RECURRING_PRESETS[+v]); },
+},
+el('option', { value: '', text: '+ Add a yearly or occasional cost…', selected: true }),
+RECURRING_PRESETS.map((p, i) => el('option', { value: i, text: p.name })),
+el('option', { value: 'custom', text: 'Something else' }));
+const RECURRING_EVERY = [[1, 'Every month'], [2, 'Every 2 months'], [3, 'Every 3 months'], [6, 'Every 6 months'], [12, 'Every year'], [24, 'Every 2 years']];
+const RECURRING_MODES = [['spread', 'Set aside monthly'], ['due', 'All in the due month']];
+
 function pageRecurring() {
   const sm = summary();
   const now = thisMonth();
-  // Presets tied to a calendar month (e.g. Chinese New Year in Feb) start at its next occurrence.
-  const firstDue = (m) => {
-    if (!m) return addMonths(now, 1);
-    const ym = `${now.slice(0, 4)}-${pad(m)}`;
-    return ym < now ? addMonths(ym, 12) : ym;
-  };
-  const add = (p) => {
-    S.recurring.push({ id: uid(), name: p.name, amount: p.amount, every: p.every, start: firstDue(p.month), end: '', mode: p.mode });
-    commit();
-    toast(`Added ${p.name}${p.amount ? '' : ' — enter the amount'}`);
-  };
-  const picker = el('select', {
-    class: 'select select--inline', 'aria-label': 'Add a recurring cost',
-    onchange: (e) => { const v = e.target.value; if (v !== '') add(v === 'custom' ? { name: 'New recurring cost', amount: 0, every: 12, mode: 'spread' } : RECURRING_PRESETS[+v]); },
-  },
-  el('option', { value: '', text: '+ Add a recurring cost…', selected: true }),
-  RECURRING_PRESETS.map((p, i) => el('option', { value: i, text: p.name })),
-  el('option', { value: 'custom', text: 'Something else' }));
+  const picker = recurringPicker();
 
   const active = S.recurring.filter((it) => nextDue(it, now));
   const perMonth = sum(active, (it) => num(it.amount) / everyOf(it));
@@ -1895,10 +1913,10 @@ function pageRecurring() {
   const cols = [
     { key: 'name', label: 'Cost', type: 'text' },
     { key: 'amount', label: 'Amount each time', type: 'money' },
-    { key: 'every', label: 'How often', type: 'text', cls: edit, get: (it) => selectFor(it, 'every', [[1, 'Every month'], [2, 'Every 2 months'], [3, 'Every 3 months'], [6, 'Every 6 months'], [12, 'Every year'], [24, 'Every 2 years']], 'How often') },
+    { key: 'every', label: 'How often', type: 'text', cls: edit, get: (it) => selectFor(it, 'every', RECURRING_EVERY, 'How often') },
     { key: 'start', label: 'First due', type: 'month' },
     { key: 'end', label: 'Last due (optional)', type: 'month' },
-    { key: 'mode', label: 'Pay it', type: 'text', cls: edit, get: (it) => selectFor(it, 'mode', [['spread', 'Set aside monthly'], ['due', 'All in the due month']], 'Pay it') },
+    { key: 'mode', label: 'Pay it', type: 'text', cls: edit, get: (it) => selectFor(it, 'mode', RECURRING_MODES, 'Pay it') },
     { key: 'per', label: 'Per month', type: 'money', get: (it) => money(num(it.amount) / everyOf(it)) },
     { key: 'next', label: 'Next due', type: 'text', get: (it) => { const d = nextDue(it, now); return d ? monthLabel(d) : 'Ended'; } },
     { key: 'fund', label: 'Set aside now', type: 'money', get: (it) => (it.mode === 'spread' ? money(sm.last?.funds?.[it.id] || 0) : el('span', { class: 'muted', text: '–' })) },
@@ -1977,12 +1995,12 @@ function setupChecklist() {
     item('recommended', S.housing.status !== 'none' || !!S.setup?.housingNone, 'Housing', 'Rent, a home loan or a home you plan to buy.', 'housing'),
     item('recommended', S.policies.length > 0, 'Insurance policies', 'To check your cover against the 9× / 4× income guide.', 'insurance'),
     item('recommended', S.goals.some((g) => g.kind !== 'emergency'), 'A savings goal', 'A home, wedding, car or holiday.', 'goals'),
-    item('recommended', !!st.lastBackup, 'A backup', 'Browser data can be cleared — keep a copy somewhere safe.', null, 'data'),
+    { ...item('recommended', !!st.lastBackup, 'A backup', 'Browser data can be cleared — keep a copy somewhere safe.', null, 'data'), run: exportBackup, cta: 'Download' },
     item('optional', a ? incomeLines().some((l) => num(a.lines?.[l.id]) > 0) : false, 'Other income', 'Side, rental or dividend income.', 'income'),
-    item('optional', S.recurring.length > 0, 'Yearly costs', 'Holidays, festive spending, road tax…', null, 'recurring'),
+    item('optional', S.recurring.length > 0, 'Yearly costs', 'Holidays, festive spending, road tax…', 'spending'),
     item('optional', S.children.length > 0, 'Children', 'Costs by age and child tax reliefs.', 'family'),
     item('optional', (S.reliefs[thisMonth().slice(0, 4)] || []).length > 0, 'Tax reliefs', 'Parent, NSman, SRS and others lower your tax.', null, 'tax'),
-    item('optional', !!KEY, 'Passphrase', 'Encrypts your records on this device.', null, 'data'),
+    { ...item('optional', !!KEY, 'Passphrase', 'Encrypts your records on this device.', null, 'data'), run: changePass, cta: 'Set one' },
   ];
 }
 
@@ -2004,6 +2022,7 @@ function pageSetup() {
       : el('button', { class: 'btn btn--primary', type: 'button', text: 'Finish — go to my dashboard', onclick: () => {
         S.setup.done = true;
         if (!S.ledger.length) S.ledger.push({ id: uid(), month: thisMonth(), bonus: 0, maDed: 0 }); // the ledger starts this month
+        setupFinishing = true; // finishing is not "leaving part-way": no Back to setup bar
         commit({ rerender: false }); go('dashboard');
       } }),
   );
@@ -2041,8 +2060,20 @@ function setupIncome(a) {
 }
 function setupSpending(a) {
   return [
-    el('p', { class: 'card__hint' }, 'Regular costs. Leave blank anything that doesn’t apply. Yearly costs like holidays and road tax go on ', el('a', { href: '#/recurring', text: 'Recurring costs' }), ' later.'),
+    el('h3', { text: 'Every month' }),
+    el('p', { class: 'card__hint', text: 'Regular costs. Leave blank anything that doesn’t apply.' }),
     el('div', { class: 'form-grid' }, linesAndPresets('expense').map((l) => lineField(a, l))),
+    el('h3', { class: 'section-gap', text: 'Yearly or occasional (optional)' }),
+    el('p', { class: 'card__hint', text: 'Costs that don’t come every month — holidays, festive spending, road tax, property tax. “Set aside monthly” spreads the cost over the months before it is due.' }),
+    S.recurring.map((it) => el('div', { class: 'form-grid setup-row' },
+      settingInput(it, 'name', 'text', 'Cost'),
+      settingInput(it, 'amount', 'money', 'Amount each time'),
+      field('How often', selectFor(it, 'every', RECURRING_EVERY, 'How often')),
+      settingInput(it, 'start', 'month', 'Next due'),
+      field('Pay it', selectFor(it, 'mode', RECURRING_MODES, 'Pay it')),
+      field('', el('button', { class: 'btn btn--danger btn--small', type: 'button', text: 'Remove', onclick: () => undoable(`${it.name || 'Cost'} removed`, () => { S.recurring = S.recurring.filter((x) => x !== it); }) })),
+    )),
+    recurringPicker(),
   ];
 }
 function setupSaving(a) {
@@ -2109,7 +2140,7 @@ function setupHousing(a) {
     el('p', { class: 'card__hint', text: 'Where you live and what it costs.' }),
     choose,
     detail ? el('div', { class: 'section-gap' }, detail()) : null,
-    current && current !== 'none' ? el('p', { class: 'card__hint section-gap' }, 'More detail — the loan over time, what you could get if you sold, stamp duty and CPF use — on the ', el('a', { href: '#/housing', text: 'Housing' }), ' page.') : null,
+    current && current !== 'none' ? el('p', { class: 'card__hint section-gap', text: 'After setup, the Housing page has more detail — the loan over time, what you could get if you sold, stamp duty and CPF use.' }) : null,
   ];
 }
 function setupFamily() {
@@ -2124,7 +2155,7 @@ function setupFamily() {
     S.children.length ? el('div', { class: 'form-grid section-gap' },
       field('Working Mother’s Child Relief', selectFor(S.settings, 'wmcr', [[false, 'Not claiming'], [true, 'I claim it']], 'Working Mother’s Child Relief')),
     ) : null,
-    S.children.length ? el('p', { class: 'card__hint' }, 'Set monthly costs by age (pre-school, school, university) on ', el('a', { href: '#/kids', text: 'Kids & education' }), '.') : null,
+    S.children.length ? el('p', { class: 'card__hint', text: 'After setup, set monthly costs by age (pre-school, school, university) on the Kids & education page.' }) : null,
   ];
 }
 function setupGoals() {
@@ -2170,7 +2201,7 @@ function setupInsurance() {
       field('', el('button', { class: 'btn btn--danger btn--small', type: 'button', text: 'Remove', onclick: () => undoable(`${p.name || 'Policy'} removed`, () => { S.policies = S.policies.filter((x) => x !== p); }) })),
     )),
     el('button', { class: 'btn', type: 'button', text: '+ Add a policy', onclick: () => { S.policies.push({ id: uid(), name: '', type: 'life', payer: 'cash', start: todayISO(), years: 20, premium: 0, coverDeath: 0, coverTPD: 0, coverCI: 0, actual: {} }); commit(); } }),
-    S.policies.length ? el('p', { class: 'card__hint section-gap' }, 'Premium dates, the yearly payment log and disability cover are on ', el('a', { href: '#/insurance', text: 'Insurance' }), '.') : null,
+    S.policies.length ? el('p', { class: 'card__hint section-gap', text: 'After setup, the Insurance page has premium dates, the yearly payment log and disability cover.' }) : null,
   ];
 }
 function setupReview() {
@@ -2181,7 +2212,8 @@ function setupReview() {
     ['optional', 'Optional', 'Only if it applies to you.'],
   ];
   const ess = items.filter((x) => x.level === 'essential');
-  const open = (x) => (x.step ? (location.hash = '#/setup?step=' + x.step) : go(x.page));
+  // Fix things in place where possible: a setup step, or a dialog (backup, passphrase). Only tax reliefs leave the setup.
+  const open = (x) => (x.run ? x.run() : x.step ? (location.hash = '#/setup?step=' + x.step) : go(x.page));
   return [
     el('p', { class: 'card__hint', text: `${ess.filter((x) => x.ok).length} of ${ess.length} essentials done. You can finish now and fill in the rest any time — the dashboard reminds you of missing essentials.` }),
     groups.map(([level, name, sub]) => el('div', { class: 'section-gap' },
@@ -2189,7 +2221,7 @@ function setupReview() {
       items.filter((x) => x.level === level).map((x) => el('div', { class: 'check' },
         el('div', { class: 'check__icon ' + (x.ok ? 'check__icon--ok' : level === 'essential' ? 'check__icon--due' : 'check__icon--skip'), text: x.ok ? '✓' : level === 'essential' ? '!' : '–' }),
         el('div', { class: 'check__text' }, el('div', { text: x.text + (x.skipped ? ' — skipped' : '') }), el('div', { class: 'check__detail', text: x.detail })),
-        x.ok ? null : el('button', { class: 'btn btn--small', type: 'button', text: 'Add', onclick: () => open(x) }),
+        x.ok ? null : el('button', { class: 'btn btn--small', type: 'button', text: x.cta || 'Add', onclick: () => open(x) }),
       )),
     )),
   ];
