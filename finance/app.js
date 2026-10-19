@@ -454,6 +454,24 @@ function assumptionFor(ym) {
   return best || rows[0];
 }
 
+/** Planned monthly investing from an Assumptions row: a fixed amount, or a % of after-CPF pay (the default). */
+const plannedInvest = (a, after) => (a?.investMode === 'amount' ? num(a.investAmt) : after * num(a?.investPct));
+const investsMonthly = (a) => (a?.investMode === 'amount' ? num(a.investAmt) : num(a?.investPct)) > 0;
+const INVEST_MODES = [['pct', '% of after-CPF pay'], ['amount', 'Fixed amount']];
+/** Switch how a row's investing is set, carrying the figure over so the planned amount stays about the same. */
+function setInvestMode(a, mode) {
+  const ym = a.effective?.slice(0, 7) || thisMonth();
+  const ee = S.settings.cpfEnabled ? num(cpfFor(ym, ageAt(ym, a)).ee) : 0;
+  const salary = num(a.salary), ceiling = num(S.settings.owCeiling);
+  const after = salary - (ceiling > 0 ? Math.min(salary, ceiling) : salary) * ee;
+  if (mode === 'amount' && a.investMode !== 'amount') a.investAmt = Math.round(after * num(a.investPct));
+  if (mode === 'pct' && a.investMode === 'amount') a.investPct = after > 0 ? Math.round((num(a.investAmt) / after) * 10000) / 10000 : 0;
+  a.investMode = mode;
+  commit({ defer: true });
+}
+const investModeSelect = (a) => el('select', { class: 'select', 'aria-label': 'Invest as', onchange: (e) => setInvestMode(a, e.target.value) },
+  INVEST_MODES.map(([v, t]) => el('option', { value: v, text: t, selected: (a.investMode || 'pct') === v })));
+
 /**
  * Age used for a month. With a birth month set it is worked out every month and is fractional on
  * purpose: CPF moves you to the next band from the month *after* your birthday month, so someone born
@@ -651,7 +669,7 @@ function computeLedger(extraMonth) {
       if (l.kind === 'income') { otherIncome += v; if (l.taxable) taxableOther += v; } else spendLines += v;
     }
     const takeHome = after + otherIncome;
-    const invest = ov('invest', after * num(a.investPct));
+    const invest = ov('invest', plannedInvest(a, after));
     const prem = premiumsFor(e.month);
     const extras = sum(e.extras || [], (x) => x.amount);
 
@@ -839,7 +857,7 @@ function checklist(sm) {
     : { ok: false, text: `Add the ledger row for ${monthLabel(lastWorked)}`, detail: 'Do this when the payslip for that month arrives.', go: 'ledger', cta: 'Add month' });
   const depThisMonth = S.deposits.some((d) => (d.date || '').slice(0, 7) === now);
   // Only remind people who invest: a planned investment % now, or deposits logged before.
-  if (num(assumptionFor(now)?.investPct) > 0 || S.deposits.length) items.push(depThisMonth
+  if (investsMonthly(assumptionFor(now)) || S.deposits.length) items.push(depThisMonth
     ? { ok: true, text: `Investment deposit logged for ${monthLabel(now)}` }
     : { ok: false, text: `Log this month's investment deposit`, detail: 'Skip if you did not invest this month.', go: 'investments', cta: 'Log' });
   if (S.portfolio.length) {
@@ -1652,7 +1670,7 @@ function editMonth(e) {
       ovField('salary', 'Salary', r?.assumption?.salary || 0),
       ovField('workDays', 'Work days', r?.assumption?.workDays || 0),
       [...incomeLines(), ...expenseLines()].map((l) => ovField(l.id, (l.kind === 'income' ? '+ ' : '') + (l.name || 'Line'), lineAuto(l), tmp.lines)),
-      ovField('invest', 'Investment (planned)', r ? r.after * num(r.assumption.investPct) : 0),
+      ovField('invest', 'Investment (planned)', r ? plannedInvest(r.assumption, r.after) : 0),
       ovField('tax', 'Income tax', r ? r.tax : 0),
     ),
     dueHere.length ? [
@@ -1704,7 +1722,10 @@ function pageAssumptions() {
       key: 'line:' + l.id, label: (l.kind === 'income' ? '+ ' : '') + lineLabel(l), type: 'money', cls: () => 'table__td--edit',
       get: (a) => inputFor((a.lines = a.lines || {}), { key: l.id, type: 'money', label: lineLabel(l) }),
     })),
-    { key: 'investPct', label: 'Investment %', type: 'pct' },
+    { key: 'investMode', label: 'Invest as', type: 'text', cls: () => 'table__td--edit', get: investModeSelect },
+    { key: 'invest', label: 'Investment', type: 'money', cls: () => 'table__td--edit', get: (a) => (a.investMode === 'amount'
+      ? inputFor(a, { key: 'investAmt', type: 'money', label: 'Investment per month' })
+      : inputFor(a, { key: 'investPct', type: 'pct', label: 'Investment %' })) },
     ...(S.settings.cpfEnabled ? [
       { key: 'cpfEE', label: 'CPF rate', type: 'pct', get: (a) => pct(cpfFor(effMonth(a), ageAt(effMonth(a), a)).ee) },
       { key: 'cpfER', label: 'Employer CPF', type: 'pct', get: (a) => pct(cpfFor(effMonth(a), ageAt(effMonth(a), a)).er) },
@@ -1875,7 +1896,7 @@ function setupChecklist() {
     item('essential', num(st.startCash) !== 0, 'Cash in the bank', 'The starting point for cash, net worth and your emergency fund.', 'saving'),
     item('essential', S.goals.some((g) => g.kind === 'emergency'), 'Emergency fund goal', '3–6 months of spending is the usual guide.', 'goals'),
     ...(st.cpfEnabled ? [item('recommended', num(st.cpfStart.oa) + num(st.cpfStart.sa) + num(st.cpfStart.ma) > 0, 'CPF balances', 'For net worth, housing and retirement.', 'saving')] : []),
-    item('recommended', num(a?.investPct) > 0 || S.portfolio.length > 0, 'Investing', 'How much you invest each month, or your portfolio value.', 'saving'),
+    item('recommended', investsMonthly(a) || S.portfolio.length > 0, 'Investing', 'How much you invest each month, or your portfolio value.', 'saving'),
     item('recommended', S.housing.status !== 'none' || !!S.setup?.housingNone, 'Housing', 'Rent, a home loan or a home you plan to buy.', 'housing'),
     item('recommended', S.policies.length > 0, 'Insurance policies', 'To check your cover against the 9× / 4× income guide.', 'insurance'),
     item('recommended', S.goals.some((g) => g.kind !== 'emergency'), 'A savings goal', 'A home, wedding, car or holiday.', 'goals'),
@@ -1953,7 +1974,10 @@ function setupSaving(a) {
   return [
     el('div', { class: 'form-grid' },
       settingInput(S.settings, 'startCash', 'money', 'Cash in the bank today', 'All savings and current accounts together. Your ledger counts on from here.'),
-      settingInput(a, 'investPct', 'pct', 'Invest each month (% of after-CPF pay)', 'Regular investing, e.g. into an index fund. 0 if none.'),
+      field('How do you invest each month?', investModeSelect(a), 'A fixed amount suits a regular savings plan (RSP) or a set transfer to your broker.'),
+      a.investMode === 'amount'
+        ? settingInput(a, 'investAmt', 'money', 'Amount invested each month', '0 if you don’t invest regularly.')
+        : settingInput(a, 'investPct', 'pct', 'Share of after-CPF pay invested', 'Bonus months invest the same share of the bonus. 0 if none.'),
       field('Investments today', inputFor(pv, { key: 'v', type: 'money', label: 'Investments today', nullable: true, placeholder: '0' }, {
         onChange: (v) => {
           const today = todayISO(), ex = S.portfolio.find((p) => p.date === today);
