@@ -254,9 +254,49 @@ const RELIEF_PRESETS = [
   { name: 'Other relief', amount: 0 },
 ];
 
+/*
+ * Budget lines: the spending and extra-income categories. Each Assumptions row holds an amount per line
+ * (a.lines[id]) — per month, or per work day for basis 'workday'. A ledger month can override any line
+ * (e.lines[id]). Income lines add to take-home; `taxable` ones also count toward projected income tax.
+ */
+// The four fixed columns of version 1 keep these ids, so migrated data and spreadsheet imports line up.
+const LEGACY_LINES = {
+  food: { name: 'Food', kind: 'expense', basis: 'workday' },
+  transport: { name: 'Transport', kind: 'expense', basis: 'workday' },
+  parents: { name: 'Parents', kind: 'expense', basis: 'month' },
+  others: { name: 'Others', kind: 'expense', basis: 'month' },
+};
+const defaultLines = () => Object.entries(LEGACY_LINES).map(([id, l]) => ({ id, ...l }));
+const LINE_PRESETS = [
+  { name: 'Rent / housing', kind: 'expense', basis: 'month' },
+  { name: 'Utilities & phone', kind: 'expense', basis: 'month' },
+  { name: 'Groceries', kind: 'expense', basis: 'month' },
+  { name: 'Dining out', kind: 'expense', basis: 'month' },
+  { name: 'Shopping', kind: 'expense', basis: 'month' },
+  { name: 'Healthcare', kind: 'expense', basis: 'month' },
+  { name: 'Childcare & school fees', kind: 'expense', basis: 'month' },
+  { name: 'Kids’ enrichment', kind: 'expense', basis: 'month' },
+  { name: 'Subscriptions', kind: 'expense', basis: 'month' },
+  { name: 'Car (petrol, parking, ERP)', kind: 'expense', basis: 'month' },
+  { name: 'Pets', kind: 'expense', basis: 'month' },
+  { name: 'Side income', kind: 'income', basis: 'month', taxable: true },
+  { name: 'Rental income (net)', kind: 'income', basis: 'month', taxable: true },
+  { name: 'Dividends & interest', kind: 'income', basis: 'month', taxable: false },
+];
+// Costs that come round every few months. 'due' spends the whole amount in the due month;
+// 'spread' sets amount ÷ every aside each month into a fund that pays it when due.
+const RECURRING_PRESETS = [
+  { name: 'Overseas holiday', amount: 3000, every: 12, mode: 'spread' },
+  { name: 'Chinese New Year / festive', amount: 800, every: 12, mode: 'due', month: 2 },
+  { name: 'Birthdays & gifts', amount: 600, every: 12, mode: 'spread' },
+  { name: 'Road tax & car insurance', amount: 2000, every: 12, mode: 'due' },
+  { name: 'Property tax', amount: 0, every: 12, mode: 'due', month: 1 },
+  { name: 'Yearly subscriptions', amount: 0, every: 12, mode: 'due' },
+];
+
 function defaultData() {
   return {
-    version: 1,
+    version: 2,
     settings: {
       currency: 'SGD',
       locale: 'en-SG',
@@ -276,6 +316,8 @@ function defaultData() {
       reliefCap: 80000,
       donationMultiplier: 2.5,
     },
+    budgetLines: defaultLines(),
+    recurring: [], // [{ id, name, amount, every, start: 'YYYY-MM', end, mode: 'due'|'spread' }]
     assumptions: [],
     // Copies, so editing a vault's tables never changes the built-in defaults.
     cpfSchedule: structuredClone(DEFAULT_CPF),
@@ -295,7 +337,22 @@ function migrate(d) {
   const base = defaultData();
   const out = { ...base, ...d, settings: { ...base.settings, ...(d.settings || {}) } };
   out.settings.cpfStart = { ...base.settings.cpfStart, ...(d.settings?.cpfStart || {}) };
-  for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'liabilities', 'policies']) if (!Array.isArray(out[k])) out[k] = [];
+  for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'liabilities', 'policies', 'recurring']) if (!Array.isArray(out[k])) out[k] = [];
+  // Version 1 had four fixed columns (food/day, transport/day, parents, others). Move them into budget
+  // lines with the same ids, including any one-month overrides on ledger rows.
+  if (!Array.isArray(d.budgetLines)) {
+    out.budgetLines = defaultLines();
+    const fromRow = { food: 'foodDay', transport: 'transportDay', parents: 'parents', others: 'others' };
+    for (const a of out.assumptions) {
+      a.lines = a.lines || {};
+      for (const [id, k] of Object.entries(fromRow)) { if (a[k] != null) a.lines[id] = num(a[k]); delete a[k]; }
+    }
+    for (const e of out.ledger) {
+      e.lines = e.lines || {};
+      for (const id of Object.keys(LEGACY_LINES)) { if (e[id] != null && e[id] !== '') e.lines[id] = e[id]; delete e[id]; }
+    }
+  }
+  out.version = 2;
   if (!Array.isArray(out.cpfSchedule) || !out.cpfSchedule.length) out.cpfSchedule = base.cpfSchedule;
   if (!Array.isArray(out.taxBrackets) || !out.taxBrackets.length) out.taxBrackets = base.taxBrackets;
   // Older vaults had one MA allocation for every age (settings.maAlloc). Give each schedule row its band's
@@ -400,6 +457,32 @@ function premiumsFor(ym) {
   return { total, items };
 }
 
+const everyOf = (it) => Math.max(1, Math.round(num(it.every)) || 12);
+/** Last due month of a recurring item (null when it never ends, '' when it ends before it starts). */
+function lastDueOf(it) {
+  if (!it.end) return null;
+  const k = monthDiff(it.start, it.end);
+  return k < 0 ? '' : addMonths(it.start, Math.floor(k / everyOf(it)) * everyOf(it));
+}
+function recurringDue(it, ym) {
+  if (!it.start) return false;
+  const k = monthDiff(it.start, ym);
+  return k >= 0 && k % everyOf(it) === 0 && (!it.end || ym <= it.end);
+}
+/** Monthly set-aside for a 'spread' item: starts `every` months before the first due month, so the fund is full when it is paid. */
+function setAsideFor(it, ym) {
+  if (it.mode !== 'spread' || !it.start) return 0;
+  const last = lastDueOf(it);
+  if (monthDiff(it.start, ym) < -(everyOf(it) - 1) || (last != null && (last === '' || ym > last))) return 0;
+  return num(it.amount) / everyOf(it);
+}
+function nextDue(it, from = thisMonth()) {
+  if (!it.start) return null;
+  const k = monthDiff(it.start, from);
+  const due = addMonths(it.start, k <= 0 ? 0 : Math.ceil(k / everyOf(it)) * everyOf(it));
+  return it.end && due > it.end ? null : due;
+}
+
 /**
  * Compute every ledger month in order. `extraMonth` adds a virtual row (used for "this month" on the dashboard).
  */
@@ -410,8 +493,9 @@ function computeLedger(extraMonth) {
   entries.sort(byKey('month'));
   const table = taxTable();
   let oa = num(st.cpfStart.oa), sa = num(st.cpfStart.sa), ma = num(st.cpfStart.ma);
-  const cum = { after: 0, salary: 0, savings: 0, ee: 0, er: 0, exp: 0, food: 0, transport: 0, parents: 0, tax: 0, others: 0, invest: 0, insurance: 0, maDed: 0 };
+  const cum = { after: 0, income: 0, otherIncome: 0, salary: 0, savings: 0, ee: 0, er: 0, exp: 0, lines: {}, tax: 0, invest: 0, insurance: 0, recurring: 0, extras: 0, maDed: 0 };
   const ytdAfter = {};
+  const fund = {}; // set-aside balance per 'spread' recurring item
   const rows = [];
   for (const e of entries) {
     const a = assumptionFor(e.month) || {};
@@ -426,23 +510,46 @@ function computeLedger(extraMonth) {
     const er = round2(cpfBase * num(c.er));
     const after = salary + bonus - ee;
     const workDays = ov('workDays', num(a.workDays));
-    const food = ov('food', num(a.foodDay) * workDays);
-    const transport = ov('transport', num(a.transportDay) * workDays);
-    const parents = ov('parents', num(a.parents));
-    const others = ov('others', num(a.others));
+    const lines = {}, lineOverrides = [];
+    let spendLines = 0, otherIncome = 0, taxableOther = 0;
+    for (const l of S.budgetLines) {
+      const o = e.lines?.[l.id];
+      const v = o != null && o !== '' ? num(o) : num(a.lines?.[l.id]) * (l.basis === 'workday' ? workDays : 1);
+      if (o != null && o !== '') lineOverrides.push(l.id);
+      lines[l.id] = v;
+      if (l.kind === 'income') { otherIncome += v; if (l.taxable) taxableOther += v; } else spendLines += v;
+    }
+    const takeHome = after + otherIncome;
     const invest = ov('invest', after * num(a.investPct));
     const prem = premiumsFor(e.month);
     const extras = sum(e.extras || [], (x) => x.amount);
 
+    // Recurring costs: 'due' items are spent in their due month; 'spread' items set money aside every
+    // month and pay from that fund, so only the set-aside counts as this month's spending.
+    let recurring = 0;
+    const recurringItems = [];
+    for (const it of S.recurring) {
+      const due = recurringDue(it, e.month);
+      const o = e.recurring?.[it.id];
+      const paid = due ? (o != null && o !== '' ? num(o) : num(it.amount)) : 0;
+      const put = setAsideFor(it, e.month);
+      if (it.mode === 'spread') fund[it.id] = (fund[it.id] || 0) + put - paid;
+      const cost = it.mode === 'spread' ? put : paid;
+      recurring += cost;
+      if (due || put) recurringItems.push({ item: it, due, paid, setAside: put, cost, adjusted: due && o != null && o !== '' });
+    }
+
     // Income tax: projected chargeable income for the calendar year ÷ 12 (same as the sheet's column K).
+    // Taxable extra income (side, rental) is projected the same way as pay.
     const [yy, mm] = e.month.split('-').map(Number);
-    ytdAfter[yy] = (ytdAfter[yy] || 0) + after;
-    const projected = ytdAfter[yy] + (ceiling > 0 ? Math.min(salary, ceiling) * (1 - num(c.ee)) + Math.max(0, salary - ceiling) : salary * (1 - num(c.ee))) * (12 - mm);
+    ytdAfter[yy] = (ytdAfter[yy] || 0) + after + taxableOther;
+    const payAfterCpf = ceiling > 0 ? Math.min(salary, ceiling) * (1 - num(c.ee)) + Math.max(0, salary - ceiling) : salary * (1 - num(c.ee));
+    const projected = ytdAfter[yy] + (payAfterCpf + taxableOther) * (12 - mm);
     const chargeable = Math.max(0, projected - earnedIncomeRelief(ageInYear(yy, a)) - reliefTotal(yy));
     const tax = e.tax != null && e.tax !== '' ? num(e.tax) : round2(taxOn(chargeable, table) / 12);
 
-    const expenditure = food + transport + parents + others + tax + prem.total + extras;
-    const savings = after - expenditure - invest;
+    const expenditure = spendLines + tax + prem.total + extras + recurring;
+    const savings = takeHome - expenditure - invest;
 
     // CPF balances (monthly approximation of CPF interest incl. 1% extra on first $60k, max $20k from OA)
     const total = ee + er;
@@ -458,19 +565,23 @@ function computeLedger(extraMonth) {
     if (st.cpfEnabled) { oa = nOA; sa = nSA; ma = nMA; }
 
     if (!e.virtual) {
-      cum.after += after; cum.salary += salary + bonus; cum.savings += savings; cum.ee += ee; cum.er += er;
-      cum.exp += expenditure; cum.food += food; cum.transport += transport; cum.parents += parents;
-      cum.tax += tax; cum.others += others; cum.invest += invest; cum.insurance += prem.total; cum.maDed += maDed;
+      cum.after += after; cum.income += takeHome; cum.otherIncome += otherIncome; cum.salary += salary + bonus; cum.savings += savings;
+      cum.ee += ee; cum.er += er; cum.exp += expenditure; cum.tax += tax; cum.invest += invest; cum.insurance += prem.total;
+      cum.recurring += recurring; cum.extras += extras; cum.maDed += maDed;
+      for (const [id, v] of Object.entries(lines)) cum.lines[id] = (cum.lines[id] || 0) + v;
     }
+    const sinking = sum(Object.values(fund));
     rows.push({
       entry: e, month: e.month, virtual: !!e.virtual, assumption: a, age, rates: c,
-      salary, bonus, ee, er, after, workDays, food, transport, parents, others, invest, tax, chargeable, projected,
-      insurance: prem.total, insuranceItems: prem.items, extras, expenditure, savings,
-      savingsRate: after ? savings / after : 0,
+      salary, bonus, ee, er, after, otherIncome, takeHome, workDays, lines, invest, tax, chargeable, projected,
+      insurance: prem.total, insuranceItems: prem.items, recurring, recurringItems, extras, expenditure, savings,
+      savingsRate: takeHome ? savings / takeHome : 0,
       oa, sa, ma, cpfTotal: oa + sa + ma, maDed,
-      cum: { ...cum },
-      cash: num(st.startCash) + cum.savings,
-      overrides: ['salary', 'workDays', 'food', 'transport', 'parents', 'others', 'invest', 'tax'].filter((k) => e[k] != null && e[k] !== ''),
+      cum: { ...cum, lines: { ...cum.lines } },
+      sinking, funds: { ...fund }, // money set aside for 'spread' recurring costs and not yet paid out
+      cash: num(st.startCash) + cum.savings + sinking,
+      overrides: ['salary', 'workDays', 'invest', 'tax'].filter((k) => e[k] != null && e[k] !== ''),
+      lineOverrides,
     });
   }
   return rows;
@@ -488,17 +599,19 @@ function summary() {
   const liabilities = sum(S.liabilities, (l) => l.balance);
   const cumSavings = last ? last.cum.savings : 0;
   const cpf = st.cpfEnabled ? (last ? last.cpfTotal : num(st.cpfStart.oa) + num(st.cpfStart.sa) + num(st.cpfStart.ma)) : 0;
-  const netWorth = num(st.startCash) + cumSavings + portfolio + cpf - liabilities - extraInvested;
+  // Set-aside funds are still cash in the bank, but earmarked — so in net worth, not in goal savings.
+  const sinking = last ? last.sinking : 0;
+  const netWorth = num(st.startCash) + cumSavings + sinking + portfolio + cpf - liabilities - extraInvested;
   const liquid = netWorth - cpf;
   const saved = num(st.startCash) + cumSavings + portfolio - extraInvested;
   const recent = rows.slice(-12);
   const pace = recent.length ? sum(recent, (r) => r.savings + r.invest) / recent.length : 0;
   const remaining = Math.max(0, num(st.goalAmount) - saved);
   const monthsToGoal = remaining <= 0 ? 0 : pace > 0 ? Math.ceil(remaining / pace) : null;
-  const expectedCash = num(st.startCash) + cumSavings - extraInvested;
+  const expectedCash = num(st.startCash) + cumSavings + sinking - extraInvested;
   return {
     rows, last, deposits, planned, extraInvested, portfolio, portfolioDate: pv.length ? pv[pv.length - 1].date : null,
-    liabilities, cumSavings, cpf, netWorth, liquid, saved, pace, remaining, monthsToGoal,
+    liabilities, cumSavings, sinking, cpf, netWorth, liquid, saved, pace, remaining, monthsToGoal,
     goalMonth: monthsToGoal != null ? addMonths(thisMonth(), monthsToGoal) : null,
     progress: num(st.goalAmount) > 0 ? Math.min(1, saved / num(st.goalAmount)) : null,
     expectedCash,
@@ -552,6 +665,11 @@ function checklist(sm) {
         items.push({ ok: false, text: `${p.name || 'Policy'}: premium ${diff >= 0 ? 'due' : 'was due'} ${monthLabel(due)}`, detail: `Expected ${money(num(p.premium))}. Log Actual Paid when you pay.`, go: 'insurance', cta: 'Log' });
       }
     }
+  }
+  for (const it of S.recurring) {
+    const due = nextDue(it, now);
+    if (!due || !num(it.amount) || monthDiff(now, due) > 1) continue;
+    items.push({ ok: false, text: `${it.name || 'Recurring cost'}: due ${due === now ? 'this month' : monthLabel(due)}`, detail: `Planned ${money(num(it.amount))}${it.mode === 'spread' ? ', paid from the money set aside' : ''}. If it costs something else, change it in that month’s ledger row.`, go: 'recurring', cta: 'View' });
   }
   if (S.settings.bankBalance != null && S.settings.bankBalance !== '') {
     const diff = num(S.settings.bankBalance) - sm.expectedCash;
@@ -802,7 +920,7 @@ function openDialog(title, body, buttons) {
   const d = $('#dlg');
   d.replaceChildren(
     el('h2', { text: title }),
-    ...[body].flat(),
+    ...[body].flat(Infinity).filter((x) => x != null && x !== false),
     el('div', { class: 'dialog__foot' }, buttons.map((b) => el('button', {
       class: 'btn' + (b.primary ? ' btn--primary' : '') + (b.danger ? ' btn--danger' : ''),
       type: 'button',
@@ -886,6 +1004,16 @@ function field(label, input, hint) {
 function settingInput(obj, key, type, label, hint, extra = {}) {
   return field(label, inputFor(obj, { key, type, label, ...extra }), hint);
 }
+/** Dropdown bound to obj[key]; options are [value, text] pairs (values may be non-strings). */
+function selectFor(obj, key, options, label) {
+  return el('select', {
+    class: 'select', 'aria-label': label,
+    onchange: (e) => { obj[key] = options[e.target.selectedIndex][0]; commit({ defer: true }); },
+  }, options.map(([v, t]) => el('option', { value: String(v), selected: obj[key] === v, text: t })));
+}
+const lineLabel = (l) => (l.name || 'Unnamed') + (l.basis === 'workday' ? ' (per day)' : ' (per month)');
+const expenseLines = () => S.budgetLines.filter((l) => l.kind !== 'income');
+const incomeLines = () => S.budgetLines.filter((l) => l.kind === 'income');
 
 /* =====================================================================
  * 10. Charts (inline SVG, no libraries)
@@ -1016,6 +1144,7 @@ const PAGES = [
   ['dashboard', 'Dashboard'],
   ['ledger', 'Monthly ledger'],
   ['assumptions', 'Assumptions'],
+  ['recurring', 'Recurring costs'],
   ['investments', 'Investments'],
   ['liabilities', 'Liabilities'],
   ['insurance', 'Insurance'],
@@ -1080,7 +1209,7 @@ function render() {
   const wy = scrollY;
   const tableScroll = same ? [...main.querySelectorAll('.table-wrap')].map((w) => [w.scrollLeft, w.scrollTop]) : [];
   const focus = same ? focusKey(main) : null;
-  const view = ({ dashboard: pageDashboard, ledger: pageLedger, assumptions: pageAssumptions, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
+  const view = ({ dashboard: pageDashboard, ledger: pageLedger, assumptions: pageAssumptions, recurring: pageRecurring, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
   main.replaceChildren(view);
   main.dataset.view = page;
   main.querySelectorAll('.table-wrap').forEach((w, i) => { if (tableScroll[i]) [w.scrollLeft, w.scrollTop] = tableScroll[i]; });
@@ -1156,12 +1285,11 @@ function pageDashboard() {
       ['Salary' + (cur.bonus ? ' + bonus' : ''), money(cur.salary + cur.bonus)],
       ['CPF (employee)', '−' + money(cur.ee)],
       ['After CPF', money(cur.after), true],
-      ['Food', '−' + money(cur.food)],
-      ['Transport', '−' + money(cur.transport)],
-      ['Parents', '−' + money(cur.parents)],
-      ['Others', '−' + money(cur.others)],
+      ...(cur.otherIncome ? [...incomeLines().filter((l) => cur.lines[l.id]).map((l) => [l.name, '+' + money(cur.lines[l.id])]), ['Take-home', money(cur.takeHome), true]] : []),
+      ...expenseLines().filter((l) => cur.lines[l.id]).map((l) => [l.name, '−' + money(cur.lines[l.id])]),
       ['Income tax (monthly)', '−' + money(cur.tax)],
       ...(cur.insurance ? [['Insurance premium', '−' + money(cur.insurance)]] : []),
+      ...cur.recurringItems.filter((x) => x.cost).map((x) => [`${x.item.name || 'Recurring'}${x.item.mode === 'spread' ? ' (set aside)' : ''}`, '−' + money(x.cost)]),
       ['Investment (planned)', '−' + money(cur.invest)],
       ['Left', money(cur.savings), true, sign(cur.savings)],
       ['Employer CPF (not in take-home)', money(cur.er)],
@@ -1187,8 +1315,9 @@ function pageDashboard() {
       el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Savings rate by month' }), barChart(rows.map((r) => r.savingsRate), labels),
         el('div', { class: 'card__title section-gap', text: 'Where the money went (all months)' }),
         bars([
-          { label: 'Food', value: sm.last.cum.food }, { label: 'Transport', value: sm.last.cum.transport }, { label: 'Parents', value: sm.last.cum.parents },
-          { label: 'Others', value: sm.last.cum.others }, { label: 'Income tax', value: sm.last.cum.tax }, { label: 'Insurance', value: sm.last.cum.insurance },
+          ...expenseLines().map((l) => ({ label: l.name || 'Spending', value: sm.last.cum.lines[l.id] || 0 })),
+          { label: 'One-offs', value: sm.last.cum.extras }, { label: 'Recurring costs', value: sm.last.cum.recurring },
+          { label: 'Income tax', value: sm.last.cum.tax }, { label: 'Insurance', value: sm.last.cum.insurance },
         ].filter((b) => b.value > 0).sort((a, b) => b.value - a.value)),
       ),
     ));
@@ -1206,8 +1335,11 @@ function pageLedger() {
     commit();
     toast(`Added ${monthLabel(m)}`);
   };
-  const mark = (r, k) => (r.overrides.includes(k) ? el('span', { class: 'table__mark', title: 'Adjusted for this month', text: '•' }) : null);
+  const markEl = () => el('span', { class: 'table__mark', title: 'Adjusted for this month', text: '•' });
+  const mark = (r, k) => (r.overrides.includes(k) ? markEl() : null);
   const cell = (r, k) => el('span', null, money(r[k]), mark(r, k));
+  const lineCell = (r, id) => el('span', null, money(r.lines[id]), r.lineOverrides.includes(id) ? markEl() : null);
+  const hasIncome = incomeLines().length > 0;
   // Mostly-zero columns read better as a dash than a wall of $0.00.
   const orDash = (v) => (num(v) ? money(v) : el('span', { class: 'muted', text: '–' }));
   const full = !S.settings.ledgerCompact;
@@ -1217,11 +1349,12 @@ function pageLedger() {
     { key: 'bonus', label: 'Bonus', type: 'money', get: (r) => orDash(r.bonus) },
     ...(S.settings.cpfEnabled ? [{ key: 'ee', label: 'CPF', type: 'money', get: (r) => money(r.ee) }, { key: 'er', label: 'Employer CPF', type: 'money', get: (r) => money(r.er) }] : []),
     { key: 'after', label: 'After CPF', type: 'money', get: (r) => money(r.after) },
-    { key: 'food', label: 'Food', type: 'money', get: (r) => cell(r, 'food') },
-    { key: 'transport', label: 'Transport', type: 'money', get: (r) => cell(r, 'transport') },
-    { key: 'parents', label: 'Parents', type: 'money', get: (r) => cell(r, 'parents') },
-    { key: 'others', label: 'Others', type: 'money', get: (r) => cell(r, 'others') },
+    ...incomeLines().map((l) => ({ key: 'line:' + l.id, label: '+ ' + (l.name || 'Income'), type: 'money', get: (r) => lineCell(r, l.id) })),
+    // Total of the income lines: the compact view's single income column; in the full view only worth it for 2+ lines.
+    ...(hasIncome && (!full || incomeLines().length > 1) ? [{ key: 'otherinc', label: 'Other income', type: 'money', get: (r) => orDash(r.otherIncome) }] : []),
+    ...expenseLines().map((l) => ({ key: 'line:' + l.id, label: l.name || 'Spending', type: 'money', get: (r) => lineCell(r, l.id) })),
     { key: 'extras', label: 'One-offs', type: 'money', get: (r) => orDash(r.extras) },
+    { key: 'recurring', label: 'Recurring', type: 'money', get: (r) => orDash(r.recurring) },
     { key: 'insurance', label: 'Insurance', type: 'money', get: (r) => orDash(r.insurance) },
     { key: 'tax', label: 'Income tax', type: 'money', get: (r) => cell(r, 'tax') },
     { key: 'invest', label: 'Investment', type: 'money', get: (r) => cell(r, 'invest') },
@@ -1234,7 +1367,7 @@ function pageLedger() {
       { key: 'ma', label: 'CPF MA', type: 'money', get: (r) => money(r.ma) },
     ] : []),
   ];
-  const KEY_COLS = ['month', 'salary', 'after', 'spend', 'tax', 'invest', 'savings', 'rate', 'cumsav'];
+  const KEY_COLS = ['month', 'salary', 'after', 'otherinc', 'spend', 'tax', 'invest', 'savings', 'rate', 'cumsav'];
   const shown = full ? cols : [...cols, { key: 'spend', label: 'Spending', type: 'money', get: (r) => money(r.expenditure - r.tax) }]
     .filter((c) => KEY_COLS.includes(c.key)).sort((a, b) => KEY_COLS.indexOf(a.key) - KEY_COLS.indexOf(b.key));
   const viewToggle = el('div', { class: 'segmented', role: 'group', 'aria-label': 'Columns' },
@@ -1254,7 +1387,7 @@ function pageLedger() {
     ) : null,
     el('div', { class: 'table-toolbar section-gap' }, el('span', { class: 'card__hint', text: 'Select a month to edit it.' }), viewToggle),
     editTable({ cols: shown, rows: [...rows].reverse(), emptyText: 'No months yet — select “Add next month”.' }),
-    el('p', { class: 'card__hint section-gap' }, el('span', { class: 'table__mark', text: '•' }), ' = value adjusted for that month only. ', full ? null : 'Spending = food, transport, parents, others, one-offs and insurance. ', 'Income tax is your projected annual tax for that calendar year ÷ 12.'),
+    el('p', { class: 'card__hint section-gap' }, el('span', { class: 'table__mark', text: '•' }), ' = value adjusted for that month only. ', full ? null : 'Spending = your spending lines, one-offs, recurring costs and insurance. ', 'Income tax is your projected annual tax for that calendar year ÷ 12.'),
   );
 }
 
@@ -1262,7 +1395,12 @@ function editMonth(e) {
   const r = computeLedger().find((x) => x.entry.id === e.id);
   const tmp = JSON.parse(JSON.stringify(e));
   tmp.extras = tmp.extras || [];
-  const ovField = (k, label, computed) => field(label, inputFor(tmp, { key: k, type: 'money', label, nullable: true, placeholder: `Auto: ${round2(computed)}` }, { onChange: () => {} }), 'Leave blank to use the automatic value.');
+  tmp.lines = tmp.lines || {};
+  tmp.recurring = tmp.recurring || {};
+  const ovField = (k, label, computed, obj = tmp) => field(label, inputFor(obj, { key: k, type: 'money', label, nullable: true, placeholder: `Auto: ${round2(computed)}` }, { onChange: () => {} }), 'Leave blank to use the automatic value.');
+  // Automatic value of a line for this month: the Assumptions amount (× work days for per-day lines).
+  const lineAuto = (l) => (r ? num(r.assumption.lines?.[l.id]) * (l.basis === 'workday' ? r.workDays : 1) : 0);
+  const dueHere = S.recurring.filter((it) => recurringDue(it, e.month));
   const extrasBox = el('div');
   const drawExtras = () => extrasBox.replaceChildren(
     ...tmp.extras.map((x, i) => el('div', { class: 'form-grid' },
@@ -1282,13 +1420,14 @@ function editMonth(e) {
     el('div', { class: 'form-grid' },
       ovField('salary', 'Salary', r?.assumption?.salary || 0),
       ovField('workDays', 'Work days', r?.assumption?.workDays || 0),
-      ovField('food', 'Food', r ? (r.overrides.includes('food') ? num(r.assumption.foodDay) * r.workDays : r.food) : 0),
-      ovField('transport', 'Transport', r ? (r.overrides.includes('transport') ? num(r.assumption.transportDay) * r.workDays : r.transport) : 0),
-      ovField('parents', 'Parents', r?.assumption?.parents || 0),
-      ovField('others', 'Others', r?.assumption?.others || 0),
+      [...incomeLines(), ...expenseLines()].map((l) => ovField(l.id, (l.kind === 'income' ? '+ ' : '') + (l.name || 'Line'), lineAuto(l), tmp.lines)),
       ovField('invest', 'Investment (planned)', r ? r.after * num(r.assumption.investPct) : 0),
       ovField('tax', 'Income tax', r ? r.tax : 0),
     ),
+    dueHere.length ? [
+      el('h3', { class: 'section-gap', text: 'Recurring costs due this month' }),
+      el('div', { class: 'form-grid' }, dueHere.map((it) => field(it.name || 'Recurring cost', inputFor(tmp.recurring, { key: it.id, type: 'money', label: it.name, nullable: true, placeholder: `Planned: ${round2(num(it.amount))}` }, { onChange: () => {} }), it.mode === 'spread' ? 'Actual amount paid. It comes out of the money set aside.' : 'Actual amount paid. Leave blank if it matched the plan.'))),
+    ] : null,
     extrasBox,
     field('Note', inputFor(tmp, { key: 'note', type: 'text', label: 'Note' }, { onChange: () => {} })),
   ], [
@@ -1298,6 +1437,7 @@ function editMonth(e) {
       label: 'Save', primary: true, run: () => {
         if (!tmp.month) return;
         if (S.ledger.some((x) => x.id !== e.id && x.month === tmp.month)) { toast('Another row already uses that month'); return; }
+        for (const o of [tmp.lines, tmp.recurring]) for (const k of Object.keys(o)) if (o[k] == null || o[k] === '') delete o[k];
         Object.keys(e).forEach((k) => delete e[k]);
         Object.assign(e, tmp);
         commit();
@@ -1310,7 +1450,7 @@ function pageAssumptions() {
   const rows = [...S.assumptions].sort(byKey('effective'));
   const add = () => {
     const last = rows[rows.length - 1];
-    S.assumptions.push(last ? { ...JSON.parse(JSON.stringify(last)), id: uid(), effective: todayISO(), notes: '' } : { id: uid(), effective: thisMonth() + '-01', salary: 0, age: 30, workDays: 22, foodDay: 0, transportDay: 0, parents: 0, investPct: 0, others: 0, notes: '' });
+    S.assumptions.push(last ? { ...JSON.parse(JSON.stringify(last)), id: uid(), effective: todayISO(), notes: '' } : { id: uid(), effective: thisMonth() + '-01', salary: 0, age: 30, workDays: 22, lines: {}, investPct: 0, notes: '' });
     commit();
   };
   const birth = S.settings.birthMonth;
@@ -1328,10 +1468,11 @@ function pageAssumptions() {
       ? { key: 'age', label: 'Age', type: 'number', get: (a) => String(Math.floor(ageAt(effMonth(a)))) }
       : { key: 'age', label: 'Age', type: 'number', step: '1' }] : []),
     { key: 'workDays', label: 'Work days/mo', type: 'number', step: '1' },
-    { key: 'foodDay', label: 'Food/day', type: 'money' },
-    { key: 'transportDay', label: 'Transport/day', type: 'money' },
-    { key: 'parents', label: 'Parents support', type: 'money' },
-    { key: 'others', label: 'Others/month', type: 'money' },
+    // One column per budget line, spending first, then extra income.
+    ...[...expenseLines(), ...incomeLines()].map((l) => ({
+      key: 'line:' + l.id, label: (l.kind === 'income' ? '+ ' : '') + lineLabel(l), type: 'money', cls: () => 'table__td--edit',
+      get: (a) => inputFor((a.lines = a.lines || {}), { key: l.id, type: 'money', label: lineLabel(l) }),
+    })),
     { key: 'investPct', label: 'Investment %', type: 'pct' },
     ...(S.settings.cpfEnabled ? [
       { key: 'cpfEE', label: 'CPF rate', type: 'pct', get: (a) => pct(cpfFor(effMonth(a), ageAt(effMonth(a), a)).ee) },
@@ -1346,7 +1487,115 @@ function pageAssumptions() {
       el('button', { class: 'btn btn--primary', type: 'button', text: rows.length ? '+ Copy last row' : '+ Add first row', onclick: add })),
     el('div', { class: 'notice notice--info', text: 'A row applies from the first month that starts on or after its effective date. Example: effective 30 May → used from June. CPF rates come from the age band in Settings → CPF schedule.' }),
     el('div', { class: 'card birth-card' }, field('Birth month', inputFor(S.settings, { key: 'birthMonth', type: 'month', label: 'Birth month' }), birthHint)),
+    budgetLinesCard(),
     editTable({ cols, rows, onDelete: (r) => undoable('Assumptions row deleted', () => { S.assumptions = S.assumptions.filter((x) => x !== r); }), emptyText: 'No assumptions yet.' }),
+  );
+}
+
+/** Manage the spending and extra-income lines that the Assumptions table and ledger are built from. */
+function budgetLinesCard() {
+  const add = (p) => {
+    if (S.budgetLines.some((l) => l.name.toLowerCase() === p.name.toLowerCase())) return toast(`${p.name} is already a line`);
+    S.budgetLines.push({ id: uid(), ...p });
+    commit();
+    toast(`Added ${p.name} — enter its amount in the Assumptions table`);
+  };
+  const custom = { expense: { name: 'New spending line', kind: 'expense', basis: 'month' }, income: { name: 'New income line', kind: 'income', basis: 'month', taxable: true } };
+  const opts = (kind) => LINE_PRESETS.map((p, i) => [p, i]).filter(([p]) => p.kind === kind).map(([p, i]) => el('option', { value: i, text: p.name }));
+  const picker = el('select', {
+    class: 'select select--inline', 'aria-label': 'Add a budget line',
+    onchange: (e) => { const v = e.target.value; if (v !== '') add(custom[v] || LINE_PRESETS[+v]); },
+  },
+  el('option', { value: '', text: '+ Add a line…', selected: true }),
+  el('optgroup', { label: 'Spending' }, opts('expense')),
+  el('optgroup', { label: 'Extra income' }, opts('income')),
+  el('optgroup', { label: 'Your own' }, el('option', { value: 'expense', text: 'Custom spending line' }), el('option', { value: 'income', text: 'Custom income line' })));
+  const remove = (l) => undoable(`${l.name || 'Line'} removed`, () => {
+    S.budgetLines = S.budgetLines.filter((x) => x !== l);
+    for (const r of [...S.assumptions, ...S.ledger]) if (r.lines) delete r.lines[l.id];
+  });
+  const edit = () => 'table__td--edit';
+  return el('div', { class: 'card section-gap' },
+    el('div', { class: 'card__title' }, el('span', { text: 'Budget lines' }), picker),
+    el('p', { class: 'card__hint', text: 'What you spend on — rent, utilities, childcare — and any income besides your salary. Each line becomes a column in the table below and in the ledger. Per-work-day lines are multiplied by work days.' }),
+    editTable({
+      cols: [
+        { key: 'name', label: 'Line', type: 'text' },
+        { key: 'kind', label: 'Type', type: 'text', cls: edit, get: (l) => selectFor(l, 'kind', [['expense', 'Spending'], ['income', 'Extra income']], 'Type') },
+        { key: 'basis', label: 'Amount is', type: 'text', cls: edit, get: (l) => selectFor(l, 'basis', [['month', 'Per month'], ['workday', 'Per work day']], 'Amount is') },
+        { key: 'taxable', label: 'Income tax', type: 'text', cls: (l) => (l.kind === 'income' ? 'table__td--edit' : ''), get: (l) => (l.kind === 'income' ? selectFor(l, 'taxable', [[false, 'Not taxable'], [true, 'Taxable']], 'Income tax') : el('span', { class: 'muted', text: '–' })) },
+      ],
+      rows: [...expenseLines(), ...incomeLines()],
+      onDelete: remove,
+      emptyText: 'No lines yet — add one above.',
+    }),
+    el('p', { class: 'card__hint section-gap', text: 'Taxable income (side income, net rental income) is added to your projected income tax. Enter it after deducting allowable expenses.' }),
+  );
+}
+
+function pageRecurring() {
+  const sm = summary();
+  const now = thisMonth();
+  // Presets tied to a calendar month (e.g. Chinese New Year in Feb) start at its next occurrence.
+  const firstDue = (m) => {
+    if (!m) return addMonths(now, 1);
+    const ym = `${now.slice(0, 4)}-${pad(m)}`;
+    return ym < now ? addMonths(ym, 12) : ym;
+  };
+  const add = (p) => {
+    S.recurring.push({ id: uid(), name: p.name, amount: p.amount, every: p.every, start: firstDue(p.month), end: '', mode: p.mode });
+    commit();
+    toast(`Added ${p.name}${p.amount ? '' : ' — enter the amount'}`);
+  };
+  const picker = el('select', {
+    class: 'select select--inline', 'aria-label': 'Add a recurring cost',
+    onchange: (e) => { const v = e.target.value; if (v !== '') add(v === 'custom' ? { name: 'New recurring cost', amount: 0, every: 12, mode: 'spread' } : RECURRING_PRESETS[+v]); },
+  },
+  el('option', { value: '', text: '+ Add a recurring cost…', selected: true }),
+  RECURRING_PRESETS.map((p, i) => el('option', { value: i, text: p.name })),
+  el('option', { value: 'custom', text: 'Something else' }));
+
+  const active = S.recurring.filter((it) => nextDue(it, now));
+  const perMonth = sum(active, (it) => num(it.amount) / everyOf(it));
+  const upcoming = [];
+  for (let k = 0; k < 12; k++) {
+    const m = addMonths(now, k);
+    for (const it of S.recurring) if (recurringDue(it, m)) upcoming.push({ id: it.id + m, month: m, name: it.name, amount: num(it.amount), mode: it.mode });
+  }
+  const edit = () => 'table__td--edit';
+  const cols = [
+    { key: 'name', label: 'Cost', type: 'text' },
+    { key: 'amount', label: 'Amount each time', type: 'money' },
+    { key: 'every', label: 'How often', type: 'text', cls: edit, get: (it) => selectFor(it, 'every', [[1, 'Every month'], [2, 'Every 2 months'], [3, 'Every 3 months'], [6, 'Every 6 months'], [12, 'Every year'], [24, 'Every 2 years']], 'How often') },
+    { key: 'start', label: 'First due', type: 'month' },
+    { key: 'end', label: 'Last due (optional)', type: 'month' },
+    { key: 'mode', label: 'Pay it', type: 'text', cls: edit, get: (it) => selectFor(it, 'mode', [['spread', 'Set aside monthly'], ['due', 'All in the due month']], 'Pay it') },
+    { key: 'per', label: 'Per month', type: 'money', get: (it) => money(num(it.amount) / everyOf(it)) },
+    { key: 'next', label: 'Next due', type: 'text', get: (it) => { const d = nextDue(it, now); return d ? monthLabel(d) : 'Ended'; } },
+    { key: 'fund', label: 'Set aside now', type: 'money', get: (it) => (it.mode === 'spread' ? money(sm.last?.funds?.[it.id] || 0) : el('span', { class: 'muted', text: '–' })) },
+  ];
+  return el('div', null,
+    pageHead('Recurring costs', 'Costs that don’t come every month — holidays, festive spending, gifts, road tax, property tax, yearly subscriptions.', picker),
+    el('div', { class: 'grid grid--stats' },
+      stat('Per month, all costs', money(perMonth), `${active.length} active`, true),
+      stat('Set aside so far', money(sm.sinking), 'Cash kept for “set aside” costs'),
+      stat('Due in the next 12 months', money(sum(upcoming, (u) => u.amount))),
+    ),
+    el('div', { class: 'section-gap' }, editTable({ cols, rows: S.recurring, onDelete: (it) => undoable(`${it.name || 'Recurring cost'} removed`, () => { S.recurring = S.recurring.filter((x) => x !== it); }), emptyText: 'Nothing yet — add a holiday, festive spending or a yearly bill above.' })),
+    el('p', { class: 'card__hint section-gap', text: '“Set aside monthly” counts amount ÷ months as spending every month, starting early enough that the money is there when it is due; the unspent part stays in your cash and net worth. “All in the due month” counts the whole amount that month. If a payment costs more or less, change it in that month’s ledger row. Insurance premiums are on the Insurance page.' }),
+    el('div', { class: 'card section-gap' },
+      el('div', { class: 'card__title', text: 'Coming up' }),
+      editTable({
+        cols: [
+          { key: 'month', label: 'Month', type: 'month', readonly: true },
+          { key: 'name', label: 'Cost', type: 'text', readonly: true },
+          { key: 'amount', label: 'Planned', type: 'money', readonly: true },
+          { key: 'mode', label: 'Paid from', type: 'text', get: (u) => (u.mode === 'spread' ? 'Money set aside' : 'That month’s pay') },
+        ],
+        rows: upcoming,
+        emptyText: 'Nothing due in the next 12 months.',
+      }),
+    ),
   );
 }
 
@@ -1495,7 +1744,7 @@ function pageTax() {
       el('div', { class: 'card' },
         el('div', { class: 'card__title', text: 'How it is worked out' }),
         kv([
-          [`After-CPF pay so far in ${year} + current pay × remaining months`, money(projected)],
+          [`After-CPF pay${incomeLines().some((l) => l.taxable) ? ' and taxable extra income' : ''} so far in ${year}, plus the current month’s × remaining months`, money(projected)],
           ['Earned income relief', '−' + money(eir)],
           ['Income before other reliefs', money(base), true],
           ['Other reliefs (capped at ' + money(num(S.settings.reliefCap), { compact: true }) + ')', '−' + money(sum(shares, (s) => s.applied))],
@@ -1547,6 +1796,7 @@ function pageNetWorth() {
         kv([
           ['Start amount', money(num(st.startCash))],
           ['Cumulative savings (ledger)', money(sm.cumSavings)],
+          ...(sm.sinking ? [['Set aside for recurring costs', money(sm.sinking)]] : []),
           ['Portfolio value', money(sm.portfolio)],
           ['Actual − planned investing', (sm.extraInvested >= 0 ? '−' : '+') + money(Math.abs(sm.extraInvested))],
           ...(st.cpfEnabled ? [['Total CPF', money(sm.cpf)]] : []),
@@ -1555,7 +1805,7 @@ function pageNetWorth() {
         ]),
         el('div', { class: 'card__title section-gap', text: 'Cash check' }),
         kv([
-          ['Expected cash (start + savings − extra invested)', money(sm.expectedCash)],
+          [sm.sinking ? 'Expected cash (start + savings + set aside − extra invested)' : 'Expected cash (start + savings − extra invested)', money(sm.expectedCash)],
           ['Actual bank balance', st.bankBalance != null && st.bankBalance !== '' ? money(num(st.bankBalance)) : '–'],
           ['Difference', bankDiff != null ? money(bankDiff) : '–', true, bankDiff != null ? sign(bankDiff) : ''],
         ]),
@@ -1679,8 +1929,9 @@ function csvCell(v) { const s = v == null ? '' : String(v); return /[",\n]/.test
 async function exportLedgerCSV() {
   if (!await confirmDialog('Export unencrypted CSV?', 'This CSV will NOT be encrypted. Anyone who gets it can read your ledger.', 'Export CSV')) return;
   const rows = computeLedger();
-  const head = ['Month', 'Salary', 'Bonus', 'CPF', 'Employer CPF', 'After CPF', 'Food', 'Transport', 'Parents', 'Others', 'One-offs', 'Insurance', 'Income Tax', 'Investment', 'Savings', 'Cumulative Savings', 'CPF OA', 'CPF SA', 'CPF MA', 'MA Deductions', 'Savings Rate'];
-  const lines = [head.join(',')].concat(rows.map((r) => [r.month, r.salary, r.bonus, r.ee, r.er, r.after, r.food, r.transport, r.parents, r.others, r.extras, r.insurance, r.tax, r.invest, r.savings, r.cum.savings, r.oa, r.sa, r.ma, r.maDed, r.savingsRate].map((v) => csvCell(typeof v === 'number' ? round2(v) : v)).join(',')));
+  const inc = incomeLines(), exp = expenseLines();
+  const head = ['Month', 'Salary', 'Bonus', 'CPF', 'Employer CPF', 'After CPF', ...inc.map((l) => l.name), 'Take-home', ...exp.map((l) => l.name), 'One-offs', 'Recurring', 'Insurance', 'Income Tax', 'Investment', 'Savings', 'Cumulative Savings', 'CPF OA', 'CPF SA', 'CPF MA', 'MA Deductions', 'Savings Rate'];
+  const lines = [head.map(csvCell).join(',')].concat(rows.map((r) => [r.month, r.salary, r.bonus, r.ee, r.er, r.after, ...inc.map((l) => r.lines[l.id]), r.takeHome, ...exp.map((l) => r.lines[l.id]), r.extras, r.recurring, r.insurance, r.tax, r.invest, r.savings, r.cum.savings, r.oa, r.sa, r.ma, r.maDed, r.savingsRate].map((v) => csvCell(typeof v === 'number' ? round2(v) : v)).join(',')));
   download(`ledger-${todayISO()}.csv`, lines.join('\n'), 'text/csv');
 }
 
@@ -1736,6 +1987,13 @@ const H = {
   rate: [/interest/i, /rate/i],
   payment: [/payment/i],
 };
+/** Budget line for one of the spreadsheet's fixed columns: the migrated one, a line with that name, or a new one. */
+function legacyLine(key) {
+  const def = LEGACY_LINES[key];
+  let l = S.budgetLines.find((x) => x.id === key) || S.budgetLines.find((x) => x.name.toLowerCase() === def.name.toLowerCase());
+  if (!l) { l = { id: key, ...def }; S.budgetLines.push(l); }
+  return l.id;
+}
 async function importCSV(type) {
   const file = await pickFile('.csv,text/csv');
   if (!file) return;
@@ -1752,15 +2010,16 @@ async function importCSV(type) {
       const sal = parseNum(cellAt(r, map, 'salary'));
       if (!eff || sal == null || eff.length < 10) continue;
       S.assumptions = S.assumptions.filter((a) => a.effective !== eff);
+      const lines = {};
+      for (const [col, key] of [['foodDay', 'food'], ['transportDay', 'transport'], ['parents', 'parents'], ['others', 'others']]) {
+        if (map[col] != null) lines[legacyLine(key)] = parseNum(cellAt(r, map, col)) ?? 0;
+      }
       S.assumptions.push({
         id: uid(), effective: eff, salary: sal,
         age: parseNum(cellAt(r, map, 'age')) ?? 30,
         workDays: parseNum(cellAt(r, map, 'workDays')) ?? 22,
-        foodDay: parseNum(cellAt(r, map, 'foodDay')) ?? 0,
-        transportDay: parseNum(cellAt(r, map, 'transportDay')) ?? 0,
-        parents: parseNum(cellAt(r, map, 'parents')) ?? 0,
+        lines,
         investPct: parseNum(cellAt(r, map, 'investPct')) ?? 0,
-        others: parseNum(cellAt(r, map, 'others')) ?? 0,
         notes: (cellAt(r, map, 'notes') || '').trim(),
       });
       added++;
@@ -1781,12 +2040,15 @@ async function importCSV(type) {
       added++;
     }
     // Detect months that were edited by hand in the sheet: if the sheet value differs from ours, keep it as an override.
+    const lineIds = Object.fromEntries(Object.keys(LEGACY_LINES).filter((k) => map[k] != null).map((k) => [k, legacyLine(k)]));
     const comp = Object.fromEntries(computeLedger().map((x) => [x.entry.id, x]));
     for (const [e, r] of imported) {
-      for (const k of ['salary', 'food', 'transport', 'parents', 'others']) {
-        const v = parseNum(cellAt(r, map, k));
-        if (v == null || !comp[e.id]) continue;
-        if (Math.abs(v - comp[e.id][k]) > 0.01) { e[k] = v; adjusted++; }
+      if (!comp[e.id]) continue;
+      const v = parseNum(cellAt(r, map, 'salary'));
+      if (v != null && Math.abs(v - comp[e.id].salary) > 0.01) { e.salary = v; adjusted++; }
+      for (const [k, id] of Object.entries(lineIds)) {
+        const lv = parseNum(cellAt(r, map, k));
+        if (lv != null && Math.abs(lv - (comp[e.id].lines[id] || 0)) > 0.01) { (e.lines = e.lines || {})[id] = lv; adjusted++; }
       }
     }
   } else if (type === 'deposits' || type === 'portfolio') {
@@ -1884,9 +2146,18 @@ function sampleData() {
   const d = defaultData();
   const start = addMonths(thisMonth(), -10);
   d.settings = { ...d.settings, startCash: 8000, goalName: 'Emergency fund + house', goalAmount: 60000, cpfStart: { oa: 12000, sa: 4000, ma: 6000 }, bankBalance: null };
+  d.budgetLines.push(
+    { id: 'rent', name: 'Rent / housing', kind: 'expense', basis: 'month' },
+    { id: 'utilities', name: 'Utilities & phone', kind: 'expense', basis: 'month' },
+    { id: 'side', name: 'Side income', kind: 'income', basis: 'month', taxable: true },
+  );
   d.assumptions = [
-    { id: uid(), effective: addMonths(start, -1) + '-28', salary: 4200, age: 28, workDays: 22, foodDay: 12, transportDay: 4.5, parents: 400, investPct: 0.2, others: 150, notes: 'Example starting point' },
-    { id: uid(), effective: addMonths(start, 5) + '-01', salary: 4500, age: 28, workDays: 22, foodDay: 13, transportDay: 4.5, parents: 400, investPct: 0.25, others: 150, notes: 'Example raise' },
+    { id: uid(), effective: addMonths(start, -1) + '-28', salary: 4200, age: 28, workDays: 22, lines: { food: 12, transport: 4.5, parents: 400, others: 150, rent: 0, utilities: 90, side: 0 }, investPct: 0.2, notes: 'Example starting point' },
+    { id: uid(), effective: addMonths(start, 5) + '-01', salary: 4500, age: 28, workDays: 22, lines: { food: 13, transport: 4.5, parents: 400, others: 150, rent: 0, utilities: 95, side: 300 }, investPct: 0.25, notes: 'Example raise and weekend tutoring' },
+  ];
+  d.recurring = [
+    { id: uid(), name: 'Overseas holiday', amount: 2400, every: 12, start: addMonths(thisMonth(), 2), end: '', mode: 'spread' },
+    { id: uid(), name: 'Chinese New Year / festive', amount: 800, every: 12, start: addMonths(start, 1), end: '', mode: 'due' },
   ];
   for (let i = 0; i < 10; i++) d.ledger.push({ id: uid(), month: addMonths(start, i), bonus: i === 6 ? 2000 : 0, maDed: 0, ...(i === 3 ? { extras: [{ label: 'Laptop repair', amount: 280 }] } : {}) });
   for (let i = 0; i < 10; i++) d.deposits.push({ id: uid(), date: addMonths(start, i + 1) + '-01', amount: i < 5 ? 750 : 1000, notes: 'Index fund' });

@@ -1,5 +1,5 @@
 /* Offline cache for the app shell. Only same-origin app files are cached — no data ever passes through here. */
-const VERSION = 'ledger-local-v1.7.0';
+const VERSION = 'ledger-local-v1.8.0';
 const SHELL = ['./', 'index.html', 'app.js', 'styles.css', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

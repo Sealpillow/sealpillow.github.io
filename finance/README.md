@@ -1,7 +1,9 @@
 # Ledger Local
 
 A private, offline personal finance tracker that runs entirely in your browser.
-Monthly ledger, Singapore CPF (OA/SA/MA), income tax with reliefs, investments, liabilities,
+Monthly ledger built from your own budget lines (rent, utilities, childcare… and extra income such as
+side or rental income), recurring costs (holidays, festive spending, yearly bills — paid when due or set
+aside monthly), Singapore CPF (OA/SA/MA), income tax with reliefs, investments, liabilities,
 insurance premiums, savings goal and net worth.
 
 **Your data never leaves your device.**
