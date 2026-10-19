@@ -37,6 +37,29 @@ then **Settings & data → Import CSV** — import *Assumptions History* first, 
 
 Non-Singapore users can switch off CPF, change the currency and replace the tax table.
 
+## Sources (checked October 2026)
+
+Every Singapore figure built into the app links to its official page in the app itself (next to the figure,
+and listed under **Settings & data → Sources**). The figures live in the `SG` and `SOURCES` tables in `app.js`.
+
+| Figure | Source |
+|---|---|
+| Resident income tax brackets (YA 2024+) | [IRAS: income tax rates](https://www.iras.gov.sg/taxes/individual-income-tax/basics-of-individual-income-tax/tax-residency-and-tax-rates/individual-income-tax-rates) |
+| Personal reliefs, $80,000 relief cap | [IRAS: tax reliefs](https://www.iras.gov.sg/taxes/individual-income-tax/basics-of-individual-income-tax/tax-reliefs-rebates-and-deductions/tax-reliefs) |
+| QCR $4,000, Child Relief (Disability) $7,500 | [IRAS: Qualifying Child Relief](https://www.iras.gov.sg/taxes/individual-income-tax/basics-of-individual-income-tax/tax-reliefs-rebates-and-deductions/tax-reliefs/qualifying-child-relief-(qcr)-handicapped-child-relief-(hcr)) |
+| WMCR amounts | [IRAS: Working Mother's Child Relief](https://www.iras.gov.sg/taxes/individual-income-tax/basics-of-individual-income-tax/tax-reliefs-rebates-and-deductions/tax-reliefs/working-mother's-child-relief-(wmcr)) |
+| Parenthood Tax Rebate | [IRAS: I have a newborn](https://www.iras.gov.sg/taxes/individual-income-tax/employees/your-situation/i-have-a-newborn) |
+| Buyer's Stamp Duty bands | [IRAS: Buyer's Stamp Duty](https://www.iras.gov.sg/taxes/stamp-duty/for-property/buying-or-acquiring-property/buyer's-stamp-duty-(bsd)) |
+| CPF contribution rates | [CPF: contribution rates](https://www.cpf.gov.sg/employer/employer-obligations/how-much-cpf-contributions-to-pay) |
+| CPF allocation rates | [CPF: allocation rates 2026 (PDF)](https://www.cpf.gov.sg/content/dam/web/employer/employer-obligations/documents/CPFAllocationRatesfromJanuary2026.pdf) |
+| Retirement sums, CPF LIFE estimates | [CPF: how much payout can I get](https://www.cpf.gov.sg/service/article/how-much-cpf-payouts-can-i-get-every-month) |
+| HDB loan rate and 75% limit | [CPF: HDB loan vs bank loan](https://www.cpf.gov.sg/member/infohub/educational-resources/3-differences-between-hdb-loan-and-bank-loan) |
+| Loan-to-value limits | [MAS: loan tenure and LTV limits](https://www.mas.gov.sg/regulation/explainers/new-housing-loans/loan-tenure-and-loan-to-value-limits) |
+| MSR 30%, TDSR 55% | [MAS: MSR and TDSR rules](https://www.mas.gov.sg/regulation/explainers/new-housing-loans/msr-and-tdsr-rules) |
+| CPF refund on selling a home | [CPF: refund when selling a property](https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/cpf-refund-when-selling-or-transferring-property) |
+| 9× / 4× cover, emergency fund, premium share | [MoneySense: Basic Financial Planning Guide](https://www.moneysense.gov.sg/planning-your-finances-well/) |
+| MediShield Life, Integrated Shield Plans | [CPF: MediShield Life](https://www.cpf.gov.sg/member/healthcare-financing/medishield-life), [CPF: Integrated Shield Plans](https://www.cpf.gov.sg/member/healthcare-financing/getting-supplementary-coverage/integrated-shield-plan) |
+
 ## Deploy your own copy (GitHub Pages, free)
 
 1. Create a **public** repository and upload these files to the root of the `main` branch.

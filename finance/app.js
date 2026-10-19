@@ -300,7 +300,7 @@ const RECURRING_PRESETS = [
  */
 const SG = {
   ltv: 0.75, // HDB and bank loan-to-value limit for a first housing loan
-  hdbRate: 0.026, // HDB concessionary loan rate (0.1% above the CPF OA rate)
+  hdbRate: 0.026, // HDB concessionary loan rate (pegged to the CPF OA rate)
   msr: 0.3, // Mortgage Servicing Ratio cap (HDB flats and ECs)
   tdsr: 0.55, // Total Debt Servicing Ratio cap
   bankMinCash: 0.05, // bank loans: at least 5% of the price in cash
@@ -314,6 +314,31 @@ const SG = {
   cpfLifeAtFrs: 1780, // CPF's estimate: FRS at 55 → ~$1,780/month from 65 (Standard plan)
   coverDeath: 9, coverCI: 4, maxPremiumShare: 0.15, // MoneySense Basic Financial Planning Guide
 };
+// Official pages behind those figures, shown next to them and listed in Settings & data so they can be checked.
+const SOURCES_CHECKED = 'October 2026';
+const SOURCES = {
+  taxRates: { label: 'IRAS: income tax rates', covers: 'Resident tax brackets from YA 2024', url: 'https://www.iras.gov.sg/taxes/individual-income-tax/basics-of-individual-income-tax/tax-residency-and-tax-rates/individual-income-tax-rates' },
+  reliefs: { label: 'IRAS: tax reliefs', covers: 'Personal reliefs and the $80,000 relief cap', url: 'https://www.iras.gov.sg/taxes/individual-income-tax/basics-of-individual-income-tax/tax-reliefs-rebates-and-deductions/tax-reliefs' },
+  qcr: { label: 'IRAS: Qualifying Child Relief', covers: 'QCR $4,000, Child Relief (Disability) $7,500, $50,000 per-child cap with WMCR', url: 'https://www.iras.gov.sg/taxes/individual-income-tax/basics-of-individual-income-tax/tax-reliefs-rebates-and-deductions/tax-reliefs/qualifying-child-relief-(qcr)-handicapped-child-relief-(hcr)' },
+  wmcr: { label: 'IRAS: Working Mother’s Child Relief', covers: 'WMCR $8k / $10k / $12k from 2024; 15% / 20% / 25% before', url: 'https://www.iras.gov.sg/taxes/individual-income-tax/basics-of-individual-income-tax/tax-reliefs-rebates-and-deductions/tax-reliefs/working-mother\'s-child-relief-(wmcr)' },
+  newborn: { label: 'IRAS: I have a newborn', covers: 'Parenthood Tax Rebate $5k / $10k / $20k', url: 'https://www.iras.gov.sg/taxes/individual-income-tax/employees/your-situation/i-have-a-newborn' },
+  bsd: { label: 'IRAS: Buyer’s Stamp Duty', covers: 'BSD bands 1%–6%', url: 'https://www.iras.gov.sg/taxes/stamp-duty/for-property/buying-or-acquiring-property/buyer\'s-stamp-duty-(bsd)' },
+  cpfRates: { label: 'CPF: contribution rates', covers: 'Employee and employer rates by age', url: 'https://www.cpf.gov.sg/employer/employer-obligations/how-much-cpf-contributions-to-pay' },
+  cpfAlloc: { label: 'CPF: allocation rates 2026 (PDF)', covers: 'OA / SA (RA) / MA shares by age', url: 'https://www.cpf.gov.sg/content/dam/web/employer/employer-obligations/documents/CPFAllocationRatesfromJanuary2026.pdf' },
+  cpfPayouts: { label: 'CPF: how much payout can I get', covers: '2026 retirement sums; CPF LIFE ≈ $1,780/month for the FRS', url: 'https://www.cpf.gov.sg/service/article/how-much-cpf-payouts-can-i-get-every-month' },
+  hdbLoan: { label: 'CPF: HDB loan vs bank loan', covers: 'HDB loan 2.6%, up to 75% of the price', url: 'https://www.cpf.gov.sg/member/infohub/educational-resources/3-differences-between-hdb-loan-and-bank-loan' },
+  masLtv: { label: 'MAS: loan-to-value limits', covers: '75% LTV, 5% minimum cash (bank loans)', url: 'https://www.mas.gov.sg/regulation/explainers/new-housing-loans/loan-tenure-and-loan-to-value-limits' },
+  masTdsr: { label: 'MAS: MSR and TDSR rules', covers: 'MSR 30% (HDB / EC), TDSR 55%', url: 'https://www.mas.gov.sg/regulation/explainers/new-housing-loans/msr-and-tdsr-rules' },
+  cpfRefund: { label: 'CPF: refund when selling a property', covers: 'CPF used plus accrued interest goes back to your OA', url: 'https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/cpf-refund-when-selling-or-transferring-property' },
+  moneysense: { label: 'MoneySense: Basic Financial Planning Guide', covers: '9× / 4× income cover, 3–6 months’ emergency fund, premiums ≤ 15% of income', url: 'https://www.moneysense.gov.sg/planning-your-finances-well/' },
+  medishield: { label: 'CPF: MediShield Life', covers: 'Basic hospital cover sized for B2 / C wards', url: 'https://www.cpf.gov.sg/member/healthcare-financing/medishield-life' },
+  shield: { label: 'CPF: Integrated Shield Plans', covers: 'How much of a plan’s premium MediSave can pay', url: 'https://www.cpf.gov.sg/member/healthcare-financing/getting-supplementary-coverage/integrated-shield-plan' },
+};
+/** "Sources: …" line of links to the official pages behind a page's figures. Opens in a new tab. */
+function sourceLinks(...keys) {
+  return el('p', { class: 'sources' }, 'Sources: ', keys.map((k, i) => [i ? ' · ' : '', el('a', { href: SOURCES[k].url, target: '_blank', rel: 'noopener noreferrer', title: SOURCES[k].covers, text: SOURCES[k].label + ' ↗' })]), ` (checked ${SOURCES_CHECKED})`);
+}
+
 // Monthly cost by a child's age. Amounts are yours to fill in — after subsidies, see ECDA (pre-school) and MOE fees.
 const defaultStages = () => [
   ['Infant care', 0, 1.5], ['Pre-school', 1.5, 7], ['Primary school', 7, 13], ['Secondary school', 13, 17],
@@ -1829,6 +1854,7 @@ function pageGoals() {
     sm.goals.length ? el('div', { class: 'card section-gap' }, sm.goals.map(goalBlock)) : null,
     el('div', { class: 'section-gap' }, editTable({ cols, rows: S.goals, onDelete: (g) => undoable(`${g.name || 'Goal'} removed`, () => { S.goals = S.goals.filter((x) => x !== g); }), emptyText: 'No goals yet — add one above.' })),
     el('p', { class: 'card__hint section-gap', text: 'The emergency fund target follows your average spending over the last 6 months (excluding income tax); the usual guide is 3–6 months. Dates assume your last 12 months’ saving pace continues and goes to each goal in turn.' }),
+    sourceLinks('moneysense'),
   );
 }
 
@@ -1891,6 +1917,7 @@ function pageKids() {
         ),
         reliefs.length ? kv(reliefs.map((r) => [r.name, money(r.amount)])) : el('p', { class: 'muted', text: `No child reliefs for ${year}.` }),
         el('p', { class: 'card__hint section-gap', text: `Qualifying Child Relief ${money(SG.qcr, { compact: true })} per child (${money(SG.childDisability, { compact: true })} with a disability) while under 16 or studying full-time. WMCR for children born from 2024: ${SG.wmcrFixed.map((v) => money(v, { compact: true })).join(' / ')} for the 1st / 2nd / 3rd+; earlier births: ${SG.wmcrPct.map((v) => pct(v, 0)).join(' / ')} of earned income. Parenthood Tax Rebate ${SG.ptr.map((v) => money(v, { compact: true })).join(' / ')}, used against tax from the year of birth and carried forward. These feed the Tax page and the ledger’s income tax. Check IRAS for your case.` }),
+        sourceLinks('qcr', 'wmcr', 'newborn', 'reliefs'),
       ),
     ),
     S.children.length ? el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: 'Kids’ costs per year (today’s prices)' }),
@@ -1998,6 +2025,7 @@ function pageRetirement() {
           ] : []),
         ]),
         el('p', { class: 'card__hint section-gap', text: `A rough projection, not advice. CPF LIFE is scaled from CPF’s estimate of ~${money(SG.cpfLifeAtFrs, { compact: true })}/month (Standard plan, from 65) for the 2026 Full Retirement Sum of ${money(SG.frs2026, { compact: true })}; the FRS is assumed to rise ${pct(SG.frsGrowth, 1)} a year. Savings growth assumes your last 12 months’ pace continues. Use CPF’s Retirement Payout Planner for your own figures.` }),
+        sourceLinks('cpfPayouts'),
       ),
     ),
     el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: `Projection, retiring at ${num(R.age)}` }),
@@ -2092,7 +2120,8 @@ function housingOwn(sm, gross) {
           ['Back to your CPF OA (CPF used + accrued interest)', '−' + money(sm.cpfUsedHome)],
           ['Cash left', money(proceeds), true, sign(proceeds)],
         ]),
-        el('p', { class: 'card__hint section-gap', text: `CPF used for a home goes back into your OA with ${pct(SG.cpfHousingRate)} accrued interest when you sell. Before agent fees and other selling costs.` }),
+        el('p', { class: 'card__hint section-gap', text: `CPF used for a home goes back into your OA with the interest it would have earned there (${pct(SG.cpfHousingRate)}, the OA rate) when you sell. Before agent fees and other selling costs.` }),
+        sourceLinks('cpfRefund', 'hdbLoan', 'masTdsr'),
       ),
     ),
     tracked.length > 1 ? el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: 'Loan balance' }), lineChart([{ name: 'Loan balance', values: tracked.map((r) => r.loanBal) }], tracked.map((r) => monthLabel(r.month).replace(' 20', " '")))) : null,
@@ -2162,6 +2191,7 @@ function housingPlan(sm, gross) {
           ['Total Debt Servicing Ratio (all debts)', ratio(inst + otherDebt, SG.tdsr)],
         ]),
         el('p', { class: 'card__hint section-gap', text: `${p.loanType === 'bank' ? `Bank loans need at least ${pct(SG.bankMinCash, 0)} of the price in cash. ` : ''}Stamp duty uses the current Buyer’s Stamp Duty bands; Additional Buyer’s Stamp Duty (a second property, PRs, foreigners) is not included. Loan limits shrink for longer tenures and older buyers — confirm with HDB (HDB Flat Eligibility letter) or your bank.` }),
+        sourceLinks('hdbLoan', 'masLtv', 'masTdsr', 'bsd'),
         el('div', { class: 'page__actions section-gap' },
           el('button', { class: 'btn btn--primary', type: 'button', text: 'Save the cash as a goal', onclick: makeGoal, disabled: !(cash > 0) }),
           el('button', { class: 'btn', type: 'button', text: 'I’ve bought it', onclick: bought, disabled: !(price > 0) }),
@@ -2246,6 +2276,7 @@ function coverCard() {
       ['Premiums this year', `${money(premiums)} · ${income > 0 ? pct(premiums / income) : '–'} of income (guide: up to ${pct(SG.maxPremiumShare, 0)})`],
     ]),
     el('p', { class: 'card__hint section-gap', text: `Guide multiples are from the MoneySense Basic Financial Planning Guide (based on LIA’s protection gap study). They are rules of thumb — what you need depends on dependants, debts and other savings. Annual income here = salary × 12 + bonuses in the last 12 months (${money(income, { compact: true })}).` }),
+    sourceLinks('moneysense', 'medishield', 'shield'),
   );
 }
 
@@ -2373,6 +2404,7 @@ function pageTax() {
         field('Donations to approved IPCs (amount given)', inputFor(S.donations, { key: year, type: 'money', label: 'Donations' }), `Deducted at ${num(S.settings.donationMultiplier) * 100}%. Not part of the relief cap.`),
         kv([['Donation tax saving', money(donSaved), true, 'pos']]),
         el('p', { class: 'card__hint section-gap', text: 'Relief amounts and caps change — check the current rules on the IRAS website. This is an estimate, not tax advice.' }),
+        sourceLinks('reliefs', 'qcr', 'newborn'),
       ),
     ),
     el('div', { class: 'card section-gap' },
@@ -2381,6 +2413,7 @@ function pageTax() {
     ),
     el('h2', { class: 'section-gap', text: 'Tax brackets' }),
     el('p', { class: 'card__hint', text: 'Default: Singapore resident rates, YA2024 onwards. Edit lower bound or rate if they change — base tax recalculates itself. Non-Singapore users can replace the whole table.' }),
+    sourceLinks('taxRates'),
     el('div', { class: 'page__actions' },
       el('button', { class: 'btn btn--small', type: 'button', text: '+ Bracket', onclick: () => { S.taxBrackets.push({ id: uid(), lower: 0, rate: 0 }); commit(); } }),
       el('button', { class: 'btn btn--small', type: 'button', text: 'Reset to SG defaults', onclick: () => undoable('Tax brackets reset to Singapore defaults', () => { S.taxBrackets = DEFAULT_TAX.map((r) => ({ ...r, id: uid() })); }) }),
@@ -2504,6 +2537,7 @@ function pageData() {
       el('div', { class: 'card' },
         el('div', { class: 'card__title' }, el('span', { text: 'CPF contribution schedule' }), el('button', { class: 'btn btn--small', type: 'button', text: '+ Row', onclick: () => { const last = S.cpfSchedule[S.cpfSchedule.length - 1]; S.cpfSchedule.push({ ...last, id: uid() }); commit(); } })),
         el('p', { class: 'card__hint', text: 'Rows with the latest “From” date on or before a month are used. To add a new year, add one row per age band with the new From date. Contribution rates are % of wages; OA and MA allocations are shares of the total contribution, and SA/RA gets the rest.' }),
+        sourceLinks('cpfRates', 'cpfAlloc'),
       ),
     ),
     el('div', { class: 'section-gap' }, editTable({
@@ -2515,6 +2549,12 @@ function pageData() {
       rows: [...S.cpfSchedule].sort((a, b) => String(a.from).localeCompare(String(b.from)) || num(a.ageAbove) - num(b.ageAbove)),
       onDelete: (r) => undoable('CPF schedule row deleted', () => { S.cpfSchedule = S.cpfSchedule.filter((x) => x !== r); }),
     })),
+    el('div', { class: 'card section-gap', id: 'sources' },
+      el('div', { class: 'card__title', text: 'Sources' }),
+      el('p', { class: 'card__hint', text: `The Singapore rates, limits and guidelines built into Ledger Local, and the official pages they come from. Checked ${SOURCES_CHECKED}. They change — usually with the Budget in February and at the start of each year — so check the page when a number matters.` }),
+      el('ul', { class: 'source-list' }, Object.values(SOURCES).map((s) => el('li', null,
+        el('a', { href: s.url, target: '_blank', rel: 'noopener noreferrer', text: s.label + ' ↗' }), el('span', { class: 'muted', text: ' — ' + s.covers })))),
+    ),
     el('p', { class: 'card__hint section-gap', text: 'Ledger Local is a tracking tool, not financial or tax advice. Figures are estimates.' }),
   );
 }
