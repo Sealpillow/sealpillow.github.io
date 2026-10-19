@@ -384,7 +384,8 @@ function defaultData() {
     cpfSchedule: structuredClone(DEFAULT_CPF),
     ledger: [],
     deposits: [],
-    portfolio: [],
+    portfolio: [], // [{ date, value, account? }] — each account keeps its own latest value; blank = typed-in total
+    dividends: [], // [{ date, amount, account }] from imported statements
     liabilities: [],
     policies: [],
     taxBrackets: structuredClone(DEFAULT_TAX),
@@ -398,7 +399,7 @@ function migrate(d) {
   const base = defaultData();
   const out = { ...base, ...d, settings: { ...base.settings, ...(d.settings || {}) } };
   out.settings.cpfStart = { ...base.settings.cpfStart, ...(d.settings?.cpfStart || {}) };
-  for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'liabilities', 'policies', 'recurring', 'goals', 'children']) if (!Array.isArray(out[k])) out[k] = [];
+  for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'dividends', 'liabilities', 'policies', 'recurring', 'goals', 'children']) if (!Array.isArray(out[k])) out[k] = [];
   if (!Array.isArray(out.childStages)) out.childStages = base.childStages;
   out.housing = { ...base.housing, ...(d.housing || {}), plan: { ...base.housing.plan, ...(d.housing?.plan || {}) } };
   out.retire = { ...base.retire, ...(d.retire || {}) };
@@ -749,7 +750,7 @@ function summary() {
   const planned = last ? last.cum.invest : 0;
   const extraInvested = deposits - planned;
   const pv = [...S.portfolio].filter((p) => p.date).sort(byKey('date'));
-  const portfolio = pv.length ? num(pv[pv.length - 1].value) : 0;
+  const portfolio = portfolioTotal(pv);
   const liabilities = sum(S.liabilities, (l) => l.balance);
   const cumSavings = last ? last.cum.savings : 0;
   const cpf = st.cpfEnabled ? (last ? last.cpfTotal : num(st.cpfStart.oa) + num(st.cpfStart.sa) + num(st.cpfStart.ma)) : 0;
@@ -780,6 +781,13 @@ function summary() {
     emergencyMonths: spendAvg > 0 ? emergencyCash / spendAvg : null,
     goals: goalPlan(saved, pace, spendAvg),
   };
+}
+
+/** Portfolio value: the latest value of each account (typed-in values count as one account), added up. */
+function portfolioTotal(entries) {
+  const latest = {};
+  for (const p of [...entries].filter((x) => x.date).sort(byKey('date'))) latest[p.account || ''] = num(p.value);
+  return sum(Object.values(latest));
 }
 
 /**
@@ -1022,10 +1030,10 @@ async function renderLock() {
   btn.focus();
 }
 
-function pickFile(accept) {
+function pickFile(accept, multiple = false) {
   return new Promise((res) => {
-    const i = el('input', { type: 'file', accept, class: 'hide' });
-    i.addEventListener('change', () => { res(i.files[0] || null); i.remove(); });
+    const i = el('input', { type: 'file', accept, class: 'hide', multiple });
+    i.addEventListener('change', () => { res(multiple ? [...i.files] : i.files[0] || null); i.remove(); });
     document.body.append(i);
     i.click();
   });
@@ -1947,6 +1955,9 @@ function setupSaving(a) {
         },
       }), 'Value of stocks, ETFs, funds, SSBs, T-bills…'),
     ),
+    el('p', { class: 'card__hint' }, 'Invest with Tiger Brokers? ',
+      el('button', { class: 'link-btn', type: 'button', text: 'Import your monthly statement PDFs', onclick: importStatements }),
+      ' to fill in the account value, deposits and dividends. (Then leave “Investments today” for your other investments only.)'),
     S.settings.cpfEnabled ? [
       el('h3', { class: 'section-gap', text: 'CPF balances today' }),
       el('p', { class: 'card__hint', text: 'From the CPF app or website (My CPF → balances).' }),
@@ -2464,18 +2475,88 @@ function housingPlan(sm, gross) {
   );
 }
 
+/* ---------- Statement import (PDF read in the browser by statement.js) ---------- */
+/** What importing one parsed statement would change, converted to the app's currency. */
+function statementPlan(r, target) {
+  const conv = (amount, cur) => { const v = stmtConvert(r, amount, cur, target); return v == null ? null : round2(v); };
+  const value = conv(r.value, r.base);
+  const moves = r.moves.map((m, i) => ({ ...m, converted: conv(m.amount, m.currency), key: `${r.source}|${m.date}|${m.amount}|${m.currency}|${i}` }));
+  const fresh = moves.filter((m) => !S.deposits.some((d) => d.importKey === m.key));
+  const divs = Object.entries(r.dividends).map(([cur, amount]) => ({ cur, amount, converted: conv(amount, cur) }));
+  const missingFx = value == null || moves.some((m) => m.converted == null) || divs.some((d) => d.converted == null);
+  return {
+    r, target, value, moves, fresh, divs, divTotal: sum(divs, (d) => d.converted), missingFx,
+    replacesValue: S.portfolio.some((p) => p.account === r.account && p.date === r.periodEnd),
+  };
+}
+function applyStatementPlan(pl) {
+  const { r, target } = pl;
+  const ex = S.portfolio.find((p) => p.account === r.account && p.date === r.periodEnd);
+  if (ex) ex.value = pl.value; else S.portfolio.push({ id: uid(), date: r.periodEnd, value: pl.value, account: r.account, notes: `${r.source} statement` });
+  for (const m of pl.fresh) {
+    S.deposits.push({ id: uid(), date: m.date, amount: m.converted, notes: `${r.source}: ${m.desc}${m.currency !== target ? ` (${m.currency} ${m.amount})` : ''}`, importKey: m.key });
+  }
+  const key = `${r.source}|${r.periodEnd}`;
+  S.dividends = S.dividends.filter((d) => d.importKey !== key);
+  if (pl.divTotal) S.dividends.push({ id: uid(), date: r.periodEnd, amount: round2(pl.divTotal), account: r.account, notes: `${r.source} statement`, importKey: key });
+}
+async function importStatements() {
+  const files = await pickFile('.pdf,application/pdf', true);
+  if (!files?.length) return;
+  const target = S.settings.currency || 'SGD';
+  const done = [], failed = [];
+  for (const f of files) {
+    try { done.push({ name: f.name, plan: statementPlan(await readStatement(new Uint8Array(await f.arrayBuffer())), target) }); } catch (e) { failed.push({ name: f.name, error: e.message }); }
+  }
+  const usable = done.filter((d) => !d.plan.missingFx).sort((a, b) => (a.plan.r.periodEnd < b.plan.r.periodEnd ? -1 : 1));
+  const fmtAmt = (cur, v) => `${cur} ${v.toLocaleString(S.settings.locale || 'en-SG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const body = [
+    ...done.map(({ name, plan: pl }) => el('div', { class: 'card import-card' },
+      el('div', { class: 'card__title', text: `${pl.r.source} · ${dateLabel(pl.r.periodStart)} – ${dateLabel(pl.r.periodEnd)}` }),
+      pl.missingFx ? el('p', { class: 'neg', text: `Can’t convert to ${target}: the statement has no ${target} exchange rate. Not imported.` }) : kv([
+        ['Account value at period end', money(pl.value) + (pl.r.base !== target ? ` (${fmtAmt(pl.r.base, pl.r.value)})` : ''), true],
+        ['Deposits / withdrawals', pl.moves.length ? `${pl.fresh.length} new · ${money(sum(pl.fresh, (m) => m.converted))}${pl.moves.length > pl.fresh.length ? ` · ${pl.moves.length - pl.fresh.length} already imported` : ''}` : 'None'],
+        ['Cash dividends received', pl.divTotal ? money(pl.divTotal) : 'None'],
+      ]),
+      pl.replacesValue && !pl.missingFx ? el('p', { class: 'card__hint', text: 'Updates the value already imported for this date.' }) : null,
+      pl.r.other.length ? el('p', { class: 'card__hint', text: `${pl.r.other.length} other cash movement(s) not imported.` }) : null,
+      el('p', { class: 'card__hint muted', text: name }),
+    )),
+    ...failed.map((f) => el('div', { class: 'notice' }, el('strong', { text: f.name }), el('div', { text: f.error }))),
+    usable.length ? el('p', { class: 'card__hint', text: `The account value goes into the portfolio log as its own account (“${usable[0].plan.r.account}”), added to any values you type in — if a typed-in value already includes this account, lower it. Deposits count as money you invested; dividends are listed on the Investments page. Converted with each statement’s own exchange rate.` }) : null,
+    el('p', { class: 'card__hint', text: `Read on this device — the file is not uploaded anywhere. Supported: ${STATEMENT_SUPPORTED}.` }),
+  ];
+  openDialog(usable.length ? `Import ${usable.length} statement${usable.length === 1 ? '' : 's'}?` : 'Nothing to import', body, [
+    { label: usable.length ? 'Cancel' : 'Close' },
+    ...(usable.length ? [{ label: 'Import', primary: true, run: () => {
+      for (const d of usable) applyStatementPlan(statementPlan(d.plan.r, target)); // re-plan in order, so duplicates within the batch are skipped too
+      commit();
+      toast(`Imported ${usable.length} statement${usable.length === 1 ? '' : 's'}`);
+    } }] : []),
+  ]);
+}
+
 function pageInvestments() {
   const sm = summary();
   const dep = [...S.deposits].sort(byKey('date'));
   const pv = [...S.portfolio].sort(byKey('date'));
   const gain = sm.portfolio - sm.deposits;
+  const yearAgo = addMonths(thisMonth(), -12);
+  const divYear = sum(S.dividends.filter((d) => d.date.slice(0, 7) > yearAgo), (d) => d.amount);
+  // Total over time: at each logged date, every account's latest value so far, added up.
+  const dates = [...new Set(pv.filter((p) => p.date).map((p) => p.date))];
+  const running = {};
+  const totals = dates.map((d) => { for (const p of pv.filter((x) => x.date === d)) running[p.account || ''] = num(p.value); return sum(Object.values(running)); });
+  const typedIn = [...pv].reverse().find((p) => !p.account);
   return el('div', null,
-    pageHead('Investments', 'Log what you actually deposit, and update the portfolio value whenever you check it.'),
+    pageHead('Investments', 'Log what you actually deposit, and update the portfolio value whenever you check it — or import a statement.',
+      el('button', { class: 'btn btn--primary', type: 'button', text: 'Import statement (PDF)', onclick: importStatements })),
     el('div', { class: 'grid grid--stats' },
       stat('Portfolio value', money(sm.portfolio), sm.portfolioDate ? `As of ${dateLabel(sm.portfolioDate)}` : 'No value logged', true),
       stat('Total deposited', money(sm.deposits)),
       stat('Gain / loss', money(gain), sm.deposits ? pct(gain / sm.deposits) : null),
       stat('Actual vs planned', money(sm.extraInvested), `Planned so far ${money(sm.planned)}`),
+      ...(S.dividends.length ? [stat('Dividends, last 12 months', money(divYear), 'Cash dividends from imported statements')] : []),
     ),
     el('p', { class: 'card__hint section-gap', text: 'The ledger subtracts your planned investment. Any difference between actual and planned deposits is corrected in net worth and expected cash, so nothing is counted twice.' }),
     el('div', { class: 'grid grid--two section-gap' },
@@ -2484,11 +2565,22 @@ function pageInvestments() {
         editTable({ cols: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'amount', label: 'Amount', type: 'money' }, { key: 'notes', label: 'Notes', type: 'text' }], rows: dep, onDelete: (r) => undoable('Deposit deleted', () => { S.deposits = S.deposits.filter((x) => x !== r); }), totals: dep.length ? { amount: sm.deposits } : null }),
       ),
       el('div', null,
-        el('div', { class: 'card__title' }, el('span', { text: 'Portfolio value log' }), el('button', { class: 'btn btn--small btn--primary', type: 'button', text: '+ Value', onclick: () => { S.portfolio.push({ id: uid(), date: todayISO(), value: sm.portfolio, notes: '' }); commit(); } })),
-        editTable({ cols: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'value', label: 'Value', type: 'money' }, { key: 'notes', label: 'Notes', type: 'text' }], rows: pv, onDelete: (r) => undoable('Portfolio value deleted', () => { S.portfolio = S.portfolio.filter((x) => x !== r); }) }),
+        el('div', { class: 'card__title' }, el('span', { text: 'Portfolio value log' }), el('button', { class: 'btn btn--small btn--primary', type: 'button', text: '+ Value', onclick: () => { S.portfolio.push({ id: uid(), date: todayISO(), value: num(typedIn?.value), notes: '' }); commit(); } })),
+        editTable({ cols: [{ key: 'date', label: 'Date', type: 'date' }, { key: 'value', label: 'Value', type: 'money' }, { key: 'account', label: 'Account', type: 'text' }, { key: 'notes', label: 'Notes', type: 'text' }], rows: pv, onDelete: (r) => undoable('Portfolio value deleted', () => { S.portfolio = S.portfolio.filter((x) => x !== r); }) }),
+        el('p', { class: 'card__hint', text: 'Each account’s latest value is added up. Leave Account blank for values you type in yourself.' }),
       ),
     ),
-    pv.length > 1 ? el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: 'Portfolio value' }), lineChart([{ name: 'Portfolio value', values: pv.map((p) => num(p.value)) }], pv.map((p) => dateLabel(p.date).replace(/^\d+ /, '')))) : null,
+    dates.length > 1 ? el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: 'Portfolio value' }), lineChart([{ name: 'Portfolio value', values: totals }], dates.map((d) => dateLabel(d).replace(/^\d+ /, '')))) : null,
+    S.dividends.length ? el('div', { class: 'section-gap' },
+      el('div', { class: 'card__title', text: 'Dividends received' }),
+      editTable({
+        cols: [{ key: 'date', label: 'Statement date', type: 'date', readonly: true }, { key: 'amount', label: 'Amount', type: 'money', readonly: true }, { key: 'account', label: 'Account', type: 'text', readonly: true }],
+        rows: [...S.dividends].sort(byKey('date')).reverse(),
+        onDelete: (r) => undoable('Dividend entry deleted', () => { S.dividends = S.dividends.filter((x) => x !== r); }),
+        totals: { amount: sum(S.dividends, (d) => d.amount) },
+      }),
+      el('p', { class: 'card__hint', text: 'Already part of the account value, so not added to your savings again.' }),
+    ) : null,
   );
 }
 
@@ -2772,6 +2864,9 @@ function pageData() {
           ['assumptions', 'ledger', 'deposits', 'portfolio', 'liabilities'].map((t) => el('button', { class: 'btn btn--small', type: 'button', text: { assumptions: 'Assumptions History', ledger: 'Monthly Ledger', deposits: 'Investment deposits', portfolio: 'Portfolio values', liabilities: 'Liabilities' }[t], onclick: () => importCSV(t) })),
         ),
         el('p', { class: 'card__hint', text: 'Deposits / portfolio CSV: a header row with Date and Amount (or Value) columns, plus optional Notes.' }),
+        el('div', { class: 'card__title section-gap', text: 'Import statements (PDF)' }),
+        el('p', { class: 'card__hint', text: `Account value, deposits and dividends from your statement PDFs, read on this device. Supported: ${STATEMENT_SUPPORTED}.` }),
+        el('button', { class: 'btn', type: 'button', text: 'Choose statement PDFs…', onclick: importStatements }),
       ),
     ),
     el('div', { class: 'grid grid--two section-gap' },

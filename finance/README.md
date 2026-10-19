@@ -29,6 +29,13 @@ After the first visit it works offline.
 Coming from the Google Sheets version: in each tab use *File → Download → Comma-separated values (.csv)*,
 then **Settings & data → Import CSV** — import *Assumptions History* first, then *Monthly Ledger*.
 
+**Statement import (PDF).** On **Investments → Import statement (PDF)**, choose one or more statement PDFs. They are
+read in the browser by a small built-in PDF text reader (`statement.js`, no library) — nothing is uploaded. Supported
+now: **Tiger Brokers (Singapore) monthly statements** — the account value at the end of the period (converted with the
+statement's own exchange rate), deposits/withdrawals and cash dividends. Re-importing a statement does not duplicate
+anything. Scanned statements (images) have no text and can't be read. Other banks and brokers can be added as parsers
+in `statement.js`.
+
 ## Defaults (editable in the app)
 
 - Tax brackets: Singapore resident rates, YA2024 onwards.
@@ -74,6 +81,7 @@ When you change files, bump `VERSION` in `sw.js` so installed copies pick up the
 |---|---|
 | `index.html` | Page shell and Content-Security-Policy |
 | `app.js` | All logic: encryption, storage, calculations, UI |
+| `statement.js` | PDF text reader and statement parsers (statement import) |
 | `styles.css` | Styles (light/dark) |
 | `sw.js` | Offline cache for the app files only |
 | `manifest.webmanifest`, `icons/` | Installable app metadata |
