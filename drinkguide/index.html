@@ -312,6 +312,40 @@
   .tier li::before { content: ''; position: absolute; left: 0; top: 15px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
   .tier-label { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
 
+  /* Stay in control */
+  .sub { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin: 32px 0 12px; }
+  .sub:first-of-type { margin-top: 0; }
+
+  .tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .tip { font-size: 14px; color: var(--text-2); }
+  .tip b { display: block; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+
+  .sip-col h3 { display: flex; align-items: center; gap: 8px; }
+  .sip-col .item span:last-child { color: var(--text-2); font-size: 13px; text-align: right; }
+
+  .rescue { list-style: none; counter-reset: step; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0 28px; }
+  .rescue li { counter-increment: step; position: relative; padding: 12px 0 12px 40px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--text-2); }
+  .rescue li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    color: var(--accent);
+    font-size: 13px;
+    text-align: center;
+    line-height: 24px;
+  }
+  .rescue li b { display: block; font-weight: 500; color: var(--ink); }
+
+  .myth { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .myth:last-child { border-bottom: 0; }
+  .myth .m { color: var(--ink); text-decoration: line-through; text-decoration-color: var(--high); text-decoration-thickness: 1px; }
+  .myth .t { color: var(--text-2); }
+
   /* Counter */
   .counter { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
   .cnt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
@@ -359,6 +393,7 @@
     .sec-head { grid-template-columns: 1fr; }
     .sec-num { padding: 0 0 4px; }
     .sec-sub { grid-column: 1; }
+    .myth { grid-template-columns: 1fr; gap: 2px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -397,6 +432,7 @@
       <a href="#wine">Wines</a>
       <a href="#examples">Everyday examples</a>
       <a href="#limits">Your limits</a>
+      <a href="#control">Stay in control</a>
       <a href="#count">Count your night</a>
     </nav>
   </div>
@@ -576,10 +612,79 @@
     </div>
   </section>
 
-  <!-- 06 Counter -->
-  <section id="count">
+  <!-- 06 Stay in control -->
+  <section id="control">
     <div class="sec-head">
       <span class="sec-num">06</span>
+      <div>
+        <h2>Stay in control</h2>
+        <p class="sec-sub">Only two things decide how drunk you get: how much alcohol you drink and how fast. Everything else just changes how quickly it reaches your blood.</p>
+      </div>
+    </div>
+
+    <p class="sub">Before and while you drink</p>
+    <div class="tips">
+      <p class="callout tip"><b>Eat a proper meal first</b>Food, especially protein and fat, holds alcohol in your stomach longer. It can cut your peak level by around a third compared with an empty stomach.</p>
+      <p class="callout tip"><b>Pick your number before you start</b>Decide on 2 standard drinks, say, and count them. Once you're tipsy, your judgement about "one more" gets worse.</p>
+      <p class="callout tip"><b>About 1 standard drink an hour</b>That's roughly how fast your liver clears it. Drink faster and it builds up.</p>
+      <p class="callout tip"><b>A glass of water with every drink</b>It slows you down and keeps your hands busy.</p>
+      <p class="callout tip"><b>Don't let people top you up</b>At dinners and rounds you lose count. Finish your glass before it's refilled, or cover it.</p>
+      <p class="callout tip"><b>Watch fizz and energy drinks</b>Carbonation speeds up absorption. Energy drinks hide how drunk you are.</p>
+      <p class="callout tip"><b>Drink less on an off day</b>Being tired, dehydrated, ill or on medication makes alcohol hit harder.</p>
+    </div>
+
+    <p class="sub">What to sip, pace or avoid gulping</p>
+    <div class="grid-3">
+      <div class="card sip-col">
+        <h3><span class="dot" style="background: var(--mid);"></span>Sip slowly</h3>
+        <div class="item"><span>Whisky or spirits</span><span>neat or on the rocks</span></div>
+        <div class="item"><span>Wine, sake, port</span><span>small sips with food</span></div>
+        <div class="item"><span>Strong or sweet cocktails</span><span>sugar hides the alcohol</span></div>
+        <div class="item"><span>Soju</span><span>sip it, don't shoot it</span></div>
+      </div>
+      <div class="card sip-col">
+        <h3><span class="dot" style="background: var(--low);"></span>Easier to pace</h3>
+        <div class="item"><span>Highball</span><span>one spirit, lots of soda and ice</span></div>
+        <div class="item"><span>Beer or cider</span><span>in a glass, not a jug</span></div>
+        <div class="item"><span>Wine spritzer</span><span>wine topped with soda</span></div>
+        <div class="item"><span>Shandy</span><span>beer with lemonade</span></div>
+      </div>
+      <div class="card sip-col">
+        <h3><span class="dot" style="background: var(--high);"></span>Avoid gulping</h3>
+        <div class="item"><span>Shots</span><span>bottoms up, yam seng</span></div>
+        <div class="item"><span>Soju rounds</span><span>shot after shot</span></div>
+        <div class="item"><span>Bombs</span><span>somaek, Jägerbombs</span></div>
+        <div class="item"><span>Drinking games</span><span>you lose count fast</span></div>
+      </div>
+    </div>
+    <p class="muted small" style="margin-top: 12px;">The trick is more liquid for the same alcohol. A highball and a shot can hold the same 30 ml of spirit, but one takes 20 minutes to drink and the other takes 2 seconds. At toasts, raise your glass and take a small sip.</p>
+
+    <p class="sub">If you drank too much at one go</p>
+    <ol class="rescue">
+      <li><b>Stop drinking now</b>Your blood alcohol keeps rising for 30 to 90 minutes after your last drink, so expect to feel worse before you feel better.</li>
+      <li><b>Tell a friend and stay with them</b>Don't walk home alone, swim, drive or take the stairs on your own.</li>
+      <li><b>Sit down, sip water, eat something plain</b>Bread or crackers won't sober you up, but they slow down what's still in your stomach.</li>
+      <li><b>Feeling sick? Sit up and lean forward</b>Don't make yourself vomit, because you can choke.</li>
+      <li><b>Sleep on your side, never on your back</b>If it's a friend, check their breathing during the night.</li>
+      <li><b>Skip painkillers that night</b>Paracetamol with heavy drinking strains your liver, and ibuprofen irritates your stomach. Wait until the next day, after food.</li>
+    </ol>
+
+    <p class="sub">Myths that don't work</p>
+    <div class="card">
+      <div class="myth"><span class="m">Coffee sobers you up</span><span class="t">You become a wide-awake drunk person who feels more in control than they are.</span></div>
+      <div class="myth"><span class="m">A cold shower helps</span><span class="t">It risks falls and chills, and your blood alcohol stays the same.</span></div>
+      <div class="myth"><span class="m">Throwing up gets it out</span><span class="t">Most of the alcohol is already absorbed, and you can choke.</span></div>
+      <div class="myth"><span class="m">A greasy meal afterwards</span><span class="t">Food helps before you drink, not after it's in your blood.</span></div>
+      <div class="myth"><span class="m">Beer before liquor, never sicker</span><span class="t">The order doesn't matter. The total amount does.</span></div>
+      <div class="myth"><span class="m">Hair of the dog</span><span class="t">A morning drink only delays the hangover.</span></div>
+    </div>
+    <p class="muted small" style="margin-top: 12px;">Only time sobers you up.</p>
+  </section>
+
+  <!-- 07 Counter -->
+  <section id="count">
+    <div class="sec-head">
+      <span class="sec-num">07</span>
       <div>
         <h2>Count your night</h2>
         <p class="sec-sub">Add what you've had to see your total in standard drinks.</p>
@@ -729,7 +834,7 @@
     }).join('') + '</div>';
   }).join('');
 
-  // 06 Counter
+  // 07 Counter
   var COUNT = [
     ['Beer', '330 ml can', stdDrinks(330, 5)],
     ['Cider', '330 ml can', stdDrinks(330, 4.5)],
