@@ -348,6 +348,7 @@ const defaultStages = () => [
 function defaultData() {
   return {
     version: 3,
+    setup: { done: false, skipped: {} }, // first-run guided setup; skipped steps show as such in its checklist
     settings: {
       currency: 'SGD',
       locale: 'en-SG',
@@ -420,6 +421,8 @@ function migrate(d) {
       for (const id of Object.keys(LEGACY_LINES)) { if (e[id] != null && e[id] !== '') e.lines[id] = e[id]; delete e[id]; }
     }
   }
+  // Vaults from before the guided setup are already in use, so it counts as done for them.
+  out.setup = { done: !!(d.assumptions?.length || d.ledger?.length), skipped: {}, ...(d.setup || {}) };
   out.version = 3;
   if (!Array.isArray(out.cpfSchedule) || !out.cpfSchedule.length) out.cpfSchedule = base.cpfSchedule;
   if (!Array.isArray(out.taxBrackets) || !out.taxBrackets.length) out.taxBrackets = base.taxBrackets;
@@ -822,11 +825,13 @@ function checklist(sm) {
   if (S.assumptions.length === 0) {
     items.push({ ok: false, text: 'Add your first assumptions row', detail: 'Salary, CPF age, daily food/transport, investment % — on the Assumptions page.', go: 'assumptions', cta: 'Add' });
   }
-  items.push(has(lastWorked)
-    ? { ok: true, text: `Ledger row for ${monthLabel(lastWorked)} added` }
+  const firstMonth = S.ledger.map((e) => e.month).sort()[0];
+  items.push(has(lastWorked) || firstMonth > lastWorked // a ledger that starts this month has no "last month" yet
+    ? { ok: true, text: has(lastWorked) ? `Ledger row for ${monthLabel(lastWorked)} added` : `Ledger starts ${monthLabel(firstMonth)}` }
     : { ok: false, text: `Add the ledger row for ${monthLabel(lastWorked)}`, detail: 'Do this when the payslip for that month arrives.', go: 'ledger', cta: 'Add month' });
   const depThisMonth = S.deposits.some((d) => (d.date || '').slice(0, 7) === now);
-  items.push(depThisMonth
+  // Only remind people who invest: a planned investment % now, or deposits logged before.
+  if (num(assumptionFor(now)?.investPct) > 0 || S.deposits.length) items.push(depThisMonth
     ? { ok: true, text: `Investment deposit logged for ${monthLabel(now)}` }
     : { ok: false, text: `Log this month's investment deposit`, detail: 'Skip if you did not invest this month.', go: 'investments', cta: 'Log' });
   if (S.portfolio.length) {
@@ -989,7 +994,8 @@ async function renderLock() {
       if (usePass.checked) await setPassphrase(p1.value);
       else { KEY = null; META = null; await persist(); }
       lastActivity = Date.now();
-      location.hash = '#/dashboard';
+      // Sample data is ready to explore; a fresh start goes through the guided setup.
+      location.hash = sample.checked ? '#/dashboard' : '#/setup';
       renderShell();
     },
   },
@@ -1382,7 +1388,7 @@ function renderShell() {
 function render() {
   if (!S) return;
   const p = route();
-  const page = PAGES.some(([id]) => id === p) ? p : 'dashboard';
+  const page = PAGES.some(([id]) => id === p) || p === 'setup' ? p : 'dashboard';
   document.querySelectorAll('[data-page]').forEach((a) => {
     const on = a.dataset.page === page || (a.dataset.page === 'more' && !TABS.includes(page));
     a.classList.toggle('nav__link--active', on);
@@ -1391,13 +1397,15 @@ function render() {
   const main = $('#main');
   if (!main) return renderShell();
   // Same page re-rendering after an edit: keep window/table scroll and the focused field.
-  const same = main.dataset.view === page;
+  // Each setup step counts as its own view, so moving between steps starts at the top.
+  const viewKey = page === 'setup' ? location.hash : page;
+  const same = main.dataset.view === viewKey;
   const wy = scrollY;
   const tableScroll = same ? [...main.querySelectorAll('.table-wrap')].map((w) => [w.scrollLeft, w.scrollTop]) : [];
   const focus = same ? focusKey(main) : null;
-  const view = ({ dashboard: pageDashboard, ledger: pageLedger, assumptions: pageAssumptions, recurring: pageRecurring, goals: pageGoals, housing: pageHousing, kids: pageKids, retirement: pageRetirement, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
+  const view = ({ dashboard: pageDashboard, ledger: pageLedger, setup: pageSetup, assumptions: pageAssumptions, recurring: pageRecurring, goals: pageGoals, housing: pageHousing, kids: pageKids, retirement: pageRetirement, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
   main.replaceChildren(view);
-  main.dataset.view = page;
+  main.dataset.view = viewKey;
   main.querySelectorAll('.table-wrap').forEach((w, i) => { if (tableScroll[i]) [w.scrollLeft, w.scrollTop] = tableScroll[i]; });
   if (focus) restoreFocus(main, focus);
   scrollTo(0, same ? wy : 0);
@@ -1443,8 +1451,13 @@ function pageDashboard() {
   const due = checks.filter((c) => !c.ok).length;
   const frag = el('div', null, pageHead('Dashboard', `Right now · ${monthLabel(now)}`));
 
-  if (!S.assumptions.length) {
-    frag.append(el('div', { class: 'notice notice--info' }, 'Start on ', el('a', { href: '#/assumptions', text: 'Assumptions' }), ' (salary, costs, investment %), then add months in the ', el('a', { href: '#/ledger', text: 'Monthly ledger' }), '. Coming from the spreadsheet? Use ', el('a', { href: '#/data', text: 'Settings & data → Import CSV' }), '.'));
+  // Until setup is finished, or while essentials are missing, point back to it.
+  const missing = setupChecklist().filter((x) => x.level === 'essential' && !x.ok);
+  if (!S.setup.done || missing.length) {
+    frag.append(el('div', { class: 'notice notice--info' },
+      !S.setup.done ? 'A few short steps will turn this into your own numbers. '
+        : `Still missing: ${missing.map((x) => x.text.toLowerCase()).join(', ')}. `,
+      el('a', { href: '#/setup?step=' + (S.setup.done ? 'review' : 'you'), text: S.setup.done ? 'See the checklist' : 'Continue setup' })));
   }
 
   frag.append(el('div', { class: 'grid grid--stats' },
@@ -1800,6 +1813,256 @@ function pageRecurring() {
       }),
     ),
   );
+}
+
+/* ---------- Guided setup: one short step per topic, every step skippable, ending in a checklist ---------- */
+const SETUP_STEPS = [
+  ['you', 'About you'], ['income', 'Income'], ['spending', 'Spending'], ['saving', 'Saving & CPF'],
+  ['housing', 'Housing'], ['family', 'Family'], ['goals', 'Goals'], ['insurance', 'Insurance'], ['review', 'Review'],
+];
+/** The Assumptions row the setup fills in: the latest one, or a new one from this month. */
+function setupRow() {
+  if (!S.assumptions.length) S.assumptions.push({ id: uid(), effective: thisMonth() + '-01', salary: 0, age: 30, workDays: 22, lines: {}, investPct: 0, notes: 'From setup' });
+  const a = [...S.assumptions].sort(byKey('effective')).pop();
+  a.lines = a.lines || {};
+  return a;
+}
+/** Amount field for a budget line; the line itself is only created once an amount is entered. */
+function lineField(a, def, hint) {
+  const line = S.budgetLines.find((l) => l.id === def.id || l.name.toLowerCase() === def.name.toLowerCase());
+  const label = lineLabel(line || def);
+  const holder = { v: line ? a.lines[line.id] ?? '' : '' };
+  return field(label, inputFor(holder, { key: 'v', type: 'money', label, nullable: true, placeholder: '0' }, {
+    onChange: (v) => {
+      let l = line;
+      if (!l) { l = { id: uid(), name: def.name, kind: def.kind, basis: def.basis, ...(def.kind === 'income' ? { taxable: !!def.taxable } : {}) }; S.budgetLines.push(l); }
+      a.lines[l.id] = v ?? 0;
+      commit({ defer: true });
+    },
+  }), hint);
+}
+/** Existing lines of a kind plus the presets not added yet. */
+const linesAndPresets = (kind) => [
+  ...S.budgetLines.filter((l) => (l.kind === 'income') === (kind === 'income')),
+  ...LINE_PRESETS.filter((p) => p.kind === kind && !S.budgetLines.some((l) => l.name.toLowerCase() === p.name.toLowerCase())),
+];
+
+/** What the setup has and hasn't covered, by how much it matters. */
+function setupChecklist() {
+  const a = S.assumptions.length ? [...S.assumptions].sort(byKey('effective')).pop() : null;
+  const st = S.settings;
+  const skipped = (step) => !!S.setup?.skipped?.[step];
+  const item = (level, ok, text, detail, step, page) => ({ level, ok, text, detail, step, page, skipped: !ok && !!step && skipped(step) });
+  return [
+    item('essential', num(a?.salary) > 0, 'Monthly salary', 'CPF, tax and savings are all worked out from it.', 'income'),
+    item('essential', !!st.birthMonth || num(a?.age) > 0, 'Birth month', 'Sets your CPF rates and age-based tax reliefs.', 'you'),
+    item('essential', a ? sum(expenseLines(), (l) => num(a.lines?.[l.id])) > 0 : false, 'Monthly spending', 'Food, transport, rent and other regular costs.', 'spending'),
+    item('essential', num(st.startCash) !== 0, 'Cash in the bank', 'The starting point for cash, net worth and your emergency fund.', 'saving'),
+    item('essential', S.goals.some((g) => g.kind === 'emergency'), 'Emergency fund goal', '3–6 months of spending is the usual guide.', 'goals'),
+    ...(st.cpfEnabled ? [item('recommended', num(st.cpfStart.oa) + num(st.cpfStart.sa) + num(st.cpfStart.ma) > 0, 'CPF balances', 'For net worth, housing and retirement.', 'saving')] : []),
+    item('recommended', num(a?.investPct) > 0 || S.portfolio.length > 0, 'Investing', 'How much you invest each month, or your portfolio value.', 'saving'),
+    item('recommended', S.housing.status !== 'none' || !!S.setup?.housingNone, 'Housing', 'Rent, a home loan or a home you plan to buy.', 'housing'),
+    item('recommended', S.policies.length > 0, 'Insurance policies', 'To check your cover against the 9× / 4× income guide.', 'insurance'),
+    item('recommended', S.goals.some((g) => g.kind !== 'emergency'), 'A savings goal', 'A home, wedding, car or holiday.', 'goals'),
+    item('recommended', !!st.lastBackup, 'A backup', 'Browser data can be cleared — keep a copy somewhere safe.', null, 'data'),
+    item('optional', a ? incomeLines().some((l) => num(a.lines?.[l.id]) > 0) : false, 'Other income', 'Side, rental or dividend income.', 'income'),
+    item('optional', S.recurring.length > 0, 'Yearly costs', 'Holidays, festive spending, road tax…', null, 'recurring'),
+    item('optional', S.children.length > 0, 'Children', 'Costs by age and child tax reliefs.', 'family'),
+    item('optional', (S.reliefs[thisMonth().slice(0, 4)] || []).length > 0, 'Tax reliefs', 'Parent, NSman, SRS and others lower your tax.', null, 'tax'),
+    item('optional', !!KEY, 'Passphrase', 'Encrypts your records on this device.', null, 'data'),
+  ];
+}
+
+function pageSetup() {
+  const q = new URLSearchParams(location.hash.split('?')[1] || '');
+  const i = Math.max(0, SETUP_STEPS.findIndex(([id]) => id === q.get('step')));
+  const [step, title] = SETUP_STEPS[i];
+  const goStep = (k) => { location.hash = '#/setup?step=' + SETUP_STEPS[k][0]; };
+  const a = setupRow();
+  const body = {
+    you: setupYou, income: () => setupIncome(a), spending: () => setupSpending(a), saving: () => setupSaving(a),
+    housing: () => setupHousing(a), family: setupFamily, goals: setupGoals, insurance: setupInsurance, review: setupReview,
+  }[step]();
+  const nav = el('div', { class: 'page__actions setup-nav' },
+    i > 0 ? el('button', { class: 'btn', type: 'button', text: '← Back', onclick: () => goStep(i - 1) }) : null,
+    step !== 'review' ? el('button', { class: 'btn', type: 'button', text: 'Skip this step', onclick: () => { S.setup.skipped[step] = true; commit({ rerender: false }); goStep(i + 1); } }) : null,
+    step !== 'review'
+      ? el('button', { class: 'btn btn--primary', type: 'button', text: 'Next →', onclick: () => { delete S.setup.skipped[step]; commit({ rerender: false }); goStep(i + 1); } })
+      : el('button', { class: 'btn btn--primary', type: 'button', text: 'Finish — go to my dashboard', onclick: () => {
+        S.setup.done = true;
+        if (!S.ledger.length) S.ledger.push({ id: uid(), month: thisMonth(), bonus: 0, maDed: 0 }); // the ledger starts this month
+        commit({ rerender: false }); go('dashboard');
+      } }),
+  );
+  return el('div', { class: 'setup' },
+    pageHead('Set up Ledger Local', `Step ${i + 1} of ${SETUP_STEPS.length} · ${title}. Skip anything that doesn’t apply — you can change it all later.`),
+    el('nav', { class: 'setup-steps', 'aria-label': 'Setup steps' }, SETUP_STEPS.map(([id, t], k) => el('a', {
+      class: 'setup-step' + (k === i ? ' setup-step--on' : '') + (S.setup.skipped[id] ? ' setup-step--skipped' : ''),
+      href: '#/setup?step=' + id, text: `${k + 1}. ${t}`, 'aria-current': k === i ? 'step' : null,
+    }))),
+    progressBar(i / (SETUP_STEPS.length - 1)),
+    el('div', { class: 'card section-gap' }, body),
+    nav,
+  );
+}
+
+function setupYou() {
+  return [
+    el('p', { class: 'card__hint', text: 'A few questions about you and your money, one topic at a time. Rough numbers are fine. Everything stays on this device.' }),
+    el('div', { class: 'form-grid' },
+      field('Birth month', inputFor(S.settings, { key: 'birthMonth', type: 'month', label: 'Birth month' }), 'Sets your CPF rates and age-based tax reliefs, and updates as you get older.'),
+      field('Do you contribute to CPF?', selectFor(S.settings, 'cpfEnabled', [[true, 'Yes — Singapore CPF'], [false, 'No']], 'CPF')),
+    ),
+    el('p', { class: 'card__hint' }, 'Moving over from the Google Sheet? You can ', el('a', { href: '#/data', text: 'import its CSV files' }), ' instead.'),
+  ];
+}
+function setupIncome(a) {
+  return [
+    el('div', { class: 'form-grid' },
+      settingInput(a, 'salary', 'money', 'Monthly salary (before CPF)', 'Gross pay on your payslip, without bonus. Bonuses go on the month they are paid.'),
+      settingInput(a, 'workDays', 'number', 'Work days a month', 'Used for daily costs like lunch and the commute.', { step: '1' }),
+    ),
+    el('h3', { class: 'section-gap', text: 'Other income (optional)' }),
+    el('div', { class: 'form-grid' }, linesAndPresets('income').map((l) => lineField(a, l, l.taxable ? 'Taxable — after allowable expenses.' : l.kind === 'income' && l.taxable === false ? 'Not taxed.' : null))),
+  ];
+}
+function setupSpending(a) {
+  return [
+    el('p', { class: 'card__hint' }, 'Regular costs. Leave blank anything that doesn’t apply. Yearly costs like holidays and road tax go on ', el('a', { href: '#/recurring', text: 'Recurring costs' }), ' later.'),
+    el('div', { class: 'form-grid' }, linesAndPresets('expense').map((l) => lineField(a, l))),
+  ];
+}
+function setupSaving(a) {
+  const latest = [...S.portfolio].filter((p) => p.date).sort(byKey('date')).pop();
+  const pv = { v: latest ? latest.value : '' };
+  return [
+    el('div', { class: 'form-grid' },
+      settingInput(S.settings, 'startCash', 'money', 'Cash in the bank today', 'All savings and current accounts together. Your ledger counts on from here.'),
+      settingInput(a, 'investPct', 'pct', 'Invest each month (% of after-CPF pay)', 'Regular investing, e.g. into an index fund. 0 if none.'),
+      field('Investments today', inputFor(pv, { key: 'v', type: 'money', label: 'Investments today', nullable: true, placeholder: '0' }, {
+        onChange: (v) => {
+          const today = todayISO(), ex = S.portfolio.find((p) => p.date === today);
+          if (ex) ex.value = v ?? 0; else S.portfolio.push({ id: uid(), date: today, value: v ?? 0, notes: 'From setup' });
+          commit({ defer: true });
+        },
+      }), 'Value of stocks, ETFs, funds, SSBs, T-bills…'),
+    ),
+    S.settings.cpfEnabled ? [
+      el('h3', { class: 'section-gap', text: 'CPF balances today' }),
+      el('p', { class: 'card__hint', text: 'From the CPF app or website (My CPF → balances).' }),
+      el('div', { class: 'form-grid' },
+        settingInput(S.settings.cpfStart, 'oa', 'money', 'Ordinary Account (OA)'),
+        settingInput(S.settings.cpfStart, 'sa', 'money', 'Special Account (SA)'),
+        settingInput(S.settings.cpfStart, 'ma', 'money', 'MediSave Account (MA)'),
+      ),
+    ] : null,
+  ];
+}
+function setupHousing(a) {
+  const hs = S.housing;
+  const pick = (v) => {
+    hs.status = v;
+    S.setup.housingNone = v === 'none';
+    if (v === 'own' && !hs.loanAsOf) hs.loanAsOf = thisMonth();
+    commit();
+  };
+  const current = hs.status === 'none' && !S.setup.housingNone ? '' : hs.status;
+  const choose = el('div', { class: 'segmented', role: 'group', 'aria-label': 'Your housing' },
+    [['none', 'With family / n.a.'], ['rent', 'Renting'], ['own', 'I own a home'], ['buying', 'Planning to buy']].map(([v, t]) => el('button', {
+      class: 'segmented__btn', type: 'button', text: t, 'aria-pressed': String(current === v), onclick: () => pick(v),
+    })));
+  const p = hs.plan;
+  const detail = {
+    rent: () => el('div', { class: 'form-grid' }, lineField(a, LINE_PRESETS[0], 'Your share of the rent.')),
+    own: () => el('div', { class: 'form-grid' },
+      settingInput(hs, 'value', 'money', 'Estimated value'),
+      field('Loan type', selectFor(hs, 'loanType', LOAN_TYPES, 'Loan type')),
+      settingInput(hs, 'loanBalance', 'money', 'Outstanding loan', 'From your latest loan statement. 0 if fully paid.'),
+      settingInput(hs, 'cpfMonthly', 'money', 'Monthly instalment from CPF OA'),
+      settingInput(hs, 'cashMonthly', 'money', 'Monthly instalment in cash'),
+      settingInput(hs, 'loanRate', 'pct', 'Interest rate / year', `HDB loans: ${pct(SG.hdbRate)}.`)),
+    buying: () => el('div', { class: 'form-grid' },
+      settingInput(p, 'price', 'money', 'Expected price'),
+      settingInput(p, 'month', 'month', 'Key collection / completion'),
+      field('Loan type', selectFor(p, 'loanType', LOAN_TYPES, 'Loan type'))),
+  }[current];
+  return [
+    el('p', { class: 'card__hint', text: 'Where you live and what it costs.' }),
+    choose,
+    detail ? el('div', { class: 'section-gap' }, detail()) : null,
+    current && current !== 'none' ? el('p', { class: 'card__hint section-gap' }, 'More detail — the loan over time, what you could get if you sold, stamp duty and CPF use — on the ', el('a', { href: '#/housing', text: 'Housing' }), ' page.') : null,
+  ];
+}
+function setupFamily() {
+  return [
+    el('p', { class: 'card__hint', text: 'Children, including one on the way. They bring costs by age and tax reliefs. Skip if this doesn’t apply.' }),
+    S.children.map((c) => el('div', { class: 'form-grid setup-row' },
+      settingInput(c, 'name', 'text', 'Name'),
+      settingInput(c, 'birthMonth', 'month', 'Born (or due)'),
+      field('', el('button', { class: 'btn btn--danger btn--small', type: 'button', text: 'Remove', onclick: () => undoable(`${c.name || 'Child'} removed`, () => { S.children = S.children.filter((x) => x !== c); }) })),
+    )),
+    el('button', { class: 'btn', type: 'button', text: '+ Add a child', onclick: () => { S.children.push({ id: uid(), name: '', birthMonth: '', disability: false, studying: true }); commit(); } }),
+    S.children.length ? el('div', { class: 'form-grid section-gap' },
+      field('Working Mother’s Child Relief', selectFor(S.settings, 'wmcr', [[false, 'Not claiming'], [true, 'I claim it']], 'Working Mother’s Child Relief')),
+    ) : null,
+    S.children.length ? el('p', { class: 'card__hint' }, 'Set monthly costs by age (pre-school, school, university) on ', el('a', { href: '#/kids', text: 'Kids & education' }), '.') : null,
+  ];
+}
+function setupGoals() {
+  const hasEm = S.goals.some((g) => g.kind === 'emergency');
+  const picker = el('select', {
+    class: 'select select--inline', 'aria-label': 'Add a goal',
+    onchange: (e) => { const g = GOAL_PRESETS[+e.target.value]; if (!g) return; S.goals.push({ id: uid(), name: g.name, target: 0, by: '', kind: g.kind || 'custom', ...(g.months ? { months: g.months } : {}) }); commit(); },
+  }, el('option', { value: '', text: '+ Add a goal…', selected: true }), GOAL_PRESETS.map((g, k) => (g.kind === 'emergency' && hasEm ? null : el('option', { value: k, text: g.name }))));
+  return [
+    el('p', { class: 'card__hint', text: 'What you are saving for. Savings fill goals from the top, so add the most important first.' }),
+    hasEm ? null : el('div', { class: 'notice notice--info' }, 'Most people start with an emergency fund of 3–6 months of spending. ',
+      el('button', { class: 'btn btn--small btn--primary', type: 'button', text: 'Add a 6-month emergency fund', onclick: () => { S.goals.unshift({ id: uid(), name: 'Emergency fund', kind: 'emergency', months: 6, target: 0, by: '' }); commit(); } })),
+    S.goals.map((g) => el('div', { class: 'form-grid setup-row' },
+      settingInput(g, 'name', 'text', 'Goal'),
+      g.kind === 'emergency' ? settingInput(g, 'months', 'number', 'Months of spending', null, { step: '1' }) : settingInput(g, 'target', 'money', 'Target amount'),
+      settingInput(g, 'by', 'month', 'By (optional)'),
+      field('', el('button', { class: 'btn btn--danger btn--small', type: 'button', text: 'Remove', onclick: () => undoable(`${g.name || 'Goal'} removed`, () => { S.goals = S.goals.filter((x) => x !== g); }) })),
+    )),
+    picker,
+  ];
+}
+function setupInsurance() {
+  return [
+    el('p', { class: 'card__hint', text: 'Everyone is covered by MediShield Life for basic hospital bills. Add the policies you pay for — life, critical illness, an Integrated Shield plan — so the app can check your cover.' }),
+    S.policies.map((p) => el('div', { class: 'form-grid setup-row' },
+      settingInput(p, 'name', 'text', 'Policy'),
+      field('Type', selectFor(p, 'type', POLICY_TYPES, 'Type')),
+      settingInput(p, 'premium', 'money', 'Premium a year'),
+      field('Paid from', selectFor(p, 'payer', [['cash', 'Cash'], ['medisave', 'MediSave']], 'Paid from')),
+      settingInput(p, 'coverDeath', 'money', 'Death cover'),
+      settingInput(p, 'coverCI', 'money', 'Critical illness cover'),
+      field('', el('button', { class: 'btn btn--danger btn--small', type: 'button', text: 'Remove', onclick: () => undoable(`${p.name || 'Policy'} removed`, () => { S.policies = S.policies.filter((x) => x !== p); }) })),
+    )),
+    el('button', { class: 'btn', type: 'button', text: '+ Add a policy', onclick: () => { S.policies.push({ id: uid(), name: '', type: 'life', payer: 'cash', start: todayISO(), years: 20, premium: 0, coverDeath: 0, coverTPD: 0, coverCI: 0, actual: {} }); commit(); } }),
+    S.policies.length ? el('p', { class: 'card__hint section-gap' }, 'Premium dates, the yearly payment log and disability cover are on ', el('a', { href: '#/insurance', text: 'Insurance' }), '.') : null,
+  ];
+}
+function setupReview() {
+  const items = setupChecklist();
+  const groups = [
+    ['essential', 'Essential', 'Needed for your numbers to make sense.'],
+    ['recommended', 'Recommended', 'Fills in the bigger picture.'],
+    ['optional', 'Optional', 'Only if it applies to you.'],
+  ];
+  const ess = items.filter((x) => x.level === 'essential');
+  const open = (x) => (x.step ? (location.hash = '#/setup?step=' + x.step) : go(x.page));
+  return [
+    el('p', { class: 'card__hint', text: `${ess.filter((x) => x.ok).length} of ${ess.length} essentials done. You can finish now and fill in the rest any time — the dashboard reminds you of missing essentials.` }),
+    groups.map(([level, name, sub]) => el('div', { class: 'section-gap' },
+      el('h3', { text: name }), el('p', { class: 'card__hint', text: sub }),
+      items.filter((x) => x.level === level).map((x) => el('div', { class: 'check' },
+        el('div', { class: 'check__icon ' + (x.ok ? 'check__icon--ok' : level === 'essential' ? 'check__icon--due' : 'check__icon--skip'), text: x.ok ? '✓' : level === 'essential' ? '!' : '–' }),
+        el('div', { class: 'check__text' }, el('div', { text: x.text + (x.skipped ? ' — skipped' : '') }), el('div', { class: 'check__detail', text: x.detail })),
+        x.ok ? null : el('button', { class: 'btn btn--small', type: 'button', text: 'Add', onclick: () => open(x) }),
+      )),
+    )),
+  ];
 }
 
 const GOAL_PRESETS = [
@@ -2485,7 +2748,8 @@ function pageNetWorth() {
 function pageData() {
   const st = S.settings;
   return el('div', null,
-    pageHead('Settings & data', KEY ? 'Everything stays on this device. Backups are encrypted with your passphrase.' : 'Everything stays on this device.'),
+    pageHead('Settings & data', KEY ? 'Everything stays on this device. Backups are encrypted with your passphrase.' : 'Everything stays on this device.',
+      el('button', { class: 'btn', type: 'button', text: 'Run setup again', onclick: () => go('setup?step=you') })),
     el('div', { class: 'grid grid--two' },
       el('div', { class: 'card' },
         el('div', { class: 'card__title', text: 'Backup & restore' }),
@@ -2800,6 +3064,7 @@ function removePass() {
 function sampleData() {
   const d = defaultData();
   const start = addMonths(thisMonth(), -10);
+  d.setup = { done: true, skipped: {} };
   d.settings = { ...d.settings, startCash: 8000, birthMonth: addMonths(thisMonth(), -28 * 12 - 4), cpfStart: { oa: 12000, sa: 4000, ma: 6000 }, bankBalance: null };
   d.goals = [
     { id: uid(), name: 'Emergency fund', kind: 'emergency', months: 6, target: 0, by: '' },
