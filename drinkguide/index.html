@@ -314,7 +314,7 @@
 
   /* Stay in control */
   .sub { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin: 32px 0 12px; }
-  .sub:first-of-type { margin-top: 0; }
+  .sec-head + .sub { margin-top: 0; }
 
   .tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
   .tip { font-size: 14px; color: var(--text-2); }
@@ -345,6 +345,27 @@
   .myth:last-child { border-bottom: 0; }
   .myth .m { color: var(--ink); text-decoration: line-through; text-decoration-color: var(--high); text-decoration-thickness: 1px; }
   .myth .t { color: var(--text-2); }
+
+  /* Glass drawings: liquid rises from the bottom of each clipped glass */
+  .liq { transform-box: fill-box; transform-origin: 50% 100%; transition: transform 0.6s cubic-bezier(0.3, 0.7, 0.3, 1), fill 0.4s ease; }
+  .gl { fill: none; stroke: var(--text-2); stroke-width: 1.3; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .stdl { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; transition: opacity 0.3s ease; }
+
+  .glass-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px 8px; text-align: center; margin-top: 8px; }
+  .glass-grid svg { display: block; height: 170px; width: auto; max-width: 100%; margin: 0 auto 10px; }
+  .g-val { font-size: 16px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; margin-top: 4px; }
+  .g-sub { font-size: 12px; color: var(--text-2); }
+  .glass-note { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13px; color: var(--text-2); margin-top: 20px; }
+
+  .lim-total { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
+  .lim-total .out-big { font-size: 48px; }
+  .lim-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 150px; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .lim-row:last-child { border-bottom: 0; }
+  .lim-icons { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 4px; min-height: 56px; }
+  .lim-icons svg { height: 56px; width: auto; display: block; }
+  .lim-read { text-align: right; }
+  .lim-read .num { font-size: 15px; }
+  .lim-read .meta { font-variant-numeric: tabular-nums; }
 
   /* Counter */
   .counter { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
@@ -394,6 +415,9 @@
     .sec-num { padding: 0 0 4px; }
     .sec-sub { grid-column: 1; }
     .myth { grid-template-columns: 1fr; gap: 2px; }
+    .glass-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .lim-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; }
+    .lim-icons { grid-column: 1 / -1; grid-row: 2; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -509,9 +533,24 @@
       <span class="sec-num">02</span>
       <div>
         <h2>Strength by drink type</h2>
-        <p class="sec-sub">Bar length shows ABV. The number on the right is standard drinks in a typical serving, which is what matters for your limit.</p>
+        <p class="sec-sub">Each drink in its usual glass. The dashed line is how far you'd fill it to get exactly one standard drink.</p>
       </div>
     </div>
+    <div class="card">
+      <div class="seg" id="glassSeg" role="group" aria-label="What the glasses show">
+        <span class="seg-label">Show</span>
+        <button class="btn" type="button" data-m="serve">Typical serving</button>
+        <button class="btn" type="button" data-m="std">1 standard drink</button>
+        <button class="btn" type="button" data-m="pure">Pure alcohol only</button>
+      </div>
+      <div class="glass-grid" id="glassGrid"></div>
+      <div class="glass-note">
+        <span><svg width="22" height="8" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;"><line x1="0" y1="4" x2="22" y2="4" stroke="currentColor" stroke-dasharray="3 3"/></svg>Fill line for 1 standard drink (10 g alcohol)</span>
+        <span id="glassNote" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <p class="sub" style="margin-top: 32px;">Alcohol strength (ABV) and standard drinks per serving</p>
     <div class="chart-row chart-head"><span>Drink · serving</span><span>ABV</span><span style="text-align: right;">Std</span></div>
     <div id="typeChart"></div>
     <div class="legend">
@@ -606,6 +645,23 @@
         </ul>
       </div>
     </div>
+
+    <p class="sub" style="margin-top: 32px;">Your limit, in glasses</p>
+    <div class="card">
+      <div class="seg" id="limSeg" role="group" aria-label="Which limit to show">
+        <span class="seg-label">Limit</span>
+        <button class="btn" type="button" data-l="1">1 · Women's daily limit</button>
+        <button class="btn" type="button" data-l="2">2 · Men's daily limit or a beginner's session</button>
+        <button class="btn" type="button" data-l="5">5 · Binge, the line to stay well under</button>
+      </div>
+      <div class="lim-total">
+        <span class="out-big" id="limNum">2</span>
+        <span class="muted" id="limText"></span>
+      </div>
+      <p class="muted small" style="margin-bottom: 8px;">Any one row is your whole allowance. It's one or the other, not all of them.</p>
+      <div id="limRows"></div>
+    </div>
+
     <div class="callouts">
       <p class="callout"><b>If you go red</b>Asian flush means your body is slow to clear acetaldehyde, a toxic by-product of alcohol. Regular drinking raises the risk of oesophageal cancer for people who flush.</p>
       <p class="callout"><b>Don't hide the flush</b>Antihistamines mask the redness, not the harm.</p>
@@ -768,6 +824,114 @@
   vol.value = 360;
   abv.value = 16.5;
   calc();
+
+  // Glass drawings. Shapes are drawn around centre x = 55 in a 64..232 tall frame;
+  // top and bot bound the liquid area, which maps linearly from 0 to cap ml.
+  var STD_ML = 12.67; // ml of pure alcohol in one standard drink (10 g)
+  var PURE_COL = '#7fb0e0';
+  var GLASSES = [
+    { n: 'Beer', s: '330 ml can', unit: ['can', 'cans'], abv: 5, serve: 330, cap: 400, col: '#e3a33a', top: 80, bot: 228, w: 36,
+      liquid: 'M20 80 L90 80 L82 228 L28 228 Z',
+      outline: '<path class="gl" d="M20 80 L90 80 L82 228 L28 228 Z"/>' },
+    { n: 'Wine', s: '150 ml glass', unit: ['glass', 'glasses'], abv: 13, serve: 150, cap: 350, col: '#9b3434', top: 92, bot: 170, w: 36,
+      liquid: 'M21 92 L89 92 Q91 164 55 172 Q19 164 21 92 Z',
+      outline: '<path class="gl" d="M21 92 L89 92 Q91 164 55 172 Q19 164 21 92 Z"/><line class="gl" x1="55" y1="172" x2="55" y2="226"/><line class="gl" x1="33" y1="228" x2="77" y2="228"/>' },
+    { n: 'Highball', s: '30 ml spirit + soda', unit: ['highball', 'highballs'], abv: 4.8, serve: 250, cap: 350, col: '#f0cf86', top: 90, bot: 228, w: 26,
+      liquid: 'M31 90 L79 90 L79 228 L31 228 Z',
+      outline: '<path class="gl" d="M31 90 L79 90 L79 228 L31 228 Z"/>' },
+    { n: 'Sake', s: '180 ml carafe', unit: ['carafe', 'carafes'], abv: 15, serve: 180, cap: 180, col: '#d6d0c2', top: 150, bot: 228, w: 30,
+      liquid: 'M27 150 L83 150 L83 228 L27 228 Z',
+      outline: '<path class="gl" d="M46 112 L46 140 Q27 146 27 162 L27 222 Q27 228 33 228 L77 228 Q83 228 83 222 L83 162 Q83 146 64 140 L64 112 Q69 108 69 104 L41 104 Q41 108 46 112 Z"/>' },
+    { n: 'Soju', s: '360 ml bottle', unit: ['bottle', 'bottles'], abv: 16.5, serve: 360, cap: 360, col: '#95d3bb', top: 112, bot: 228, w: 24,
+      liquid: 'M33 112 L77 112 L77 228 L33 228 Z',
+      outline: '<path class="gl" d="M48 76 L48 92 Q33 100 33 116 L33 222 Q33 228 39 228 L71 228 Q77 228 77 222 L77 116 Q77 100 62 92 L62 76 Z"/><rect x="47" y="68" width="16" height="9" rx="2" fill="#2f8a62"/>' },
+    { n: 'Spirits', s: '30 ml shot', unit: ['shot', 'shots'], abv: 40, serve: 30, cap: 45, col: '#b8741a', top: 186, bot: 228, w: 19,
+      liquid: 'M38 186 L72 186 L68 228 L42 228 Z',
+      outline: '<path class="gl" d="M38 186 L72 186 L68 228 L42 228 Z"/>' }
+  ];
+  GLASSES.forEach(function (g) {
+    g.sd = stdDrinks(g.serve, g.abv);
+    g.stdVol = STD_ML / (g.abv / 100);
+    g.pure = g.serve * g.abv / 100;
+  });
+
+  var clipSeq = 0;
+  // One glass as an SVG; fillMl sets the liquid level, stdLine adds the dashed 1-standard-drink mark
+  function glassSvg(g, fillMl, opts) {
+    opts = opts || {};
+    var id = 'gc' + (clipSeq++);
+    var frac = Math.min(fillMl / g.cap, 1);
+    var line = '';
+    if (opts.stdLine) {
+      var ly = g.bot - Math.min(g.stdVol / g.cap, 1) * (g.bot - g.top);
+      line = '<line class="stdl" x1="' + (55 - g.w - 4) + '" y1="' + ly + '" x2="' + (55 + g.w + 4) + '" y2="' + ly + '"/>';
+    }
+    return '<svg viewBox="' + (55 - g.w - 6) + ' 64 ' + (2 * g.w + 12) + ' 168" aria-hidden="true">' +
+      '<defs><clipPath id="' + id + '"><path d="' + g.liquid + '"/></clipPath></defs>' +
+      '<g clip-path="url(#' + id + ')"><rect class="liq" x="0" y="' + g.top + '" width="110" height="' + (g.bot - g.top) + '" fill="' + (opts.col || g.col) + '" opacity="0.8" style="transform:scaleY(' + frac + ')"/></g>' +
+      g.outline + line + '</svg>';
+  }
+
+  // 02 Glasses: typical serving, one standard drink, or just the alcohol in it
+  var glassGrid = document.getElementById('glassGrid');
+  var glassSeg = document.getElementById('glassSeg');
+  glassGrid.innerHTML = GLASSES.map(function (g, i) {
+    return '<div>' + glassSvg(g, g.serve, { stdLine: true }) +
+      '<div class="name">' + g.n + '</div><div class="g-sub">' + g.s + '</div>' +
+      '<div class="g-val" id="gv' + i + '"></div><div class="g-sub" id="gs' + i + '"></div></div>';
+  }).join('');
+
+  function setGlassMode(m) {
+    glassSeg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.m === m); });
+    GLASSES.forEach(function (g, i) {
+      var cell = glassGrid.children[i];
+      var ml = m === 'serve' ? g.serve : m === 'std' ? g.stdVol : g.pure;
+      var liq = cell.querySelector('.liq');
+      liq.style.transform = 'scaleY(' + Math.min(ml / g.cap, 1) + ')';
+      liq.setAttribute('fill', m === 'pure' ? PURE_COL : g.col);
+      cell.querySelector('.stdl').style.opacity = m === 'pure' ? 0 : 1;
+      var v = document.getElementById('gv' + i), s = document.getElementById('gs' + i);
+      if (m === 'serve') { v.textContent = fmt(g.sd) + ' std'; s.textContent = g.serve + ' ml poured'; }
+      else if (m === 'std') { v.textContent = Math.round(g.stdVol) + ' ml'; s.textContent = 'is 1 standard drink'; }
+      else { v.textContent = fmt(g.pure) + ' ml'; s.textContent = 'of pure alcohol'; }
+    });
+    document.getElementById('glassNote').textContent = m === 'pure'
+      ? 'Blue is the pure alcohol in each serving. A bottle of soju holds 3.6 times what a can of beer does.'
+      : "Glasses aren't drawn to the same scale, so compare the numbers.";
+  }
+  glassSeg.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (b) setGlassMode(b.dataset.m);
+  });
+  setGlassMode('serve');
+
+  // 05 Limit in glasses: whole servings, then one part-filled glass for the remainder
+  var limSeg = document.getElementById('limSeg');
+  function setLimit(lim) {
+    limSeg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.l === lim); });
+    var binge = lim >= 5;
+    var num = document.getElementById('limNum');
+    num.textContent = lim;
+    num.style.color = binge ? 'var(--high)' : '';
+    document.getElementById('limText').textContent = (lim === 1 ? 'standard drink' : 'standard drinks') + ', or ' + lim * 10 + ' g of alcohol' +
+      (binge ? '. Reaching this in about 2 hours is a binge.' : '');
+    document.getElementById('limRows').innerHTML = GLASSES.map(function (g) {
+      var n = lim / g.sd;
+      var whole = Math.floor(n + 1e-6), part = n - whole, icons = '';
+      for (var k = 0; k < whole; k++) icons += glassSvg(g, g.serve);
+      if (part > 0.04) icons += glassSvg(g, g.serve * part);
+      var label = (n >= 0.95 && n < 1.05) ? g.unit[0] : g.unit[1];
+      if (n < 1) label = 'of a ' + g.unit[0];
+      return '<div class="lim-row"><div><div class="name">' + g.n + '</div><div class="meta">' + g.s + '</div></div>' +
+        '<div class="lim-icons">' + icons + '</div>' +
+        '<div class="lim-read"><div class="num">' + fmt(n) + ' ' + label + '</div><div class="meta">' + Math.round(g.stdVol * lim) + ' ml</div></div></div>';
+    }).join('');
+  }
+  limSeg.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (b) setLimit(+b.dataset.l);
+  });
+  setLimit(2);
 
   // 02 Drink types: [name, serving, ABV, ml, fixed std drinks for drinks that vary]
   var TYPES = [
