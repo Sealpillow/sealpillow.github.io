@@ -294,16 +294,42 @@ const RECURRING_PRESETS = [
   { name: 'Yearly subscriptions', amount: 0, every: 12, mode: 'due' },
 ];
 
+/*
+ * Singapore figures used by the housing, kids, retirement and insurance pages (checked Oct 2026 against
+ * HDB, IRAS, CPF and MoneySense). Most are also editable on their pages; check the official sites when they change.
+ */
+const SG = {
+  ltv: 0.75, // HDB and bank loan-to-value limit for a first housing loan
+  hdbRate: 0.026, // HDB concessionary loan rate (0.1% above the CPF OA rate)
+  msr: 0.3, // Mortgage Servicing Ratio cap (HDB flats and ECs)
+  tdsr: 0.55, // Total Debt Servicing Ratio cap
+  bankMinCash: 0.05, // bank loans: at least 5% of the price in cash
+  cpfHousingRate: 0.025, // accrued interest owed back to CPF OA on CPF used for housing
+  bsd: [[180000, 0.01], [180000, 0.02], [640000, 0.03], [500000, 0.04], [1500000, 0.05], [Infinity, 0.06]], // Buyer's Stamp Duty bands
+  qcr: 4000, childDisability: 7500, childCap: 50000, // per child; QCR + WMCR capped at $50k per child
+  wmcrFixed: [8000, 10000, 12000], // children born from 2024: 1st, 2nd, 3rd+
+  wmcrPct: [0.15, 0.2, 0.25], // children born before 2024: % of the mother's earned income
+  ptr: [5000, 10000, 20000], // Parenthood Tax Rebate: 1st, 2nd, 3rd+
+  frs2026: 220400, frsGrowth: 0.035, // Full Retirement Sum for those turning 55 in 2026; ~3.5% a year after
+  cpfLifeAtFrs: 1780, // CPF's estimate: FRS at 55 → ~$1,780/month from 65 (Standard plan)
+  coverDeath: 9, coverCI: 4, maxPremiumShare: 0.15, // MoneySense Basic Financial Planning Guide
+};
+// Monthly cost by a child's age. Amounts are yours to fill in — after subsidies, see ECDA (pre-school) and MOE fees.
+const defaultStages = () => [
+  ['Infant care', 0, 1.5], ['Pre-school', 1.5, 7], ['Primary school', 7, 13], ['Secondary school', 13, 17],
+  ['JC / Poly / ITE', 17, 19], ['University', 19, 23],
+].map(([name, from, to]) => ({ id: uid(), name, from, to, monthly: 0 }));
+
 function defaultData() {
   return {
-    version: 2,
+    version: 3,
     settings: {
       currency: 'SGD',
       locale: 'en-SG',
       cpfEnabled: true,
       startCash: 0,
-      goalName: 'Savings goal',
-      goalAmount: 0,
+      wmcr: false, // claim Working Mother's Child Relief
+      childReliefShare: 1, // share of QCR / Parenthood Tax Rebate you claim (rest by your spouse)
       cpfStart: { oa: 0, sa: 0, ma: 0 },
       birthMonth: '', // 'YYYY-MM'; when set, age is worked out per month instead of read from Assumptions
       cpfExtraRate: 0.01,
@@ -318,6 +344,15 @@ function defaultData() {
     },
     budgetLines: defaultLines(),
     recurring: [], // [{ id, name, amount, every, start: 'YYYY-MM', end, mode: 'due'|'spread' }]
+    goals: [], // [{ id, name, target, by: 'YYYY-MM'|'', kind: 'custom'|'emergency', months }] — filled in this order
+    housing: {
+      status: 'none', // 'none' | 'rent' | 'own' | 'buying'
+      value: 0, loanType: 'hdb', loanBalance: 0, loanAsOf: '', loanRate: SG.hdbRate, cpfMonthly: 0, cashMonthly: 0, cpfUsed: 0,
+      plan: { price: 0, month: '', loanType: 'hdb', grants: 0, fees: 0, tenure: 25, rate: SG.hdbRate, cpfUse: null },
+    },
+    children: [], // [{ id, name, birthMonth: 'YYYY-MM', disability, studying }]
+    childStages: defaultStages(),
+    retire: { age: 65, spendMonthly: null, returnRate: 0.05, inflation: 0.025, swr: 0.04, lifeExpectancy: 90 },
     assumptions: [],
     // Copies, so editing a vault's tables never changes the built-in defaults.
     cpfSchedule: structuredClone(DEFAULT_CPF),
@@ -337,7 +372,15 @@ function migrate(d) {
   const base = defaultData();
   const out = { ...base, ...d, settings: { ...base.settings, ...(d.settings || {}) } };
   out.settings.cpfStart = { ...base.settings.cpfStart, ...(d.settings?.cpfStart || {}) };
-  for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'liabilities', 'policies', 'recurring']) if (!Array.isArray(out[k])) out[k] = [];
+  for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'liabilities', 'policies', 'recurring', 'goals', 'children']) if (!Array.isArray(out[k])) out[k] = [];
+  if (!Array.isArray(out.childStages)) out.childStages = base.childStages;
+  out.housing = { ...base.housing, ...(d.housing || {}), plan: { ...base.housing.plan, ...(d.housing?.plan || {}) } };
+  out.retire = { ...base.retire, ...(d.retire || {}) };
+  // Version 2 had a single goal in settings; it becomes the first entry of the goals list.
+  if (!Array.isArray(d.goals) && num(d.settings?.goalAmount) > 0) {
+    out.goals = [{ id: uid(), name: d.settings.goalName || 'Savings goal', target: num(d.settings.goalAmount), by: '', kind: 'custom' }];
+  }
+  delete out.settings.goalName; delete out.settings.goalAmount;
   // Version 1 had four fixed columns (food/day, transport/day, parents, others). Move them into budget
   // lines with the same ids, including any one-month overrides on ledger rows.
   if (!Array.isArray(d.budgetLines)) {
@@ -352,7 +395,7 @@ function migrate(d) {
       for (const id of Object.keys(LEGACY_LINES)) { if (e[id] != null && e[id] !== '') e.lines[id] = e[id]; delete e[id]; }
     }
   }
-  out.version = 2;
+  out.version = 3;
   if (!Array.isArray(out.cpfSchedule) || !out.cpfSchedule.length) out.cpfSchedule = base.cpfSchedule;
   if (!Array.isArray(out.taxBrackets) || !out.taxBrackets.length) out.taxBrackets = base.taxBrackets;
   // Older vaults had one MA allocation for every age (settings.maAlloc). Give each schedule row its band's
@@ -433,10 +476,62 @@ function taxOn(income, table = taxTable()) {
   return Math.max(0, row.base + (income - row.lower) * num(row.rate));
 }
 function earnedIncomeRelief(age) { return age >= 60 ? 8000 : age >= 55 ? 6000 : 1000; }
-function reliefTotal(year) {
-  const list = S.reliefs[year] || [];
+const childrenByBirth = () => S.children.filter((c) => c.birthMonth).sort(byKey('birthMonth'));
+const childName = (c, i) => c.name || `Child ${i + 1}`;
+/**
+ * Automatic child reliefs for an income year: QCR (or Child Relief (Disability)) while the child is under 16 or
+ * studying full-time, plus WMCR if claimed — fixed amounts for children born from 2024, % of the mother's earned
+ * income before that, capped at $50k per child with QCR and at her earned income overall.
+ */
+function childReliefs(year, earned = 0) {
+  const share = S.settings.childReliefShare ?? 1;
+  const out = [];
+  let wmcrLeft = Math.max(0, earned);
+  childrenByBirth().forEach((c, i) => {
+    const age = +year - +c.birthMonth.slice(0, 4);
+    if (age < 0 || (age >= 16 && (c.studying === false || age > 25))) return;
+    const qcr = (c.disability ? SG.childDisability : SG.qcr) * num(share);
+    out.push({ id: 'qcr-' + c.id, name: `${childName(c, i)} — ${c.disability ? 'Child Relief (Disability)' : 'Qualifying Child Relief'}`, amount: qcr, auto: true });
+    if (S.settings.wmcr) {
+      const k = Math.min(i, 2);
+      const w = Math.min(c.birthMonth >= '2024-01' ? SG.wmcrFixed[k] : SG.wmcrPct[k] * earned, SG.childCap - qcr, wmcrLeft);
+      wmcrLeft -= Math.max(0, w);
+      if (w > 0) out.push({ id: 'wmcr-' + c.id, name: `${childName(c, i)} — Working Mother’s Child Relief`, amount: w, auto: true });
+    }
+  });
+  return out;
+}
+/** Parenthood Tax Rebate earned in an income year (children born that year); unused rebate carries forward. */
+function ptrFor(year) {
+  return sum(childrenByBirth().map((c, i) => (c.birthMonth.slice(0, 4) === String(year) ? SG.ptr[Math.min(i, 2)] * num(S.settings.childReliefShare ?? 1) : 0)));
+}
+function reliefTotal(year, earned = 0) {
+  const list = [...childReliefs(year, earned), ...(S.reliefs[year] || [])];
   const r = Math.min(num(S.settings.reliefCap) || Infinity, sum(list, (x) => x.amount));
   return r + num(S.donations[year]) * num(S.settings.donationMultiplier);
+}
+/** Monthly cost of the children for a month, from the age-stage table. */
+function kidsCostFor(ym) {
+  let total = 0;
+  const items = [];
+  for (const c of S.children) {
+    if (!c.birthMonth || ym < c.birthMonth) continue;
+    const age = monthDiff(c.birthMonth, ym) / 12;
+    const st = S.childStages.find((s) => age >= num(s.from) && age < num(s.to));
+    if (st && num(st.monthly)) { total += num(st.monthly); items.push({ child: c, stage: st }); }
+  }
+  return { total, items };
+}
+function stampDuty(price) {
+  let left = num(price), duty = 0;
+  for (const [band, rate] of SG.bsd) { const part = Math.min(left, band); duty += part * rate; left -= part; if (left <= 0) break; }
+  return duty;
+}
+/** Level monthly instalment for a loan (annuity). */
+function instalment(loan, rate, years) {
+  const n = Math.round(num(years) * 12), r = num(rate) / 12;
+  if (!(loan > 0) || n <= 0) return 0;
+  return r === 0 ? loan / n : (loan * r) / (1 - Math.pow(1 + r, -n));
 }
 
 function premiumsFor(ym) {
@@ -451,10 +546,12 @@ function premiumsFor(ym) {
       const actual = p.actual?.[k];
       const amt = actual != null && actual !== '' ? num(actual) : num(p.premium);
       total += amt;
-      items.push({ policy: p.name, year: k + 1, amount: amt });
+      items.push({ policy: p.name, year: k + 1, amount: amt, medisave: p.payer === 'medisave' });
     }
   }
-  return { total, items };
+  // Premiums paid from MediSave (e.g. Integrated Shield plans) come out of the MA, not take-home pay.
+  const medisave = sum(items.filter((i) => i.medisave), (i) => i.amount);
+  return { total, cash: total - medisave, medisave, items };
 }
 
 const everyOf = (it) => Math.max(1, Math.round(num(it.every)) || 12);
@@ -493,9 +590,14 @@ function computeLedger(extraMonth) {
   entries.sort(byKey('month'));
   const table = taxTable();
   let oa = num(st.cpfStart.oa), sa = num(st.cpfStart.sa), ma = num(st.cpfStart.ma);
-  const cum = { after: 0, income: 0, otherIncome: 0, salary: 0, savings: 0, ee: 0, er: 0, exp: 0, lines: {}, tax: 0, invest: 0, insurance: 0, recurring: 0, extras: 0, maDed: 0 };
-  const ytdAfter = {};
+  const cum = { after: 0, income: 0, otherIncome: 0, salary: 0, savings: 0, ee: 0, er: 0, exp: 0, lines: {}, tax: 0, invest: 0, insurance: 0, recurring: 0, extras: 0, maDed: 0, home: 0, kids: 0 };
+  const ytdAfter = {}, ytdGross = {};
   const fund = {}; // set-aside balance per 'spread' recurring item
+  // Home loan, followed month by month from the month its balance was entered for.
+  const hs = S.housing, owning = hs.status === 'own';
+  let loanBal = num(hs.loanBalance), cpfUsed = num(hs.cpfUsed);
+  // Parenthood Tax Rebate: a pool per income year, used against that year's tax, the rest carried forward.
+  const ptr = { year: null, pool: 0, applied: 0 };
   const rows = [];
   for (const e of entries) {
     const a = assumptionFor(e.month) || {};
@@ -543,13 +645,27 @@ function computeLedger(extraMonth) {
     // Taxable extra income (side, rental) is projected the same way as pay.
     const [yy, mm] = e.month.split('-').map(Number);
     ytdAfter[yy] = (ytdAfter[yy] || 0) + after + taxableOther;
+    ytdGross[yy] = (ytdGross[yy] || 0) + salary + bonus;
     const payAfterCpf = ceiling > 0 ? Math.min(salary, ceiling) * (1 - num(c.ee)) + Math.max(0, salary - ceiling) : salary * (1 - num(c.ee));
     const projected = ytdAfter[yy] + (payAfterCpf + taxableOther) * (12 - mm);
-    const chargeable = Math.max(0, projected - earnedIncomeRelief(ageInYear(yy, a)) - reliefTotal(yy));
-    const tax = e.tax != null && e.tax !== '' ? num(e.tax) : round2(taxOn(chargeable, table) / 12);
+    const earned = ytdGross[yy] + salary * (12 - mm); // projected gross pay, for % based WMCR
+    const chargeable = Math.max(0, projected - earnedIncomeRelief(ageInYear(yy, a)) - reliefTotal(yy, earned));
+    if (ptr.year !== yy) { ptr.pool = Math.max(0, ptr.pool - ptr.applied) + ptrFor(yy); ptr.year = yy; ptr.applied = 0; }
+    const yearTax = taxOn(chargeable, table);
+    ptr.applied = Math.min(ptr.pool, yearTax);
+    const tax = e.tax != null && e.tax !== '' ? num(e.tax) : round2((yearTax - ptr.applied) / 12);
 
-    const expenditure = spendLines + tax + prem.total + extras + recurring;
-    const savings = takeHome - expenditure - invest;
+    const kids = kidsCostFor(e.month);
+
+    // Home loan: interest accrues monthly; the instalment is paid from CPF OA first (as set), the rest in cash.
+    let homeCash = 0, homeCpf = 0, loanInterest = 0;
+    if (owning && hs.loanAsOf && e.month >= hs.loanAsOf && loanBal > 0) {
+      loanInterest = (loanBal * num(hs.loanRate)) / 12;
+      const pay = Math.min(num(hs.cpfMonthly) + num(hs.cashMonthly), loanBal + loanInterest);
+      homeCpf = Math.min(num(hs.cpfMonthly), pay);
+      homeCash = pay - homeCpf;
+      loanBal = Math.max(0, loanBal + loanInterest - pay);
+    }
 
     // CPF balances (monthly approximation of CPF interest incl. 1% extra on first $60k, max $20k from OA)
     const total = ee + er;
@@ -558,23 +674,33 @@ function computeLedger(extraMonth) {
     const eOA = Math.min(oa, 20000);
     const eSA = Math.min(sa, 60000 - eOA);
     const eMA = Math.min(ma, Math.max(60000 - eOA - sa, 0));
-    const maDed = num(e.maDed);
+    const maDed = num(e.maDed) + prem.medisave;
     const nOA = oa * (1 + num(c.oaRate) / 12) + total * num(c.oa);
     const nSA = sa * (1 + num(c.samaRate) / 12) + eOA * x + eSA * x + total * Math.max(0, 1 - num(c.oa) - maAlloc);
     const nMA = ma * (1 + num(c.samaRate) / 12) + eMA * x + total * maAlloc - maDed;
-    if (st.cpfEnabled) { oa = nOA; sa = nSA; ma = nMA; }
+    // Whatever the OA cannot cover of the CPF share of the instalment is paid in cash.
+    const fromOa = st.cpfEnabled ? Math.min(homeCpf, Math.max(0, nOA)) : 0;
+    homeCash += homeCpf - fromOa;
+    homeCpf = fromOa;
+    if (st.cpfEnabled) { oa = nOA - fromOa; sa = nSA; ma = nMA; }
+    if (owning && hs.loanAsOf && e.month >= hs.loanAsOf) cpfUsed = cpfUsed * (1 + SG.cpfHousingRate / 12) + homeCpf;
+
+    const expenditure = spendLines + tax + prem.cash + extras + recurring + kids.total + homeCash;
+    const savings = takeHome - expenditure - invest;
 
     if (!e.virtual) {
       cum.after += after; cum.income += takeHome; cum.otherIncome += otherIncome; cum.salary += salary + bonus; cum.savings += savings;
-      cum.ee += ee; cum.er += er; cum.exp += expenditure; cum.tax += tax; cum.invest += invest; cum.insurance += prem.total;
-      cum.recurring += recurring; cum.extras += extras; cum.maDed += maDed;
+      cum.ee += ee; cum.er += er; cum.exp += expenditure; cum.tax += tax; cum.invest += invest; cum.insurance += prem.cash;
+      cum.recurring += recurring; cum.extras += extras; cum.maDed += maDed; cum.home += homeCash; cum.kids += kids.total;
       for (const [id, v] of Object.entries(lines)) cum.lines[id] = (cum.lines[id] || 0) + v;
     }
     const sinking = sum(Object.values(fund));
     rows.push({
       entry: e, month: e.month, virtual: !!e.virtual, assumption: a, age, rates: c,
-      salary, bonus, ee, er, after, otherIncome, takeHome, workDays, lines, invest, tax, chargeable, projected,
-      insurance: prem.total, insuranceItems: prem.items, recurring, recurringItems, extras, expenditure, savings,
+      salary, bonus, ee, er, after, otherIncome, takeHome, workDays, lines, invest, tax, chargeable, projected, earned,
+      yearTax, ptrApplied: ptr.applied, ptrPool: ptr.pool,
+      insurance: prem.cash, insuranceMedisave: prem.medisave, insuranceItems: prem.items, recurring, recurringItems, extras, expenditure, savings,
+      kids: kids.total, kidsItems: kids.items, homeCash, homeCpf, loanInterest, loanBal, cpfUsed,
       savingsRate: takeHome ? savings / takeHome : 0,
       oa, sa, ma, cpfTotal: oa + sa + ma, maDed,
       cum: { ...cum, lines: { ...cum.lines } },
@@ -601,21 +727,51 @@ function summary() {
   const cpf = st.cpfEnabled ? (last ? last.cpfTotal : num(st.cpfStart.oa) + num(st.cpfStart.sa) + num(st.cpfStart.ma)) : 0;
   // Set-aside funds are still cash in the bank, but earmarked — so in net worth, not in goal savings.
   const sinking = last ? last.sinking : 0;
-  const netWorth = num(st.startCash) + cumSavings + sinking + portfolio + cpf - liabilities - extraInvested;
-  const liquid = netWorth - cpf;
+  // Home: value and loan count in net worth, but not in liquid net worth. The loan balance follows the ledger
+  // from the month it was entered for.
+  const hs = S.housing, owning = hs.status === 'own';
+  const tracked = owning && last && hs.loanAsOf && last.month >= hs.loanAsOf;
+  const homeValue = owning ? num(hs.value) : 0;
+  const homeLoan = owning ? (tracked ? last.loanBal : num(hs.loanBalance)) : 0;
+  const cpfUsedHome = owning ? (tracked ? last.cpfUsed : num(hs.cpfUsed)) : 0;
+  const homeEquity = homeValue - homeLoan;
+  const netWorth = num(st.startCash) + cumSavings + sinking + portfolio + cpf + homeEquity - liabilities - extraInvested;
+  const liquid = netWorth - cpf - homeEquity;
   const saved = num(st.startCash) + cumSavings + portfolio - extraInvested;
   const recent = rows.slice(-12);
   const pace = recent.length ? sum(recent, (r) => r.savings + r.invest) / recent.length : 0;
-  const remaining = Math.max(0, num(st.goalAmount) - saved);
-  const monthsToGoal = remaining <= 0 ? 0 : pace > 0 ? Math.ceil(remaining / pace) : null;
   const expectedCash = num(st.startCash) + cumSavings + sinking - extraInvested;
+  // Emergency fund: cash in the bank (not counting set-aside money) ÷ average monthly spending excl. tax.
+  const recent6 = rows.slice(-6);
+  const spendAvg = recent6.length ? sum(recent6, (r) => r.expenditure - r.tax) / recent6.length : 0;
+  const emergencyCash = expectedCash - sinking;
   return {
     rows, last, deposits, planned, extraInvested, portfolio, portfolioDate: pv.length ? pv[pv.length - 1].date : null,
-    liabilities, cumSavings, sinking, cpf, netWorth, liquid, saved, pace, remaining, monthsToGoal,
-    goalMonth: monthsToGoal != null ? addMonths(thisMonth(), monthsToGoal) : null,
-    progress: num(st.goalAmount) > 0 ? Math.min(1, saved / num(st.goalAmount)) : null,
-    expectedCash,
+    liabilities, cumSavings, sinking, cpf, netWorth, liquid, saved, pace, expectedCash,
+    homeValue, homeLoan, homeEquity, cpfUsedHome, spendAvg, emergencyCash,
+    emergencyMonths: spendAvg > 0 ? emergencyCash / spendAvg : null,
+    goals: goalPlan(saved, pace, spendAvg),
   };
+}
+
+/**
+ * Goals are filled in list order: savings so far go to the first goal until it is full, then the next; future
+ * saving (the 12-month pace) does the same, so a later goal is reached after the ones above it.
+ */
+function goalPlan(saved, pace, spendAvg) {
+  const now = thisMonth();
+  let pool = Math.max(0, saved), months = 0;
+  return S.goals.map((g) => {
+    const target = g.kind === 'emergency' ? num(g.months || 6) * spendAvg : num(g.target);
+    const have = Math.min(target, pool);
+    pool -= have;
+    const left = Math.max(0, target - have);
+    if (months != null) months = left <= 0 ? months : pace > 0 ? months + Math.ceil(left / pace) : null;
+    const reach = left <= 0 ? now : months != null ? addMonths(now, months) : null;
+    const monthsLeft = g.by ? monthDiff(now, g.by) : null;
+    const needPerMonth = g.by && left > 0 ? left / Math.max(1, monthsLeft) : 0;
+    return { goal: g, target, have, left, progress: target > 0 ? have / target : 1, reach, monthsLeft, needPerMonth, onTrack: !g.by || left <= 0 || (reach != null && reach <= g.by) };
+  });
 }
 
 /** Months to pay off: NPER(rate/12, -payment, balance). Null if the payment never covers interest. */
@@ -1088,7 +1244,7 @@ function lineChart(series, labels, { height = 220, format = (v) => money(v, { co
     el('div', { class: 'legend' }, series.map((s, si) => el('span', null, el('span', { class: `legend__swatch legend__swatch--${si + 1}` }), s.name))),
   );
 }
-function barChart(values, labels, { height = 180, format = (v) => pct(v, 0) } = {}) {
+function barChart(values, labels, { height = 180, format = (v) => pct(v, 0), label = 'Savings rate by month' } = {}) {
   if (!values.length) return el('p', { class: 'muted', text: 'No months yet.' });
   const draw = (W) => {
     const H = height, L = 44, R = 8, T = 18, B = 26;
@@ -1105,7 +1261,7 @@ function barChart(values, labels, { height = 180, format = (v) => pct(v, 0) } = 
     });
     return svg('svg', { class: 'chart', width: W, height: H, viewBox: `0 0 ${W} ${H}` }, parts);
   };
-  return chartBox(draw, 'Savings rate by month: ' + values.map((v, i) => `${labels[i]} ${format(v)}`).join(', '));
+  return chartBox(draw, label + ': ' + values.map((v, i) => `${labels[i]} ${format(v)}`).join(', '));
 }
 function niceStep(raw) {
   if (!(raw > 0)) return 1;
@@ -1145,20 +1301,25 @@ const PAGES = [
   ['ledger', 'Monthly ledger'],
   ['assumptions', 'Assumptions'],
   ['recurring', 'Recurring costs'],
+  ['goals', 'Goals'],
+  ['housing', 'Housing'],
+  ['kids', 'Kids & education'],
   ['investments', 'Investments'],
   ['liabilities', 'Liabilities'],
   ['insurance', 'Insurance'],
   ['tax', 'Tax & reliefs'],
-  ['networth', 'Goal & net worth'],
+  ['retirement', 'Retirement'],
+  ['networth', 'Net worth'],
   ['data', 'Settings & data'],
 ];
 const route = () => (location.hash.replace(/^#\/?/, '') || 'dashboard').split('?')[0];
 addEventListener('hashchange', () => S && render());
 
 // Phone layout: these pages get a bottom tab each; the rest live under "More".
-const TABS = ['dashboard', 'ledger', 'investments', 'networth'];
-const TAB_LABEL = { dashboard: 'Home', ledger: 'Ledger', investments: 'Invest', networth: 'Net worth' };
+const TABS = ['dashboard', 'ledger', 'goals', 'networth'];
+const TAB_LABEL = { dashboard: 'Home', ledger: 'Ledger', goals: 'Goals', networth: 'Net worth' };
 const ICONS = {
+  goals: 'M5 21V4M5 4h11l-2.5 4L16 12H5',
   dashboard: 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z',
   ledger: 'M4 5h16M4 10h16M4 15h16M4 20h10',
   investments: 'M3 17l6-6 4 4 8-8M15 7h6v6',
@@ -1209,7 +1370,7 @@ function render() {
   const wy = scrollY;
   const tableScroll = same ? [...main.querySelectorAll('.table-wrap')].map((w) => [w.scrollLeft, w.scrollTop]) : [];
   const focus = same ? focusKey(main) : null;
-  const view = ({ dashboard: pageDashboard, ledger: pageLedger, assumptions: pageAssumptions, recurring: pageRecurring, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
+  const view = ({ dashboard: pageDashboard, ledger: pageLedger, assumptions: pageAssumptions, recurring: pageRecurring, goals: pageGoals, housing: pageHousing, kids: pageKids, retirement: pageRetirement, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
   main.replaceChildren(view);
   main.dataset.view = page;
   main.querySelectorAll('.table-wrap').forEach((w, i) => { if (tableScroll[i]) [w.scrollLeft, w.scrollTop] = tableScroll[i]; });
@@ -1266,18 +1427,14 @@ function pageDashboard() {
     stat('Liquid net worth', money(sm.liquid), 'Excl. CPF'),
     stat('Left this month', cur ? money(cur.savings) : '–', cur ? `Savings rate ${pct(cur.savingsRate)}` : null),
     stat('Total CPF', money(sm.cpf), S.settings.cpfEnabled ? 'OA + SA + MA' : 'CPF tracking off'),
+    stat('Emergency fund', sm.emergencyMonths != null ? `${sm.emergencyMonths.toFixed(1)} months` : '–', sm.emergencyMonths != null ? (sm.emergencyMonths >= 3 ? 'Of spending, in cash' : 'Aim for 3–6 months') : 'Needs a few ledger months'),
   ));
 
   const goal = el('div', { class: 'card' },
-    el('div', { class: 'card__title' }, el('span', { text: S.settings.goalName || 'Savings goal' }), el('a', { class: 'card__hint', href: '#/networth', text: 'Details' })),
+    el('div', { class: 'card__title' }, el('span', { text: 'Goals' }), el('a', { class: 'card__hint', href: '#/goals', text: 'All goals' })),
   );
-  if (num(S.settings.goalAmount) > 0) {
-    goal.append(
-      el('div', { class: 'bar__head' }, el('span', { text: `${money(sm.saved)} of ${money(S.settings.goalAmount)}` }), el('strong', { text: pct(sm.progress, 0) })),
-      progressBar(sm.progress),
-      el('div', { class: 'card__hint', text: sm.remaining <= 0 ? 'Goal reached.' : sm.monthsToGoal != null ? `About ${sm.monthsToGoal} months to go at your 12-month pace (${money(sm.pace)}/month) — around ${monthLabel(sm.goalMonth)}.` : 'Not enough saving pace yet to project a date.' }),
-    );
-  } else goal.append(el('p', { class: 'muted' }, 'Set a goal amount on ', el('a', { href: '#/networth', text: 'Goal & net worth' }), '.'));
+  if (sm.goals.length) goal.append(sm.goals.slice(0, 4).map(goalBlock));
+  else goal.append(el('p', { class: 'muted' }, 'No goals yet — add an emergency fund, a home down payment or a holiday on ', el('a', { href: '#/goals', text: 'Goals' }), '.'));
 
   const month = el('div', { class: 'card' }, el('div', { class: 'card__title', text: `This month (from current assumptions)` }));
   if (cur) {
@@ -1290,6 +1447,8 @@ function pageDashboard() {
       ['Income tax (monthly)', '−' + money(cur.tax)],
       ...(cur.insurance ? [['Insurance premium', '−' + money(cur.insurance)]] : []),
       ...cur.recurringItems.filter((x) => x.cost).map((x) => [`${x.item.name || 'Recurring'}${x.item.mode === 'spread' ? ' (set aside)' : ''}`, '−' + money(x.cost)]),
+      ...(cur.kids ? [['Kids', '−' + money(cur.kids)]] : []),
+      ...(cur.homeCash ? [['Home loan (cash part)', '−' + money(cur.homeCash)]] : []),
       ['Investment (planned)', '−' + money(cur.invest)],
       ['Left', money(cur.savings), true, sign(cur.savings)],
       ['Employer CPF (not in take-home)', money(cur.er)],
@@ -1318,11 +1477,25 @@ function pageDashboard() {
           ...expenseLines().map((l) => ({ label: l.name || 'Spending', value: sm.last.cum.lines[l.id] || 0 })),
           { label: 'One-offs', value: sm.last.cum.extras }, { label: 'Recurring costs', value: sm.last.cum.recurring },
           { label: 'Income tax', value: sm.last.cum.tax }, { label: 'Insurance', value: sm.last.cum.insurance },
+          { label: 'Kids', value: sm.last.cum.kids }, { label: 'Home loan (cash)', value: sm.last.cum.home },
         ].filter((b) => b.value > 0).sort((a, b) => b.value - a.value)),
       ),
     ));
   }
   return frag;
+}
+
+/** One goal's progress bar and status line (dashboard and Goals page). */
+function goalBlock(p) {
+  const g = p.goal;
+  const when = p.left <= 0 ? 'Reached.'
+    : p.reach ? `Around ${monthLabel(p.reach)} at your 12-month pace${g.by ? (p.onTrack ? ' — on track.' : ` — after your ${monthLabel(g.by)} target; needs ${money(p.needPerMonth)}/month.`) : '.'}`
+      : 'Not enough saving pace yet to project a date.';
+  return el('div', { class: 'goal' },
+    el('div', { class: 'bar__head' }, el('span', { text: g.name || 'Goal' }), el('strong', { text: `${money(p.have, { compact: true })} / ${money(p.target, { compact: true })}` })),
+    progressBar(Math.min(1, p.progress)),
+    el('div', { class: 'card__hint' + (p.onTrack ? '' : ' neg'), text: when }),
+  );
 }
 
 function pageLedger() {
@@ -1356,6 +1529,11 @@ function pageLedger() {
     { key: 'extras', label: 'One-offs', type: 'money', get: (r) => orDash(r.extras) },
     { key: 'recurring', label: 'Recurring', type: 'money', get: (r) => orDash(r.recurring) },
     { key: 'insurance', label: 'Insurance', type: 'money', get: (r) => orDash(r.insurance) },
+    ...(S.children.length ? [{ key: 'kids', label: 'Kids', type: 'money', get: (r) => orDash(r.kids) }] : []),
+    ...(S.housing.status === 'own' ? [
+      { key: 'homecash', label: 'Home loan (cash)', type: 'money', get: (r) => orDash(r.homeCash) },
+      { key: 'homecpf', label: 'Home loan (CPF)', type: 'money', get: (r) => orDash(r.homeCpf) },
+    ] : []),
     { key: 'tax', label: 'Income tax', type: 'money', get: (r) => cell(r, 'tax') },
     { key: 'invest', label: 'Investment', type: 'money', get: (r) => cell(r, 'invest') },
     { key: 'savings', label: 'Savings', type: 'money', get: (r) => money(r.savings), cls: (r) => sign(r.savings) },
@@ -1387,7 +1565,7 @@ function pageLedger() {
     ) : null,
     el('div', { class: 'table-toolbar section-gap' }, el('span', { class: 'card__hint', text: 'Select a month to edit it.' }), viewToggle),
     editTable({ cols: shown, rows: [...rows].reverse(), emptyText: 'No months yet — select “Add next month”.' }),
-    el('p', { class: 'card__hint section-gap' }, el('span', { class: 'table__mark', text: '•' }), ' = value adjusted for that month only. ', full ? null : 'Spending = your spending lines, one-offs, recurring costs and insurance. ', 'Income tax is your projected annual tax for that calendar year ÷ 12.'),
+    el('p', { class: 'card__hint section-gap' }, el('span', { class: 'table__mark', text: '•' }), ' = value adjusted for that month only. ', full ? null : 'Spending = your spending lines, one-offs, recurring costs, insurance, kids and the cash part of a home loan. ', 'Income tax is your projected annual tax for that calendar year ÷ 12.'),
   );
 }
 
@@ -1599,6 +1777,400 @@ function pageRecurring() {
   );
 }
 
+const GOAL_PRESETS = [
+  { name: 'Emergency fund', kind: 'emergency', months: 6 },
+  { name: 'Home down payment' }, { name: 'Wedding' }, { name: 'Car' }, { name: 'Holiday' },
+  { name: 'Children’s education' }, { name: 'Further studies' },
+];
+
+function pageGoals() {
+  const sm = summary();
+  const plan = Object.fromEntries(sm.goals.map((p) => [p.goal.id, p]));
+  const add = (p) => {
+    S.goals.push({ id: uid(), name: p.name, target: 0, by: '', kind: p.kind || 'custom', ...(p.months ? { months: p.months } : {}) });
+    commit();
+    toast(`Added ${p.name}${p.kind === 'emergency' ? '' : ' — enter the target amount'}`);
+  };
+  const picker = el('select', {
+    class: 'select select--inline', 'aria-label': 'Add a goal',
+    onchange: (e) => { const v = e.target.value; if (v !== '') add(v === 'custom' ? { name: 'New goal' } : GOAL_PRESETS[+v]); },
+  },
+  el('option', { value: '', text: '+ Add a goal…', selected: true }),
+  GOAL_PRESETS.map((p, i) => el('option', { value: i, text: p.name })),
+  el('option', { value: 'custom', text: 'Something else' }));
+  const move = (g, d) => {
+    const i = S.goals.indexOf(g), j = i + d;
+    if (j < 0 || j >= S.goals.length) return;
+    [S.goals[i], S.goals[j]] = [S.goals[j], S.goals[i]];
+    commit();
+  };
+  const edit = () => 'table__td--edit';
+  const cols = [
+    { key: 'order', label: 'Order', type: 'text', get: (g) => el('span', { class: 'page__actions' },
+      el('button', { class: 'btn btn--icon', type: 'button', text: '↑', 'aria-label': `Move ${g.name} up`, disabled: S.goals[0] === g, onclick: () => move(g, -1) }),
+      el('button', { class: 'btn btn--icon', type: 'button', text: '↓', 'aria-label': `Move ${g.name} down`, disabled: S.goals[S.goals.length - 1] === g, onclick: () => move(g, 1) })) },
+    { key: 'name', label: 'Goal', type: 'text' },
+    { key: 'target', label: 'Target', type: 'money', cls: edit, get: (g) => (g.kind === 'emergency'
+      ? el('span', { class: 'goal__months' }, inputFor(g, { key: 'months', type: 'number', label: 'Months of spending', step: '1' }), ` months = ${money(plan[g.id]?.target)}`)
+      : inputFor(g, { key: 'target', type: 'money', label: 'Target' })) },
+    { key: 'by', label: 'Target date (optional)', type: 'month' },
+    { key: 'have', label: 'Saved', type: 'money', get: (g) => money(plan[g.id]?.have) },
+    { key: 'left', label: 'Still to save', type: 'money', get: (g) => money(plan[g.id]?.left) },
+    { key: 'need', label: 'Needed / month', type: 'money', get: (g) => (plan[g.id]?.needPerMonth ? money(plan[g.id].needPerMonth) : '–') },
+    { key: 'reach', label: 'Reached around', type: 'text', get: (g) => { const p = plan[g.id]; return !p ? '–' : p.left <= 0 ? 'Reached' : p.reach ? monthLabel(p.reach) : 'Not at current pace'; }, cls: (g) => (plan[g.id] && !plan[g.id].onTrack ? 'neg' : '') },
+  ];
+  return el('div', null,
+    pageHead('Goals', 'What you are saving for. Savings fill the goals from the top, so put the most important first.', picker),
+    el('div', { class: 'grid grid--stats' },
+      stat('Saved so far', money(sm.saved), 'Cash + investments, excl. money set aside', true),
+      stat('12-month pace', money(sm.pace) + '/mo', 'Savings + planned investing'),
+      stat('Emergency fund', sm.emergencyMonths != null ? `${sm.emergencyMonths.toFixed(1)} months` : '–', sm.spendAvg ? `Cash ÷ ${money(sm.spendAvg, { compact: true })} average monthly spending` : null),
+    ),
+    sm.goals.length ? el('div', { class: 'card section-gap' }, sm.goals.map(goalBlock)) : null,
+    el('div', { class: 'section-gap' }, editTable({ cols, rows: S.goals, onDelete: (g) => undoable(`${g.name || 'Goal'} removed`, () => { S.goals = S.goals.filter((x) => x !== g); }), emptyText: 'No goals yet — add one above.' })),
+    el('p', { class: 'card__hint section-gap', text: 'The emergency fund target follows your average spending over the last 6 months (excluding income tax); the usual guide is 3–6 months. Dates assume your last 12 months’ saving pace continues and goes to each goal in turn.' }),
+  );
+}
+
+function pageKids() {
+  const now = thisMonth(), year = now.slice(0, 4);
+  const cur = computeLedger(now).find((r) => r.month === now);
+  const earned = cur ? cur.earned : num((assumptionFor(now) || {}).salary) * 12;
+  const ordered = childrenByBirth();
+  const stageOf = (c, ym = now) => {
+    if (!c.birthMonth || ym < c.birthMonth) return null;
+    const age = monthDiff(c.birthMonth, ym) / 12;
+    return S.childStages.find((s) => age >= num(s.from) && age < num(s.to)) || null;
+  };
+  const eduGoal = (c) => {
+    const i = ordered.indexOf(c);
+    S.goals.push({ id: uid(), name: `${childName(c, i < 0 ? S.children.indexOf(c) : i)} — education fund`, target: 0, by: c.birthMonth ? addMonths(c.birthMonth, 19 * 12) : '', kind: 'custom' });
+    commit(); go('goals'); toast('Goal added — enter the target amount');
+  };
+  const yesNo = [[true, 'Yes'], [false, 'No']];
+  const edit = () => 'table__td--edit';
+  const childCols = [
+    { key: 'name', label: 'Name', type: 'text' },
+    { key: 'birthMonth', label: 'Born (or due)', type: 'month' },
+    { key: 'age', label: 'Age', type: 'text', get: (c) => (c.birthMonth ? (now < c.birthMonth ? 'Not born yet' : String(Math.floor(monthDiff(c.birthMonth, now) / 12))) : '–') },
+    { key: 'stage', label: 'Now', type: 'text', get: (c) => stageOf(c)?.name || '–' },
+    { key: 'cost', label: 'Cost now / month', type: 'money', get: (c) => money(num(stageOf(c)?.monthly)) },
+    { key: 'studying', label: 'Studying full-time after 16', type: 'text', cls: edit, get: (c) => selectFor(c, 'studying', yesNo, 'Studying full-time after 16') },
+    { key: 'disability', label: 'Disability', type: 'text', cls: edit, get: (c) => selectFor(c, 'disability', [[false, 'No'], [true, 'Yes']], 'Disability') },
+    { key: 'goal', label: '', type: 'text', get: (c) => el('button', { class: 'btn btn--small', type: 'button', text: '+ Education goal', onclick: () => eduGoal(c) }) },
+  ];
+  // Kids' costs for the next 25 years, by calendar year (today's prices).
+  const firstYear = +year, years = Array.from({ length: 25 }, (_, k) => firstYear + k);
+  const yearly = years.map((y) => sum(Array.from({ length: 12 }, (_, m) => kidsCostFor(`${y}-${pad(m + 1)}`).total)));
+  const reliefs = childReliefs(year, earned);
+  const ptrNow = cur ? { pool: cur.ptrPool, applied: cur.ptrApplied } : { pool: ptrFor(year), applied: 0 };
+  return el('div', null,
+    pageHead('Kids & education', 'Each child’s costs by age, education savings, and the tax reliefs and rebates they bring.',
+      el('button', { class: 'btn btn--primary', type: 'button', text: '+ Child', onclick: () => { S.children.push({ id: uid(), name: '', birthMonth: '', disability: false, studying: true }); commit(); } })),
+    el('div', { class: 'grid grid--stats' },
+      stat('Kids’ costs this month', money(kidsCostFor(now).total), `${S.children.length} child${S.children.length === 1 ? '' : 'ren'}`, true),
+      stat(`Child reliefs ${year}`, money(sum(reliefs, (r) => r.amount)), 'Inside the $80k relief cap'),
+      stat('Parenthood Tax Rebate', money(Math.max(0, ptrNow.pool - ptrNow.applied)), `Left after ${year}; ${money(ptrNow.applied, { compact: true })} used this year`),
+    ),
+    el('div', { class: 'section-gap' }, editTable({ cols: childCols, rows: S.children, onDelete: (c) => undoable(`${c.name || 'Child'} removed`, () => { S.children = S.children.filter((x) => x !== c); }), emptyText: 'No children added. Add one — including a baby on the way — to plan costs and reliefs.' })),
+    el('div', { class: 'grid grid--two section-gap grid--top' },
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title' }, el('span', { text: 'Monthly cost by age' }), el('button', { class: 'btn btn--small', type: 'button', text: '+ Stage', onclick: () => { const last = S.childStages[S.childStages.length - 1]; S.childStages.push({ id: uid(), name: 'New stage', from: num(last?.to), to: num(last?.to) + 1, monthly: 0 }); commit(); } })),
+        el('p', { class: 'card__hint', text: 'Your own estimates after subsidies — fees, enrichment, allowance, food. Pre-school fees and subsidies: ECDA; school fees: MOE. Applies to every child; counts as spending in the ledger.' }),
+        editTable({
+          cols: [{ key: 'name', label: 'Stage', type: 'text' }, { key: 'from', label: 'From age', type: 'number', step: '0.5' }, { key: 'to', label: 'Until age', type: 'number', step: '0.5' }, { key: 'monthly', label: 'Per month', type: 'money' }],
+          rows: S.childStages,
+          onDelete: (s) => undoable('Stage removed', () => { S.childStages = S.childStages.filter((x) => x !== s); }),
+        }),
+      ),
+      el('div', { class: 'card' },
+        el('div', { class: 'card__title', text: 'Tax' }),
+        el('div', { class: 'form-grid' },
+          field('Working Mother’s Child Relief', selectFor(S.settings, 'wmcr', [[false, 'Not claiming'], [true, 'I claim it']], 'Working Mother’s Child Relief')),
+          settingInput(S.settings, 'childReliefShare', 'pct', 'Share of QCR & rebate you claim', 'Parents can split them; 100% if you claim all.'),
+        ),
+        reliefs.length ? kv(reliefs.map((r) => [r.name, money(r.amount)])) : el('p', { class: 'muted', text: `No child reliefs for ${year}.` }),
+        el('p', { class: 'card__hint section-gap', text: `Qualifying Child Relief ${money(SG.qcr, { compact: true })} per child (${money(SG.childDisability, { compact: true })} with a disability) while under 16 or studying full-time. WMCR for children born from 2024: ${SG.wmcrFixed.map((v) => money(v, { compact: true })).join(' / ')} for the 1st / 2nd / 3rd+; earlier births: ${SG.wmcrPct.map((v) => pct(v, 0)).join(' / ')} of earned income. Parenthood Tax Rebate ${SG.ptr.map((v) => money(v, { compact: true })).join(' / ')}, used against tax from the year of birth and carried forward. These feed the Tax page and the ledger’s income tax. Check IRAS for your case.` }),
+      ),
+    ),
+    S.children.length ? el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: 'Kids’ costs per year (today’s prices)' }),
+      barChart(yearly, years.map(String), { format: (v) => money(v, { compact: true }), label: 'Kids’ costs per year' })) : null,
+  );
+}
+
+/**
+ * Year-by-year retirement projection in future dollars. Until `retireAge`: savings and investments grow at the
+ * expected return plus the last 12 months' saving pace, and CPF gets the same contributions. At 55 the RA is
+ * formed up to the Full Retirement Sum (SA first, then OA); anything above it becomes withdrawable and joins
+ * savings. From 65, CPF LIFE pays an estimate scaled from CPF's figure for the FRS. After retiring, spending
+ * (growing with inflation) comes out of savings.
+ */
+function retireSim(ctx, retireAge) {
+  const R = S.retire, r = num(R.returnRate), infl = num(R.inflation);
+  let W = ctx.wealth, oa = ctx.oa, sa = ctx.sa, ra = ctx.ra, payout = ctx.payout;
+  const out = [];
+  let lastsTo = null, atRetire = null;
+  for (let t = 0; ctx.age + t <= Math.max(num(R.lifeExpectancy), 95); t++) {
+    const age = ctx.age + t, year = ctx.year + t;
+    const working = age < retireAge;
+    if (!working && atRetire == null) atRetire = W;
+    if (ctx.cpf) {
+      if (Math.floor(age) === 55 && ra == null) {
+        const frs = SG.frs2026 * Math.pow(1 + SG.frsGrowth, year - 2026);
+        const fromSa = Math.min(sa, frs), fromOa = Math.min(oa, frs - fromSa);
+        ra = fromSa + fromOa; sa -= fromSa; oa -= fromOa;
+        W += sa + oa; sa = 0; oa = 0; // above the FRS: withdrawable at 55
+        payout = (SG.cpfLifeAtFrs * ra) / SG.frs2026;
+      }
+      const contrib = working ? ctx.contrib : 0;
+      const house = t < ctx.housingYears ? ctx.housingCpf : 0;
+      oa = Math.max(0, oa * 1.025 + contrib * ctx.oaShare - house);
+      sa = sa * 1.04 + contrib * ctx.saShare;
+      if (ra != null && age < 65) ra *= 1.04;
+    }
+    const spend = ctx.spend * Math.pow(1 + infl, t);
+    const income = ctx.cpf && age >= 65 && payout ? payout * 12 : 0;
+    W = W * (1 + r) + (working ? ctx.save : income - spend);
+    out.push({ age, year, wealth: W, cpf: ctx.cpf ? oa + sa + (ra || 0) : 0, spend, income });
+    if (!working && W < 0 && lastsTo == null) lastsTo = age;
+  }
+  return { years: out, lastsTo, atRetire, payout };
+}
+
+function pageRetirement() {
+  const R = S.retire, st = S.settings, sm = summary(), now = thisMonth();
+  const a = assumptionFor(now) || {};
+  const age = st.birthMonth ? ageAt(now) : num(a.age);
+  if (!(age > 0)) {
+    return el('div', null, pageHead('Retirement', 'When you could stop working, and how long your money lasts.'),
+      el('div', { class: 'notice' }, 'Set your birth month (or an age) on ', el('a', { href: '#/assumptions', text: 'Assumptions' }), ' to see a projection.'));
+  }
+  const recent = sm.rows.slice(-12);
+  const last = sm.last;
+  const po = S.housing.status === 'own' ? payoff({ balance: sm.homeLoan, payment: num(S.housing.cpfMonthly) + num(S.housing.cashMonthly), rate: S.housing.loanRate }) : { months: 0 };
+  const spendMonthly = R.spendMonthly != null && R.spendMonthly !== '' ? num(R.spendMonthly) : sm.spendAvg;
+  const ctx = {
+    age: Math.floor(age), year: +now.slice(0, 4), cpf: st.cpfEnabled,
+    wealth: sm.liquid, save: sm.pace * 12, spend: spendMonthly * 12,
+    oa: last ? last.oa : num(st.cpfStart.oa), sa: last ? last.sa : num(st.cpfStart.sa),
+    ra: age >= 55 ? (last ? last.sa : num(st.cpfStart.sa)) : null, payout: null,
+    contrib: recent.length ? (sum(recent, (r) => r.ee + r.er) / recent.length) * 12 : 0,
+    oaShare: last ? num(last.rates.oa) : 0.6, saShare: last ? Math.max(0, 1 - num(last.rates.oa) - num(last.rates.ma)) : 0.16,
+    housingCpf: num(S.housing.cpfMonthly) * 12, housingYears: po.months == null ? 99 : Math.ceil(num(po.months) / 12),
+  };
+  if (ctx.ra != null) { ctx.payout = (SG.cpfLifeAtFrs * ctx.ra) / SG.frs2026; ctx.sa = 0; }
+  const plan = retireSim(ctx, num(R.age));
+  const life = num(R.lifeExpectancy);
+  let earliest = null;
+  for (let ra = ctx.age; ra <= 75; ra++) { const s = retireSim(ctx, ra); if (s.lastsTo == null || s.lastsTo > life) { earliest = ra; break; } }
+  const toToday = (v, years) => v / Math.pow(1 + num(R.inflation), years);
+  const yrsToRet = Math.max(0, num(R.age) - ctx.age);
+  const spendAtRet = ctx.spend * Math.pow(1 + num(R.inflation), yrsToRet);
+  const fireNumber = num(R.swr) > 0 ? spendAtRet / num(R.swr) : null;
+  const shown = plan.years.filter((y) => y.age <= Math.max(life, num(R.age) + 5));
+  return el('div', null,
+    pageHead('Retirement', 'When you could stop working, and how long your money lasts — with CPF LIFE.'),
+    el('div', { class: 'grid grid--stats' },
+      stat('Earliest you could retire', earliest != null ? `Age ${earliest}` : 'Not by 75', earliest != null ? `${ctx.year + earliest - ctx.age} · money lasts past ${life}` : 'Save more or spend less in retirement', true),
+      stat(`Savings at ${num(R.age)}`, money(plan.atRetire ?? 0, { compact: true }), `≈ ${money(toToday(plan.atRetire ?? 0, yrsToRet), { compact: true })} in today’s money`),
+      stat('CPF LIFE from 65', plan.payout ? money(plan.payout) + '/mo' : '–', plan.payout ? `≈ ${money(toToday(plan.payout, Math.max(0, 65 - ctx.age)))} in today’s money` : (st.cpfEnabled ? 'Forms at 55' : 'CPF tracking off')),
+      stat(`Retiring at ${num(R.age)}, money lasts`, plan.lastsTo == null ? `Past ${Math.max(life, 95)}` : `Until ${plan.lastsTo}`, plan.lastsTo != null && plan.lastsTo <= life ? 'Runs out before your life expectancy' : null),
+    ),
+    el('div', { class: 'grid grid--two section-gap grid--top' },
+      el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Your assumptions' }),
+        el('div', { class: 'form-grid' },
+          settingInput(R, 'age', 'number', 'Retire at age', null, { step: '1' }),
+          settingInput(R, 'lifeExpectancy', 'number', 'Plan until age', 'Plan for longer than average.', { step: '1' }),
+          settingInput(R, 'spendMonthly', 'money', 'Spending in retirement / month', `Today’s prices. Blank = your recent average (${money(sm.spendAvg, { compact: true })}).`, { nullable: true }),
+          settingInput(R, 'returnRate', 'pct', 'Investment return / year', 'Before inflation. Lower is safer.'),
+          settingInput(R, 'inflation', 'pct', 'Inflation / year'),
+          settingInput(R, 'swr', 'pct', 'Safe withdrawal rate', 'Used for the FIRE number; 4% is the common rule of thumb.'),
+        )),
+      el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Key numbers' }),
+        kv([
+          ['Saving now (12-month pace)', money(sm.pace) + '/mo'],
+          ['Savings & investments now (liquid net worth)', money(sm.liquid)],
+          [`Spending at ${num(R.age)} (future prices)`, money(spendAtRet / 12) + '/mo'],
+          [`FIRE number at ${num(R.age)} (spending ÷ ${pct(R.swr, 1)})`, fireNumber != null ? money(fireNumber, { compact: true }) : '–', true],
+          ...(st.cpfEnabled ? [
+            ['Full Retirement Sum for your cohort', money(SG.frs2026 * Math.pow(1 + SG.frsGrowth, ctx.year + Math.max(0, 55 - ctx.age) - 2026), { compact: true })],
+            ['CPF LIFE estimate from 65', plan.payout ? money(plan.payout) + '/mo' : '–'],
+          ] : []),
+        ]),
+        el('p', { class: 'card__hint section-gap', text: `A rough projection, not advice. CPF LIFE is scaled from CPF’s estimate of ~${money(SG.cpfLifeAtFrs, { compact: true })}/month (Standard plan, from 65) for the 2026 Full Retirement Sum of ${money(SG.frs2026, { compact: true })}; the FRS is assumed to rise ${pct(SG.frsGrowth, 1)} a year. Savings growth assumes your last 12 months’ pace continues. Use CPF’s Retirement Payout Planner for your own figures.` }),
+      ),
+    ),
+    el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: `Projection, retiring at ${num(R.age)}` }),
+      lineChart([
+        { name: 'Savings & investments', values: shown.map((y) => y.wealth) },
+        ...(st.cpfEnabled ? [{ name: 'CPF (OA + SA, then RA)', values: shown.map((y) => y.cpf) }] : []),
+      ], shown.map((y) => `${y.age}`))),
+  );
+}
+
+/** CPF going into the OA each month at current pay and age band. */
+function oaInflow() {
+  if (!S.settings.cpfEnabled) return 0;
+  const now = thisMonth(), a = assumptionFor(now) || {};
+  const c = cpfFor(now, ageAt(now, a));
+  const ceiling = num(S.settings.owCeiling);
+  return (ceiling > 0 ? Math.min(num(a.salary), ceiling) : num(a.salary)) * (num(c.ee) + num(c.er)) * num(c.oa);
+}
+const LOAN_TYPES = [['hdb', 'HDB loan'], ['bank', 'Bank loan']];
+
+function pageHousing() {
+  const hs = S.housing, sm = summary(), now = thisMonth();
+  const a = assumptionFor(now) || {};
+  const gross = num(a.salary);
+  const choose = el('div', { class: 'segmented', role: 'group', 'aria-label': 'Your housing' },
+    [['rent', 'Renting'], ['own', 'I own a home'], ['buying', 'Planning to buy']].map(([v, t]) => el('button', {
+      class: 'segmented__btn', type: 'button', text: t, 'aria-pressed': String(hs.status === v), onclick: () => { hs.status = v; commit(); },
+    })));
+  const body = hs.status === 'rent' ? housingRent(a, computeLedger(now).find((r) => r.month === now))
+    : hs.status === 'own' ? housingOwn(sm, gross)
+      : hs.status === 'buying' ? housingPlan(sm, gross)
+        : el('div', { class: 'card muted', text: 'Choose your situation above.' });
+  return el('div', null,
+    pageHead('Housing', 'Your rent, the home you own and its loan, or the home you plan to buy.'),
+    el('div', { class: 'table-toolbar' }, choose),
+    el('div', { class: 'section-gap' }, body),
+  );
+}
+
+function housingRent(a, cur) {
+  const line = expenseLines().find((l) => /rent|housing/i.test(l.name));
+  if (!line) {
+    return el('div', { class: 'card' },
+      el('p', { text: 'Rent is a spending line, so it flows into every month of the ledger.' }),
+      el('button', { class: 'btn btn--primary', type: 'button', text: 'Add a rent line', onclick: () => { S.budgetLines.push({ id: uid(), ...LINE_PRESETS[0] }); commit(); go('assumptions'); toast('Rent line added — enter the amount in the Assumptions table'); } }));
+  }
+  const rent = cur ? cur.lines[line.id] : num(a.lines?.[line.id]);
+  return el('div', { class: 'grid grid--two' },
+    el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Rent' }),
+      kv([['Rent per month', money(rent)], ['Share of take-home pay', cur?.takeHome ? pct(rent / cur.takeHome) : '–', true]]),
+      el('p', { class: 'card__hint section-gap' }, 'Set the amount on ', el('a', { href: '#/assumptions', text: 'Assumptions' }), ` (line “${line.name}”), and add a new Assumptions row when it changes.`)),
+    el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Thinking of buying?' }),
+      el('p', { class: 'card__hint', text: 'Switch to “Planning to buy” to see the down payment, stamp duty, how much CPF you can use, the cash you need and the monthly instalment.' })),
+  );
+}
+
+function housingOwn(sm, gross) {
+  const hs = S.housing;
+  const payment = num(hs.cpfMonthly) + num(hs.cashMonthly);
+  const po = payoff({ balance: sm.homeLoan, payment, rate: hs.loanRate });
+  // A loan that starts later (e.g. keys in a few years) is paid off counting from its start, not from today.
+  if (po.months != null && hs.loanAsOf > thisMonth()) po.date = addMonths(hs.loanAsOf, po.months);
+  const tracked = sm.rows.filter((r) => hs.loanAsOf && r.month >= hs.loanAsOf);
+  const otherDebt = sum(S.liabilities, (l) => l.payment);
+  const proceeds = sm.homeValue - sm.homeLoan - sm.cpfUsedHome;
+  const cap = hs.loanType === 'hdb' ? SG.msr : SG.tdsr;
+  const ratio = gross > 0 ? (payment + (hs.loanType === 'hdb' ? 0 : otherDebt)) / gross : null;
+  return el('div', null,
+    el('div', { class: 'grid grid--stats' },
+      stat('Home equity', money(sm.homeEquity), 'Value − loan', true),
+      stat('Loan balance', money(sm.homeLoan), tracked.length ? `After ${monthLabel(tracked[tracked.length - 1].month)}` : hs.loanAsOf ? `At ${monthLabel(hs.loanAsOf)}` : 'Enter it below'),
+      stat('Loan paid off', po.months == null ? (payment > 0 ? 'Never at this payment' : '–') : po.months === 0 ? 'Done' : monthLabel(po.date), po.months ? `${po.months} months · ${money(po.interest, { compact: true })} interest to go` : null),
+      stat(hs.loanType === 'hdb' ? 'Instalment ÷ gross pay' : 'All debts ÷ gross pay', ratio != null ? pct(ratio) : '–',
+        `${hs.loanType === 'hdb' ? 'MSR' : 'TDSR'} limit ${pct(cap, 0)}${ratio > cap ? ' — over the limit' : ''}`),
+    ),
+    el('div', { class: 'grid grid--two section-gap' },
+      el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Your home and loan' }),
+        el('div', { class: 'form-grid' },
+          settingInput(hs, 'value', 'money', 'Estimated value', 'Recent prices for similar units are a fair guide.'),
+          field('Loan type', selectFor(hs, 'loanType', LOAN_TYPES, 'Loan type')),
+          settingInput(hs, 'loanBalance', 'money', 'Outstanding loan', 'From your latest loan statement.'),
+          settingInput(hs, 'loanAsOf', 'month', 'Balance is at the start of', 'Instalments from this month on are followed in the ledger.'),
+          settingInput(hs, 'loanRate', 'pct', 'Interest rate / year', `HDB loans: ${pct(SG.hdbRate)}.`),
+          settingInput(hs, 'cpfMonthly', 'money', 'Paid monthly from CPF OA', 'Taken off your OA balance each month.'),
+          settingInput(hs, 'cashMonthly', 'money', 'Paid monthly in cash', 'Counts as spending in the ledger.'),
+          settingInput(hs, 'cpfUsed', 'money', 'CPF used so far, incl. accrued interest', 'CPF statement → Home ownership, at the same month as the balance.'),
+        )),
+      el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'If you sold today' }),
+        kv([
+          ['Estimated value', money(sm.homeValue)],
+          ['Repay the loan', '−' + money(sm.homeLoan)],
+          ['Back to your CPF OA (CPF used + accrued interest)', '−' + money(sm.cpfUsedHome)],
+          ['Cash left', money(proceeds), true, sign(proceeds)],
+        ]),
+        el('p', { class: 'card__hint section-gap', text: `CPF used for a home goes back into your OA with ${pct(SG.cpfHousingRate)} accrued interest when you sell. Before agent fees and other selling costs.` }),
+      ),
+    ),
+    tracked.length > 1 ? el('div', { class: 'card section-gap' }, el('div', { class: 'card__title', text: 'Loan balance' }), lineChart([{ name: 'Loan balance', values: tracked.map((r) => r.loanBal) }], tracked.map((r) => monthLabel(r.month).replace(' 20', " '")))) : null,
+  );
+}
+
+function housingPlan(sm, gross) {
+  const p = S.housing.plan;
+  const price = num(p.price), grants = num(p.grants);
+  const loan = Math.max(0, Math.min(price * SG.ltv, price - grants));
+  const down = Math.max(0, price - grants - loan);
+  const bsd = stampDuty(price), fees = num(p.fees);
+  const upfront = down + bsd + fees;
+  const minCash = p.loanType === 'bank' ? price * SG.bankMinCash : 0;
+  const monthsAway = p.month ? Math.max(0, monthDiff(thisMonth(), p.month)) : 0;
+  const oaNow = S.settings.cpfEnabled ? (sm.last ? sm.last.oa : num(S.settings.cpfStart.oa)) : 0;
+  const oaThen = oaNow + oaInflow() * monthsAway;
+  const cpfMax = Math.max(0, Math.min(oaThen, upfront - minCash));
+  const cpfUse = p.cpfUse == null || p.cpfUse === '' ? cpfMax : Math.max(0, Math.min(num(p.cpfUse), cpfMax));
+  const cash = upfront - cpfUse;
+  const inst = instalment(loan, p.rate, p.tenure);
+  const otherDebt = sum(S.liabilities, (l) => l.payment);
+  const ratio = (v, cap) => (gross > 0 ? `${pct(v / gross)} of gross pay (limit ${pct(cap, 0)}${v / gross > cap ? ' — over' : ''})` : 'Add your salary on Assumptions');
+  const makeGoal = () => {
+    S.goals.push({ id: uid(), name: 'Home: cash for down payment & fees', target: Math.round(cash), by: p.month || '', kind: 'custom' });
+    commit(); go('goals'); toast('Goal added');
+  };
+  const bought = () => undoable('Moved to “I own a home”', () => {
+    const fromOa = Math.min(inst, oaInflow());
+    Object.assign(S.housing, { status: 'own', value: price, loanType: p.loanType, loanBalance: loan, loanAsOf: p.month || thisMonth(), loanRate: p.rate, cpfMonthly: Math.round(fromOa), cashMonthly: Math.round(inst - fromOa), cpfUsed: Math.round(cpfUse) });
+  });
+  return el('div', null,
+    el('div', { class: 'grid grid--stats' },
+      stat('Cash needed', money(cash), p.month ? `By ${monthLabel(p.month)}` : null, true),
+      stat('From CPF OA', money(cpfUse), `${money(oaThen, { compact: true })} expected in OA by then`),
+      stat('Monthly instalment', money(inst), `${money(loan, { compact: true })} over ${num(p.tenure)} years`),
+      stat('Cash in the bank now', money(sm.emergencyCash), cash > 0 ? `${pct(Math.min(1, Math.max(0, sm.emergencyCash) / cash), 0)} of the cash needed` : null),
+    ),
+    el('div', { class: 'grid grid--two section-gap' },
+      el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'The home' }),
+        el('div', { class: 'form-grid' },
+          settingInput(p, 'price', 'money', 'Price'),
+          settingInput(p, 'month', 'month', 'Key collection / completion'),
+          field('Loan type', selectFor(p, 'loanType', LOAN_TYPES, 'Loan type')),
+          settingInput(p, 'rate', 'pct', 'Interest rate / year', `HDB loans: ${pct(SG.hdbRate)}. Bank rates float.`),
+          settingInput(p, 'tenure', 'number', 'Loan tenure (years)', 'Check the current maximum with HDB or your bank.', { step: '1' }),
+          settingInput(p, 'grants', 'money', 'Housing grants', 'e.g. Enhanced CPF Housing Grant — check eligibility on the HDB site.'),
+          settingInput(p, 'fees', 'money', 'Legal & other fees', 'Conveyancing, valuation, renovation deposit…'),
+          settingInput(p, 'cpfUse', 'money', 'CPF OA to use', 'Blank = as much as allowed and available.', { nullable: true }),
+        )),
+      el('div', { class: 'card' }, el('div', { class: 'card__title', text: 'Where the money comes from' }),
+        kv([
+          ['Price', money(price)],
+          ['Housing grants', '−' + money(grants)],
+          [`Loan (up to ${pct(SG.ltv, 0)} of the price)`, '−' + money(loan)],
+          ['Down payment', money(down), true],
+          ['Buyer’s Stamp Duty', money(bsd)],
+          ['Legal & other fees', money(fees)],
+          ['Needed upfront', money(upfront), true],
+          ['From CPF OA', '−' + money(cpfUse)],
+          ['Cash needed', money(cash), true],
+        ]),
+        el('div', { class: 'card__title section-gap', text: 'Can you borrow this much?' }),
+        kv([
+          ['Monthly instalment', money(inst)],
+          ...(p.loanType === 'hdb' ? [['Mortgage Servicing Ratio (HDB/EC)', ratio(inst, SG.msr)]] : []),
+          ['Total Debt Servicing Ratio (all debts)', ratio(inst + otherDebt, SG.tdsr)],
+        ]),
+        el('p', { class: 'card__hint section-gap', text: `${p.loanType === 'bank' ? `Bank loans need at least ${pct(SG.bankMinCash, 0)} of the price in cash. ` : ''}Stamp duty uses the current Buyer’s Stamp Duty bands; Additional Buyer’s Stamp Duty (a second property, PRs, foreigners) is not included. Loan limits shrink for longer tenures and older buyers — confirm with HDB (HDB Flat Eligibility letter) or your bank.` }),
+        el('div', { class: 'page__actions section-gap' },
+          el('button', { class: 'btn btn--primary', type: 'button', text: 'Save the cash as a goal', onclick: makeGoal, disabled: !(cash > 0) }),
+          el('button', { class: 'btn', type: 'button', text: 'I’ve bought it', onclick: bought, disabled: !(price > 0) }),
+        ),
+      ),
+    ),
+  );
+}
+
 function pageInvestments() {
   const sm = summary();
   const dep = [...S.deposits].sort(byKey('date'));
@@ -1648,11 +2220,42 @@ function pageLiabilities() {
   );
 }
 
+const POLICY_TYPES = [['life', 'Whole life'], ['term', 'Term life'], ['ci', 'Critical illness'], ['hospital', 'Hospital (Integrated Shield)'], ['accident', 'Personal accident'], ['other', 'Other']];
+
+/** Cover across all policies against the MoneySense Basic Financial Planning Guide multiples of annual income. */
+function coverCard() {
+  const now = thisMonth(), a = assumptionFor(now) || {};
+  const bonuses = sum(computeLedger().slice(-12), (r) => r.bonus);
+  const income = num(a.salary) * 12 + bonuses;
+  const have = { death: sum(S.policies, (p) => p.coverDeath), tpd: sum(S.policies, (p) => p.coverTPD), ci: sum(S.policies, (p) => p.coverCI) };
+  const need = { death: income * SG.coverDeath, tpd: income * SG.coverDeath, ci: income * SG.coverCI };
+  const year = +now.slice(0, 4);
+  const premiums = sum(S.policies.filter((p) => p.start && year >= +p.start.slice(0, 4) && year < +p.start.slice(0, 4) + num(p.years)), (p) => p.premium);
+  const shield = S.policies.some((p) => p.type === 'hospital');
+  const row = (label, h, n) => el('div', { class: 'goal' },
+    el('div', { class: 'bar__head' }, el('span', { text: label }), el('strong', { text: `${money(h, { compact: true })} / ${money(n, { compact: true })}` })),
+    progressBar(n > 0 ? Math.min(1, h / n) : 0),
+    el('div', { class: 'card__hint' + (h < n ? ' neg' : ''), text: n <= 0 ? 'Add your salary on Assumptions.' : h >= n ? 'Meets the guide.' : `Gap ${money(n - h, { compact: true })}` }));
+  return el('div', { class: 'card' },
+    el('div', { class: 'card__title', text: 'Your cover' }),
+    row(`Death (guide: ${SG.coverDeath}× annual income)`, have.death, need.death),
+    row(`Total & permanent disability (${SG.coverDeath}×)`, have.tpd, need.tpd),
+    row(`Critical illness (${SG.coverCI}×)`, have.ci, need.ci),
+    kv([
+      ['Hospital', shield ? 'Integrated Shield plan' : 'MediShield Life only (basic, B2/C wards)'],
+      ['Premiums this year', `${money(premiums)} · ${income > 0 ? pct(premiums / income) : '–'} of income (guide: up to ${pct(SG.maxPremiumShare, 0)})`],
+    ]),
+    el('p', { class: 'card__hint section-gap', text: `Guide multiples are from the MoneySense Basic Financial Planning Guide (based on LIA’s protection gap study). They are rules of thumb — what you need depends on dependants, debts and other savings. Annual income here = salary × 12 + bonuses in the last 12 months (${money(income, { compact: true })}).` }),
+  );
+}
+
 function pageInsurance() {
-  const add = () => { S.policies.push({ id: uid(), name: 'Whole life policy', start: todayISO(), years: 20, premium: 0, actual: {} }); commit(); };
+  const add = () => { S.policies.push({ id: uid(), name: 'Whole life policy', type: 'life', payer: 'cash', start: todayISO(), years: 20, premium: 0, coverDeath: 0, coverTPD: 0, coverCI: 0, actual: {} }); commit(); };
   const cards = S.policies.map((p) => {
     const years = Math.max(0, Math.min(100, num(p.years)));
     p.actual = p.actual || {};
+    p.type = p.type || 'life';
+    p.payer = p.payer || 'cash';
     const [sy, smn, sd] = (p.start || todayISO()).split('-');
     const sched = Array.from({ length: years }, (_, k) => ({ k, date: `${+sy + k}-${smn}-${sd}`, expected: num(p.premium), actual: p.actual[k] }));
     const paid = sum(sched, (r) => (r.actual != null && r.actual !== '' ? r.actual : 0));
@@ -1667,18 +2270,24 @@ function pageInsurance() {
       el('div', { class: 'card__title' }, el('span', { text: p.name || 'Policy' }), el('button', { class: 'btn btn--small btn--danger', type: 'button', text: 'Delete policy', onclick: () => undoable(`${p.name || 'Policy'} deleted`, () => { S.policies = S.policies.filter((x) => x !== p); }) })),
       el('div', { class: 'form-grid' },
         settingInput(p, 'name', 'text', 'Policy name'),
+        field('Type', selectFor(p, 'type', POLICY_TYPES, 'Type')),
         settingInput(p, 'start', 'date', 'Policy start date'),
         settingInput(p, 'years', 'number', 'Premium term (years)', null, { step: '1' }),
         settingInput(p, 'premium', 'money', 'Annual premium (expected)'),
+        field('Paid from', selectFor(p, 'payer', [['cash', 'Cash'], ['medisave', 'MediSave']], 'Paid from'), 'MediSave: e.g. the MediShield Life / Integrated Shield part of a hospital plan.'),
+        settingInput(p, 'coverDeath', 'money', 'Death cover (sum assured)'),
+        settingInput(p, 'coverTPD', 'money', 'Total & permanent disability cover'),
+        settingInput(p, 'coverCI', 'money', 'Critical illness cover'),
       ),
-      el('p', { class: 'card__hint', text: `Paid so far ${money(paid)}. Premiums reduce that month's “Left” and count as spending, but are not added to net worth (paid premiums ≠ cash value).` }),
+      el('p', { class: 'card__hint', text: `Paid so far ${money(paid)}. ${p.payer === 'medisave' ? 'Paid from MediSave, so it comes out of your MA balance, not your take-home pay.' : 'Premiums reduce that month’s “Left” and count as spending.'} Not added to net worth (paid premiums ≠ cash value).` }),
       editTable({ cols, rows: sched }),
     );
   });
   return el('div', null,
-    pageHead('Insurance', 'Premium schedule for each policy. Log the actual amount each year when you pay.',
+    pageHead('Insurance', 'Your cover against common guidelines, and each policy’s premium schedule.',
       el('button', { class: 'btn btn--primary', type: 'button', text: '+ Policy', onclick: add })),
-    cards.length ? cards : el('div', { class: 'card muted', text: 'No policies yet.' }),
+    coverCard(),
+    cards.length ? el('div', { class: 'section-gap' }, cards) : el('div', { class: 'card muted section-gap', text: 'No policies yet.' }),
   );
 }
 
@@ -1697,8 +2306,10 @@ function pageTax() {
   const projected = lastRow ? lastRow.projected : 0;
   const base = Math.max(0, projected - eir);
   const taxNo = taxOn(base, table);
+  // Child reliefs come from the Kids page and go first; your own reliefs follow, all inside the cap.
+  const all = [...childReliefs(year, lastRow ? lastRow.earned : 0), ...list];
   let cur = base, capLeft = num(S.settings.reliefCap) || Infinity;
-  const shares = list.map((r) => {
+  const shares = all.map((r) => {
     const amt = Math.min(num(r.amount), capLeft);
     capLeft -= amt;
     const next = Math.max(0, cur - amt);
@@ -1710,7 +2321,9 @@ function pageTax() {
   const nextD = Math.max(0, cur - don);
   const donSaved = taxOn(cur, table) - taxOn(nextD, table);
   cur = nextD;
-  const taxWith = taxOn(cur, table);
+  const taxGross = taxOn(cur, table);
+  const rebate = lastRow ? Math.min(lastRow.ptrPool, taxGross) : 0; // Parenthood Tax Rebate
+  const taxWith = taxGross - rebate;
 
   const yearSel = el('select', { class: 'select', 'aria-label': 'Income year', onchange: (e) => { location.hash = '#/tax?y=' + e.target.value; } }, years.map((y) => el('option', { value: y, selected: y === year, text: `Income year ${y} (YA ${+y + 1})` })));
 
@@ -1725,9 +2338,10 @@ function pageTax() {
     },
   }, el('option', { value: '', text: '+ Add a relief…', selected: true }), RELIEF_PRESETS.map((p, i) => el('option', { value: i, text: p.amount ? `${p.name} · ${money(p.amount, { compact: true })}` : p.name })));
 
+  const own = (r) => (r.auto ? '' : 'table__td--edit');
   const reliefCols = [
-    { key: 'name', label: 'Relief', type: 'text' },
-    { key: 'amount', label: 'Amount', type: 'money' },
+    { key: 'name', label: 'Relief', type: 'text', cls: own, get: (r) => (r.auto ? el('span', null, r.name, el('a', { class: 'muted', href: '#/kids', text: ' · from Kids' })) : inputFor(r, { key: 'name', type: 'text', label: 'Relief' })) },
+    { key: 'amount', label: 'Amount', type: 'money', cls: own, get: (r) => (r.auto ? money(r.amount) : inputFor(r, { key: 'amount', type: 'money', label: 'Amount' })) },
     { key: 'applied', label: 'Applied (after cap)', type: 'money', get: (r) => money(shares.find((s) => s.r === r)?.applied) },
     { key: 'saved', label: 'Tax saved', type: 'money', get: (r) => money(shares.find((s) => s.r === r)?.saved), cls: () => 'pos' },
   ];
@@ -1737,7 +2351,7 @@ function pageTax() {
     el('div', { class: 'grid grid--stats' },
       stat('Projected tax', money(taxWith), `≈ ${money(taxWith / 12)} / month`, true),
       stat('Tax without reliefs', money(taxNo)),
-      stat('Tax saved by reliefs', money(taxNo - taxWith), null),
+      stat('Tax saved by reliefs', money(taxNo - taxWith), rebate ? `Incl. ${money(rebate, { compact: true })} Parenthood Tax Rebate` : null),
       stat('Chargeable income', money(cur), `After ${money(eir, { compact: true })} earned income relief`),
     ),
     el('div', { class: 'grid grid--two section-gap' },
@@ -1750,6 +2364,7 @@ function pageTax() {
           ['Other reliefs (capped at ' + money(num(S.settings.reliefCap), { compact: true }) + ')', '−' + money(sum(shares, (s) => s.applied))],
           [`Donations × ${num(S.settings.donationMultiplier) * 100}%`, '−' + money(don)],
           ['Chargeable income', money(cur), true],
+          ...(rebate ? [['Tax on it', money(taxGross)], ['Parenthood Tax Rebate', '−' + money(rebate)], ['Tax payable', money(taxWith), true]] : []),
         ]),
         el('p', { class: 'card__hint section-gap', text: 'Reliefs are applied one after another from the top, so each one’s share adds up to the total saved. Later reliefs save less once earlier ones push income into a lower band. CPF relief is already included by using after-CPF pay.' }),
       ),
@@ -1762,7 +2377,7 @@ function pageTax() {
     ),
     el('div', { class: 'card section-gap' },
       el('div', { class: 'card__title' }, el('span', { text: `Reliefs for ${year}` }), reliefPicker),
-      editTable({ cols: reliefCols, rows: list, onDelete: (r) => undoable('Relief removed', () => { S.reliefs[year] = list.filter((x) => x !== r); }), emptyText: 'No reliefs yet — use “Add a relief” to pick one.' }),
+      editTable({ cols: reliefCols, rows: all, onDelete: (r) => (r.auto ? toast('Child reliefs follow your children — change them on Kids & education') : undoable('Relief removed', () => { S.reliefs[year] = list.filter((x) => x !== r); })), emptyText: 'No reliefs yet — use “Add a relief” to pick one.' }),
     ),
     el('h2', { class: 'section-gap', text: 'Tax brackets' }),
     el('p', { class: 'card__hint', text: 'Default: Singapore resident rates, YA2024 onwards. Edit lower bound or rate if they change — base tax recalculates itself. Non-Singapore users can replace the whole table.' }),
@@ -1783,12 +2398,12 @@ function pageNetWorth() {
   const st = S.settings;
   const bankDiff = st.bankBalance != null && st.bankBalance !== '' ? num(st.bankBalance) - sm.expectedCash : null;
   return el('div', null,
-    pageHead('Goal & net worth', 'Cash savings, CPF, investments and liabilities in one picture.'),
+    pageHead('Net worth', 'Cash savings, CPF, investments, your home and liabilities in one picture.'),
     el('div', { class: 'grid grid--stats' },
-      stat('Net worth', money(sm.netWorth), 'Incl. CPF', true),
-      stat('Liquid net worth', money(sm.liquid), 'Excl. CPF (not withdrawable pre-retirement)'),
-      stat('Saved toward goal', money(sm.saved), sm.progress != null ? pct(sm.progress, 0) + ' of goal' : null),
-      stat('12-month pace', money(sm.pace) + '/mo', sm.monthsToGoal != null && sm.remaining > 0 ? `Goal around ${monthLabel(sm.goalMonth)}` : null),
+      stat('Net worth', money(sm.netWorth), 'Incl. CPF and home', true),
+      stat('Liquid net worth', money(sm.liquid), 'Excl. CPF and home'),
+      stat('Saved so far', money(sm.saved), 'Toward your goals'),
+      stat('12-month pace', money(sm.pace) + '/mo', 'Savings + planned investing'),
     ),
     el('div', { class: 'grid grid--two section-gap' },
       el('div', { class: 'card' },
@@ -1800,6 +2415,7 @@ function pageNetWorth() {
           ['Portfolio value', money(sm.portfolio)],
           ['Actual − planned investing', (sm.extraInvested >= 0 ? '−' : '+') + money(Math.abs(sm.extraInvested))],
           ...(st.cpfEnabled ? [['Total CPF', money(sm.cpf)]] : []),
+          ...(S.housing.status === 'own' ? [['Home value', money(sm.homeValue)], ['Home loan', '−' + money(sm.homeLoan)]] : []),
           ['Liabilities', '−' + money(sm.liabilities)],
           ['Net worth', money(sm.netWorth), true],
         ]),
@@ -1813,8 +2429,6 @@ function pageNetWorth() {
       el('div', { class: 'card' },
         el('div', { class: 'card__title', text: 'Your inputs' }),
         el('div', { class: 'form-grid' },
-          settingInput(st, 'goalName', 'text', 'Goal name'),
-          settingInput(st, 'goalAmount', 'money', 'Savings goal'),
           settingInput(st, 'startCash', 'money', 'Start amount', 'Cash you had before the first ledger month.'),
           settingInput(st, 'bankBalance', 'money', 'Actual bank balance', 'Compare with expected cash.', { nullable: true }),
         ),
@@ -1829,6 +2443,7 @@ function pageNetWorth() {
           sm.last ? kv([['OA', money(sm.last.oa)], ['SA', money(sm.last.sa)], ['MA', money(sm.last.ma)], ['Total CPF', money(sm.cpf), true]]) : null,
           el('p', { class: 'card__hint section-gap', text: 'Planning approximation: CPF credits interest yearly in January, while this accrues monthly. Re-calibrate the starting balances if they drift from your statement.' }),
         ) : null,
+        el('p', { class: 'card__hint section-gap' }, 'Goals are on ', el('a', { href: '#/goals', text: 'Goals' }), '; your home and its loan on ', el('a', { href: '#/housing', text: 'Housing' }), '.'),
       ),
     ),
   );
@@ -1930,8 +2545,8 @@ async function exportLedgerCSV() {
   if (!await confirmDialog('Export unencrypted CSV?', 'This CSV will NOT be encrypted. Anyone who gets it can read your ledger.', 'Export CSV')) return;
   const rows = computeLedger();
   const inc = incomeLines(), exp = expenseLines();
-  const head = ['Month', 'Salary', 'Bonus', 'CPF', 'Employer CPF', 'After CPF', ...inc.map((l) => l.name), 'Take-home', ...exp.map((l) => l.name), 'One-offs', 'Recurring', 'Insurance', 'Income Tax', 'Investment', 'Savings', 'Cumulative Savings', 'CPF OA', 'CPF SA', 'CPF MA', 'MA Deductions', 'Savings Rate'];
-  const lines = [head.map(csvCell).join(',')].concat(rows.map((r) => [r.month, r.salary, r.bonus, r.ee, r.er, r.after, ...inc.map((l) => r.lines[l.id]), r.takeHome, ...exp.map((l) => r.lines[l.id]), r.extras, r.recurring, r.insurance, r.tax, r.invest, r.savings, r.cum.savings, r.oa, r.sa, r.ma, r.maDed, r.savingsRate].map((v) => csvCell(typeof v === 'number' ? round2(v) : v)).join(',')));
+  const head = ['Month', 'Salary', 'Bonus', 'CPF', 'Employer CPF', 'After CPF', ...inc.map((l) => l.name), 'Take-home', ...exp.map((l) => l.name), 'One-offs', 'Recurring', 'Insurance', 'Kids', 'Home Loan (Cash)', 'Home Loan (CPF)', 'Income Tax', 'Investment', 'Savings', 'Cumulative Savings', 'CPF OA', 'CPF SA', 'CPF MA', 'MA Deductions', 'Savings Rate'];
+  const lines = [head.map(csvCell).join(',')].concat(rows.map((r) => [r.month, r.salary, r.bonus, r.ee, r.er, r.after, ...inc.map((l) => r.lines[l.id]), r.takeHome, ...exp.map((l) => r.lines[l.id]), r.extras, r.recurring, r.insurance, r.kids, r.homeCash, r.homeCpf, r.tax, r.invest, r.savings, r.cum.savings, r.oa, r.sa, r.ma, r.maDed, r.savingsRate].map((v) => csvCell(typeof v === 'number' ? round2(v) : v)).join(',')));
   download(`ledger-${todayISO()}.csv`, lines.join('\n'), 'text/csv');
 }
 
@@ -2145,7 +2760,13 @@ function removePass() {
 function sampleData() {
   const d = defaultData();
   const start = addMonths(thisMonth(), -10);
-  d.settings = { ...d.settings, startCash: 8000, goalName: 'Emergency fund + house', goalAmount: 60000, cpfStart: { oa: 12000, sa: 4000, ma: 6000 }, bankBalance: null };
+  d.settings = { ...d.settings, startCash: 8000, birthMonth: addMonths(thisMonth(), -28 * 12 - 4), cpfStart: { oa: 12000, sa: 4000, ma: 6000 }, bankBalance: null };
+  d.goals = [
+    { id: uid(), name: 'Emergency fund', kind: 'emergency', months: 6, target: 0, by: '' },
+    { id: uid(), name: 'Home: cash for down payment & fees', kind: 'custom', target: 25000, by: addMonths(thisMonth(), 36) },
+  ];
+  d.housing.status = 'buying';
+  Object.assign(d.housing.plan, { price: 380000, month: addMonths(thisMonth(), 36), grants: 0, fees: 3000 });
   d.budgetLines.push(
     { id: 'rent', name: 'Rent / housing', kind: 'expense', basis: 'month' },
     { id: 'utilities', name: 'Utilities & phone', kind: 'expense', basis: 'month' },
@@ -2166,7 +2787,10 @@ function sampleData() {
     { id: uid(), date: addMonths(start, 9) + '-15', value: 8900, notes: '' },
   ];
   d.liabilities = [{ id: uid(), name: 'Example study loan', balance: 6000, rate: 0.045, payment: 300, notes: '' }];
-  d.policies = [{ id: uid(), name: 'Example life policy', start: addMonths(start, 2) + '-15', years: 20, premium: 1800, actual: { 0: 1800 } }];
+  d.policies = [
+    { id: uid(), name: 'Example life policy', type: 'life', payer: 'cash', start: addMonths(start, 2) + '-15', years: 20, premium: 1800, coverDeath: 200000, coverTPD: 200000, coverCI: 50000, actual: { 0: 1800 } },
+    { id: uid(), name: 'Example Integrated Shield plan', type: 'hospital', payer: 'medisave', start: addMonths(start, 6) + '-01', years: 50, premium: 400, coverDeath: 0, coverTPD: 0, coverCI: 0, actual: {} },
+  ];
   const y = thisMonth().slice(0, 4);
   d.reliefs[y] = [{ id: uid(), name: 'Parent Relief (living with parent)', amount: 9000 }];
   return d;

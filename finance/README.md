@@ -3,8 +3,11 @@
 A private, offline personal finance tracker that runs entirely in your browser.
 Monthly ledger built from your own budget lines (rent, utilities, childcare… and extra income such as
 side or rental income), recurring costs (holidays, festive spending, yearly bills — paid when due or set
-aside monthly), Singapore CPF (OA/SA/MA), income tax with reliefs, investments, liabilities,
-insurance premiums, savings goal and net worth.
+aside monthly), Singapore CPF (OA/SA/MA), income tax with reliefs, investments, liabilities and net worth.
+Also: several savings goals and an emergency-fund check; housing (rent, a home loan paid from CPF OA and
+cash, or a purchase plan with down payment, stamp duty and MSR/TDSR); kids' costs by age with child tax
+reliefs and the Parenthood Tax Rebate; a retirement projection with CPF LIFE; and insurance cover against
+the MoneySense guide (9× income for death/TPD, 4× for critical illness).
 
 **Your data never leaves your device.**
 
