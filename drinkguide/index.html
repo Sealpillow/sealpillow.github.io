@@ -159,12 +159,55 @@
 
   .lede { font-size: 18px; color: var(--text-2); }
 
-  .toc { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 28px; font-size: 14px; }
-  .toc a { color: var(--text-2); text-decoration: none; border-bottom: 1px solid var(--line-2); padding-bottom: 1px; }
-  .toc a:hover { color: var(--ink); border-color: var(--accent); }
+  /* Tabs: a sticky bar that scrolls sideways on its own when it doesn't fit */
+  .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    gap: 24px;
+    margin: 0 calc(-1 * var(--pad));
+    padding: 0 var(--pad);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+    scrollbar-width: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .tabs::-webkit-scrollbar { display: none; }
+  /* Fades whichever edge has more tabs hidden past it */
+  .tabs.more-right { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent); }
+  .tabs.more-left { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent); }
+  .tabs.more-left.more-right { -webkit-mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent); }
+
+  .tab {
+    flex: none;
+    font: inherit;
+    font-size: 14px;
+    color: var(--text-2);
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 14px 0 12px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .tab:hover { color: var(--ink); }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--gold); }
+  .tab .n { font-size: 11px; letter-spacing: 0.06em; color: var(--accent); margin-right: 6px; }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
+  .pager .btn { padding: 10px 16px; font-size: 14px; }
+  .pager .next { margin-left: auto; }
 
   /* Sections */
-  section { padding: clamp(40px, 6vw, 64px) 0 0; scroll-margin-top: 16px; }
+  section { padding: clamp(28px, 4vw, 40px) 0 0; scroll-margin-top: 64px; }
+  section[hidden] { display: none; }
 
   .sec-head { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 0 12px; margin-bottom: 24px; }
   .sec-num { font-size: 13px; letter-spacing: 0.08em; color: var(--accent); padding-top: 10px; font-variant-numeric: tabular-nums; }
@@ -450,15 +493,16 @@
     <h1>Know your <em>pour</em></h1>
     <div class="rule"></div>
     <p class="lede">A can of beer, a glass of wine and a shot of whisky hold about the same amount of alcohol. A bottle of soju holds five times that. This guide shows how strong each drink really is, and how much is sensible for you.</p>
-    <nav class="toc" aria-label="Sections">
-      <a href="#strength">How strength works</a>
-      <a href="#types">Drink types</a>
-      <a href="#wine">Wines</a>
-      <a href="#examples">Everyday examples</a>
-      <a href="#limits">Your limits</a>
-      <a href="#control">Stay in control</a>
-      <a href="#count">Count your night</a>
-    </nav>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Guide sections">
+    <button class="tab" type="button" role="tab" id="tab-strength" aria-controls="strength"><span class="n">01</span>How strength works</button>
+    <button class="tab" type="button" role="tab" id="tab-types" aria-controls="types"><span class="n">02</span>Drink types</button>
+    <button class="tab" type="button" role="tab" id="tab-wine" aria-controls="wine"><span class="n">03</span>Wines</button>
+    <button class="tab" type="button" role="tab" id="tab-examples" aria-controls="examples"><span class="n">04</span>Everyday examples</button>
+    <button class="tab" type="button" role="tab" id="tab-limits" aria-controls="limits"><span class="n">05</span>Your limits</button>
+    <button class="tab" type="button" role="tab" id="tab-control" aria-controls="control"><span class="n">06</span>Stay in control</button>
+    <button class="tab" type="button" role="tab" id="tab-count" aria-controls="count"><span class="n">07</span>Count your night</button>
   </div>
 
   <!-- 01 How strength is worked out -->
@@ -1048,6 +1092,82 @@
     msg.textContent = txt;
   }
   tally();
+
+  // Tabs: one section at a time. Without this script every section simply shows in order.
+  (function () {
+    var tablist = document.querySelector('.tabs');
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('.tab'));
+    var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); });
+
+    panels.forEach(function (p, i) {
+      p.setAttribute('role', 'tabpanel');
+      p.setAttribute('aria-labelledby', tabs[i].id);
+      p.tabIndex = -1;
+      // Previous / next buttons at the foot of each section
+      var prev = tabs[i - 1], next = tabs[i + 1];
+      var html = '<div class="pager">';
+      if (prev) html += '<button class="btn" type="button" data-go="' + (i - 1) + '">← ' + prev.lastChild.textContent + '</button>';
+      if (next) html += '<button class="btn next" type="button" data-go="' + (i + 1) + '">' + next.lastChild.textContent + ' →</button>';
+      p.insertAdjacentHTML('beforeend', html + '</div>');
+    });
+
+    function select(i, opts) {
+      opts = opts || {};
+      tabs.forEach(function (t, k) {
+        var on = k === i;
+        t.setAttribute('aria-selected', on);
+        t.tabIndex = on ? 0 : -1;
+        panels[k].hidden = !on;
+      });
+      // Keep the chosen tab visible in the bar on narrow screens, without scrolling the page
+      var t = tabs[i];
+      if (t.offsetLeft < tablist.scrollLeft || t.offsetLeft + t.offsetWidth > tablist.scrollLeft + tablist.clientWidth) {
+        tablist.scrollLeft = t.offsetLeft - 24;
+      }
+      if (opts.focus) tabs[i].focus();
+      if (opts.hash !== false) history.replaceState(null, '', '#' + panels[i].id);
+      // Bring the top of the section into view when switching from further down the page
+      // (measured from the intro above, since a stuck sticky bar reports its stuck position)
+      var barTop = document.querySelector('.intro').getBoundingClientRect().bottom + window.scrollY;
+      if (opts.scroll !== false && window.scrollY > barTop) window.scrollTo(0, barTop);
+    }
+
+    tablist.addEventListener('click', function (e) {
+      var t = e.target.closest('.tab');
+      if (t) select(tabs.indexOf(t));
+    });
+
+    tablist.addEventListener('keydown', function (e) {
+      var i = tabs.indexOf(document.activeElement);
+      if (i < 0) return;
+      var to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (to === undefined) return;
+      e.preventDefault();
+      select((to + tabs.length) % tabs.length, { focus: true });
+    });
+
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest('.pager [data-go]');
+      if (b) select(+b.dataset.go, { focus: true });
+    });
+
+    // Open the section named in the address, so links like #wine keep working
+    function fromHash(scroll) {
+      var i = panels.findIndex(function (p) { return '#' + p.id === location.hash; });
+      select(i < 0 ? 0 : i, { hash: false, scroll: scroll });
+    }
+    window.addEventListener('hashchange', function () { fromHash(true); });
+    fromHash(false);
+
+    function edges() {
+      var max = tablist.scrollWidth - tablist.clientWidth;
+      tablist.classList.toggle('more-left', tablist.scrollLeft > 1);
+      tablist.classList.toggle('more-right', tablist.scrollLeft < max - 1);
+    }
+    tablist.addEventListener('scroll', edges, { passive: true });
+    window.addEventListener('resize', edges);
+    edges();
+  })();
 
   // Theme toggle: an explicit choice is remembered; otherwise the page follows the system setting
   (function () {
