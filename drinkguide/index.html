@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Know Your Pour — A Drinking Guide</title>
+<meta name="description" content="How strong your drink really is: standard drinks by alcohol type, wine styles, everyday examples, limits for beginners and experienced drinkers, and a session counter.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* Site palette, plus three strength levels for the charts */
+  :root {
+    --bg: #f6f4f0;
+    --surface: #ece8e1;
+    --card: #fbfaf7;
+    --ink: #151413;
+    --text: #2e2b28;
+    --text-2: #5c5751;
+    --line: rgba(21, 20, 19, 0.12);
+    --line-2: rgba(21, 20, 19, 0.22);
+    --accent: #7d5f26;
+    --gold: #b08d55; /* decorative only (rules, bullets): too light for text */
+    --low: #3f7a4a;
+    --mid: #a2650f;
+    --high: #a63d32;
+    --low-bg: rgba(63, 122, 74, 0.1);
+    --mid-bg: rgba(162, 101, 15, 0.1);
+    --high-bg: rgba(166, 61, 50, 0.09);
+    color-scheme: light;
+
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --pad: clamp(16px, 5vw, 72px);
+    --max: 1040px;
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #161412;
+    --surface: #211e1b;
+    --card: #1c1a17;
+    --ink: #f3efe8;
+    --text: #dcd6cd;
+    --text-2: #a8a095;
+    --line: rgba(243, 239, 232, 0.14);
+    --line-2: rgba(243, 239, 232, 0.26);
+    --accent: #c8a96e;
+    --gold: #c8a96e;
+    --low: #6fb07d;
+    --mid: #d9a04a;
+    --high: #e07a6e;
+    --low-bg: rgba(111, 176, 125, 0.12);
+    --mid-bg: rgba(217, 160, 74, 0.12);
+    --high-bg: rgba(224, 122, 110, 0.12);
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg: #161412;
+      --surface: #211e1b;
+      --card: #1c1a17;
+      --ink: #f3efe8;
+      --text: #dcd6cd;
+      --text-2: #a8a095;
+      --line: rgba(243, 239, 232, 0.14);
+      --line-2: rgba(243, 239, 232, 0.26);
+      --accent: #c8a96e;
+      --gold: #c8a96e;
+      --low: #6fb07d;
+      --mid: #d9a04a;
+      --high: #e07a6e;
+      --low-bg: rgba(111, 176, 125, 0.12);
+      --mid-bg: rgba(217, 160, 74, 0.12);
+      --high-bg: rgba(224, 122, 110, 0.12);
+      color-scheme: dark;
+    }
+  }
+
+  body {
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  a { color: inherit; }
+
+  .page { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad) 64px; }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 68px;
+    font-size: 14px;
+    color: var(--text-2);
+  }
+
+  .top a { text-decoration: none; }
+  .top a:hover { color: var(--ink); }
+
+  /* Theme toggle: moon in light mode, sun in dark mode */
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .theme-toggle:hover { color: var(--ink); border-color: var(--text-2); }
+
+  .theme-toggle svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .theme-toggle .icon-sun,
+  :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+
+  /* Intro */
+  .intro { padding: clamp(32px, 6vw, 72px) 0 clamp(24px, 4vw, 40px); max-width: 720px; }
+
+  .eyebrow { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(44px, 7vw, 76px);
+    line-height: 1.02;
+    color: var(--ink);
+    margin: 14px 0 20px;
+  }
+
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .rule { width: 48px; height: 2px; background: var(--gold); margin-bottom: 20px; }
+
+  .lede { font-size: 18px; color: var(--text-2); }
+
+  .toc { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 28px; font-size: 14px; }
+  .toc a { color: var(--text-2); text-decoration: none; border-bottom: 1px solid var(--line-2); padding-bottom: 1px; }
+  .toc a:hover { color: var(--ink); border-color: var(--accent); }
+
+  /* Sections */
+  section { padding: clamp(40px, 6vw, 64px) 0 0; scroll-margin-top: 16px; }
+
+  .sec-head { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 0 12px; margin-bottom: 24px; }
+  .sec-num { font-size: 13px; letter-spacing: 0.08em; color: var(--accent); padding-top: 10px; font-variant-numeric: tabular-nums; }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(30px, 4vw, 40px);
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  .sec-sub { grid-column: 2; color: var(--text-2); margin-top: 8px; max-width: 640px; }
+
+  h3 { font-size: 15px; font-weight: 500; color: var(--ink); }
+
+  .muted { color: var(--text-2); }
+  .small { font-size: 13px; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
+
+  /* How strength is worked out */
+  .formula {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    padding: 18px 20px;
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .formula .term { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; }
+  .formula .op { color: var(--text-2); }
+  .formula .res { color: var(--accent); font-weight: 500; }
+
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 16px; }
+  .step-k { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 4px; }
+
+  .calc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 16px; }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field label { font-size: 13px; color: var(--text-2); }
+
+  input[type="number"], select {
+    font: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line-2);
+    border-radius: 8px;
+    height: 42px;
+    padding: 0 12px;
+    width: 100%;
+  }
+
+  input[type="number"]:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .err { font-size: 13px; color: var(--high); min-height: 20px; }
+
+  .out-big { font-family: var(--serif); font-size: 56px; line-height: 1; color: var(--ink); }
+  .out-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .out-row:last-child { border-bottom: 0; }
+  .out-row b { font-weight: 500; color: var(--ink); }
+
+  /* Bar charts */
+  .chart-row {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr) 64px;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .wine .chart-row { grid-template-columns: 200px minmax(0, 1fr) 56px 64px; }
+
+  .chart-head { padding-top: 0; font-size: 12px; color: var(--text-2); border-bottom-color: var(--line-2); }
+
+  .name { font-size: 15px; font-weight: 500; color: var(--ink); line-height: 1.3; }
+  .meta { font-size: 12px; color: var(--text-2); }
+  .num { text-align: right; font-size: 15px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .num.dim { font-weight: 400; color: var(--text-2); font-size: 14px; }
+
+  .bar { height: 10px; border-radius: 5px; background: var(--surface); position: relative; overflow: hidden; }
+  .bar span { position: absolute; inset: 0 auto 0 0; border-radius: 5px; transition: width 0.3s ease; }
+
+  .group { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); padding: 18px 0 2px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 14px; font-size: 13px; color: var(--text-2); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 6px;
+    background: var(--low-bg);
+    color: var(--low);
+    margin-left: 6px;
+    vertical-align: 1px;
+    white-space: nowrap;
+  }
+
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; align-items: center; }
+  .seg-label { font-size: 13px; color: var(--text-2); margin-right: 4px; }
+
+  .btn {
+    font: inherit;
+    font-size: 13px;
+    color: var(--text);
+    background: none;
+    border: 1px solid var(--line-2);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .btn:hover { background: var(--surface); }
+  .btn[aria-pressed="true"] { background: var(--surface); border-color: var(--accent); color: var(--ink); }
+
+  /* Examples */
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .item { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .item:last-child { border-bottom: 0; }
+  .item .v { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .item .v.hi { color: var(--high); }
+  .card h3 { margin-bottom: 6px; }
+
+  .callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
+  .callout { border-left: 2px solid var(--gold); padding: 2px 0 2px 14px; font-size: 14px; color: var(--text-2); }
+  .callout b { display: block; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+
+  /* Tiers */
+  .tier-big { font-family: var(--serif); font-size: 40px; line-height: 1.1; color: var(--ink); margin-top: 10px; }
+  .tier-cap { font-size: 13px; color: var(--text-2); margin-bottom: 12px; }
+  .tier ul { list-style: none; font-size: 14px; }
+  .tier li { padding: 6px 0 6px 16px; position: relative; border-top: 1px solid var(--line); }
+  .tier li::before { content: ''; position: absolute; left: 0; top: 15px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+  .tier-label { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* Counter */
+  .counter { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .cnt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .cnt-ctrl { display: flex; align-items: center; gap: 10px; }
+  .cnt-ctrl .btn { width: 32px; height: 32px; padding: 0; font-size: 18px; line-height: 1; }
+  .cnt-ctrl output { min-width: 18px; text-align: center; font-weight: 500; color: var(--ink); }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat { background: var(--surface); border-radius: 10px; padding: 14px 16px; }
+  .stat .k { font-size: 13px; color: var(--text-2); }
+  .stat .v { font-family: var(--serif); font-size: 40px; line-height: 1.1; color: var(--ink); }
+
+  .meter { position: relative; height: 10px; border-radius: 5px; background: var(--surface); overflow: hidden; margin: 18px 0 6px; }
+  .meter span { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 5px; transition: width 0.25s ease, background-color 0.25s ease; }
+  .ticks { position: relative; height: 16px; font-size: 11px; color: var(--text-2); }
+  .ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .ticks span:first-child { transform: none; }
+  .ticks span:last-child { transform: translateX(-100%); }
+
+  .verdict { margin-top: 16px; padding: 12px 14px; border-radius: 10px; font-size: 14px; }
+
+  .alert {
+    margin-top: clamp(40px, 6vw, 64px);
+    border: 1px solid var(--high);
+    background: var(--high-bg);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 14px;
+  }
+
+  .alert h3 { color: var(--high); margin-bottom: 4px; }
+
+  .notes { margin-top: 32px; font-size: 13px; color: var(--text-2); border-top: 1px solid var(--line); padding-top: 20px; }
+  .notes p + p { margin-top: 8px; }
+
+  @keyframes pgFadeIn { from { opacity: 0; } to { opacity: 1; } }
+  body { animation: pgFadeIn 0.25s ease both; }
+
+  @media (max-width: 760px) {
+    .calc, .counter { grid-template-columns: 1fr; }
+    .chart-row { grid-template-columns: 116px minmax(0, 1fr) 48px; gap: 10px; }
+    .wine .chart-row { grid-template-columns: 124px minmax(0, 1fr) 40px 48px; gap: 10px; }
+    .name { font-size: 14px; }
+    .tag { margin-left: 0; margin-top: 3px; }
+    .sec-head { grid-template-columns: 1fr; }
+    .sec-num { padding: 0 0 4px; }
+    .sec-sub { grid-column: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+<script>
+  // Apply the saved theme, or the system one, before first paint
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+</head>
+<body>
+
+<div class="page">
+  <header class="top">
+    <a href="/">Brian Lua</a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </header>
+
+  <div class="intro">
+    <p class="eyebrow">A drinking guide · Singapore</p>
+    <h1>Know your <em>pour</em></h1>
+    <div class="rule"></div>
+    <p class="lede">A can of beer, a glass of wine and a shot of whisky hold about the same amount of alcohol. A bottle of soju holds five times that. This guide shows how strong each drink really is, and how much is sensible for you.</p>
+    <nav class="toc" aria-label="Sections">
+      <a href="#strength">How strength works</a>
+      <a href="#types">Drink types</a>
+      <a href="#wine">Wines</a>
+      <a href="#examples">Everyday examples</a>
+      <a href="#limits">Your limits</a>
+      <a href="#count">Count your night</a>
+    </nav>
+  </div>
+
+  <!-- 01 How strength is worked out -->
+  <section id="strength">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <div>
+        <h2>How strength is worked out</h2>
+        <p class="sec-sub">Strength depends on two things: how big the drink is and how much of it is alcohol. Multiply them together and you get the amount of pure alcohol, which is what your body actually has to deal with.</p>
+      </div>
+    </div>
+
+    <div class="formula" aria-label="Volume in millilitres times ABV times 0.789, divided by 10, equals standard drinks">
+      <span class="term">Volume (ml)</span><span class="op">×</span>
+      <span class="term">ABV %</span><span class="op">×</span>
+      <span class="term">0.789</span><span class="op">÷</span>
+      <span class="term">10 g</span><span class="op">=</span>
+      <span class="res">standard drinks</span>
+    </div>
+
+    <div class="steps">
+      <div class="card">
+        <p class="step-k">ABV</p>
+        <p class="small">Alcohol by volume, printed on every label. A 5% beer is 5% pure alcohol, so a 330 ml can holds 16.5 ml of it.</p>
+      </div>
+      <div class="card">
+        <p class="step-k">0.789</p>
+        <p class="small">The density of alcohol, in grams per ml. It turns millilitres into grams: 16.5 ml × 0.789 ≈ 13 g.</p>
+      </div>
+      <div class="card">
+        <p class="step-k">Standard drink</p>
+        <p class="small">Singapore's Health Promotion Board counts 10 g of alcohol as one standard drink. 13 g ÷ 10 = 1.3 drinks. The US uses 14 g and the UK uses 8 g, so the same can counts differently abroad.</p>
+      </div>
+    </div>
+
+    <div class="card calc" style="margin-top: 16px;">
+      <div>
+        <h3 style="margin-bottom: 14px;">Work out any drink</h3>
+        <div class="field">
+          <label for="preset">Start from a drink</label>
+          <select id="preset"></select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="field">
+            <label for="vol">Volume (ml)</label>
+            <input type="number" id="vol" min="1" max="5000" step="1" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="abv">ABV (%)</label>
+            <input type="number" id="abv" min="0.1" max="96" step="0.1" inputmode="decimal">
+          </div>
+        </div>
+        <p class="err" id="calcErr" role="alert"></p>
+      </div>
+      <div>
+        <p class="muted small">Standard drinks (Singapore, 10 g)</p>
+        <p class="out-big" id="outSd">0</p>
+        <div style="margin-top: 14px;">
+          <div class="out-row"><span>Pure alcohol</span><b id="outMl">0 ml</b></div>
+          <div class="out-row"><span>In grams</span><b id="outG">0 g</b></div>
+          <div class="out-row"><span>US standard drinks (14 g)</span><b id="outUs">0</b></div>
+          <div class="out-row"><span>UK units (8 g)</span><b id="outUk">0</b></div>
+          <div class="out-row"><span>Rough time for your liver to clear</span><b id="outHr">0 h</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Drink types -->
+  <section id="types">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <div>
+        <h2>Strength by drink type</h2>
+        <p class="sec-sub">Bar length shows ABV. The number on the right is standard drinks in a typical serving, which is what matters for your limit.</p>
+      </div>
+    </div>
+    <div class="chart-row chart-head"><span>Drink · serving</span><span>ABV</span><span style="text-align: right;">Std</span></div>
+    <div id="typeChart"></div>
+    <div class="legend">
+      <span><span class="dot" style="background: var(--low);"></span>Easier to pace, under 15% ABV</span>
+      <span><span class="dot" style="background: var(--mid);"></span>Pace with care, 15 to 25%</span>
+      <span><span class="dot" style="background: var(--high);"></span>Strong, 35% and up</span>
+    </div>
+  </section>
+
+  <!-- 03 Wines -->
+  <section id="wine" class="wine">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <div>
+        <h2>Wines, light to strong</h2>
+        <p class="sec-sub">A 5.5% Moscato has less than half the alcohol of a 15% Zinfandel. Bars often pour 175 ml or more, so switch the glass size to see what you're really drinking.</p>
+      </div>
+    </div>
+    <div class="seg" id="pourSeg" role="group" aria-label="Glass pour size">
+      <span class="seg-label">Glass pour</span>
+    </div>
+    <div class="chart-row chart-head"><span>Style · ABV</span><span>Per glass</span><span style="text-align: right;">Glass</span><span style="text-align: right;">Bottle</span></div>
+    <div id="wineChart"></div>
+    <div class="legend">
+      <span><span class="dot" style="background: var(--low);"></span>Under 1.5 std per glass</span>
+      <span><span class="dot" style="background: var(--mid);"></span>1.5 to 2</span>
+      <span><span class="dot" style="background: var(--high);"></span>Over 2</span>
+      <span><span class="tag" style="margin-left: 0;">Beginner pick</span> lighter, easy to sip slowly</span>
+    </div>
+    <div class="callouts">
+      <p class="callout"><b>A shared bottle is over the limit</b>Split between two, each person drinks about 4 standard drinks.</p>
+      <p class="callout"><b>Bubbles hit faster</b>Carbonation speeds up absorption, so pace Prosecco and Champagne more slowly.</p>
+      <p class="callout"><b>Sweet isn't weak</b>Many dessert wines are 15% or more. Check the label, not the taste.</p>
+      <p class="callout"><b>Warm climates, stronger wine</b>Australian, Californian and southern Italian reds often reach 14 to 15%.</p>
+    </div>
+  </section>
+
+  <!-- 04 Everyday examples -->
+  <section id="examples">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <div>
+        <h2>Everyday examples</h2>
+        <p class="sec-sub">Standard drinks per serving for drinks you'll see around Singapore. Anything over 2 in one serving is marked in red.</p>
+      </div>
+    </div>
+    <div class="grid-3" id="examplesGrid"></div>
+  </section>
+
+  <!-- 05 Limits -->
+  <section id="limits">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <div>
+        <h2>How to approach it</h2>
+        <p class="sec-sub">Limits don't go up with experience. Tolerance changes how drunk you feel, not how much harm the alcohol does.</p>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="card tier">
+        <p class="tier-label" style="color: var(--low);">Beginner</p>
+        <p class="tier-big">1 to 2</p>
+        <p class="tier-cap">standard drinks per session, at most</p>
+        <ul>
+          <li>Start with beer, cider or a light wine</li>
+          <li>Skip shots and soju rounds at first</li>
+          <li>Eat first, and drink water between drinks</li>
+          <li>Drink with people you trust</li>
+          <li>Red face or racing heart: stop for the night</li>
+        </ul>
+      </div>
+      <div class="card tier">
+        <p class="tier-label" style="color: var(--accent);">Regular</p>
+        <p class="tier-big">≤2 · ≤1</p>
+        <p class="tier-cap">per day for men · for women (HPB guidance)</p>
+        <ul>
+          <li>Pace at about 1 standard drink an hour</li>
+          <li>Keep 2 or more alcohol-free days a week</li>
+          <li>Know your drink's ABV, since pours vary</li>
+          <li>Don't mix spirits with energy drinks</li>
+        </ul>
+      </div>
+      <div class="card tier">
+        <p class="tier-label" style="color: var(--mid);">Experienced</p>
+        <p class="tier-big">Same limits</p>
+        <p class="tier-cap">tolerance doesn't make it safer</p>
+        <ul>
+          <li>Feeling fine doesn't mean your body is</li>
+          <li>4 to 5 or more drinks in 2 hours is a binge</li>
+          <li>Track your weekly total, not just nights out</li>
+          <li>Needing more to feel it is a sign to cut back</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callouts">
+      <p class="callout"><b>If you go red</b>Asian flush means your body is slow to clear acetaldehyde, a toxic by-product of alcohol. Regular drinking raises the risk of oesophageal cancer for people who flush.</p>
+      <p class="callout"><b>Don't hide the flush</b>Antihistamines mask the redness, not the harm.</p>
+    </div>
+  </section>
+
+  <!-- 06 Counter -->
+  <section id="count">
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <div>
+        <h2>Count your night</h2>
+        <p class="sec-sub">Add what you've had to see your total in standard drinks.</p>
+      </div>
+    </div>
+    <div class="card counter">
+      <div id="counterList"></div>
+      <div>
+        <div class="stats">
+          <div class="stat"><p class="k">Standard drinks</p><p class="v" id="cTot">0</p></div>
+          <div class="stat"><p class="k">Rough hours to clear</p><p class="v" id="cHrs">0 h</p></div>
+        </div>
+        <div class="meter"><span id="cMeter"></span></div>
+        <div class="ticks"><span style="left: 0;">0</span><span style="left: 25%;">2</span><span style="left: 62.5%;">5 binge</span><span style="left: 100%;">8</span></div>
+        <p class="verdict" id="cMsg" aria-live="polite"></p>
+        <button class="btn" type="button" id="cReset" style="margin-top: 12px;">Reset</button>
+        <p class="muted small" style="margin-top: 12px;">Your liver clears about 1 standard drink an hour. Water, coffee and sleep don't speed it up. Never drive after drinking.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="alert" role="note">
+    <h3>Call 995 if someone has</h3>
+    <p>Confusion, vomiting while drowsy, slow or irregular breathing, cold or bluish skin, a seizure, or can't be woken up. Lay them on their side, stay with them, and don't let them "sleep it off" alone.</p>
+  </div>
+
+  <div class="notes">
+    <p>Figures use typical ABVs and serving sizes. Real bottles vary by 1 to 2%, and cocktail and bar pours vary a lot more. Limits follow Singapore Health Promotion Board guidance. The WHO notes that no level of drinking is completely risk-free, so these are lower-risk limits, not safe ones.</p>
+    <p>"Hours to clear" is a rough average and doesn't tell you when you're fit to drive.</p>
+  </div>
+</div>
+
+<script>
+  // Standard drinks (Singapore: 10 g of alcohol) for a volume in ml and an ABV in %
+  function stdDrinks(ml, abv) { return ml * abv / 100 * 0.789 / 10; }
+  function fmt(n) { return n.toFixed(1); }
+  function level(v, lo, hi) { return v < lo ? 'low' : v <= hi ? 'mid' : 'high'; }
+
+  // 01 Calculator
+  var PRESETS = [
+    ['Beer, 330 ml can', 330, 5],
+    ['Glass of wine, 150 ml', 150, 13],
+    ['Soju bottle, 360 ml', 360, 16.5],
+    ['Sake carafe, 180 ml', 180, 15],
+    ['Spirit shot, 30 ml', 30, 40],
+    ['Beer jug, 1.5 L', 1500, 5],
+    ['Bottle of wine, 750 ml', 750, 13.5]
+  ];
+  var preset = document.getElementById('preset');
+  var vol = document.getElementById('vol');
+  var abv = document.getElementById('abv');
+  var calcErr = document.getElementById('calcErr');
+
+  preset.innerHTML = PRESETS.map(function (p, i) { return '<option value="' + i + '">' + p[0] + '</option>'; }).join('') + '<option value="custom">Custom</option>';
+  preset.addEventListener('change', function () {
+    if (preset.value === 'custom') return;
+    var p = PRESETS[+preset.value];
+    vol.value = p[1];
+    abv.value = p[2];
+    calc();
+  });
+
+  function calc() {
+    var v = parseFloat(vol.value), a = parseFloat(abv.value);
+    if (!(v > 0) || v > 5000) { calcErr.textContent = 'Enter a volume between 1 and 5000 ml.'; return; }
+    if (!(a > 0) || a > 96) { calcErr.textContent = 'Enter an ABV between 0.1 and 96%.'; return; }
+    calcErr.textContent = '';
+    var pure = v * a / 100, g = pure * 0.789;
+    document.getElementById('outSd').textContent = fmt(g / 10);
+    document.getElementById('outMl').textContent = fmt(pure) + ' ml';
+    document.getElementById('outG').textContent = fmt(g) + ' g';
+    document.getElementById('outUs').textContent = fmt(g / 14);
+    document.getElementById('outUk').textContent = fmt(g / 8);
+    document.getElementById('outHr').textContent = Math.max(1, Math.ceil(g / 10)) + ' h';
+  }
+
+  [vol, abv].forEach(function (el) {
+    el.addEventListener('input', function () { preset.value = 'custom'; calc(); });
+  });
+  preset.value = '2';
+  vol.value = 360;
+  abv.value = 16.5;
+  calc();
+
+  // 02 Drink types: [name, serving, ABV, ml, fixed std drinks for drinks that vary]
+  var TYPES = [
+    ['Beer', '330 ml can', 5, 330],
+    ['Cider / seltzer', '330 ml can', 4.5, 330],
+    ['Wine', '150 ml glass', 13, 150],
+    ['Sake', '180 ml carafe', 15, 180],
+    ['Soju', '360 ml bottle', 16.5, 360],
+    ['Cocktail', 'typical mixed', 20, 0, 2],
+    ['Spirits', '30 ml shot', 40, 30]
+  ];
+  document.getElementById('typeChart').innerHTML = TYPES.map(function (t) {
+    var sd = t[4] || stdDrinks(t[3], t[2]);
+    var lv = t[2] < 15 ? 'low' : t[2] < 35 ? 'mid' : 'high';
+    return '<div class="chart-row"><div><div class="name">' + t[0] + '</div><div class="meta">' + t[1] + ' · ' + (t[4] ? 'varies' : t[2] + '%') + '</div></div>' +
+      '<div class="bar"><span style="width:' + (t[2] / 40 * 100) + '%;background:var(--' + lv + ')"></span></div>' +
+      '<div class="num">' + fmt(sd) + '</div></div>';
+  }).join('');
+
+  // 03 Wines: [group, [[name, ABV, beginner pick, fixed pour ml]]]
+  var WINES = [
+    ['Sparkling', [["Moscato d'Asti", 5.5, 1], ['Prosecco', 11, 1], ['Champagne', 12]]],
+    ['White and rosé', [['German Riesling (Kabinett)', 9, 1], ['Rosé', 12, 1], ['Sauvignon Blanc', 13], ['Chardonnay (oaked)', 13.5]]],
+    ['Red', [['Pinot Noir', 13], ['Merlot', 13.5], ['Cabernet Sauvignon', 14], ['Shiraz / Syrah', 14.5], ['Zinfandel / Amarone', 15]]],
+    ['Fortified, served small', [['Port or sherry', 20, 0, 60]]]
+  ];
+  var POURS = [[125, '125 ml'], [150, '150 ml standard'], [175, '175 ml bar'], [250, '250 ml large']];
+  var pour = 150;
+  var pourSeg = document.getElementById('pourSeg');
+  pourSeg.insertAdjacentHTML('beforeend', POURS.map(function (p) {
+    return '<button class="btn" type="button" data-ml="' + p[0] + '">' + p[1] + '</button>';
+  }).join(''));
+  pourSeg.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    pour = +b.dataset.ml;
+    drawWines();
+  });
+
+  function drawWines() {
+    pourSeg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.ml === pour); });
+    document.getElementById('wineChart').innerHTML = WINES.map(function (g) {
+      return '<div class="group">' + g[0] + '</div>' + g[1].map(function (w) {
+        var ml = w[3] || pour, glass = stdDrinks(ml, w[1]), bottle = stdDrinks(750, w[1]);
+        return '<div class="chart-row"><div><div class="name">' + w[0] + (w[2] ? ' <span class="tag">Beginner pick</span>' : '') + '</div>' +
+          '<div class="meta">' + w[1] + '%' + (w[3] ? ' · ' + w[3] + ' ml pour' : '') + '</div></div>' +
+          '<div class="bar"><span style="width:' + Math.min(glass / 2.6 * 100, 100) + '%;background:var(--' + level(glass, 1.5, 2) + ')"></span></div>' +
+          '<div class="num">' + fmt(glass) + '</div><div class="num dim">' + fmt(bottle) + '</div></div>';
+      }).join('');
+    }).join('');
+  }
+  drawWines();
+
+  // 04 Everyday examples: [heading, [[name, ml, ABV] or [name, fixed std drinks]]]
+  var EXAMPLES = [
+    ['Beer and cider', [['Tiger or Heineken, 330 ml', 330, 5], ['Hoegaarden, 330 ml', 330, 4.9], ['Guinness, 440 ml can', 440, 4.2], ['Craft IPA 6.5%, 330 ml', 330, 6.5], ['Somersby cider, 330 ml', 330, 4.5], ['Beer jug, 1.5 L', 1500, 5]]],
+    ['Korean and Japanese', [['Makgeolli 6%, 750 ml', 750, 6], ['Fruit soju 13%, 360 ml', 360, 13], ['Chamisul soju 16.5%, 360 ml', 360, 16.5], ['Soju shot, 50 ml', 50, 16.5], ['Sake 15%, 180 ml', 180, 15]]],
+    ['Spirits and cocktails', [['Whisky or vodka, 30 ml', 30, 40], ['Gin and tonic, single', 30, 40], ['Mojito', 1.3], ['Jägerbomb', 30, 35], ['Long Island iced tea', 2.4]]]
+  ];
+  document.getElementById('examplesGrid').innerHTML = EXAMPLES.map(function (g) {
+    return '<div class="card"><h3>' + g[0] + '</h3>' + g[1].map(function (it) {
+      var v = it.length === 3 ? stdDrinks(it[1], it[2]) : it[1];
+      return '<div class="item"><span>' + it[0] + '</span><span class="v' + (v > 2 ? ' hi' : '') + '">' + fmt(v) + '</span></div>';
+    }).join('') + '</div>';
+  }).join('');
+
+  // 06 Counter
+  var COUNT = [
+    ['Beer', '330 ml can', stdDrinks(330, 5)],
+    ['Cider', '330 ml can', stdDrinks(330, 4.5)],
+    ['Wine', '150 ml glass', stdDrinks(150, 13)],
+    ['Sake', '180 ml carafe', stdDrinks(180, 15)],
+    ['Soju', '360 ml bottle', stdDrinks(360, 16.5)],
+    ['Soju shot', '50 ml', stdDrinks(50, 16.5)],
+    ['Cocktail', 'typical', 2],
+    ['Spirit shot', '30 ml', stdDrinks(30, 40)]
+  ];
+  var counts = COUNT.map(function () { return 0; });
+  var list = document.getElementById('counterList');
+  list.innerHTML = COUNT.map(function (c, i) {
+    return '<div class="cnt-row"><span><span class="name" style="font-size:14px">' + c[0] + '</span> <span class="meta">' + c[1] + ' · ' + fmt(c[2]) + ' std</span></span>' +
+      '<span class="cnt-ctrl"><button class="btn" type="button" data-i="' + i + '" data-d="-1" aria-label="Remove one ' + c[0] + '">−</button>' +
+      '<output id="n' + i + '">0</output>' +
+      '<button class="btn" type="button" data-i="' + i + '" data-d="1" aria-label="Add one ' + c[0] + '">+</button></span></div>';
+  }).join('');
+  list.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    var i = +b.dataset.i;
+    counts[i] = Math.max(0, counts[i] + +b.dataset.d);
+    document.getElementById('n' + i).textContent = counts[i];
+    tally();
+  });
+  document.getElementById('cReset').addEventListener('click', function () {
+    counts = counts.map(function () { return 0; });
+    counts.forEach(function (_, i) { document.getElementById('n' + i).textContent = 0; });
+    tally();
+  });
+
+  function tally() {
+    var t = counts.reduce(function (s, n, i) { return s + n * COUNT[i][2]; }, 0);
+    var msg = document.getElementById('cMsg'), meter = document.getElementById('cMeter');
+    var lv, txt;
+    if (t === 0) { lv = 'low'; txt = "Nothing yet. Add drinks to see where you land."; }
+    else if (t <= 2) { lv = 'low'; txt = 'Within a beginner session and the daily guideline. Pace it at about 1 an hour.'; }
+    else if (t < 5) { lv = 'mid'; txt = 'Over the daily guideline. Switch to water and food, and call it a night soon.'; }
+    else { lv = 'high'; txt = 'Binge territory. Stop drinking, get home safely, and make sure someone is with you.'; }
+    document.getElementById('cTot').textContent = fmt(t);
+    document.getElementById('cHrs').textContent = Math.ceil(t) + ' h';
+    meter.style.width = Math.min(t / 8 * 100, 100) + '%';
+    meter.style.background = 'var(--' + lv + ')';
+    msg.style.background = 'var(--' + lv + '-bg)';
+    msg.style.color = 'var(--' + lv + ')';
+    msg.textContent = txt;
+  }
+  tally();
+
+  // Theme toggle: an explicit choice is remembered; otherwise the page follows the system setting
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    function label() {
+      btn.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    label();
+    btn.addEventListener('click', function () {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      label();
+    });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (err) {}
+      if (saved !== 'light' && saved !== 'dark') { root.dataset.theme = e.matches ? 'dark' : 'light'; label(); }
+    });
+  })();
+</script>
+</body>
+</html>
