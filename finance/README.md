@@ -6,14 +6,18 @@ insurance premiums, savings goal and net worth.
 
 **Your data never leaves your device.**
 
-- Records are encrypted with your passphrase (AES-256-GCM; key derived with PBKDF2-SHA256, 600,000 rounds) and stored in your browser's IndexedDB.
+- Records are stored in your browser's IndexedDB. A passphrase is optional: without one they are saved unencrypted
+  and the app opens straight away; with one they are encrypted (AES-256-GCM; key derived with PBKDF2-SHA256, 600,000 rounds).
+  Add or remove it any time in **Settings & data → Security**.
+- Browser storage is shared by every page on the same address (e.g. all of `username.github.io`). If other pages there
+  load third-party scripts, set a passphrase — or run the app locally (`python -m http.server --bind 127.0.0.1`).
 - The page's Content-Security-Policy sets `connect-src 'none'` and only allows the site's own files, so the app cannot send data anywhere. There is no server, no analytics, no third-party code.
 - There is no account and no password reset. If you forget your passphrase, the data cannot be recovered.
-- Clearing browser/site data deletes the vault. Use **Settings & data → Export encrypted backup** regularly.
+- Clearing browser/site data deletes your records. Use **Settings & data → Export backup** regularly.
 
 ## Use it
 
-Open the site, choose a passphrase, and start on **Assumptions** (salary, age, daily food/transport, investment %),
+Open the site (optionally choose a passphrase), and start on **Assumptions** (salary, age, daily food/transport, investment %),
 then add months in the **Monthly ledger**. To install: Chrome/Edge → *Install app*; iPhone Safari → *Share → Add to Home Screen*.
 After the first visit it works offline.
 

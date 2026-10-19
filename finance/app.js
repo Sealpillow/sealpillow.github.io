@@ -1,7 +1,7 @@
 /*
  * Ledger Local — a private, offline finance tracker.
- * All data is encrypted (AES-GCM, key from PBKDF2-SHA256) and stored only in this
- * browser's IndexedDB. The page's Content-Security-Policy sets connect-src 'none',
+ * All data is stored only in this browser's IndexedDB — encrypted (AES-GCM, key from
+ * PBKDF2-SHA256) if the user sets a passphrase, plain otherwise. The page's Content-Security-Policy sets connect-src 'none',
  * so no code on this page can send data over the network.
  */
 'use strict';
@@ -198,6 +198,18 @@ async function sealData(key, meta, data) {
   const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(data)));
   return { app: 'ledger-local', v: 1, kdf: 'PBKDF2-SHA256', iter: meta.iter, salt: meta.salt, iv: b64(iv), ct: b64(ct), savedAt: new Date().toISOString() };
 }
+/** Encrypted record when a passphrase is set, otherwise a plain one. */
+async function seal(data) {
+  if (!KEY) return { app: 'ledger-local', v: 1, plain: true, data, savedAt: new Date().toISOString() };
+  return sealData(KEY, META, data);
+}
+async function setPassphrase(pass) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  META = { salt: b64(salt), iter: VAULT.ITER };
+  KEY = await deriveKey(pass, salt, VAULT.ITER);
+  await persist();
+}
+const LOCAL_HOST = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
 async function openSealed(rec, pass) {
   const key = await deriveKey(pass, unb64(rec.salt), rec.iter);
   const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(rec.iv) }, key, unb64(rec.ct));
@@ -549,8 +561,8 @@ function checklist(sm) {
   const lb = S.settings.lastBackup;
   const bAge = lb ? daysBetween(lb.slice(0, 10), todayISO()) : null;
   items.push(lb && bAge <= 30
-    ? { ok: true, text: 'Encrypted backup is recent', detail: `Last exported ${dateLabel(lb.slice(0, 10))}` }
-    : { ok: false, text: 'Export an encrypted backup', detail: lb ? `Last backup ${bAge} days ago.` : 'Clearing browser data would erase everything without one.', go: 'data', cta: 'Back up now' });
+    ? { ok: true, text: 'Backup is recent', detail: `Last exported ${dateLabel(lb.slice(0, 10))}` }
+    : { ok: false, text: 'Export a backup', detail: lb ? `Last backup ${bAge} days ago.` : 'Clearing browser data would erase everything without one.', go: 'data', cta: 'Back up now' });
   return items;
 }
 
@@ -582,10 +594,10 @@ function undoable(msg, mutate) {
   toast(msg, { label: 'Undo', run: () => { if (!S) return; S = before; commit(); toast('Restored'); } });
 }
 async function persist() {
-  if (!S || !KEY) return;
+  if (!S) return;
   try {
-    await VAULT.put(await sealData(KEY, META, S));
-    setStatus('Saved · encrypted on this device');
+    await VAULT.put(await seal(S));
+    setStatus(KEY ? 'Saved · encrypted on this device' : 'Saved on this device');
   } catch (err) {
     setStatus('Save failed');
     toast('Could not save: ' + err.message);
@@ -595,7 +607,7 @@ function setStatus(t) { const s = $('#save-status'); if (s) s.textContent = t; }
 
 function lock() {
   clearTimeout(saveTimer);
-  const pending = S && KEY ? persist() : Promise.resolve();
+  const pending = S ? persist() : Promise.resolve();
   pending.finally(() => {
     S = null; KEY = null; META = null;
     $('#dlg').open && $('#dlg').close();
@@ -605,7 +617,8 @@ function lock() {
 }
 ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach((ev) => addEventListener(ev, () => { lastActivity = Date.now(); }, { passive: true }));
 setInterval(() => {
-  if (S && num(S.settings.autoLockMin) > 0 && Date.now() - lastActivity > S.settings.autoLockMin * 60000) lock();
+  // Locking only means something with a passphrase; without one the app would just reopen.
+  if (S && KEY && num(S.settings.autoLockMin) > 0 && Date.now() - lastActivity > S.settings.autoLockMin * 60000) lock();
 }, 15000);
 
 /* =====================================================================
@@ -618,6 +631,11 @@ async function renderLock() {
   const err = el('div', { class: 'lock__error' });
   const brand = el('div', { class: 'lock__title' }, el('span', { class: 'shell__brand-dot' }), 'Ledger Local', themeButton());
 
+  if (rec?.plain) { // saved without a passphrase: open straight away
+    KEY = null; META = null; S = migrate(rec.data);
+    renderShell();
+    return;
+  }
   if (rec) {
     const pass = el('input', { class: 'input', type: 'password', autocomplete: 'current-password', placeholder: 'Passphrase', 'aria-label': 'Passphrase' });
     const btn = el('button', { class: 'btn btn--primary', type: 'submit', text: 'Unlock' });
@@ -651,45 +669,52 @@ async function renderLock() {
 
   const p1 = el('input', { class: 'input', type: 'password', autocomplete: 'new-password', placeholder: 'At least 10 characters', 'aria-label': 'New passphrase' });
   const p2 = el('input', { class: 'input', type: 'password', autocomplete: 'new-password', placeholder: 'Type it again', 'aria-label': 'Confirm passphrase' });
+  const passBox = el('div', { class: 'hide' },
+    el('div', { class: 'field' }, el('label', { class: 'field__label', text: 'Choose a passphrase' }), p1),
+    el('div', { class: 'field' }, el('label', { class: 'field__label', text: 'Confirm passphrase' }), p2),
+    el('p', { class: 'field__hint', text: 'There is no reset. Forget the passphrase and the data cannot be recovered.' }),
+  );
+  const usePass = el('input', { type: 'checkbox', id: 'use-pass', onchange: () => { passBox.classList.toggle('hide', !usePass.checked); if (usePass.checked) p1.focus(); } });
   const sample = el('input', { type: 'checkbox', id: 'sample' });
-  const btn = el('button', { class: 'btn btn--primary', type: 'submit', text: 'Create encrypted vault' });
+  const btn = el('button', { class: 'btn btn--primary', type: 'submit', text: 'Start' });
   const form = el('form', {
     onsubmit: async (e) => {
       e.preventDefault();
       err.textContent = '';
-      if (p1.value.length < 10) { err.textContent = 'Use at least 10 characters (a short sentence works well).'; return; }
-      if (p1.value !== p2.value) { err.textContent = 'The passphrases do not match.'; return; }
-      btn.disabled = true; btn.textContent = 'Creating…';
-      const salt = crypto.getRandomValues(new Uint8Array(16));
-      META = { salt: b64(salt), iter: VAULT.ITER };
-      KEY = await deriveKey(p1.value, salt, VAULT.ITER);
+      if (usePass.checked) {
+        if (p1.value.length < 10) { err.textContent = 'Use at least 10 characters (a short sentence works well).'; return; }
+        if (p1.value !== p2.value) { err.textContent = 'The passphrases do not match.'; return; }
+      }
+      btn.disabled = true; btn.textContent = 'Starting…';
       S = sample.checked ? sampleData() : defaultData();
-      await persist();
+      if (usePass.checked) await setPassphrase(p1.value);
+      else { KEY = null; META = null; await persist(); }
       lastActivity = Date.now();
       location.hash = '#/dashboard';
       renderShell();
     },
   },
-  el('div', { class: 'field' }, el('label', { class: 'field__label', text: 'Choose a passphrase' }), p1),
-  el('div', { class: 'field' }, el('label', { class: 'field__label', text: 'Confirm passphrase' }), p2),
-  el('label', { class: 'field__hint', for: 'sample' }, sample, ' Start with sample data (fictional numbers, to explore)'),
+  el('div', { class: 'field' }, el('label', { class: 'field__hint', for: 'sample' }, sample, ' Start with sample data (fictional numbers, to explore)')),
+  el('div', { class: 'field' }, el('label', { class: 'field__hint', for: 'use-pass' }, usePass, ' Protect with a passphrase (encrypts your records)')),
+  passBox,
   err, btn);
 
   app.append(el('div', { class: 'lock' }, el('div', { class: 'card lock__card' },
     brand,
     el('p', { class: 'muted', text: 'A private finance tracker that runs entirely in your browser.' }),
     el('ul', { class: 'lock__list' },
-      el('li', { text: 'Records are encrypted with your passphrase and stored only on this device.' }),
+      el('li', { text: 'Records are stored only in this browser, on this device.' }),
       el('li', { text: 'This page is blocked from making network requests — nothing is uploaded.' }),
-      el('li', { text: 'There is no account and no reset. Forget the passphrase and the data cannot be recovered.' }),
-      el('li', { text: 'Export an encrypted backup regularly; clearing browser data erases the vault.' }),
+      el('li', { text: 'A passphrase is optional. You can add or remove one later in Settings & data.' }),
+      el('li', { text: 'Export a backup regularly; clearing browser data erases your records.' }),
     ),
+    LOCAL_HOST ? null : el('div', { class: 'notice', text: 'This copy runs on a shared website address. Without a passphrase, other pages on this domain could read your records. Set one, or run the app locally.' }),
     form,
     el('div', { class: 'lock__links' },
       el('button', { class: 'link-btn', type: 'button', text: 'Restore from a backup file', onclick: () => restoreFlow(true) }),
     ),
   )));
-  p1.focus();
+  btn.focus();
 }
 
 function pickFile(accept) {
@@ -706,11 +731,28 @@ async function restoreFlow(fromLock) {
   if (!file) return;
   let rec;
   try { rec = JSON.parse(await file.text()); } catch { toast('That file is not a valid backup.'); return; }
-  if (rec?.app !== 'ledger-local' || !rec.ct) { toast('That file is not a Ledger Local backup.'); return; }
+  if (rec?.app !== 'ledger-local' || !(rec.ct || (rec.plain && rec.data))) { toast('That file is not a Ledger Local backup.'); return; }
+  const saved = `Backup saved ${rec.savedAt ? dateLabel(rec.savedAt.slice(0, 10)) : ''}. Restoring replaces the data currently on this device.`;
+  if (rec.plain) {
+    openDialog('Restore backup', [el('p', { text: saved + ' This backup has no passphrase, so the restored records will not be encrypted.' })], [
+      { label: 'Cancel' },
+      {
+        label: 'Restore', primary: true,
+        run: async () => {
+          KEY = null; META = null; S = migrate(rec.data);
+          await persist();
+          toast('Backup restored');
+          lastActivity = Date.now();
+          renderShell();
+        },
+      },
+    ]);
+    return;
+  }
   const pass = el('input', { class: 'input', type: 'password', placeholder: 'Passphrase used for that backup' });
   const err = el('div', { class: 'lock__error' });
   openDialog('Restore backup', [
-    el('p', { text: `Backup saved ${rec.savedAt ? dateLabel(rec.savedAt.slice(0, 10)) : ''}. Restoring replaces the data currently on this device.` }),
+    el('p', { text: saved + ' Afterwards this device uses that backup’s passphrase.' }),
     el('div', { class: 'field' }, pass), err,
   ], [
     { label: 'Cancel' },
@@ -736,7 +778,7 @@ async function restoreFlow(fromLock) {
 function eraseFlow() {
   const conf = el('input', { class: 'input', placeholder: 'Type ERASE' });
   openDialog('Erase data on this device', [
-    el('p', { text: 'This permanently deletes the encrypted vault from this browser. Only an exported backup can bring it back.' }),
+    el('p', { text: 'This permanently deletes your records from this browser. Only an exported backup can bring it back.' }),
     el('div', { class: 'field' }, conf),
   ], [
     { label: 'Cancel' },
@@ -1010,8 +1052,8 @@ function renderShell() {
       el('div', { class: 'shell__brand' }, el('span', { class: 'shell__brand-dot' }), 'Ledger Local'),
       el('div', { class: 'shell__links' }, PAGES.map(([id, label]) => el('a', { class: 'nav__link', href: '#/' + id, 'data-page': id, text: label }))),
       el('div', { class: 'shell__spacer' }),
-      el('div', { class: 'status' }, el('span', { class: 'status__dot' }), el('span', { id: 'save-status', text: 'Encrypted on this device' })),
-      el('div', { class: 'shell__actions' }, themeButton(), el('button', { class: 'btn shell__lock', type: 'button', text: 'Lock', onclick: lock })),
+      el('div', { class: 'status' }, el('span', { class: 'status__dot' }), el('span', { id: 'save-status', text: KEY ? 'Encrypted on this device' : 'Saved on this device' })),
+      el('div', { class: 'shell__actions' }, themeButton(), KEY ? el('button', { class: 'btn shell__lock', type: 'button', text: 'Lock', onclick: lock }) : null),
     ),
     el('main', { class: 'shell__main', id: 'main' }),
     el('nav', { class: 'tabbar', 'aria-label': 'Main sections' },
@@ -1545,13 +1587,13 @@ function pageNetWorth() {
 function pageData() {
   const st = S.settings;
   return el('div', null,
-    pageHead('Settings & data', 'Everything stays on this device. Backups are encrypted with your passphrase.'),
+    pageHead('Settings & data', KEY ? 'Everything stays on this device. Backups are encrypted with your passphrase.' : 'Everything stays on this device.'),
     el('div', { class: 'grid grid--two' },
       el('div', { class: 'card' },
         el('div', { class: 'card__title', text: 'Backup & restore' }),
         el('p', { class: 'card__hint', text: st.lastBackup ? `Last backup: ${dateLabel(st.lastBackup.slice(0, 10))}` : 'No backup yet. Browser data can be cleared by you, the browser, or the OS — keep a backup somewhere safe.' }),
         el('div', { class: 'page__actions' },
-          el('button', { class: 'btn btn--primary', type: 'button', text: 'Export encrypted backup', onclick: exportBackup }),
+          el('button', { class: 'btn btn--primary', type: 'button', text: KEY ? 'Export encrypted backup' : 'Export backup', onclick: exportBackup }),
           el('button', { class: 'btn', type: 'button', text: 'Restore backup…', onclick: () => restoreFlow(false) }),
         ),
         el('div', { class: 'card__title section-gap', text: 'Unencrypted exports' }),
@@ -1576,7 +1618,7 @@ function pageData() {
         el('div', { class: 'form-grid' },
           settingInput(st, 'currency', 'text', 'Currency code', 'e.g. SGD, MYR, TWD, HKD, USD'),
           settingInput(st, 'locale', 'text', 'Number format locale', 'e.g. en-SG, zh-TW, en-US'),
-          settingInput(st, 'autoLockMin', 'number', 'Auto-lock after (minutes idle)', '0 = never', { step: '1' }),
+          KEY ? settingInput(st, 'autoLockMin', 'number', 'Auto-lock after (minutes idle)', '0 = never', { step: '1' }) : null,
           field('Appearance', el('select', { class: 'select', id: 'theme-select', onchange: (e) => setTheme(e.target.value) },
             [['system', 'Match device'], ['light', 'Light'], ['dark', 'Dark']].map(([v, t]) => el('option', { value: v, selected: getTheme() === v, text: t }))), 'Saved on this device only.'),
           field('Track CPF', el('select', { class: 'select', onchange: (e) => { st.cpfEnabled = e.target.value === 'yes'; commit(); } },
@@ -1586,10 +1628,13 @@ function pageData() {
         ),
         el('div', { class: 'card__title section-gap', text: 'Security' }),
         el('div', { class: 'page__actions' },
-          el('button', { class: 'btn', type: 'button', text: 'Change passphrase', onclick: changePass }),
+          el('button', { class: 'btn', type: 'button', text: KEY ? 'Change passphrase' : 'Set a passphrase', onclick: changePass }),
+          KEY ? el('button', { class: 'btn', type: 'button', text: 'Remove passphrase', onclick: removePass }) : null,
           el('button', { class: 'btn btn--danger', type: 'button', text: 'Erase this device…', onclick: eraseFlow }),
         ),
-        el('p', { class: 'card__hint section-gap', text: 'Encryption: AES-256-GCM with a key derived from your passphrase (PBKDF2-SHA256, 600,000 rounds). The passphrase is never stored.' }),
+        el('p', { class: 'card__hint section-gap', text: KEY
+          ? 'Encryption: AES-256-GCM with a key derived from your passphrase (PBKDF2-SHA256, 600,000 rounds). The passphrase is never stored.'
+          : 'No passphrase: records are saved unencrypted in this browser, so anyone using this browser profile can open them. Set a passphrase to encrypt them (AES-256-GCM).' }),
       ),
       el('div', { class: 'card' },
         el('div', { class: 'card__title' }, el('span', { text: 'CPF contribution schedule' }), el('button', { class: 'btn btn--small', type: 'button', text: '+ Row', onclick: () => { const last = S.cpfSchedule[S.cpfSchedule.length - 1]; S.cpfSchedule.push({ ...last, id: uid() }); commit(); } })),
@@ -1621,10 +1666,10 @@ function download(name, content, type) {
 }
 async function exportBackup() {
   S.settings.lastBackup = new Date().toISOString();
-  const rec = await sealData(KEY, META, S);
+  const rec = await seal(S);
   download(`ledger-local-backup-${todayISO()}.json`, JSON.stringify(rec), 'application/json');
   commit();
-  toast('Encrypted backup downloaded');
+  toast(KEY ? 'Encrypted backup downloaded' : 'Backup downloaded (not encrypted)');
 }
 async function exportPlainJSON() {
   if (!await confirmDialog('Export unencrypted data?', 'This file will NOT be encrypted. Anyone who gets it can read your finances.', 'Export JSON')) return;
@@ -1776,30 +1821,60 @@ async function importCSV(type) {
   toast(added ? `Imported ${added} row${added === 1 ? '' : 's'}${adjusted ? `, ${adjusted} hand-edited value${adjusted === 1 ? '' : 's'} kept` : ''}` : 'No rows found in that file.');
 }
 
+/** Sets a passphrase, or changes it when one is already set. */
 function changePass() {
+  const had = !!KEY;
   const p0 = el('input', { class: 'input', type: 'password', placeholder: 'Current passphrase', autocomplete: 'current-password' });
   const p1 = el('input', { class: 'input', type: 'password', placeholder: 'New passphrase (10+ characters)', autocomplete: 'new-password' });
   const p2 = el('input', { class: 'input', type: 'password', placeholder: 'Confirm new passphrase', autocomplete: 'new-password' });
   const err = el('div', { class: 'lock__error' });
-  openDialog('Change passphrase', [field('Current', p0), field('New', p1), field('Confirm', p2), err, el('p', { class: 'card__hint', text: 'Old backups keep their old passphrase. Export a new backup afterwards.' })], [
+  const hint = had ? 'Old backups keep their old passphrase. Export a new backup afterwards.' : 'Your records will be encrypted with it. There is no reset — forget it and the data cannot be recovered.';
+  openDialog(had ? 'Change passphrase' : 'Set a passphrase', [had ? field('Current', p0) : null, field('New', p1), field('Confirm', p2), err, el('p', { class: 'card__hint', text: hint })].filter(Boolean), [
     { label: 'Cancel' },
     {
-      label: 'Change', primary: true, keepOpen: true,
+      label: had ? 'Change' : 'Set passphrase', primary: true, keepOpen: true,
+      run: async () => {
+        err.textContent = '';
+        if (had) {
+          const rec = await VAULT.get();
+          try { await openSealed(rec, p0.value); } catch { err.textContent = 'Current passphrase is wrong.'; return; }
+        }
+        if (p1.value.length < 10) { err.textContent = 'Use at least 10 characters.'; return; }
+        if (p1.value !== p2.value) { err.textContent = 'New passphrases do not match.'; return; }
+        await setPassphrase(p1.value);
+        $('#dlg').close();
+        toast(had ? 'Passphrase changed' : 'Passphrase set — records are now encrypted');
+        lastActivity = Date.now();
+        renderShell();
+      },
+    },
+  ]);
+  setTimeout(() => (had ? p0 : p1).focus(), 50);
+}
+
+function removePass() {
+  const p0 = el('input', { class: 'input', type: 'password', placeholder: 'Current passphrase', autocomplete: 'current-password' });
+  const err = el('div', { class: 'lock__error' });
+  openDialog('Remove passphrase', [
+    el('p', { text: 'Your records will be saved in this browser without encryption, and the app will open without asking for a passphrase. Anyone using this browser profile could read them.' }),
+    field('Current passphrase', p0), err,
+  ], [
+    { label: 'Cancel' },
+    {
+      label: 'Remove passphrase', danger: true, keepOpen: true,
       run: async () => {
         err.textContent = '';
         const rec = await VAULT.get();
         try { await openSealed(rec, p0.value); } catch { err.textContent = 'Current passphrase is wrong.'; return; }
-        if (p1.value.length < 10) { err.textContent = 'Use at least 10 characters.'; return; }
-        if (p1.value !== p2.value) { err.textContent = 'New passphrases do not match.'; return; }
-        const salt = crypto.getRandomValues(new Uint8Array(16));
-        META = { salt: b64(salt), iter: VAULT.ITER };
-        KEY = await deriveKey(p1.value, salt, VAULT.ITER);
+        KEY = null; META = null;
         await persist();
         $('#dlg').close();
-        toast('Passphrase changed');
+        toast('Passphrase removed');
+        renderShell();
       },
     },
   ]);
+  setTimeout(() => p0.focus(), 50);
 }
 
 /* =====================================================================
