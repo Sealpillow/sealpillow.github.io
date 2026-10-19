@@ -792,12 +792,88 @@ function summary() {
   const recent6 = rows.slice(-6);
   const spendAvg = recent6.length ? sum(recent6, (r) => r.expenditure - r.tax) / recent6.length : 0;
   const emergencyCash = expectedCash - sinking;
-  return {
+  const out = {
     rows, last, deposits, planned, extraInvested, portfolio, portfolioDate: pv.length ? pv[pv.length - 1].date : null,
     liabilities, cumSavings, sinking, cpf, netWorth, liquid, saved, pace, expectedCash,
     homeValue, homeLoan, homeEquity, cpfUsedHome, spendAvg, emergencyCash,
     emergencyMonths: spendAvg > 0 ? emergencyCash / spendAvg : null,
     goals: goalPlan(saved, pace, spendAvg),
+  };
+  out.milestones = S.goals.filter((g) => g.kind === 'milestone').map((g) => milestoneStatus(g, out));
+  return out;
+}
+
+/*
+ * Milestones: a target for a figure the app already tracks (cash, net worth, debts…). Unlike savings goals they
+ * don't set money aside, so they never compete with each other. Dates assume the last 12 months' pace continues
+ * and leave out investment growth, so they lean cautious.
+ */
+const MILESTONES = {
+  cash: { short: 'Cash savings', about: 'Cash in your bank accounts, including money set aside for recurring costs. SSBs, T-bills and fixed deposits count as investments.' },
+  wealth: { short: 'Savings + investments', about: 'Cash plus your investments. Not CPF or your home.' },
+  networth: { short: 'Net worth', about: 'Everything: cash, investments, CPF and your home, less debts.' },
+  portfolio: { short: 'Investments', about: 'Your portfolio value (Investments page).' },
+  debt: { short: 'Debts left', about: 'Loans and debts on the Liabilities page — not your home loan.' },
+  cpf: { short: 'CPF OA + SA', about: 'What forms your Retirement Account at 55.' },
+  dividends: { short: 'Dividends, last 12 months', about: 'Cash dividends from imported statements.' },
+  savingsRate: { short: 'Savings rate', about: 'Average share of take-home pay left over, last 12 months.' },
+  fire: { short: 'Savings + investments vs FIRE number', about: 'Retirement spending ÷ safe withdrawal rate, from the Retirement page.' },
+};
+const ROUND_MILESTONES = [10000, 25000, 50000, 100000, 250000, 500000, 1000000, 2000000];
+/** The Full Retirement Sum for the year you turn 55 (current FRS grown at the assumed rate). */
+function cohortFRS() {
+  const b = S.settings.birthMonth;
+  const year55 = b ? +b.slice(0, 4) + 55 : +thisMonth().slice(0, 4);
+  return Math.round(SG.frs2026 * Math.pow(1 + SG.frsGrowth, Math.max(0, year55 - 2026)));
+}
+function milestoneStatus(g, sm) {
+  const rows = sm.rows.slice(-12);
+  const avg = (f) => (rows.length ? sum(rows, f) / rows.length : 0);
+  const R = S.retire;
+  let value = 0, target = num(g.target), pace = 0;
+  switch (g.metric) {
+    case 'cash': value = sm.expectedCash; pace = avg((r) => r.savings); break;
+    case 'wealth': value = sm.expectedCash + sm.portfolio; pace = sm.pace; break;
+    case 'networth': value = sm.netWorth; pace = sm.pace + avg((r) => r.ee + r.er); break;
+    case 'portfolio': value = sm.portfolio; pace = avg((r) => r.invest); break;
+    case 'cpf':
+      value = sm.last ? sm.last.oa + sm.last.sa : num(S.settings.cpfStart.oa) + num(S.settings.cpfStart.sa);
+      pace = avg((r) => (r.ee + r.er) * (1 - num(r.rates.ma)) - r.homeCpf);
+      break;
+    case 'dividends': value = sum(S.dividends.filter((d) => d.date.slice(0, 7) > addMonths(thisMonth(), -12)), (d) => d.amount); break;
+    case 'savingsRate': value = avg((r) => r.savingsRate); break;
+    case 'fire': {
+      const spend = R.spendMonthly != null && R.spendMonthly !== '' ? num(R.spendMonthly) : sm.spendAvg;
+      target = num(R.swr) > 0 ? (spend * 12) / num(R.swr) : 0;
+      value = sm.expectedCash + sm.portfolio; pace = sm.pace;
+      break;
+    }
+    case 'debt': value = sm.liabilities; target = 0; break;
+    default: break;
+  }
+  const down = g.metric === 'debt';
+  const start = down ? Math.max(num(g.startValue), value) : 0;
+  const reached = down ? value <= 0.005 : target > 0 && value >= target;
+  let reach = null;
+  if (reached) reach = thisMonth();
+  else if (down) {
+    const plans = S.liabilities.filter((l) => num(l.balance) > 0).map(payoff);
+    reach = plans.every((p) => p.months != null) ? plans.map((p) => p.date).sort().pop() : null;
+  } else if (g.metric === 'cpf') {
+    // CPF interest is guaranteed, so it counts: OA 2.5% and SA 4%, weighted by today's balances.
+    const oa = sm.last ? sm.last.oa : num(S.settings.cpfStart.oa), sa = sm.last ? sm.last.sa : num(S.settings.cpfStart.sa);
+    const r = (oa + sa > 0 ? (oa * 0.025 + sa * 0.04) / (oa + sa) : 0.03) / 12;
+    let v = value, n = 0;
+    while (v < target && n < 1200) { v = v * (1 + r) + Math.max(0, pace); n++; }
+    reach = v >= target ? addMonths(thisMonth(), n) : null;
+  } else if (pace > 0 && ['cash', 'wealth', 'networth', 'portfolio', 'fire'].includes(g.metric)) {
+    reach = addMonths(thisMonth(), Math.ceil((target - value) / pace));
+  }
+  return {
+    goal: g, value, target, reached, reach, pct: g.metric === 'savingsRate',
+    progress: down ? (start > 0 ? 1 - value / start : 1) : target > 0 ? Math.min(1, Math.max(0, value / target)) : 0,
+    onTrack: !g.by || reached || (reach != null && reach <= g.by),
+    projects: down || ['cash', 'wealth', 'networth', 'portfolio', 'cpf', 'fire'].includes(g.metric),
   };
 }
 
@@ -815,7 +891,7 @@ function portfolioTotal(entries) {
 function goalPlan(saved, pace, spendAvg) {
   const now = thisMonth();
   let pool = Math.max(0, saved), months = 0;
-  return S.goals.map((g) => {
+  return S.goals.filter((g) => g.kind !== 'milestone').map((g) => {
     const target = g.kind === 'emergency' ? num(g.months || 6) * spendAvg : num(g.target);
     const have = Math.min(target, pool);
     pool -= have;
@@ -1504,7 +1580,8 @@ function pageDashboard() {
   const goal = el('div', { class: 'card' },
     el('div', { class: 'card__title' }, el('span', { text: 'Goals' }), el('a', { class: 'card__hint', href: '#/goals', text: 'All goals' })),
   );
-  if (sm.goals.length) goal.append(sm.goals.slice(0, 4).map(goalBlock));
+  const shownGoals = [...sm.goals.map(goalBlock), ...sm.milestones.map(milestoneBlock)].slice(0, 4);
+  if (shownGoals.length) goal.append(...shownGoals);
   else goal.append(el('p', { class: 'muted' }, 'No goals yet — add an emergency fund, a home down payment or a holiday on ', el('a', { href: '#/goals', text: 'Goals' }), '.'));
 
   const month = el('div', { class: 'card' }, el('div', { class: 'card__title', text: `This month (from current assumptions)` }));
@@ -2054,15 +2131,26 @@ function setupGoals() {
   const hasEm = S.goals.some((g) => g.kind === 'emergency');
   const picker = el('select', {
     class: 'select select--inline', 'aria-label': 'Add a goal',
-    onchange: (e) => { const g = GOAL_PRESETS[+e.target.value]; if (!g) return; S.goals.push({ id: uid(), name: g.name, target: 0, by: '', kind: g.kind || 'custom', ...(g.months ? { months: g.months } : {}) }); commit(); },
-  }, el('option', { value: '', text: '+ Add a goal…', selected: true }), GOAL_PRESETS.map((g, k) => (g.kind === 'emergency' && hasEm ? null : el('option', { value: k, text: g.name }))));
+    onchange: (e) => {
+      const v = e.target.value;
+      if (v === '') return;
+      if (v[0] === 'm') S.goals.push(newMilestone(MILESTONE_PRESETS[+v.slice(1)]));
+      else { const g = GOAL_PRESETS[+v]; S.goals.push({ id: uid(), name: g.name, target: 0, by: '', kind: g.kind || 'custom', ...(g.months ? { months: g.months } : {}) }); }
+      commit();
+    },
+  }, el('option', { value: '', text: '+ Add a goal…', selected: true }),
+  el('optgroup', { label: 'Save for something' }, GOAL_PRESETS.map((g, k) => (g.kind === 'emergency' && hasEm ? null : el('option', { value: k, text: g.name })))),
+  el('optgroup', { label: 'Reach a milestone' }, MILESTONE_PRESETS.map((p, k) => el('option', { value: 'm' + k, text: p.name }))));
+  const target = (g) => (g.kind === 'emergency' ? settingInput(g, 'months', 'number', 'Months of spending', null, { step: '1' })
+    : g.metric === 'debt' ? field('Target', el('span', { class: 'muted', text: 'All debts paid off' }))
+      : g.metric === 'fire' ? field('Target', el('span', { class: 'muted', text: 'Your FIRE number (Retirement page)' }))
+        : settingInput(g, 'target', g.metric === 'savingsRate' ? 'pct' : 'money', g.kind === 'milestone' ? `Target (${MILESTONES[g.metric]?.short})` : 'Target amount'));
   return [
-    el('p', { class: 'card__hint', text: 'What you are saving for. Savings fill goals from the top, so add the most important first.' }),
-    hasEm ? null : el('div', { class: 'notice notice--info' }, 'Most people start with an emergency fund of 3–6 months of spending. ',
-      el('button', { class: 'btn btn--small btn--primary', type: 'button', text: 'Add a 6-month emergency fund', onclick: () => { S.goals.unshift({ id: uid(), name: 'Emergency fund', kind: 'emergency', months: 6, target: 0, by: '' }); commit(); } })),
+    el('p', { class: 'card__hint', text: 'What you are saving for, and milestones you want to reach. Savings fill “saving for” goals from the top, so add the most important first.' }),
+    suggestionsCard(summary(), 5),
     S.goals.map((g) => el('div', { class: 'form-grid setup-row' },
-      settingInput(g, 'name', 'text', 'Goal'),
-      g.kind === 'emergency' ? settingInput(g, 'months', 'number', 'Months of spending', null, { step: '1' }) : settingInput(g, 'target', 'money', 'Target amount'),
+      settingInput(g, 'name', 'text', g.kind === 'milestone' ? 'Milestone' : 'Goal'),
+      target(g),
       settingInput(g, 'by', 'month', 'By (optional)'),
       field('', el('button', { class: 'btn btn--danger btn--small', type: 'button', text: 'Remove', onclick: () => undoable(`${g.name || 'Goal'} removed`, () => { S.goals = S.goals.filter((x) => x !== g); }) })),
     )),
@@ -2113,32 +2201,148 @@ const GOAL_PRESETS = [
   { name: 'Children’s education' }, { name: 'Further studies' },
 ];
 
+// Milestones to pick from. Targets left at 0 are yours to fill in; a few are worked out for you.
+const MILESTONE_PRESETS = [
+  { name: 'First $100k saved & invested', metric: 'wealth', target: 100000 },
+  { name: 'Cash savings target', metric: 'cash' },
+  { name: 'Net worth target', metric: 'networth' },
+  { name: 'Investments target', metric: 'portfolio' },
+  { name: 'Debt-free', metric: 'debt' },
+  { name: 'CPF Full Retirement Sum by 55', metric: 'cpf' },
+  { name: 'Dividend income', metric: 'dividends' },
+  { name: 'Save 20% of take-home pay', metric: 'savingsRate', target: 0.2 },
+  { name: 'Financial independence', metric: 'fire' },
+];
+function newMilestone(p) {
+  const g = { id: uid(), kind: 'milestone', name: p.name, metric: p.metric, target: p.target ?? 0, by: p.by || '' };
+  if (p.metric === 'cpf' && !p.target) {
+    g.target = cohortFRS();
+    if (S.settings.birthMonth) g.by = addMonths(S.settings.birthMonth, 55 * 12);
+  }
+  if (p.metric === 'debt') g.startValue = sum(S.liabilities, (l) => l.balance); // progress counts down from here
+  return g;
+}
+
+/** Goals that fit this person's data and aren't set yet, most useful first. */
+function goalSuggestions(sm) {
+  const has = (f) => S.goals.some(f);
+  const out = [];
+  const addGoal = (g, msg) => () => { S.goals.push(g); commit(); toast(msg || `Added ${g.name}`); };
+  const age = S.settings.birthMonth ? ageAt(thisMonth()) : num(assumptionFor(thisMonth())?.age);
+  if (!has((g) => g.kind === 'emergency')) {
+    out.push({ title: 'Emergency fund (6 months)', why: 'The first thing most guides recommend: 3–6 months of spending in cash.', add: () => { S.goals.unshift({ id: uid(), name: 'Emergency fund', kind: 'emergency', months: 6, target: 0, by: '' }); commit(); toast('Emergency fund added'); } });
+  }
+  if (sm.liabilities > 0 && !has((g) => g.metric === 'debt')) {
+    out.push({ title: 'Debt-free', why: `${money(sm.liabilities, { compact: true })} of loans and debts to clear.`, add: addGoal(newMilestone({ name: 'Debt-free', metric: 'debt' })) });
+  }
+  if (S.housing.status === 'buying' && !has((g) => /home|house|flat|bto|down ?payment/i.test(g.name))) {
+    out.push({ title: 'Cash for your home', why: 'Work it out from your plan on the Housing page, then save it as a goal.', label: 'Open Housing', add: () => go('housing') });
+  } else if (S.housing.status === 'rent' && !has((g) => /home|house|flat|bto|down ?payment/i.test(g.name))) {
+    out.push({ title: 'Home down payment', why: 'You rent today. Saving for a down payment keeps buying an option.', add: addGoal({ id: uid(), name: 'Home down payment', kind: 'custom', target: 0, by: '' }, 'Added — enter the target amount') });
+  }
+  childrenByBirth().forEach((c, i) => {
+    const name = `${childName(c, i)} — education fund`;
+    if (!has((g) => g.name === name)) out.push({ title: name, why: 'University starts around 19. Saving early spreads it out.', add: addGoal({ id: uid(), name, kind: 'custom', target: 0, by: addMonths(c.birthMonth, 19 * 12) }, 'Added — enter the target amount') });
+  });
+  if (S.settings.cpfEnabled && age > 0 && age < 55 && !has((g) => g.metric === 'cpf')) {
+    out.push({ title: 'CPF Full Retirement Sum by 55', why: `About ${money(cohortFRS(), { compact: true })} for your cohort — the amount behind CPF LIFE’s standard payout.`, add: addGoal(newMilestone(MILESTONE_PRESETS[5])) });
+  }
+  const wealth = sm.expectedCash + sm.portfolio;
+  const next = ROUND_MILESTONES.find((v) => v > wealth);
+  if (next && sm.rows.length && !has((g) => g.metric === 'wealth')) {
+    const name = `First ${money(next, { compact: true })} saved & invested`;
+    out.push({ title: name, why: `You have ${money(wealth, { compact: true })} in cash and investments now.`, add: addGoal(newMilestone({ name, metric: 'wealth', target: next })) });
+  }
+  const rate = sm.rows.length ? sum(sm.rows.slice(-12), (r) => r.savingsRate) / sm.rows.slice(-12).length : null;
+  if (rate != null && rate < 0.2 && !has((g) => g.metric === 'savingsRate')) {
+    out.push({ title: 'Save 20% of take-home pay', why: `You keep about ${pct(rate, 0)} now.`, add: addGoal(newMilestone(MILESTONE_PRESETS[7])) });
+  }
+  if (S.dividends.length && !has((g) => g.metric === 'dividends')) {
+    const yearly = sum(S.dividends.filter((d) => d.date.slice(0, 7) > addMonths(thisMonth(), -12)), (d) => d.amount);
+    const target = Math.max(1000, Math.ceil((yearly * 2) / 500) * 500);
+    out.push({ title: `Dividend income of ${money(target, { compact: true })} a year`, why: `${money(yearly, { compact: true })} in the last 12 months.`, add: addGoal(newMilestone({ name: 'Dividend income', metric: 'dividends', target })) });
+  }
+  if (sm.rows.length && !has((g) => g.metric === 'fire')) {
+    out.push({ title: 'Financial independence', why: 'Enough invested that your spending could come from it (the Retirement page’s FIRE number).', add: addGoal(newMilestone(MILESTONE_PRESETS[8])) });
+  }
+  return out;
+}
+function suggestionsCard(sm, limit = 4) {
+  const list = goalSuggestions(sm).slice(0, limit);
+  if (!list.length) return null;
+  return el('div', { class: 'card section-gap' },
+    el('div', { class: 'card__title', text: 'Suggested for you' }),
+    list.map((s) => el('div', { class: 'check' },
+      el('div', { class: 'check__icon check__icon--skip', text: '+' }),
+      el('div', { class: 'check__text' }, el('div', { text: s.title }), el('div', { class: 'check__detail', text: s.why })),
+      el('button', { class: 'btn btn--small', type: 'button', text: s.label || 'Add', onclick: s.add }),
+    )));
+}
+
+/** One milestone's progress bar and status line. */
+function milestoneBlock(st) {
+  const g = st.goal;
+  const fmt = (v) => (st.pct ? pct(v, 0) : money(v, { compact: true }));
+  const head = g.metric === 'debt' ? `${money(st.value, { compact: true })} left` : `${fmt(st.value)} / ${fmt(st.target)}`;
+  const when = st.reached ? 'Reached.'
+    : !st.projects ? (g.by ? `Target ${monthLabel(g.by)}.` : MILESTONES[g.metric]?.about || '')
+      : st.reach ? `Around ${monthLabel(st.reach)} ${g.metric === 'debt' ? 'at your current repayments' : 'at your current pace'}${g.by ? (st.onTrack ? ' — on track.' : ` — after your ${monthLabel(g.by)} target.`) : '.'}`
+        : g.metric === 'debt' ? 'Some debts are never paid off at their current payments.' : 'Not at your current pace.';
+  return el('div', { class: 'goal' },
+    el('div', { class: 'bar__head' }, el('span', { text: g.name || MILESTONES[g.metric]?.short }), el('strong', { text: head })),
+    progressBar(st.progress),
+    el('div', { class: 'card__hint' + (st.onTrack ? '' : ' neg'), text: when }),
+  );
+}
+
 function pageGoals() {
   const sm = summary();
   const plan = Object.fromEntries(sm.goals.map((p) => [p.goal.id, p]));
+  const mstat = Object.fromEntries(sm.milestones.map((m) => [m.goal.id, m]));
+  const buckets = S.goals.filter((g) => g.kind !== 'milestone');
+  const milestones = S.goals.filter((g) => g.kind === 'milestone');
   const add = (p) => {
-    S.goals.push({ id: uid(), name: p.name, target: 0, by: '', kind: p.kind || 'custom', ...(p.months ? { months: p.months } : {}) });
+    if (p.metric) S.goals.push(newMilestone(p));
+    else S.goals.push({ id: uid(), name: p.name, target: 0, by: '', kind: p.kind || 'custom', ...(p.months ? { months: p.months } : {}) });
     commit();
-    toast(`Added ${p.name}${p.kind === 'emergency' ? '' : ' — enter the target amount'}`);
+    const needsTarget = p.metric ? !['debt', 'fire', 'cpf'].includes(p.metric) && !p.target : p.kind !== 'emergency';
+    toast(`Added ${p.name}${needsTarget ? ' — enter the target' : ''}`);
   };
   const picker = el('select', {
     class: 'select select--inline', 'aria-label': 'Add a goal',
-    onchange: (e) => { const v = e.target.value; if (v !== '') add(v === 'custom' ? { name: 'New goal' } : GOAL_PRESETS[+v]); },
+    onchange: (e) => {
+      const v = e.target.value;
+      if (v === '') return;
+      add(v === 'custom' ? { name: 'New goal' } : v[0] === 'm' ? MILESTONE_PRESETS[+v.slice(1)] : GOAL_PRESETS[+v]);
+    },
   },
   el('option', { value: '', text: '+ Add a goal…', selected: true }),
-  GOAL_PRESETS.map((p, i) => el('option', { value: i, text: p.name })),
-  el('option', { value: 'custom', text: 'Something else' }));
+  el('optgroup', { label: 'Save for something' }, GOAL_PRESETS.map((p, i) => el('option', { value: i, text: p.name })), el('option', { value: 'custom', text: 'Something else' })),
+  el('optgroup', { label: 'Reach a milestone' }, MILESTONE_PRESETS.map((p, i) => el('option', { value: 'm' + i, text: p.name }))));
+  // Order only matters among savings goals (they share the money); milestones are independent.
   const move = (g, d) => {
-    const i = S.goals.indexOf(g), j = i + d;
-    if (j < 0 || j >= S.goals.length) return;
-    [S.goals[i], S.goals[j]] = [S.goals[j], S.goals[i]];
+    const j = buckets.indexOf(g) + d;
+    if (j < 0 || j >= buckets.length) return;
+    const a = S.goals.indexOf(g), b = S.goals.indexOf(buckets[j]);
+    [S.goals[a], S.goals[b]] = [S.goals[b], S.goals[a]];
     commit();
   };
   const edit = () => 'table__td--edit';
+  const mCols = [
+    { key: 'name', label: 'Milestone', type: 'text' },
+    { key: 'metric', label: 'Measured by', type: 'text', get: (g) => el('span', { title: MILESTONES[g.metric]?.about, text: MILESTONES[g.metric]?.short || g.metric }) },
+    { key: 'target', label: 'Target', type: 'money', cls: (g) => (['debt', 'fire'].includes(g.metric) ? '' : 'table__td--edit'), get: (g) => (g.metric === 'debt' ? money(0)
+      : g.metric === 'fire' ? el('span', { title: 'From the Retirement page', text: `${money(mstat[g.id]?.target, { compact: true })} (auto)` })
+        : inputFor(g, { key: 'target', type: g.metric === 'savingsRate' ? 'pct' : 'money', label: 'Target' })) },
+    { key: 'by', label: 'Target date (optional)', type: 'month' },
+    { key: 'now', label: 'Now', type: 'money', get: (g) => { const s = mstat[g.id]; return !s ? '–' : s.pct ? pct(s.value) : money(s.value); } },
+    { key: 'reach', label: 'Reached around', type: 'text', get: (g) => { const s = mstat[g.id]; return !s ? '–' : s.reached ? 'Reached' : !s.projects ? '–' : s.reach ? monthLabel(s.reach) : 'Not at current pace'; }, cls: (g) => (mstat[g.id] && !mstat[g.id].onTrack ? 'neg' : '') },
+  ];
+  const remove = (g) => undoable(`${g.name || 'Goal'} removed`, () => { S.goals = S.goals.filter((x) => x !== g); });
   const cols = [
     { key: 'order', label: 'Order', type: 'text', get: (g) => el('span', { class: 'page__actions' },
-      el('button', { class: 'btn btn--icon', type: 'button', text: '↑', 'aria-label': `Move ${g.name} up`, disabled: S.goals[0] === g, onclick: () => move(g, -1) }),
-      el('button', { class: 'btn btn--icon', type: 'button', text: '↓', 'aria-label': `Move ${g.name} down`, disabled: S.goals[S.goals.length - 1] === g, onclick: () => move(g, 1) })) },
+      el('button', { class: 'btn btn--icon', type: 'button', text: '↑', 'aria-label': `Move ${g.name} up`, disabled: buckets[0] === g, onclick: () => move(g, -1) }),
+      el('button', { class: 'btn btn--icon', type: 'button', text: '↓', 'aria-label': `Move ${g.name} down`, disabled: buckets[buckets.length - 1] === g, onclick: () => move(g, 1) })) },
     { key: 'name', label: 'Goal', type: 'text' },
     { key: 'target', label: 'Target', type: 'money', cls: edit, get: (g) => (g.kind === 'emergency'
       ? el('span', { class: 'goal__months' }, inputFor(g, { key: 'months', type: 'number', label: 'Months of spending', step: '1' }), ` months = ${money(plan[g.id]?.target)}`)
@@ -2150,16 +2354,23 @@ function pageGoals() {
     { key: 'reach', label: 'Reached around', type: 'text', get: (g) => { const p = plan[g.id]; return !p ? '–' : p.left <= 0 ? 'Reached' : p.reach ? monthLabel(p.reach) : 'Not at current pace'; }, cls: (g) => (plan[g.id] && !plan[g.id].onTrack ? 'neg' : '') },
   ];
   return el('div', null,
-    pageHead('Goals', 'What you are saving for. Savings fill the goals from the top, so put the most important first.', picker),
+    pageHead('Goals', 'Money you’re saving for something, and milestones you want to reach.', picker),
     el('div', { class: 'grid grid--stats' },
       stat('Saved so far', money(sm.saved), 'Cash + investments, excl. money set aside', true),
       stat('12-month pace', money(sm.pace) + '/mo', 'Savings + planned investing'),
       stat('Emergency fund', sm.emergencyMonths != null ? `${sm.emergencyMonths.toFixed(1)} months` : '–', sm.spendAvg ? `Cash ÷ ${money(sm.spendAvg, { compact: true })} average monthly spending` : null),
     ),
-    sm.goals.length ? el('div', { class: 'card section-gap' }, sm.goals.map(goalBlock)) : null,
-    el('div', { class: 'section-gap' }, editTable({ cols, rows: S.goals, onDelete: (g) => undoable(`${g.name || 'Goal'} removed`, () => { S.goals = S.goals.filter((x) => x !== g); }), emptyText: 'No goals yet — add one above.' })),
+    suggestionsCard(sm),
+    el('h2', { class: 'section-gap', text: 'Saving for something' }),
+    el('p', { class: 'card__hint', text: 'Your savings fill these from the top, so put the most important first.' }),
+    sm.goals.length ? el('div', { class: 'card' }, sm.goals.map(goalBlock)) : null,
+    el('div', { class: 'section-gap' }, editTable({ cols, rows: buckets, onDelete: remove, emptyText: 'Nothing yet — add a goal above.' })),
     el('p', { class: 'card__hint section-gap', text: 'The emergency fund target follows your average spending over the last 6 months (excluding income tax); the usual guide is 3–6 months. Dates assume your last 12 months’ saving pace continues and goes to each goal in turn.' }),
-    sourceLinks('moneysense'),
+    el('h2', { class: 'section-gap', text: 'Milestones' }),
+    el('p', { class: 'card__hint', text: 'Targets for figures the app already tracks. They don’t set money aside, so they don’t compete with the goals above. Dates use your last 12 months’ pace and leave out investment growth, so they lean cautious; CPF includes its guaranteed interest.' }),
+    sm.milestones.length ? el('div', { class: 'card' }, sm.milestones.map(milestoneBlock)) : null,
+    el('div', { class: 'section-gap' }, editTable({ cols: mCols, rows: milestones, onDelete: remove, emptyText: 'No milestones yet — pick one from “Add a goal”, or a suggestion above.' })),
+    sourceLinks('moneysense', 'cpfPayouts'),
   );
 }
 
