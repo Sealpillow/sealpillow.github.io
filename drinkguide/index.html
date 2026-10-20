@@ -389,6 +389,20 @@
   .myth .m { color: var(--ink); text-decoration: line-through; text-decoration-color: var(--high); text-decoration-thickness: 1px; }
   .myth .t { color: var(--text-2); }
 
+  /* Effects */
+  .upside p { font-size: 14px; color: var(--text-2); }
+  .upside h3 { margin-bottom: 4px; }
+  .catch { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .catch b { display: block; font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+
+  .ladder { display: grid; gap: 0; }
+  .rung { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 16px; align-items: start; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--text-2); }
+  .rung:last-child { border-bottom: 0; }
+  .rung b { display: block; font-weight: 500; color: var(--ink); }
+  .amt { display: inline-block; text-align: center; font-size: 13px; font-weight: 500; padding: 4px 0; border-radius: 6px; color: var(--lv); background: var(--lv-bg); white-space: nowrap; }
+
+  .effects .card p { font-size: 14px; color: var(--text-2); }
+
   /* Glass drawings: liquid rises from the bottom of each clipped glass */
   .liq { transform-box: fill-box; transform-origin: 50% 100%; transition: transform 0.6s cubic-bezier(0.3, 0.7, 0.3, 1), fill 0.4s ease; }
   .gl { fill: none; stroke: var(--text-2); stroke-width: 1.3; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
@@ -500,9 +514,10 @@
     <button class="tab" type="button" role="tab" id="tab-types" aria-controls="types"><span class="n">02</span>Drink types</button>
     <button class="tab" type="button" role="tab" id="tab-wine" aria-controls="wine"><span class="n">03</span>Wines</button>
     <button class="tab" type="button" role="tab" id="tab-examples" aria-controls="examples"><span class="n">04</span>Everyday examples</button>
-    <button class="tab" type="button" role="tab" id="tab-limits" aria-controls="limits"><span class="n">05</span>Your limits</button>
-    <button class="tab" type="button" role="tab" id="tab-control" aria-controls="control"><span class="n">06</span>Stay in control</button>
-    <button class="tab" type="button" role="tab" id="tab-count" aria-controls="count"><span class="n">07</span>Count your night</button>
+    <button class="tab" type="button" role="tab" id="tab-effects" aria-controls="effects"><span class="n">05</span>Effects on you</button>
+    <button class="tab" type="button" role="tab" id="tab-limits" aria-controls="limits"><span class="n">06</span>Your limits</button>
+    <button class="tab" type="button" role="tab" id="tab-control" aria-controls="control"><span class="n">07</span>Stay in control</button>
+    <button class="tab" type="button" role="tab" id="tab-count" aria-controls="count"><span class="n">08</span>Count your night</button>
   </div>
 
   <!-- 01 How strength is worked out -->
@@ -644,10 +659,74 @@
     <div class="grid-3" id="examplesGrid"></div>
   </section>
 
-  <!-- 05 Limits -->
-  <section id="limits">
+  <!-- 05 Effects -->
+  <section id="effects">
     <div class="sec-head">
       <span class="sec-num">05</span>
+      <div>
+        <h2>What alcohol does to you</h2>
+        <p class="sec-sub">The upsides of drinking are mostly social and personal. The downsides are physical, and they grow with every drink. Health bodies like the WHO now say no amount of alcohol is good for your health.</p>
+      </div>
+    </div>
+
+    <p class="sub">Possible upsides, and the catch</p>
+    <div class="tips">
+      <div class="card upside">
+        <h3>Enjoyment</h3>
+        <p>Taste, food pairing and ritual are real pleasures.</p>
+        <p class="catch"><b>The catch</b>Most of the enjoyment comes from the first drink or two. After that it's mostly the alcohol talking.</p>
+      </div>
+      <div class="card upside">
+        <h3>Bringing people together</h3>
+        <p>Toasts, celebrations and shared rounds are part of many cultures.</p>
+        <p class="catch"><b>The catch</b>The company matters more than the alcohol. A soft drink or a 0% beer joins the toast just as well.</p>
+      </div>
+      <div class="card upside">
+        <h3>Taking the edge off</h3>
+        <p>A drink can make you feel relaxed for a while.</p>
+        <p class="catch"><b>The catch</b>Anxiety often comes back stronger as it wears off, and drinking to cope is a common path to dependence.</p>
+      </div>
+      <div class="card upside">
+        <h3>Good for your heart?</h3>
+        <p>Older studies linked light drinking with less heart disease.</p>
+        <p class="catch"><b>The catch</b>Newer, better studies suggest that's because the non-drinkers they compared with included people who'd quit through ill health. Doctors don't advise drinking for your heart.</p>
+      </div>
+      <div class="card upside">
+        <h3>Antioxidants in red wine?</h3>
+        <p>Red wine does contain resveratrol.</p>
+        <p class="catch"><b>The catch</b>The amounts are tiny. The doses that show effects in studies would take far more wine than anyone could drink. Grapes and berries have it without the alcohol.</p>
+      </div>
+    </div>
+
+    <p class="sub">Tonight: effects build with each drink</p>
+    <div class="card">
+      <div class="ladder">
+        <div class="rung"><span class="amt" style="--lv: var(--low); --lv-bg: var(--low-bg);">1 to 2</span><p><b>Relaxed and chatty</b>Reaction time and judgement already slip, enough to make driving unsafe.</p></div>
+        <div class="rung"><span class="amt" style="--lv: var(--mid); --lv-bg: var(--mid-bg);">3 to 5</span><p><b>Loud, clumsy, less careful</b>Inhibitions drop, decisions get riskier, and memory starts to get patchy.</p></div>
+        <div class="rung"><span class="amt" style="--lv: var(--high); --lv-bg: var(--high-bg);">6 to 9</span><p><b>Slurring, swaying, sick</b>Unsteady on your feet, nausea and vomiting. Blackouts and injuries become likely.</p></div>
+        <div class="rung"><span class="amt" style="--lv: var(--high); --lv-bg: var(--high-bg);">10 +</span><p><b>Danger zone</b>Confusion, passing out and slowed breathing. This is alcohol poisoning territory: call 995.</p></div>
+      </div>
+      <p class="muted small" style="margin-top: 12px;">Standard drinks in one session of a few hours, for an average adult. Body size, sex, food and how fast you drink all shift these. Tolerance hides the signs, not the effects.</p>
+    </div>
+
+    <p class="sub">Over the years: what regular drinking does</p>
+    <div class="grid-3 effects">
+      <div class="card"><h3>Cancer</h3><p>Alcohol causes at least 7 cancers, including mouth, throat, oesophagus, liver, bowel and breast. Risk rises from the first drink, and is higher still if you go red when you drink.</p></div>
+      <div class="card"><h3>Liver</h3><p>Fat builds up in the liver after even a few days of heavy drinking. Years of it can lead to inflammation and cirrhosis, which is permanent scarring.</p></div>
+      <div class="card"><h3>Heart and blood pressure</h3><p>Raises blood pressure and the risk of an irregular heartbeat and stroke. Heavy drinking can weaken the heart muscle.</p></div>
+      <div class="card"><h3>Brain and mood</h3><p>Low mood and anxiety often worsen after drinking. Long-term heavy drinking harms memory, and dependence can build up slowly.</p></div>
+      <div class="card"><h3>Sleep</h3><p>It helps you drop off but breaks up the second half of the night, so you wake up less rested.</p></div>
+      <div class="card"><h3>Weight and gut</h3><p>Alcohol has 7 calories per gram, almost as much as fat. It irritates the stomach and can inflame the pancreas.</p></div>
+      <div class="card"><h3>Immunity</h3><p>Heavy drinking weakens your defences, making infections like pneumonia more likely.</p></div>
+      <div class="card"><h3>Pregnancy and fertility</h3><p>No amount of alcohol is known to be safe in pregnancy. Drinking can also lower fertility.</p></div>
+      <div class="card"><h3>Medicines</h3><p>Alcohol interacts with many medicines, including painkillers, antihistamines, sleeping pills and antidepressants. Check the label or ask a pharmacist.</p></div>
+    </div>
+  </section>
+
+  <!-- 06 Limits -->
+  <section id="limits">
+    <div class="sec-head">
+      <span class="sec-num">06</span>
       <div>
         <h2>How to approach it</h2>
         <p class="sec-sub">Limits don't go up with experience. Tolerance changes how drunk you feel, not how much harm the alcohol does.</p>
@@ -712,10 +791,10 @@
     </div>
   </section>
 
-  <!-- 06 Stay in control -->
+  <!-- 07 Stay in control -->
   <section id="control">
     <div class="sec-head">
-      <span class="sec-num">06</span>
+      <span class="sec-num">07</span>
       <div>
         <h2>Stay in control</h2>
         <p class="sec-sub">Only two things decide how drunk you get: how much alcohol you drink and how fast. Everything else just changes how quickly it reaches your blood.</p>
@@ -781,10 +860,10 @@
     <p class="muted small" style="margin-top: 12px;">Only time sobers you up.</p>
   </section>
 
-  <!-- 07 Counter -->
+  <!-- 08 Counter -->
   <section id="count">
     <div class="sec-head">
-      <span class="sec-num">07</span>
+      <span class="sec-num">08</span>
       <div>
         <h2>Count your night</h2>
         <p class="sec-sub">Add what you've had to see your total in standard drinks.</p>
@@ -814,6 +893,7 @@
   <div class="notes">
     <p>Figures use typical ABVs and serving sizes. Real bottles vary by 1 to 2%, and cocktail and bar pours vary a lot more. Limits follow Singapore Health Promotion Board guidance. The WHO notes that no level of drinking is completely risk-free, so these are lower-risk limits, not safe ones.</p>
     <p>"Hours to clear" is a rough average and doesn't tell you when you're fit to drive.</p>
+    <p>The health effects summarise findings from the WHO and the International Agency for Research on Cancer, which lists alcohol as a known cause of cancer. This is general information, not medical advice. A doctor can tell you what applies to you.</p>
   </div>
 </div>
 
@@ -949,7 +1029,7 @@
   });
   setGlassMode('serve');
 
-  // 05 Limit in glasses: whole servings, then one part-filled glass for the remainder
+  // 06 Limit in glasses: whole servings, then one part-filled glass for the remainder
   var limSeg = document.getElementById('limSeg');
   function setLimit(lim) {
     limSeg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.l === lim); });
@@ -1042,7 +1122,7 @@
     }).join('') + '</div>';
   }).join('');
 
-  // 07 Counter
+  // 08 Counter
   var COUNT = [
     ['Beer', '330 ml can', stdDrinks(330, 5)],
     ['Cider', '330 ml can', stdDrinks(330, 4.5)],
