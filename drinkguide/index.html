@@ -159,27 +159,57 @@
 
   .lede { font-size: 18px; color: var(--text-2); }
 
-  /* Tabs: a sticky bar that scrolls sideways on its own when it doesn't fit */
-  .tabs {
+  /* Tabs: a sticky bar that scrolls sideways (swipe, drag, wheel or arrows) when it doesn't fit */
+  .tabbar {
     position: sticky;
     top: 0;
     z-index: 5;
-    display: flex;
-    gap: 24px;
     margin: 0 calc(-1 * var(--pad));
-    padding: 0 var(--pad);
     background: var(--bg);
     border-bottom: 1px solid var(--line);
-    overflow-x: auto;
-    scrollbar-width: none;
     transition: background-color 0.3s ease;
   }
 
+  .tabs {
+    display: flex;
+    gap: 24px;
+    padding: 0 var(--pad);
+    overflow-x: auto;
+    scrollbar-width: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
   .tabs::-webkit-scrollbar { display: none; }
+  .tabbar.more-left .tabs, .tabbar.more-right .tabs { cursor: grab; }
+  .tabs.dragging, .tabs.dragging .tab { cursor: grabbing; }
+
   /* Fades whichever edge has more tabs hidden past it */
-  .tabs.more-right { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent); }
-  .tabs.more-left { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent); }
-  .tabs.more-left.more-right { -webkit-mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent); }
+  .tabbar.more-right .tabs { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 72px), transparent calc(100% - 24px)); mask-image: linear-gradient(to right, #000 calc(100% - 72px), transparent calc(100% - 24px)); }
+  .tabbar.more-left .tabs { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 72px), transparent calc(100% - 24px)); mask-image: linear-gradient(to left, #000 calc(100% - 72px), transparent calc(100% - 24px)); }
+  .tabbar.more-left.more-right .tabs { -webkit-mask-image: linear-gradient(to right, transparent 24px, #000 72px, #000 calc(100% - 72px), transparent calc(100% - 24px)); mask-image: linear-gradient(to right, transparent 24px, #000 72px, #000 calc(100% - 72px), transparent calc(100% - 24px)); }
+
+  .tab-arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 36px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: var(--bg);
+    border: 0;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+
+  .tab-arrow:hover { color: var(--ink); }
+  .tab-arrow svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .tab-arrow.left { left: 0; }
+  .tab-arrow.right { right: 0; }
+  .tabbar.more-left .tab-arrow.left, .tabbar.more-right .tab-arrow.right { display: flex; }
 
   .tab {
     flex: none;
@@ -509,15 +539,19 @@
     <p class="lede">A can of beer, a glass of wine and a shot of whisky hold about the same amount of alcohol. A bottle of soju holds five times that. This guide shows how strong each drink really is, and how much is sensible for you.</p>
   </div>
 
-  <div class="tabs" role="tablist" aria-label="Guide sections">
-    <button class="tab" type="button" role="tab" id="tab-strength" aria-controls="strength"><span class="n">01</span>How strength works</button>
-    <button class="tab" type="button" role="tab" id="tab-types" aria-controls="types"><span class="n">02</span>Drink types</button>
-    <button class="tab" type="button" role="tab" id="tab-wine" aria-controls="wine"><span class="n">03</span>Wines</button>
-    <button class="tab" type="button" role="tab" id="tab-examples" aria-controls="examples"><span class="n">04</span>Everyday examples</button>
-    <button class="tab" type="button" role="tab" id="tab-effects" aria-controls="effects"><span class="n">05</span>Effects on you</button>
-    <button class="tab" type="button" role="tab" id="tab-limits" aria-controls="limits"><span class="n">06</span>Your limits</button>
-    <button class="tab" type="button" role="tab" id="tab-control" aria-controls="control"><span class="n">07</span>Stay in control</button>
-    <button class="tab" type="button" role="tab" id="tab-count" aria-controls="count"><span class="n">08</span>Count your night</button>
+  <div class="tabbar">
+    <button class="tab-arrow left" type="button" tabindex="-1" aria-label="Scroll tabs left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <div class="tabs" role="tablist" aria-label="Guide sections">
+      <button class="tab" type="button" role="tab" id="tab-strength" aria-controls="strength"><span class="n">01</span>How strength works</button>
+      <button class="tab" type="button" role="tab" id="tab-types" aria-controls="types"><span class="n">02</span>Drink types</button>
+      <button class="tab" type="button" role="tab" id="tab-wine" aria-controls="wine"><span class="n">03</span>Wines</button>
+      <button class="tab" type="button" role="tab" id="tab-examples" aria-controls="examples"><span class="n">04</span>Everyday examples</button>
+      <button class="tab" type="button" role="tab" id="tab-effects" aria-controls="effects"><span class="n">05</span>Effects on you</button>
+      <button class="tab" type="button" role="tab" id="tab-limits" aria-controls="limits"><span class="n">06</span>Your limits</button>
+      <button class="tab" type="button" role="tab" id="tab-control" aria-controls="control"><span class="n">07</span>Stay in control</button>
+      <button class="tab" type="button" role="tab" id="tab-count" aria-controls="count"><span class="n">08</span>Count your night</button>
+    </div>
+    <button class="tab-arrow right" type="button" tabindex="-1" aria-label="Scroll tabs right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
   </div>
 
   <!-- 01 How strength is worked out -->
@@ -1201,8 +1235,9 @@
       });
       // Keep the chosen tab visible in the bar on narrow screens, without scrolling the page
       var t = tabs[i];
-      if (t.offsetLeft < tablist.scrollLeft || t.offsetLeft + t.offsetWidth > tablist.scrollLeft + tablist.clientWidth) {
-        tablist.scrollLeft = t.offsetLeft - 24;
+      // (40px allows for the edge arrows covering part of the bar)
+      if (t.offsetLeft < tablist.scrollLeft + 40 || t.offsetLeft + t.offsetWidth > tablist.scrollLeft + tablist.clientWidth - 40) {
+        tablist.scrollLeft = t.offsetLeft - 48;
       }
       if (opts.focus) tabs[i].focus();
       if (opts.hash !== false) history.replaceState(null, '', '#' + panels[i].id);
@@ -1239,14 +1274,65 @@
     window.addEventListener('hashchange', function () { fromHash(true); });
     fromHash(false);
 
+    // Show the fade and arrow on whichever side has tabs hidden past it
+    var bar = tablist.parentNode;
     function edges() {
       var max = tablist.scrollWidth - tablist.clientWidth;
-      tablist.classList.toggle('more-left', tablist.scrollLeft > 1);
-      tablist.classList.toggle('more-right', tablist.scrollLeft < max - 1);
+      bar.classList.toggle('more-left', tablist.scrollLeft > 1);
+      bar.classList.toggle('more-right', tablist.scrollLeft < max - 1);
     }
     tablist.addEventListener('scroll', edges, { passive: true });
     window.addEventListener('resize', edges);
     edges();
+
+    bar.querySelectorAll('.tab-arrow').forEach(function (a) {
+      a.addEventListener('click', function () {
+        var dir = a.classList.contains('left') ? -1 : 1;
+        tablist.scrollBy({ left: dir * tablist.clientWidth * 0.6, behavior: 'smooth' });
+      });
+    });
+
+    // Mouse drag to scroll (touch screens already swipe natively)
+    var drag = null, dragged = false;
+    tablist.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      drag = { x: e.clientX, left: tablist.scrollLeft };
+      dragged = false;
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x;
+      if (!dragged && Math.abs(dx) > 5) {
+        dragged = true;
+        tablist.classList.add('dragging');
+      }
+      if (dragged) tablist.scrollLeft = drag.left - dx;
+    });
+    function endDrag() {
+      drag = null;
+      tablist.classList.remove('dragging');
+    }
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+    // Stop the browser starting its own drag of the tab text, which would cancel ours
+    tablist.addEventListener('dragstart', function (e) { e.preventDefault(); });
+    // A drag shouldn't also count as clicking the tab it ended on
+    tablist.addEventListener('click', function (e) {
+      if (!dragged) return;
+      dragged = false;
+      e.stopPropagation();
+      e.preventDefault();
+    }, true);
+
+    // Mouse wheel scrolls the bar sideways, then hands back to the page at either end
+    tablist.addEventListener('wheel', function (e) {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      var max = tablist.scrollWidth - tablist.clientWidth;
+      if (max <= 0) return;
+      if ((e.deltaY < 0 && tablist.scrollLeft <= 0) || (e.deltaY > 0 && tablist.scrollLeft >= max - 1)) return;
+      e.preventDefault();
+      tablist.scrollLeft += e.deltaY;
+    }, { passive: false });
   })();
 
   // Theme toggle: an explicit choice is remembered; otherwise the page follows the system setting
