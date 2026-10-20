@@ -25,20 +25,121 @@ const PdfText = (() => {
     return new Uint8Array(await new Response(stream).arrayBuffer());
   }
 
-  /** Index every "n 0 obj … endobj" by number: its dictionary text and raw stream (if any). */
+  /* ---- Encrypted PDFs that open without a password (common for bank statements: they only restrict printing
+     or copying). Standard security handler, RC4 40/128-bit and AES-128. MD5 is needed and browsers don't ship it. */
+  function md5(bytes) {
+    const S = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21];
+    const K = Array.from({ length: 64 }, (_, i) => Math.floor(Math.abs(Math.sin(i + 1)) * 2 ** 32) >>> 0);
+    const n = ((bytes.length + 8) >> 6) + 1;
+    const m = new Uint8Array(n * 64);
+    m.set(bytes);
+    m[bytes.length] = 0x80;
+    const dv = new DataView(m.buffer);
+    dv.setUint32(n * 64 - 8, (bytes.length * 8) >>> 0, true);
+    dv.setUint32(n * 64 - 4, Math.floor((bytes.length * 8) / 2 ** 32), true);
+    let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+    for (let off = 0; off < m.length; off += 64) {
+      let A = a0, B = b0, C = c0, D = d0;
+      for (let i = 0; i < 64; i++) {
+        let F, g;
+        if (i < 16) { F = (B & C) | (~B & D); g = i; } else if (i < 32) { F = (D & B) | (~D & C); g = (5 * i + 1) % 16; } else if (i < 48) { F = B ^ C ^ D; g = (3 * i + 5) % 16; } else { F = C ^ (B | ~D); g = (7 * i) % 16; }
+        F = (F + A + K[i] + dv.getUint32(off + g * 4, true)) >>> 0;
+        A = D; D = C; C = B;
+        const s = S[(i >> 4) * 4 + (i % 4)];
+        B = (B + ((F << s) | (F >>> (32 - s)))) >>> 0;
+      }
+      a0 = (a0 + A) >>> 0; b0 = (b0 + B) >>> 0; c0 = (c0 + C) >>> 0; d0 = (d0 + D) >>> 0;
+    }
+    const out = new Uint8Array(16), ov = new DataView(out.buffer);
+    [a0, b0, c0, d0].forEach((v, i) => ov.setUint32(i * 4, v, true));
+    return out;
+  }
+  function rc4(key, data) {
+    const S = Uint8Array.from({ length: 256 }, (_, i) => i);
+    for (let i = 0, j = 0; i < 256; i++) { j = (j + S[i] + key[i % key.length]) & 255; [S[i], S[j]] = [S[j], S[i]]; }
+    const out = new Uint8Array(data.length);
+    for (let k = 0, i = 0, j = 0; k < data.length; k++) {
+      i = (i + 1) & 255; j = (j + S[i]) & 255; [S[i], S[j]] = [S[j], S[i]];
+      out[k] = data[k] ^ S[(S[i] + S[j]) & 255];
+    }
+    return out;
+  }
+  const concat = (...parts) => { const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0)); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; } return out; };
+  /** A PDF string value (literal or hex) following `key` in a dictionary, as bytes. */
+  function pdfString(dict, key) {
+    const i = dict.indexOf(key);
+    if (i < 0) return null;
+    let j = i + key.length;
+    while (/\s/.test(dict[j])) j++;
+    if (dict[j] === '<') return toBytes(dict.slice(j + 1, dict.indexOf('>', j)).replace(/\s/g, '').replace(/../g, (h) => String.fromCharCode(parseInt(h, 16))));
+    if (dict[j] !== '(') return null;
+    let out = '', depth = 1;
+    for (j++; j < dict.length && depth; j++) {
+      const ch = dict[j];
+      if (ch === '\\') {
+        const oct = dict.slice(j + 1, j + 4).match(/^[0-7]{1,3}/);
+        if (oct) { out += String.fromCharCode(parseInt(oct[0], 8) & 255); j += oct[0].length; continue; }
+        const nx = dict[++j];
+        out += { n: '\n', r: '\r', t: '\t', b: '\b', f: '\f' }[nx] ?? (nx === '\r' || nx === '\n' ? '' : nx);
+        continue;
+      }
+      if (ch === '(') depth++;
+      else if (ch === ')' && !--depth) break;
+      out += ch;
+    }
+    return toBytes(out);
+  }
+  const PAD = toBytes('\x28\xBF\x4E\x5E\x4E\x75\x8A\x41\x64\x00\x4E\x56\xFF\xFA\x01\x08\x2E\x2E\x00\xB6\xD0\x68\x3E\x80\x2F\x0C\xA9\xFE\x64\x53\x69\x7A');
+  /** Work out the file key from the empty user password, or throw if the file really needs a password. */
+  function setupDecryption(s, objs) {
+    const ref = s.match(/\/Encrypt\s+(\d+)\s+\d+\s+R/);
+    const dict = ref ? objs.get(+ref[1])?.dict || '' : dictAfter(objs, s.slice(s.lastIndexOf('trailer')), '/Encrypt');
+    const V = +(dict.match(/\/V\s+(\d+)/)?.[1] || 0), R = +(dict.match(/\/R\s+(\d+)/)?.[1] || 0);
+    if (!/\/Filter\s*\/Standard/.test(dict) || V > 4 || R > 4) throw new Error('This PDF uses a kind of protection that can’t be read here. Open it and use “Print → Save as PDF” to make an unprotected copy, then import that.');
+    const O = pdfString(dict, '/O'), U = pdfString(dict, '/U');
+    const P = +(dict.match(/\/P\s+(-?\d+)/)?.[1] || 0);
+    const idBytes = (() => { const m = s.match(/\/ID\s*\[\s*(<[0-9A-Fa-f\s]*>|\((?:\\.|[^\\)])*\))/); return m ? pdfString('/X' + m[1], '/X') : new Uint8Array(0); })();
+    const aes = V === 4 && /\/CFM\s*\/AESV2/.test(dict);
+    const len = V === 1 ? 5 : aes ? 16 : Math.floor(+(dict.match(/\/Length\s+(\d+)/)?.[1] || 40) / 8);
+    const p4 = new Uint8Array(4);
+    new DataView(p4.buffer).setUint32(0, P >>> 0, true);
+    const noMeta = R >= 4 && /\/EncryptMetadata\s+false/.test(dict) ? new Uint8Array([255, 255, 255, 255]) : new Uint8Array(0);
+    let key = md5(concat(PAD, O.subarray(0, 32), p4, idBytes, noMeta));
+    if (R >= 3) for (let i = 0; i < 50; i++) key = md5(key.subarray(0, len));
+    key = key.subarray(0, len);
+    // Check it against /U: the empty password is right only if this matches.
+    let ok;
+    if (R === 2) ok = rc4(key, PAD).every((b, i) => b === U[i]);
+    else {
+      let x = rc4(key, md5(concat(PAD, idBytes)));
+      for (let i = 1; i <= 19; i++) x = rc4(key.map((b) => b ^ i), x);
+      ok = x.subarray(0, 16).every((b, i) => b === U[i]);
+    }
+    if (!ok) throw new Error('This PDF needs a password to open. Open it, then use “Print → Save as PDF” to save a copy without one, and import that copy.');
+    return { key, aes };
+  }
+  async function decrypt(crypt, num, gen, bytes) {
+    const objKey = md5(concat(crypt.key, new Uint8Array([num & 255, (num >> 8) & 255, (num >> 16) & 255, gen & 255, (gen >> 8) & 255]), crypt.aes ? toBytes('sAlT') : new Uint8Array(0)))
+      .subarray(0, Math.min(crypt.key.length + 5, 16));
+    if (!crypt.aes) return rc4(objKey, bytes);
+    const k = await crypto.subtle.importKey('raw', objKey, 'AES-CBC', false, ['decrypt']);
+    return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-CBC', iv: bytes.subarray(0, 16) }, k, bytes.subarray(16)));
+  }
+
+  /** Index every "n g obj … endobj" by number: its dictionary text, generation and raw stream (if any). */
   function indexObjects(s) {
     const objs = new Map();
-    const re = /(\d+)\s+\d+\s+obj\b([\s\S]*?)endobj/g;
+    const re = /(\d+)\s+(\d+)\s+obj\b([\s\S]*?)endobj/g;
     let m;
     while ((m = re.exec(s))) {
-      const body = m[2];
+      const body = m[3];
       const at = body.search(/\bstream\r?\n/);
-      if (at < 0) { objs.set(+m[1], { dict: body, raw: null }); continue; }
+      if (at < 0) { objs.set(+m[1], { dict: body, gen: +m[2], raw: null }); continue; }
       const start = body.indexOf('\n', at) + 1;
       let end = body.lastIndexOf('endstream');
       if (body[end - 1] === '\n') end--;
       if (body[end - 1] === '\r') end--;
-      objs.set(+m[1], { dict: body.slice(0, at), raw: body.slice(start, end) });
+      objs.set(+m[1], { dict: body.slice(0, at), gen: +m[2], raw: body.slice(start, end) });
     }
     return objs;
   }
@@ -63,7 +164,8 @@ const PdfText = (() => {
     const o = objs.get(num);
     if (!o || o.raw == null) return '';
     if (/\/Filter\s*\[?\s*\/(?!FlateDecode)/.test(o.dict)) return ''; // images and other filters: not text
-    const bytes = toBytes(o.raw);
+    let bytes = toBytes(o.raw);
+    if (objs.crypt) bytes = await decrypt(objs.crypt, num, o.gen, bytes);
     return toStr(/\/FlateDecode/.test(o.dict) ? await inflate(bytes) : bytes);
   }
 
@@ -210,8 +312,8 @@ const PdfText = (() => {
   async function lines(bytes) {
     const s = toStr(bytes);
     if (!s.startsWith('%PDF')) throw new Error('This is not a PDF file.');
-    if (/\/Encrypt\b/.test(s)) throw new Error('This PDF is password-protected. Save an unprotected copy and try again.');
     const objs = indexObjects(s);
+    if (/\/Encrypt\b/.test(s)) objs.crypt = setupDecryption(s, objs);
     // Pages in order, following the page tree from the catalog; resources are inherited down the tree.
     const pages = [];
     const walk = (num, inherited, seen = new Set()) => {
@@ -339,11 +441,83 @@ function parseTigerStatement(lines) {
     }
   }
 
-  return { source: 'Tiger Brokers', account: 'Tiger Brokers', periodStart: period[1], periodEnd: period[2], base, value, fx, moves, other, dividends };
+  return { kind: 'broker', source: 'Tiger Brokers', account: 'Tiger Brokers', periodStart: period[1], periodEnd: period[2], base, value, fx, moves, other, dividends };
 }
 
-const STATEMENT_PARSERS = [parseTigerStatement];
-const STATEMENT_SUPPORTED = 'Tiger Brokers (Singapore) monthly statements';
+const MONTH_NO = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12 };
+const two = (n) => String(n).padStart(2, '0');
+
+/**
+ * DBS / POSB consolidated statement (deposit accounts). Each account has a block headed "<name>  Account No.
+ * 123-45678-9" with Date · Description · Withdrawal (-) · Deposit (+) · Balance columns; a transaction is a dated
+ * row plus a few description lines underneath. Money in vs out comes from the running balance (more reliable
+ * than column positions), falling back to the column when a row has no balance.
+ */
+function parseDbsStatement(lines) {
+  if (!lines.some((l) => /^Transaction Details/.test(l.text)) || !lines.some((l) => /\b(POSB|DBS)\b/.test(l.text))) return null;
+  const asAt = lines.map((l) => l.text.match(/Transaction Details as (?:at|of) (\d{1,2}) ([A-Z][a-z]{2}) (\d{4})/)).find(Boolean);
+  const periodEnd = asAt && MONTH_NO[asAt[2]] ? `${asAt[3]}-${two(MONTH_NO[asAt[2]])}-${two(asAt[1])}` : null;
+  const accounts = [];
+  let acct = null, depositX = null, prev = null, tx = null;
+  for (const l of lines) {
+    const c = l.cells, first = c[0]?.text || '';
+    const no = l.text.match(/Account No\.\s*([\d-]+)/);
+    if (no && c.length >= 2 && first !== 'Account') {
+      acct = accounts.find((a) => a.number === no[1]);
+      if (!acct) { acct = { name: first, number: no[1], currency: 'SGD', transactions: [] }; accounts.push(acct); }
+      tx = null;
+      continue;
+    }
+    if (/Withdrawal \(-\)/.test(l.text) && /Deposit \(\+\)/.test(l.text)) {
+      depositX = c.find((x) => /^Deposit/.test(x.text))?.x ?? null;
+      const cur = l.text.match(/\(([A-Z]{3})\)\s*$/);
+      if (acct && cur) acct.currency = cur[1];
+      tx = null;
+      continue;
+    }
+    // "Total Balance Carried Forward: <withdrawals> <deposits> <balance>" — used to check the parse.
+    if (/^Total Balance Carried Forward/.test(l.text)) {
+      const nums = c.map((x) => stmtNum(x.text)).filter((v) => v != null);
+      if (acct && nums.length >= 3) acct.totals = { out: nums[nums.length - 3], in: nums[nums.length - 2], balance: nums[nums.length - 1] };
+      tx = null;
+      continue;
+    }
+    if (/^Balance (Brought|Carried) Forward/.test(l.text)) {
+      const nums = c.map((x) => stmtNum(x.text)).filter((v) => v != null);
+      if (/Brought/.test(l.text) && nums.length) prev = nums[nums.length - 1];
+      tx = null;
+      continue;
+    }
+    const d = first.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (d && acct) {
+      const nums = c.slice(2).map((x) => ({ x: x.x, v: stmtNum(x.text) })).filter((x) => x.v != null);
+      if (!nums.length) { tx = null; continue; }
+      const amount = Math.abs(nums[0].v);
+      const balance = nums.length > 1 ? nums[nums.length - 1].v : null;
+      const dir = balance != null && prev != null && Math.abs(Math.abs(balance - prev) - amount) < 0.011
+        ? (balance > prev ? 1 : -1)
+        : depositX != null && nums[0].x >= depositX - 20 ? 1 : -1;
+      if (balance != null) prev = balance;
+      tx = { date: `${d[3]}-${d[2]}-${d[1]}`, type: c[1]?.text || '', details: [], amount: dir * amount, x: c[1]?.x };
+      acct.transactions.push(tx);
+      continue;
+    }
+    // Further description lines sit under the description column.
+    if (tx && c.length === 1 && Math.abs(c[0].x - tx.x) < 4) { if (tx.details.length < 4) tx.details.push(first); continue; }
+    tx = null;
+  }
+  for (const a of accounts) {
+    for (const t of a.transactions) delete t.x;
+    const sumIn = a.transactions.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+    const sumOut = -a.transactions.filter((t) => t.amount < 0).reduce((s, t) => s + t.amount, 0);
+    // true / false when the statement prints totals to check against; null when it doesn't
+    a.verified = a.totals ? Math.abs(sumIn - a.totals.in) < 0.01 && Math.abs(sumOut - a.totals.out) < 0.01 : null;
+  }
+  return { kind: 'bank', source: 'DBS/POSB', periodEnd, accounts: accounts.filter((a) => a.transactions.length) };
+}
+
+const STATEMENT_PARSERS = [parseTigerStatement, parseDbsStatement];
+const STATEMENT_SUPPORTED = 'Tiger Brokers (Singapore) monthly statements and DBS/POSB account statements';
 
 /** Read one PDF statement → parsed figures, or throw with a message for the user. */
 async function readStatement(bytes) {

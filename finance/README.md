@@ -36,6 +36,12 @@ statement's own exchange rate), deposits/withdrawals and cash dividends. Re-impo
 anything. Scanned statements (images) have no text and can't be read. Other banks and brokers can be added as parsers
 in `statement.js`.
 
+**DBS/POSB bank statements** (on **Statements → Import statement (PDF)**) are recorded only: each account's
+transactions are stored as read and shown on the Statements page; nothing else in the app changes. The parser checks
+itself against the totals printed on the statement. Bank PDFs that are encrypted but open without a password (most
+e-statements — they only restrict printing/copying) are decrypted in the browser (RC4 / AES-128); PDFs that need a
+password to open must be saved as an unprotected copy first.
+
 ## Defaults (editable in the app)
 
 - Tax brackets: Singapore resident rates, YA2024 onwards.

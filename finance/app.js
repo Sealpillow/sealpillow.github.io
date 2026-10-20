@@ -386,6 +386,8 @@ function defaultData() {
     deposits: [],
     portfolio: [], // [{ date, value, account? }] — each account keeps its own latest value; blank = typed-in total
     dividends: [], // [{ date, amount, account }] from imported statements
+    // Bank statements, recorded as read — nothing else in the app uses them yet.
+    statements: [], // [{ id, key, source, account, accountNo, currency, periodEnd, importedAt, verified, transactions: [{ date, type, details, amount }] }]
     liabilities: [],
     policies: [],
     taxBrackets: structuredClone(DEFAULT_TAX),
@@ -399,7 +401,7 @@ function migrate(d) {
   const base = defaultData();
   const out = { ...base, ...d, settings: { ...base.settings, ...(d.settings || {}) } };
   out.settings.cpfStart = { ...base.settings.cpfStart, ...(d.settings?.cpfStart || {}) };
-  for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'dividends', 'liabilities', 'policies', 'recurring', 'goals', 'children']) if (!Array.isArray(out[k])) out[k] = [];
+  for (const k of ['assumptions', 'ledger', 'deposits', 'portfolio', 'dividends', 'statements', 'liabilities', 'policies', 'recurring', 'goals', 'children']) if (!Array.isArray(out[k])) out[k] = [];
   if (!Array.isArray(out.childStages)) out.childStages = base.childStages;
   out.housing = { ...base.housing, ...(d.housing || {}), plan: { ...base.housing.plan, ...(d.housing?.plan || {}) } };
   out.retire = { ...base.retire, ...(d.retire || {}) };
@@ -1453,6 +1455,7 @@ const PAGES = [
   ['housing', 'Housing'],
   ['kids', 'Kids & education'],
   ['investments', 'Investments'],
+  ['statements', 'Statements'],
   ['liabilities', 'Liabilities'],
   ['insurance', 'Insurance'],
   ['tax', 'Tax & reliefs'],
@@ -1536,7 +1539,7 @@ function render() {
   const wy = scrollY;
   const tableScroll = same ? [...main.querySelectorAll('.table-wrap')].map((w) => [w.scrollLeft, w.scrollTop]) : [];
   const focus = same ? focusKey(main) : null;
-  const view = ({ dashboard: pageDashboard, ledger: pageLedger, setup: pageSetup, assumptions: pageAssumptions, recurring: pageRecurring, goals: pageGoals, housing: pageHousing, kids: pageKids, retirement: pageRetirement, investments: pageInvestments, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
+  const view = ({ dashboard: pageDashboard, ledger: pageLedger, setup: pageSetup, assumptions: pageAssumptions, recurring: pageRecurring, goals: pageGoals, housing: pageHousing, kids: pageKids, retirement: pageRetirement, investments: pageInvestments, statements: pageStatements, liabilities: pageLiabilities, insurance: pageInsurance, tax: pageTax, networth: pageNetWorth, data: pageData }[page])();
   main.replaceChildren(...(setupReturn && page !== 'setup' ? [setupReturnBar()] : []), view);
   main.dataset.view = viewKey;
   main.querySelectorAll('.table-wrap').forEach((w, i) => { if (tableScroll[i]) [w.scrollLeft, w.scrollTop] = tableScroll[i]; });
@@ -2803,17 +2806,55 @@ function applyStatementPlan(pl) {
   S.dividends = S.dividends.filter((d) => d.importKey !== key);
   if (pl.divTotal) S.dividends.push({ id: uid(), date: r.periodEnd, amount: round2(pl.divTotal), account: r.account, notes: `${r.source} statement`, importKey: key });
 }
+/** Bank statement accounts → records to store as read (one per account and statement). */
+function bankRecords(r) {
+  return r.accounts.map((a) => ({
+    key: `${r.source}|${a.number}|${r.periodEnd}`, source: r.source, account: a.name, accountNo: '…' + a.number.replace(/\D/g, '').slice(-4),
+    currency: a.currency, periodEnd: r.periodEnd, verified: a.verified,
+    transactions: a.transactions.map(({ date, type, details, amount }) => ({ date, type, details, amount })),
+  }));
+}
+function storeBankRecord(rec) {
+  const existing = S.statements.find((s) => s.key === rec.key);
+  if (existing) Object.assign(existing, rec, { importedAt: new Date().toISOString() });
+  else S.statements.push({ id: uid(), ...rec, importedAt: new Date().toISOString() });
+}
+
 async function importStatements() {
   const files = await pickFile('.pdf,application/pdf', true);
   if (!files?.length) return;
   const target = S.settings.currency || 'SGD';
-  const done = [], failed = [];
+  const done = [], banks = [], failed = [];
   for (const f of files) {
-    try { done.push({ name: f.name, plan: statementPlan(await readStatement(new Uint8Array(await f.arrayBuffer())), target) }); } catch (e) { failed.push({ name: f.name, error: e.message }); }
+    try {
+      const r = await readStatement(new Uint8Array(await f.arrayBuffer()));
+      if (r.kind === 'bank') {
+        if (!r.accounts.length) throw new Error('No transactions found in this statement.');
+        banks.push({ name: f.name, records: bankRecords(r) });
+      } else done.push({ name: f.name, plan: statementPlan(r, target) });
+    } catch (e) { failed.push({ name: f.name, error: e.message }); }
   }
   const usable = done.filter((d) => !d.plan.missingFx).sort((a, b) => (a.plan.r.periodEnd < b.plan.r.periodEnd ? -1 : 1));
+  const records = banks.flatMap((b) => b.records.map((rec) => ({ ...rec, file: b.name })));
+  const count = usable.length + records.length;
   const fmtAmt = (cur, v) => `${cur} ${v.toLocaleString(S.settings.locale || 'en-SG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const body = [
+    ...records.map((rec) => {
+      const ins = rec.transactions.filter((t) => t.amount > 0), outs = rec.transactions.filter((t) => t.amount < 0);
+      const dates = rec.transactions.map((t) => t.date).sort();
+      return el('div', { class: 'card import-card' },
+        el('div', { class: 'card__title', text: `${rec.source} · ${rec.account} ${rec.accountNo}` }),
+        kv([
+          ['Transactions', `${rec.transactions.length} · ${dateLabel(dates[0])} – ${dateLabel(dates[dates.length - 1])}`],
+          ['Money in', `${fmtAmt(rec.currency, sum(ins, (t) => t.amount))} (${ins.length})`],
+          ['Money out', `${fmtAmt(rec.currency, -sum(outs, (t) => t.amount))} (${outs.length})`],
+        ]),
+        el('p', { class: 'card__hint' + (rec.verified === false ? ' neg' : ''), text: rec.verified ? '✓ Matches the totals printed on the statement.' : rec.verified === false ? 'Doesn’t match the totals printed on the statement — some lines may have been misread.' : 'The statement prints no totals to check against.' }),
+        S.statements.some((s) => s.key === rec.key) ? el('p', { class: 'card__hint', text: 'Replaces the copy already recorded for this statement.' }) : null,
+        el('p', { class: 'card__hint muted', text: rec.file }),
+      );
+    }),
+    records.length ? el('p', { class: 'card__hint', text: 'Bank statements are recorded as read and listed on the Statements page. Nothing else changes — your ledger, plan and totals stay as they are.' }) : null,
     ...done.map(({ name, plan: pl }) => el('div', { class: 'card import-card' },
       el('div', { class: 'card__title', text: `${pl.r.source} · ${dateLabel(pl.r.periodStart)} – ${dateLabel(pl.r.periodEnd)}` }),
       pl.missingFx ? el('p', { class: 'neg', text: `Can’t convert to ${target}: the statement has no ${target} exchange rate. Not imported.` }) : kv([
@@ -2829,14 +2870,61 @@ async function importStatements() {
     usable.length ? el('p', { class: 'card__hint', text: `The account value goes into the portfolio log as its own account (“${usable[0].plan.r.account}”), added to any values you type in — if a typed-in value already includes this account, lower it. Deposits count as money you invested; dividends are listed on the Investments page. Converted with each statement’s own exchange rate.` }) : null,
     el('p', { class: 'card__hint', text: `Read on this device — the file is not uploaded anywhere. Supported: ${STATEMENT_SUPPORTED}.` }),
   ];
-  openDialog(usable.length ? `Import ${usable.length} statement${usable.length === 1 ? '' : 's'}?` : 'Nothing to import', body, [
-    { label: usable.length ? 'Cancel' : 'Close' },
-    ...(usable.length ? [{ label: 'Import', primary: true, run: () => {
+  openDialog(count ? `Import ${count} statement${count === 1 ? '' : 's'}?` : 'Nothing to import', body, [
+    { label: count ? 'Cancel' : 'Close' },
+    ...(count ? [{ label: 'Import', primary: true, run: () => {
       for (const d of usable) applyStatementPlan(statementPlan(d.plan.r, target)); // re-plan in order, so duplicates within the batch are skipped too
+      for (const rec of records) { const { file, ...keep } = rec; storeBankRecord(keep); }
       commit();
-      toast(`Imported ${usable.length} statement${usable.length === 1 ? '' : 's'}`);
+      toast(`Imported ${count} statement${count === 1 ? '' : 's'}${records.length ? ' — see Statements' : ''}`);
     } }] : []),
   ]);
+}
+
+/** Imported bank statements, shown exactly as read. Kept as records only — nothing else uses them yet. */
+function pageStatements() {
+  const list = [...S.statements].sort((a, b) => (a.periodEnd < b.periodEnd ? 1 : a.periodEnd > b.periodEnd ? -1 : a.account < b.account ? -1 : 1));
+  const id = new URLSearchParams(location.hash.split('?')[1] || '').get('id');
+  const sel = list.find((s) => s.id === id) || list[0];
+  const fmt = (cur, v) => `${cur} ${v.toLocaleString(S.settings.locale || 'en-SG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const ins = (s) => sum(s.transactions.filter((t) => t.amount > 0), (t) => t.amount);
+  const outs = (s) => -sum(s.transactions.filter((t) => t.amount < 0), (t) => t.amount);
+  const check = (s) => (s.verified ? '✓ matches' : s.verified === false ? '✗ check' : '–');
+  const head = pageHead('Statements', 'Bank statements you’ve imported, recorded exactly as read. Nothing else in the app uses them yet.',
+    el('button', { class: 'btn btn--primary', type: 'button', text: 'Import statement (PDF)', onclick: importStatements }));
+  if (!list.length) {
+    return el('div', null, head,
+      el('div', { class: 'card muted', text: `No statements yet. Import a statement PDF — it’s read on this device and never uploaded. Supported: ${STATEMENT_SUPPORTED}.` }));
+  }
+  return el('div', null, head,
+    editTable({
+      cols: [
+        { key: 'account', label: 'Account', type: 'text', get: (s) => el('button', { class: 'table__link', type: 'button', text: `${s.account} ${s.accountNo}`, onclick: () => { location.hash = '#/statements?id=' + s.id; } }) },
+        { key: 'periodEnd', label: 'Statement date', type: 'date', readonly: true },
+        { key: 'count', label: 'Transactions', type: 'number', get: (s) => String(s.transactions.length) },
+        { key: 'in', label: 'Money in', type: 'money', get: (s) => fmt(s.currency, ins(s)) },
+        { key: 'out', label: 'Money out', type: 'money', get: (s) => fmt(s.currency, outs(s)) },
+        { key: 'check', label: 'Totals check', type: 'text', get: check, cls: (s) => (s.verified === false ? 'neg' : '') },
+      ],
+      rows: list,
+      onDelete: (s) => undoable(`${s.account} ${monthLabel(s.periodEnd.slice(0, 7))} removed`, () => { S.statements = S.statements.filter((x) => x !== s); }),
+    }),
+    el('div', { class: 'card section-gap' },
+      el('div', { class: 'card__title', text: `${sel.source} · ${sel.account} ${sel.accountNo} · statement of ${dateLabel(sel.periodEnd)}` }),
+      editTable({
+        cols: [
+          { key: 'date', label: 'Date', type: 'date', readonly: true },
+          { key: 'type', label: 'Transaction', type: 'text', readonly: true },
+          { key: 'details', label: 'Details', type: 'text', cls: () => 'table__td--wrap', get: (t) => (t.details || []).join(' · ') },
+          { key: 'in', label: 'Money in', type: 'money', get: (t) => (t.amount > 0 ? fmt(sel.currency, t.amount) : '') },
+          { key: 'out', label: 'Money out', type: 'money', get: (t) => (t.amount < 0 ? fmt(sel.currency, -t.amount) : '') },
+        ],
+        rows: sel.transactions,
+        totals: { in: el('span', { text: fmt(sel.currency, ins(sel)) }), out: el('span', { text: fmt(sel.currency, outs(sel)) }) },
+      }),
+      el('p', { class: 'card__hint section-gap', text: `Recorded ${dateLabel(sel.importedAt.slice(0, 10))}, inside your vault on this device. Re-importing the same statement replaces this copy.` }),
+    ),
+  );
 }
 
 function pageInvestments() {
