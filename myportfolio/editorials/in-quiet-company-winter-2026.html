@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+
+<!-- Scripts -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+/* Override Bootstrap's blue links: follow the surrounding text colour */
+a,
+a:hover {
+    color: inherit;
+}
+
+
+  html, body {
+    overflow-x: hidden;
+    color: black;
+    text-wrap: pretty;
+    height: auto;
+    margin: 0;
+    padding: 0;
+  }
+  .page.parallax {
+    padding-top: 0px !important;
+  }
+
+  /* Hide folder headers (SiteGenesis leftover) */
+  .folder-header,
+  .folder_post .folder-container .container {
+      display: none !important;
+  }
+  /* ============================================================
+  ED BASE — include ONCE per page, before any ed-* section.
+  Tokens + shared .ed-media / .ed-caption used by every section.
+============================================================
+  */
+  .ed {
+    --ed-font: "proxima-nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --ed-ink: #000;
+    --ed-paper: #fff;
+    --ed-placeholder: #f2f2f2;
+    --ed-gutter: 40px;
+    --ed-edge: 16px;
+    --ed-space: 104px;
+    --ed-space-tight: 40px;
+    --ed-caption-size: 12px;
+    --ed-body-size: 14px;
+    --ed-title-size: 20px;
+    --ed-lane-left: 10.8%;
+    --ed-lane-right: 29.3%;
+    --ed-lane-width: 55%;
+
+    position: relative;
+    margin: 0;
+    padding-top: var(--ed-space);
+    font-family: var(--ed-font);
+    color: var(--ed-ink);
+    background: var(--ed-paper);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .ed *,
+  .ed *::before,
+  .ed *::after {
+    box-sizing: border-box;
+  }
+
+  /* body has overflow-x: hidden, which stops sticky working; clip still blocks sideways scroll without breaking it */
+  body:has(.ed-page) {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  /* sticky is confined to the intro, so the hero leaves once it's covered
+     and nothing sits behind the rest of the page to show through while scrolling */
+  .ed-page__intro {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .ed-page__intro .ed.ed-hero {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+  }
+
+  .ed-page__intro .ed-hero ~ .ed {
+    z-index: 1;
+  }
+
+  .ed--tight {
+    padding-top: var(--ed-space-tight);
+  }
+
+  .ed--flush {
+    padding-top: 0;
+  }
+
+  /* ---------- media ---------- */
+  .ed-media {
+    position: relative;
+    display: block;
+    margin: 0;
+    overflow: hidden;
+    background: var(--ed-placeholder);
+    aspect-ratio: var(--ed-ratio, auto);
+  }
+
+  .ed-media--3x2 { --ed-ratio: 3 / 2; }
+  .ed-media--2x3 { --ed-ratio: 2 / 3; }
+  .ed-media--4x3 { --ed-ratio: 4 / 3; }
+  .ed-media--3x4 { --ed-ratio: 3 / 4; }
+  .ed-media--4x5 { --ed-ratio: 4 / 5; }
+  .ed-media--1x1 { --ed-ratio: 1 / 1; }
+
+  .ed-media__link,
+  .ed-media__picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ed-media__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---------- caption ---------- */
+  .ed-caption {
+    margin: 0;
+    font-size: var(--ed-caption-size);
+    line-height: 1.35;
+  }
+
+  .ed-caption__group {
+    margin: 0;
+  }
+
+  .ed-caption__group + .ed-caption__group {
+    margin-top: 1.35em;
+  }
+
+  .ed-caption__line {
+    display: block;
+  }
+
+  .ed-caption__product {
+    font-weight: 700;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a.ed-caption__product:hover,
+  a.ed-caption__product:focus-visible {
+    text-decoration: underline;
+  }
+
+  /* ---------- mobile (414 design) ---------- */
+  @media (max-width: 767.98px) {
+    .ed {
+      --ed-gutter: 20px;
+      --ed-edge: 20px;
+      --ed-space: 72px;
+      --ed-space-tight: 40px;
+      --ed-caption-size: 10px;
+      --ed-body-size: 16px;
+      --ed-title-size: 18px;
+      --ed-m-lane: 29.7%;
+      --ed-m-end-width: 70.3%;
+      --ed-m-center-width: 84.3%;
+    }
+
+    .ed--m-tight { padding-top: var(--ed-space-tight); }
+    .ed--m-flush { padding-top: 0; }
+
+    .ed-media--m-3x2 { --ed-ratio: 3 / 2; }
+    .ed-media--m-2x3 { --ed-ratio: 2 / 3; }
+    .ed-media--m-4x3 { --ed-ratio: 4 / 3; }
+    .ed-media--m-3x4 { --ed-ratio: 3 / 4; }
+    .ed-media--m-4x5 { --ed-ratio: 4 / 5; }
+    .ed-media--m-1x1 { --ed-ratio: 1 / 1; }
+  }
+
+  /* ============================================================
+  ED HERO — full-viewport image with centred title.
+  Header overlays this section in the design (transparent header).
+============================================================
+  */
+  .ed-hero {
+    --ed-hero-height: 100vh;
+    padding-top: 0;
+  }
+
+  @supports (height: 100svh) {
+    .ed-hero {
+      --ed-hero-height: 100svh;
+    }
+  }
+
+  .ed-hero__media {
+    aspect-ratio: auto;
+    height: var(--ed-hero-height);
+    min-height: 480px;
+  }
+
+  .ed-hero__content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--ed-gutter);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ed-hero__title {
+    margin: 0;
+    font-size: 40px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  @media (max-width: 767.98px) {
+    .ed-hero__title {
+      font-size: 40px;
+    }
+  }
+
+  /* ============================================================
+  ED TEXT — centred intro / paragraph block.
+  Title is optional (remove .ed-text__title for body-only usage).
+============================================================
+  */
+  .ed-text {
+    --ed-text-gap: 136px;
+  }
+
+  .ed-text__inner {
+    max-width: calc(885px + (var(--ed-gutter) * 2));
+    margin: 0 auto;
+    padding: 0 var(--ed-gutter);
+    text-align: center;
+  }
+
+  .ed-text__title {
+    margin: 0 0 var(--ed-text-gap);
+    font-size: var(--ed-title-size);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .ed-text__body {
+    margin: 0;
+    font-size: var(--ed-body-size);
+    line-height: 1.35;
+  }
+
+  .ed-text__body + .ed-text__body {
+    margin-top: 1em;
+  }
+
+  @media (max-width: 767.98px) {
+    .ed-text {
+      --ed-text-gap: 96px;
+    }
+
+    .ed-text__inner {
+      max-width: calc(280px + (var(--ed-gutter) * 2));
+    }
+
+    .ed-text__body {
+      font-size: 16px;
+      line-height: 1.25;
+    }
+  }
+
+  /* ============================================================
+  ED FULLBLEED — edge-to-edge image (3:2 desktop / 4:5 mobile)
+  with "model wearing" caption below.
+============================================================
+  */
+  /* ratio via .ed-media--3x2 (desktop) + .ed-media--m-* (mobile) */
+  .ed-fullbleed__caption {
+    margin-top: 24px;
+    padding: 0 var(--ed-gutter);
+  }
+
+  @media (max-width: 767.98px) {
+    .ed-fullbleed__caption {
+      margin-top: 18px;
+    }
+  }
+
+  /* ============================================================
+  ED DUO — two 2:3 images side by side.
+  Modifiers: --right (default lane in design) | --left | --center
+============================================================
+  */
+  .ed-duo__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: var(--ed-lane-width);
+  }
+
+  .ed-duo--right .ed-duo__inner {
+    margin-left: var(--ed-lane-right);
+  }
+
+  .ed-duo--left .ed-duo__inner {
+    margin-left: var(--ed-lane-left);
+  }
+
+  .ed-duo--center .ed-duo__inner {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* mobile: stacked single column, flush to the right edge */
+  @media (max-width: 767.98px) {
+    .ed-duo__inner,
+    .ed-duo--right .ed-duo__inner,
+    .ed-duo--left .ed-duo__inner,
+    .ed-duo--center .ed-duo__inner {
+      grid-template-columns: 1fr;
+      width: var(--ed-m-end-width);
+      margin-left: auto;
+      margin-right: 0;
+    }
+  }
+
+  /* ============================================================
+  ED FRAME — single image with optional side caption (aside).
+  Placement : --left | --right | --center
+  Width     : (default 59.7%) | --medium 46.7% | --compact 44.6% | --narrow 40.6%
+  Aside     : .ed-frame__aside (top-aligned) | .ed-frame__aside--bottom
+  Ratio     : set on .ed-media (--4x3, --3x2, --4x5, --1x1 ...)
+  Mobile    : --m-full (default) | --m-end (70.3% flush right) | --m-center (84.3%)
+              aside: below + lane indent (default) | __aside--m-before | __aside--m-end
+              ratio: .ed-media--m-* (e.g. --m-1x1, --m-2x3)
+============================================================
+  */
+  .ed-frame {
+    --ed-frame-width: var(--ed-lane-width);
+  }
+
+  .ed-frame--medium  { --ed-frame-width: 46.7%; }
+  .ed-frame--compact { --ed-frame-width: 41.6%; }
+  .ed-frame--narrow  { --ed-frame-width: 40.6%; }
+
+  .ed-frame__inner {
+    position: relative;
+  }
+
+  .ed-frame__media {
+    width: var(--ed-frame-width);
+  }
+
+  .ed-frame--left .ed-frame__media {
+    margin-left: var(--ed-lane-left);
+  }
+
+  .ed-frame--right .ed-frame__media {
+    margin-left: var(--ed-lane-right);
+  }
+
+  .ed-frame--center .ed-frame__media {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ed-frame__aside {
+    position: absolute;
+    top: 0;
+    left: 71%;
+    right: 2%;
+  }
+
+  .ed-frame__aside--bottom {
+    top: auto;
+    bottom: 0;
+  }
+
+  /* ----- mobile: placement set independently via --m-* modifiers ----- */
+  @media (max-width: 767.98px) {
+    .ed-frame__inner {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ed-frame .ed-frame__media,
+    .ed-frame--m-full .ed-frame__media {
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .ed-frame--m-end .ed-frame__media {
+      width: var(--ed-m-end-width);
+      margin-left: auto;
+      margin-right: 0;
+    }
+
+    .ed-frame--m-center .ed-frame__media {
+      width: var(--ed-m-center-width);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* default: below image, indented to the mobile lane */
+    .ed-frame__aside,
+    .ed-frame__aside--bottom {
+      position: static;
+      margin-top: 28px;
+      padding-left: var(--ed-m-lane);
+    }
+
+    /* caption above the image */
+    .ed-frame__aside--m-before {
+      order: -1;
+      margin-top: 0;
+      margin-bottom: 56px;
+    }
+
+    /* caption block pushed to the right edge of a centred image */
+    .ed-frame__aside--m-end {
+      width: max-content;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: calc((100% - var(--ed-m-center-width)) / 2);
+      padding-left: 0;
+      margin-top: 38px;
+    }
+  }
+
+  /* ============================================================
+  ED STAGGER — 3:2 landscape top-left, 3:4 portrait stepping
+  down on the right (starts where the first image ends).
+============================================================
+  */
+  .ed-stagger__media--first {
+    width: 35.1%;
+    margin-left: 6%;
+  }
+
+  .ed-stagger__media--second {
+    width: 34.1%;
+    margin-left: 54.9%;
+  }
+
+  @media (max-width: 767.98px) {
+    .ed-stagger__media--first {
+      width: 84.3%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .ed-stagger__media--second {
+      width: 74.4%;
+      margin: 60px auto 0;
+    }
+  }
+
+  /* ============================================================
+  ED META — published date + shop links (closes the editorial,
+  sits directly above "SHOP THE COLLECTION").
+============================================================
+  */
+  .ed-meta {
+    padding-top: calc(var(--ed-space) + 24px);
+    padding-bottom: 40px;
+  }
+
+  .ed-meta__inner {
+    padding: 0 var(--ed-edge);
+  }
+
+  .ed-meta__date {
+    margin: 0 0 32px;
+    font-size: 18px;
+    line-height: 1.3;
+  }
+
+  .ed-meta__links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ed-meta__item {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .ed-meta__link {
+    color: inherit;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .ed-meta__label {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+  }
+
+  .ed-meta__link:hover .ed-meta__label,
+  .ed-meta__link:focus-visible .ed-meta__label {
+    text-decoration-thickness: 2px;
+  }
+
+  @media (max-width: 767.98px) {
+    .ed-meta {
+      padding-top: 112px;
+      padding-bottom: 60px;
+    }
+
+    .ed-meta__date {
+      margin-bottom: 28px;
+      font-size: 17px;
+    }
+
+    .ed-meta__item {
+      font-size: 15px;
+      line-height: 1.2;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+
+<div class="ed-page">
+
+  <div class="ed-page__intro">
+
+    <!-- ==================== 01 · HERO ==================== -->
+    <section class="ed ed-hero js-vertical-slider">
+      <div class="ed-media ed-hero__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PW2-45060030_DK.BRW,PW1-26220100_NVY.SU" href="$url('Product-Show','pid','PW2-45060030_DK.BRW')$">
+          <picture class="ed-media__picture">
+            <source media="(max-width: 767.98px)" srcset="images/in-quiet-company-winter-2026/winter-tier1-mobile_01.webp?$staticlink$">
+            <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_01.webp?$staticlink$" alt="Model seated with a dark brown leather tote" fetchpriority="high">
+          </picture>
+        </a>
+      </div>
+      <div class="ed-hero__content">
+        <h1 class="ed-hero__title">IN QUIET COMPANY</h1>
+      </div>
+    </section>
+
+    <!-- ==================== 02 · TEXT (with title) ==================== -->
+    <section class="ed ed-text">
+      <div class="ed-text__inner">
+        <h2 class="ed-text__title">WINTER 2026</h2>
+        <p class="ed-text__body">
+          The most compelling moments often happen in the pause between actions. 
+          For Winter 2026, we consider the silhouette as an expression of personal intent, 
+          shaped by character rather than passing trends. 
+          Dressing becomes less about making a statement than finding a way of being that feels 
+          entirely one's own.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== 03 · FULLBLEED + CAPTION ==================== -->
+    <section class="ed ed-fullbleed">
+      <div class="ed-media ed-media--3x2 ed-media--m-1x1 ed-fullbleed__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PM2-26320290_ESBRWE,PM1-56600022_DBW.BU" href="$url('Product-Show','pid','PM2-26320290_ESBRWE')$">
+          <picture class="ed-media__picture">
+            <source media="(max-width: 767.98px)" srcset="images/in-quiet-company-winter-2026/winter-tier1-mobile_02.webp?$staticlink$">
+            <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_02.webp?$staticlink$" alt="Male model reclining with an espresso brown crossbody bag" loading="lazy">
+          </picture>
+        </a>
+      </div>
+      <div class="ed-caption ed-fullbleed__caption">
+        <p class="ed-caption__group">
+          <span class="ed-caption__line">Male model wearing</span>
+          <span class="ed-caption__line"><b>Maven Leather Crossbody Bag</b> in espresso brown</span>
+          <span class="ed-caption__line"><b>Ross Leather Loafers</b> in dark brown</span>
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ==================== 04 · DUO (right lane) ==================== -->
+  <section class="ed ed-duo ed-duo--right">
+    <div class="ed-duo__inner">
+      <div class="ed-media ed-media--2x3 ed-duo__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PM2-26320290_ESBRWE,PM1-56600024_BRW.SU" href="$url('Product-Show','pid','PM2-26320290_ESBRWE')$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_03.webp?$staticlink$" alt="Male model seated holding a leather shoulder bag" loading="lazy">
+        </a>
+      </div>
+      <div class="ed-media ed-media--2x3 ed-duo__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PW2-45060030_DK.BRW" href="$url('Product-Show','pid','PW2-45060030_DK.BRW')$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_04.webp?$staticlink$" alt="Dark brown leather tote detail" loading="lazy">
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 05 · FRAME left + aside caption (tight) ==================== -->
+  <section class="ed ed-frame ed-frame--left ed-frame--m-full ed--tight">
+    <div class="ed-frame__inner">
+      <div class="ed-media ed-media--4x3 ed-media--m-1x1 ed-frame__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PW2-45060030_DK.BRW" href="$url('Product-Show','pid','PW2-45060030_DK.BRW')$">
+          <picture class="ed-media__picture">
+            <source media="(max-width: 767.98px)" srcset="images/in-quiet-company-winter-2026/winter-tier1-mobile_05.webp?$staticlink$">
+            <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_05.webp?$staticlink$" alt="Female model holding a navy leather messenger bag" loading="lazy">
+          </picture>
+        </a>
+      </div>
+      <div class="ed-caption ed-frame__aside ed-frame__aside--m-before">
+        <p class="ed-caption__group">
+          <span class="ed-caption__line">Male model wearing</span>
+          <span class="ed-caption__line"><b>Maven Leather Crossbody Bag</b> in espresso brown</span>
+          <span class="ed-caption__line"><b>Waller Suede Derby Shoes</b> in brown suede</span>
+        </p>
+        <p class="ed-caption__group">
+          <span class="ed-caption__line">Female model wearing</span>
+          <span class="ed-caption__line"><b>Vienna Leather Tote Bag</b> in dark brown</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 06 · TEXT (body only) ==================== -->
+  <section class="ed ed-text">
+    <div class="ed-text__inner">
+      <p class="ed-text__body">
+        The season takes shape through deep, nuanced tones, soft constructions and tactile finishes.
+        With wear, materials begin to tell a more personal story, 
+        softening and evolving alongside the wearer. 
+        Familiar pieces gather meaning over time, shaped as much by the life
+        they accompany as by the hands that made them.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 07 · FRAME center portrait ==================== -->
+  <section class="ed ed-frame ed-frame--center ed-frame--narrow ed-frame--m-full">
+    <div class="ed-frame__inner">
+      <div class="ed-media ed-media--4x5 ed-frame__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PM2-26320268-1_NAVY" href="$url('Product-Show','pid','PM2-26320268-1_NAVY')$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_06.webp?$staticlink$" alt="Male model seated with a navy box bag" loading="lazy">
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 08 · FULLBLEED + CAPTION ==================== -->
+  <section class="ed ed-fullbleed ed--m-tight">
+    <div class="ed-media ed-media--3x2 ed-fullbleed__media">
+      <a class="ed-media__link js-shop-the-collection" data-pid="PW2-45060029_NAVY" href="$url('Product-Show','pid','PW2-45060029_NAVY')$">
+        <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_07.webp?$staticlink$" alt="Female model holding a navy leather messenger bag" loading="lazy">
+      </a>
+    </div>
+    <div class="ed-caption ed-fullbleed__caption">
+      <p class="ed-caption__group">
+        <span class="ed-caption__line">Female model wearing</span>
+        <span class="ed-caption__line"><b>Vienna Leather Messenger Bag</b> in navy</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 09 · STAGGER ==================== -->
+  <section class="ed ed-stagger">
+    <div class="ed-media ed-media--3x2 ed-stagger__media ed-stagger__media--first">
+      <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_08.webp?$staticlink$" alt="Male model in a grey blazer" loading="lazy">
+    </div>
+
+    <div class="ed-media ed-media--3x4 ed-stagger__media ed-stagger__media--second">
+      <a class="ed-media__link js-shop-the-collection" data-pid="PW1-66600033_DK.BRW" href="$url('Product-Show','pid','PW1-66600033_DK.BRW')$">
+        <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_09.webp?$staticlink$" alt="Dark brown leather loafers" loading="lazy">
+      </a>
+    </div>
+  </section>
+
+  <!-- ==================== 10 · FRAME center landscape ==================== -->
+  <section class="ed ed-frame ed-frame--center ed-frame--medium ed-frame--m-center">
+    <div class="ed-frame__inner">
+      <div class="ed-media ed-media--3x2 ed-frame__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PW1-66600033_DK.BRW,PW2-45060030_DK.BRW" href="$url('Product-Show','pid','PW1-66600033_DK.BRW')$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_10.webp?$staticlink$" alt="Female model lying on a sofa with a dark brown leather tote" loading="lazy">
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 11 · FULLBLEED + CAPTION ==================== -->
+  <section class="ed ed-fullbleed">
+    <div class="ed-media ed-media--3x2 ed-media--m-1x1 ed-fullbleed__media">
+      <a class="ed-media__link js-shop-the-collection" data-pid="PM2-26320290_CAM.SU,PU1-76210001-1_CAMEL" href="$url('Product-Show','pid','PM2-26320290_CAM.SU')$">
+        <picture class="ed-media__picture">
+          <source media="(max-width: 767.98px)" srcset="images/in-quiet-company-winter-2026/winter-tier1-mobile_11.webp?$staticlink$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_11.webp?$staticlink$" alt="Male model seated on the floor with a camel suede crossbody bag" loading="lazy">
+        </picture>
+      </a>
+    </div>
+    <div class="ed-caption ed-fullbleed__caption">
+      <p class="ed-caption__group">
+        <span class="ed-caption__line">Male model wearing</span>
+        <span class="ed-caption__line"><b>Maven Suede Crossbody Bag</b> in camel suede</span>
+        <span class="ed-caption__line"><b>Crest Corduroy Sneakers</b> in camel</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 12 · FRAME center portrait ==================== -->
+  <section class="ed ed-frame ed-frame--center ed-frame--narrow ed-frame--m-full ed--m-tight">
+    <div class="ed-frame__inner">
+      <div class="ed-media ed-media--4x5 ed-frame__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PW2-45060029_NAVY,PW1-66220047_DCA.SU" href="$url('Product-Show','pid','PW2-45060029_NAVY')$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_12.webp?$staticlink$" alt="Female model on a white sofa with a navy leather handbag" loading="lazy">
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 13 · TEXT (body only) ==================== -->
+  <section class="ed ed-text">
+    <div class="ed-text__inner">
+      <p class="ed-text__body">A wardrobe is never entirely fixed. Pieces are returned to, worn in new combinations and carried from one season into the next. Winter 2026 embraces this sense of continuity, where considered design leaves room for personal instinct and the character that emerges through everyday wear.</p>
+    </div>
+  </section>
+
+  <!-- ==================== 14 · FULLBLEED + CAPTION ==================== -->
+  <section class="ed ed-fullbleed">
+    <div class="ed-media ed-media--3x2 ed-media--m-1x1 ed-fullbleed__media">
+      <a class="ed-media__link js-shop-the-collection" data-pid="PW2-55060031_COG.SU" href="$url('Product-Show','pid','PW2-55060031_COG.SU')$">
+        <picture class="ed-media__picture">
+          <source media="(max-width: 767.98px)" srcset="images/in-quiet-company-winter-2026/winter-tier1-mobile_13.webp?$staticlink$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_13.webp?$staticlink$" alt="Female model holding a cognac suede handbag" loading="lazy">
+        </picture>
+      </a>
+    </div>
+    <div class="ed-caption ed-fullbleed__caption">
+      <p class="ed-caption__group">
+        <span class="ed-caption__line">Female model wearing</span>
+        <span class="ed-caption__line"><b>Vienna Suede Handbag</b> in cognac suede</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 15 · FRAME right ==================== -->
+  <section class="ed ed-frame ed-frame--right ed-frame--m-end">
+    <div class="ed-frame__inner">
+      <div class="ed-media ed-media--4x3 ed-media--m-2x3 ed-frame__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PM2-26320291_ESBRWE,PU1-76210001-1_CAMEL" href="$url('Product-Show','pid','PM2-26320291_ESBRWE')$">
+          <picture class="ed-media__picture">
+            <source media="(max-width: 767.98px)" srcset="images/in-quiet-company-winter-2026/winter-tier1-mobile_14.webp?$staticlink$">
+            <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_14.webp?$staticlink$" alt="Male model seated on a draped sofa with a leather sling bag" loading="lazy">
+          </picture>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 16 · FRAME left + aside caption (tight) ==================== -->
+  <section class="ed ed-frame ed-frame--left ed-frame--m-end ed--tight ed--m-flush">
+    <div class="ed-frame__inner">
+      <div class="ed-media ed-media--4x3 ed-media--m-2x3 ed-frame__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PW2-36390024_BLK.TU" href="$url('Product-Show','pid','PW2-36390024_BLK.TU')$">
+          <picture class="ed-media__picture">
+            <source media="(max-width: 767.98px)" srcset="images/in-quiet-company-winter-2026/winter-tier1-mobile_15.webp?$staticlink$">
+            <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_15.webp?$staticlink$" alt="Female model seated by a column with a black leather hobo bag" loading="lazy">
+          </picture>
+        </a>
+      </div>
+      <div class="ed-caption ed-frame__aside">
+        <p class="ed-caption__group">
+          <span class="ed-caption__line">Male model wearing</span>
+          <span class="ed-caption__line"><b>Maven Leather Belt Bag</b> in espresso brown</span>
+          <span class="ed-caption__line"><b>Crest Corduroy Sneakers</b> in camel</span>
+        </p>
+        <p class="ed-caption__group">
+          <span class="ed-caption__line">Female model wearing</span>
+          <span class="ed-caption__line"><b>Danielle Large Leather Hobo Bag</b> in black</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 17 · FULLBLEED + CAPTION ==================== -->
+  <section class="ed ed-fullbleed">
+    <div class="ed-media ed-media--3x2 ed-media--m-3x4 ed-fullbleed__media">
+      <a class="ed-media__link js-shop-the-collection" data-pid="PW2-36390024_BLK.TU" href="$url('Product-Show','pid','PW2-36390024_BLK.TU')$">
+        <picture class="ed-media__picture">
+          <source media="(max-width: 767.98px)" srcset="images/in-quiet-company-winter-2026/winter-tier1-mobile_16.webp?$staticlink$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_16.webp?$staticlink$" alt="Female model seated by a column with a black leather hobo bag" loading="lazy">
+        </picture>
+      </a>
+    </div>
+    <div class="ed-caption ed-fullbleed__caption">
+      <p class="ed-caption__group">
+        <span class="ed-caption__line">Female model wearing</span>
+        <span class="ed-caption__line"><b>Danielle Large Leather Hobo Bag</b> in black</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 18 · FRAME left square + bottom aside caption ==================== -->
+  <section class="ed ed-frame ed-frame--left ed-frame--compact ed-frame--m-center">
+    <div class="ed-frame__inner">
+      <div class="ed-media ed-media--1x1 ed-frame__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PW2-55060031_COG.SU" href="$url('Product-Show','pid','PW2-55060031_COG.SU')$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_17.webp?$staticlink$" alt="Female model resting beside a cognac suede bag" loading="lazy">
+        </a>
+      </div>
+      <div class="ed-caption ed-frame__aside ed-frame__aside--bottom ed-frame__aside--m-end">
+        <p class="ed-caption__group">
+          <span class="ed-caption__line">Female model wearing</span>
+          <span class="ed-caption__line"><b>Vienna Suede Handbag</b> in cognac suede</span>
+          <span class="ed-caption__line"><b>Vienna Leather Tote Bag</b> in dark brown</span>
+          <span class="ed-caption__line"><b>Sylvie Slingback Heel Pumps</b> in navy suede</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 19 · FRAME right (tight) ==================== -->
+  <section class="ed ed-frame ed-frame--right ed-frame--m-center ed--tight">
+    <div class="ed-frame__inner">
+      <div class="ed-media ed-media--4x3 ed-frame__media">
+        <a class="ed-media__link js-shop-the-collection" data-pid="PW2-45060030_DK.BRW,PW1-26220100_NVY.SU" href="$url('Product-Show','pid','PW2-45060030_DK.BRW')$">
+          <img class="ed-media__img" src="images/in-quiet-company-winter-2026/winter-tier1_18.webp?$staticlink$" alt="Female model seated hugging her knees beside a dark brown leather tote" loading="lazy">
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 20 · META (published + shop links) ==================== -->
+  <section class="ed ed-meta">
+    <div class="ed-meta__inner">
+      <p class="ed-meta__date">Published on <time datetime="2026-11-02">2 Nov 2026</time></p>
+      <ul class="ed-meta__links">
+        <li class="ed-meta__item">
+          <a class="ed-meta__link" href="#"><span class="ed-meta__label">Shop Women's New Arrivals</span> <span aria-hidden="true">&gt;</span></a>
+        </li>
+        <li class="ed-meta__item">
+          <a class="ed-meta__link" href="#"><span class="ed-meta__label">Shop Men's New Arrivals</span> <span aria-hidden="true">&gt;</span></a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==================== END · "SHOP THE COLLECTION" follows ==================== -->
+
+</div>
+
+</body>
+
+</html>

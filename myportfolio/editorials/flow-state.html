@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" />
+
+<!-- Scripts -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+/* Override Bootstrap's blue links: follow the surrounding text colour */
+a,
+a:hover {
+    color: inherit;
+}
+
+
+
+/* Force icons to be black */
+.theme_light .menu-group .theme_color, .theme_light .page_header-left .theme_color, .theme_light .page_header-right .theme_color {
+  color: black;
+}
+
+/* theme_light present -> black logo instead */
+.page_header.theme_light .logo_static img.logo-white {
+    display: none !important;
+}
+.page_header.theme_light .logo_static img.logo-black {
+    display: inline-block !important;
+}
+
+
+html, body {
+  overflow-x: hidden;
+  color: black;
+  text-wrap: pretty;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+.page.parallax {
+  padding-top: 0px !important;
+}
+
+/* Hide folder headers (SiteGenesis leftover) */
+.folder-header,
+.folder_post .folder-container .container {
+    display: none !important;
+}
+/* =========================================================
+    ED — Editorial story (reusable sections)
+    Wrapper: .ed  |  Section spacing: .ed__section(--tight|--loose)
+    Sections: ed-hero, ed-intro, ed-full, ed-grid + ed-qa / ed-inset / ed-pair,
+              ed-duo, ed-quote, ed-meta, ed-shop
+    ========================================================= */
+.ed {
+  --ed-font-sans: "inter";
+  --ed-font-serif: "source serif 4";
+  --ed-color: #111;
+  --ed-placeholder: #f2f2f2;
+  --ed-gutter: 32px;
+  --ed-col: 39.5%;
+  --ed-space: 56px;
+  --ed-space-tight: 56px;
+  --ed-space-loose: 56px;
+  color: var(--ed-color);
+  font-family: var(--ed-font-sans);
+  background: #fff;
+  overflow: hidden;
+}
+
+.ed *,
+.ed *::before,
+.ed *::after { box-sizing: border-box; }
+
+:where(.ed) :where(p, h1, h2, figure, blockquote, ul) { margin: 0; padding: 0; }
+
+.ed__section + .ed__section { margin-top: var(--ed-space); }
+.ed__section + .ed__section--tight { margin-top: var(--ed-space-tight); }
+.ed__section + .ed__section--loose { margin-top: var(--ed-space-loose); }
+
+/* ---------- Media (shared) ---------- */
+.ed-media {
+  position: relative;
+  overflow: hidden;
+  background: var(--ed-placeholder);
+}
+.ed-media__link,
+.ed-media picture { display: block; width: 100%; height: auto; }
+.ed-media__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+.ed-media--portrait  { aspect-ratio: 4 / 5; }
+.ed-media--tall      { aspect-ratio: 3 / 4; }
+.ed-media--landscape { aspect-ratio: 16 / 9; }
+.ed-media--wide      { aspect-ratio: 5 / 4; }
+
+/* ---------- Video (MP4) ---------- */
+.ed-video {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+}
+.ed-video__player {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  filter: grayscale(0);
+}
+.ed-video__sound {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+.ed-video__icon { width: 20px; height: 20px; }
+.ed-video__icon--on { display: none; }
+.ed-video--unmuted .ed-video__icon--on { display: block; }
+.ed-video--unmuted .ed-video__icon--off { display: none; }
+
+/* ---------- Hero: image + video ---------- */
+.ed-hero { display: flex; flex-direction: column; }
+.ed-hero__video { order: -1; }
+.ed-hero__image { aspect-ratio: 3 / 4; }
+
+/* ---------- Intro ---------- */
+.ed-intro { padding: 0 var(--ed-gutter); }
+.ed-intro__title {
+  font-family: var(--ed-font-sans);
+  text-align: left;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 32px;
+}
+.ed-intro__lede {
+  font-family: var(--ed-font-serif);
+  font-size: 18px;
+  line-height: 1.5;
+}
+/* Animated underline link (left to right) */
+.ed-intro__link {
+  padding-bottom: 2px;
+  color: inherit;
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.4s ease;
+}
+.ed-intro__link:hover,
+.ed-intro__link:focus-visible {
+  color: inherit;
+  text-decoration: none;
+  background-size: 100% 1px;
+}
+.ed-intro__body {
+  font-family: var(--ed-font-sans);
+  margin-top: 40px;
+  font-size: 15px;
+  line-height: 1.47;
+}
+.ed-intro__signature {
+  display: block;
+  width: 125px;
+  height: auto;
+  margin-top: 48px;
+}
+
+/* ---------- Grid (shared 2-col for qa / inset / pair) ---------- */
+.ed-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 30px;
+  padding: 0 var(--ed-gutter);
+}
+
+/* ---------- Q&A ---------- */
+.ed-qa__question {
+  font-family: var(--ed-font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.ed-qa__answer {
+  font-family: var(--ed-font-sans);
+  margin-top: 32px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+/* ---------- Duo: small + large ---------- */
+.ed-duo { display: flex; flex-direction: column; }
+.ed-duo__small { width: 60%; margin-left: auto; }
+.ed-duo__large { aspect-ratio: 3 / 4; }
+
+/* ---------- Quote ---------- */
+.ed-quote { padding: 0 var(--ed-gutter); text-align: center; }
+.ed-quote__text,
+.ed-quote__text p { font-family: var(--ed-font-sans); }
+.ed-quote__text {
+  font-size: 19px;
+  line-height: 1.45;
+}
+
+/* ---------- Meta: date + links ---------- */
+.ed-meta { padding: 0 16px; }
+.ed-meta__date { font-size: 18px; line-height: 1.4; }
+.ed-meta__links { margin-top: 24px; list-style: none; }
+.ed-meta__link {
+  font-size: 16px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--ed-color);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+/* =========================================================
+    Desktop
+    ========================================================= */
+@media (min-width: 768px) {
+  .ed {
+    --ed-gutter: 5%;
+    --ed-space: 100px;
+    --ed-space-tight: 52px;
+    --ed-space-loose: 200px;
+  }
+
+  .ed-media--wide { aspect-ratio: 16 / 10; }
+
+  .ed-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+  .ed-hero__video { order: 0; width: 55%; justify-self: center; }
+  .ed-hero__image { aspect-ratio: 4 / 5; }
+
+  .ed-intro { text-align: center; }
+  .ed-intro__title { font-size: 30px; margin-bottom: 40px; text-align: center; }
+  .ed-intro__lede {
+    max-width: 960px;
+    margin: 0 auto;
+    font-size: 20px;
+    line-height: 1.45;
+    text-align: left;
+  }
+  .ed-intro__body {
+    max-width: 465px;
+    margin: 56px auto 0;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: left;
+  }
+  .ed-intro__signature { width: 130px; margin: 48px auto 0; }
+
+  .ed-grid {
+    grid-template-columns: var(--ed-col) var(--ed-col);
+    justify-content: space-between;
+    column-gap: 0;
+    row-gap: 0;
+  }
+
+  .ed-qa__item { max-width: 520px; }
+  .ed-qa--right .ed-qa__item { grid-column: 2; }
+  .ed-qa__answer { margin-top: 30px; font-size: 14px; line-height: 1.5; }
+
+  .ed-inset__media { grid-column: 1 / -1; justify-self: center; width: var(--ed-col); }
+
+  .ed-pair { align-items: end; }
+
+  .ed-duo {
+    display: grid;
+    grid-template-columns: 34% 66%;
+    align-items: start;
+  }
+  .ed-duo__small { width: 100%; margin-left: 0; }
+  .ed-duo__large { aspect-ratio: 4 / 5; }
+
+  .ed-quote__text { max-width: 960px; margin: 0 auto; font-size: 21px; line-height: 1.4; }
+
+  .ed-meta { padding: 0 20px; }
+}
+
+figure{
+  margin: 0;
+}
+</style>
+</head>
+
+<body>
+
+
+<div class="ed">
+
+<!-- 01 · Hero: image + video -->
+<section class="ed__section ed-hero js-vertical-slider">
+  <figure class="ed-media ed-hero__image">
+    <a class="ed-media__link js-shop-the-collection" data-pid="PW2-75210192-1_SG.GRN" href="$url('Product-Show','pid','PW2-75210192-1_SG.GRN')$">
+      <img class="ed-media__img" src="images/flow-state/kimrose-editorial-a1.webp?$staticlink$" alt="Model in a grey suit carrying the PEDRO green shoulder bag" width="900" height="1125">
+    </a>
+  </figure>
+  <div class="ed-hero__video">
+    <div class="ed-video">
+      <video class="ed-video__player" src="images/flow-state/KIMROSE_V6.3_9X16.mp4?$staticlink$" autoplay muted loop playsinline preload="metadata"></video>
+      <button class="ed-video__sound" type="button" aria-label="Unmute video" aria-pressed="false">
+        <svg class="ed-video__icon ed-video__icon--off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6"/></svg>
+        <svg class="ed-video__icon ed-video__icon--on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- 02 · Intro -->
+<section class="ed__section ed-intro">
+  <h1 class="ed-intro__title">Flow State</h1>
+  <p class="ed-intro__lede"><a class="ed-intro__link" href="https://www.instagram.com/kim.rose.art/?hl=en">Kim Rose</a> is not one for modest gestures. The Los Angeles-based artist spends time with thoughts, feelings and fragments of ideas before letting them find their way onto the canvas. Freeform by nature, her paintings build through layers of ink, resin and gold, with intuition leading as often as intention.</p>
+  <p class="ed-intro__body">For Winter 2026, PEDRO collaborates with Kim on a collection that carries that energy from the canvas into everyday wear, translating her painterly language into something to be worn, lived in and experienced first-hand. Here, she shares the thinking behind her process, her love of wearable art, and what it means to go with the flow.</p>
+  <img class="ed-intro__signature" src="images/flow-state/kimrose-signature.svg?$staticlink$" alt="Kim Rose" width="260" height="96" loading="lazy">
+</section>
+
+<!-- 03 · Full-bleed image -->
+<section class="ed__section ed-full">
+  <figure class="ed-media ed-media--wide">
+    <a class="ed-media__link js-shop-the-collection" data-pid="PW2-75210192-1_SG.GRN" href="$url('Product-Show','pid','PW2-75210192-1_SG.GRN')$">
+      <picture>
+        <source media="(max-width: 767px)" srcset="images/flow-state/kimrose-editorial-b1.webp?$staticlink$">
+        <img class="ed-media__img" src="images/flow-state/kimrose-editorial-b1.webp?$staticlink$" alt="Kim Rose standing in her studio beside a large canvas" width="1440" height="900" loading="lazy">
+      </picture>
+    </a>
+  </figure>
+</section>
+
+<!-- 04 · Q&A left -->
+<section class="ed__section ed-grid ed-qa">
+  <div class="ed-qa__item">
+    <h2 class="ed-qa__question">What does art mean to you, and what early memories or influences shaped the way you see the world?</h2>
+    <p class="ed-qa__answer">Art is a form of communication that expresses what words cannot, connecting with people across cultures and languages through a shared understanding of emotion. My earliest influence was my mother, who encouraged me to paint freely as a child, giving me the confidence and freedom to express myself without restraint.</p>
+  </div>
+</section>
+
+<!-- 05 · Inset image -->
+<section class="ed__section ed-grid ed-inset">
+  <figure class="ed-media ed-media--landscape ed-inset__media">
+    <img class="ed-media__img" src="images/flow-state/kimrose-editorial-c1.webp?$staticlink$" alt="Hand painting sage green strokes on canvas" width="1024" height="576" loading="lazy">
+  </figure>
+</section>
+
+<!-- 06 · Q&A right -->
+<section class="ed__section ed-grid ed-qa ed-qa--right">
+  <div class="ed-qa__item">
+    <h2 class="ed-qa__question">Looking back on your journey so far, what has shaped you most as an artist?</h2>
+    <p class="ed-qa__answer">I've always had a somewhat irrational optimism, paired with the grit to back it up. I think that belief in what's possible, and the determination to pursue what matters to me, have been the biggest forces shaping both my life and my work as an artist.</p>
+  </div>
+</section>
+
+<!-- 07 · Duo: small + large -->
+<section class="ed__section ed-duo">
+  <figure class="ed-media ed-media--tall ed-duo__small">
+      <img class="ed-media__img" src="images/flow-state/kimrose-editorial-d1.webp?$staticlink$" alt="Studio corner with canvases and trestles" width="600" height="800" loading="lazy">
+  </figure>
+  <figure class="ed-media ed-duo__large">
+    <a class="ed-media__link js-shop-the-collection" data-pid="PW2-75210192-1_SG.GRN" href="$url('Product-Show','pid','PW2-75210192-1_SG.GRN')$">
+      <img class="ed-media__img" src="images/flow-state/kimrose-editorial-d2.webp?$staticlink$" alt="Kim Rose holding the PEDRO green shoulder bag in front of her painting" width="1200" height="1500" loading="lazy">
+    </a>
+  </figure>
+</section>
+
+<!-- 08 · Q&A left -->
+<section class="ed__section ed-grid ed-qa">
+  <div class="ed-qa__item">
+    <h2 class="ed-qa__question">Your paintings balance fluidity with structure. How does your art reflect your own nature?</h2>
+    <p class="ed-qa__answer">I think you can see someone's soul through the mediums they choose. My art reflects my own nature: a little chaotic, but still somewhat structured. It's a constant balance between order and chaos, brought together into something poetic.</p>
+  </div>
+</section>
+
+<!-- 09 · Pair: landscape + portrait -->
+<section class="ed__section ed__section--tight ed-grid ed-pair">
+  <figure class="ed-media ed-media--landscape">
+    <a class="ed-media__link" href="#">
+      <img class="ed-media__img" src="images/flow-state/kimrose-editorial-e1.webp?$staticlink$" alt="Sage green paint spread across a palette" width="1024" height="576" loading="lazy">
+    </a>
+  </figure>
+  <figure class="ed-media ed-media--portrait">
+    <a class="ed-media__link js-shop-the-collection" data-pid="PW1-66380045-5_SG.GRN" href="$url('Product-Show','pid','PW1-66380045-5_SG.GRN')$">
+      <img class="ed-media__img" src="images/flow-state/kimrose-editorial-e2.webp?$staticlink$" alt="PEDRO green toe-ring sandals" width="1024" height="1280" loading="lazy">
+    </a>
+  </figure>
+</section>
+
+<!-- 10 · Q&A right -->
+<section class="ed__section ed__section--tight ed-grid ed-qa ed-qa--right">
+  <div class="ed-qa__item">
+    <h2 class="ed-qa__question">You've often spoken about art as something to be lived with, not just viewed. What changes when artistic expression becomes part of everyday life?</h2>
+    <p class="ed-qa__answer">Artistic expression manifests in everything we make, from the clothes we wear to the art and furniture we choose to adorn our space. I want my work to bring a sense of joy into a space, much like fashion can be a source of confidence and a way to express who we are.</p>
+  </div>
+</section>
+
+<!-- 11 · Full-bleed image -->
+<section class="ed__section ed-full">
+  <figure class="ed-media ed-media--wide">
+    <picture>
+      <source media="(max-width: 767px)" srcset="images/flow-state/kimrose-editorial-f1.webp?$staticlink$">
+      <img class="ed-media__img" src="images/flow-state/kimrose-editorial-f1.webp?$staticlink$" alt="Kim Rose painting on a large canvas in her studio" width="1440" height="900" loading="lazy">
+    </picture>
+  </figure>
+</section>
+
+<!-- 12 · Quote -->
+<section class="ed__section ed-quote">
+  <blockquote class="ed-quote__text">
+    <p>&ldquo;Creating isn't just what I do, it's who I am.<br>That internal drive is simply part of my DNA.&rdquo;</p>
+  </blockquote>
+</section>
+
+<!-- 13 · Pair: portrait + landscape -->
+<section class="ed__section ed-grid ed-pair">
+  <figure class="ed-media ed-media--portrait">
+    <a class="ed-media__link js-shop-the-collection" data-pid="PW2-75210192-1_SG.GRN" href="$url('Product-Show','pid','PW2-75210192-1_SG.GRN')$">
+      <img class="ed-media__img" src="images/flow-state/kimrose-editorial-g1.webp?$staticlink$" alt="PEDRO green shoulder bag with chain hanging on a paint-splattered wall" width="1024" height="1280" loading="lazy">
+    </a>
+  </figure>
+  <figure class="ed-media ed-media--landscape">
+    <img class="ed-media__img" src="images/flow-state/kimrose-editorial-g2.webp?$staticlink$" alt="Hand mixing paint in two buckets" width="1024" height="576" loading="lazy">
+  </figure>
+</section>
+
+<!-- 14 · Q&A right -->
+<section class="ed__section ed__section--tight ed-grid ed-qa ed-qa--right">
+  <div class="ed-qa__item">
+    <h2 class="ed-qa__question">What inspired the collaboration, and what is the story behind the colour palette?</h2>
+    <p class="ed-qa__answer">I drew inspiration from kintsugi, the philosophy of artistic restoration, paired with sage green, which symbolises luck and renewal. With PEDRO's considered approach to fashion, one of the feelings we wanted to capture during our design conversations was wearable art.</p>
+  </div>
+</section>
+
+<!-- 15 · Duo: small + large -->
+<section class="ed__section ed-duo">
+  <figure class="ed-media ed-media--tall ed-duo__small">
+    <a class="ed-media__link js-shop-the-collection" data-pid="PW1-66380045-5_SG.GRN" href="$url('Product-Show','pid','PW1-66380045-5_SG.GRN')$">
+      <img class="ed-media__img" src="images/flow-state/kimrose-editorial-h1.webp?$staticlink$" alt="PEDRO sandal on a painted canvas" width="600" height="800" loading="lazy">
+    </a>
+  </figure>
+  <figure class="ed-media ed-duo__large">
+    <a class="ed-media__link js-shop-the-collection" data-pid="PW2-75210192-1_SG.GRN" href="$url('Product-Show','pid','PW2-75210192-1_SG.GRN')$">
+      <img class="ed-media__img" src="images/flow-state/kimrose-editorial-h2.webp?$staticlink$" alt="Kim Rose in a grey suit holding the PEDRO green shoulder bag" width="1200" height="1500" loading="lazy">
+    </a>
+  </figure>
+</section>
+
+<!-- 16 · Meta -->
+<section class="ed__section ed__section--loose ed-meta">
+  <p class="ed-meta__date">Published on <time datetime="2026-11-02">2 November 2026</time></p>
+  <ul class="ed-meta__links">
+    <li><a class="ed-meta__link" href="$url('Search-Show','cgid','pwnewarrivals')$">Shop Women's New Arrivals &gt;</a></li>
+    <li><a class="ed-meta__link" href="$url('Search-Show','cgid','pmnewarrivals')$">Shop Men's New Arrivals &gt;</a></li>
+  </ul>
+</section>
+
+</div>
+
+<script>
+(function () {
+  /* ---------- Video (MP4) ---------- */
+  function initVideo(el) {
+    var video = el.querySelector('.ed-video__player');
+    var btn = el.querySelector('.ed-video__sound');
+    if (!video) return;
+
+    btn.addEventListener('click', function () {
+      video.muted = !video.muted;
+      if (!video.muted) video.volume = 1;
+      el.classList.toggle('ed-video--unmuted', !video.muted);
+      btn.setAttribute('aria-pressed', String(!video.muted));
+      btn.setAttribute('aria-label', video.muted ? 'Unmute video' : 'Mute video');
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            video.play().catch(function () {});
+          } else {
+            video.pause();
+          }
+        });
+      }, { threshold: 0.25 }).observe(el);
+    }
+  }
+
+  document.querySelectorAll('.ed-video').forEach(initVideo);
+})();
+</script>
+
+
+<!-- force transparent header -->
+<script>
+(function () {
+  var header = document.querySelector('.page_header');
+  if (!header) return;
+
+  function forceThemeLight() {
+    if (!header.classList.contains('theme_light')) {
+      header.classList.add('theme_light');
+    }
+  }
+
+  // Apply immediately on load
+  forceThemeLight();
+
+  // Re-apply any time the class attribute changes (e.g. their scroll
+  // handler adding/removing js-is-sticky--change and stripping theme_light
+  // along with it)
+  var observer = new MutationObserver(forceThemeLight);
+  observer.observe(header, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="https://use.typekit.net/dzf2sjt.css" />
+<link rel="stylesheet" href="https://use.typekit.net/pkr8irj.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400&display=swap" />
+
+<!--
+  IMAGE LIST (swap paths to match the uploaded files)
+  images/everyday-with-pedro/ewp-hero-01.webp         Hero - full width (desktop)
+  images/everyday-with-pedro/ewp-hero-01-mobile.webp  Hero - full width (mobile)
+  images/everyday-with-pedro/ewp-cheng-01.webp     Cheng intro - flowers, Demi Maxi Bag
+  images/everyday-with-pedro/ewp-cheng-video.mp4  Cheng detail - flowers video (9:16)
+  images/everyday-with-pedro/ewp-cheng-02.webp     Cheng detail - on the stairs, loafers
+  images/everyday-with-pedro/ewp-eddy-01.webp      Eddy intro - salon shelves
+  images/everyday-with-pedro/ewp-eddy-03.webp      Eddy detail - Vienna Suede Tote (2:3)
+  images/everyday-with-pedro/ewp-eddy-04.webp      Eddy detail - among the salon shelves (2:3)
+  images/everyday-with-pedro/ewp-eddy-video.mp4   Eddy detail - video (9:16)
+  images/everyday-with-pedro/ewp-dan-01.webp       Dan - corner with chair
+  images/everyday-with-pedro/ewp-dan-02.webp       Dan - hanging lamps
+  images/everyday-with-pedro/ewp-dan-video.mp4    Dan detail - video (9:16)
+  images/everyday-with-pedro/ewp-dan-04.webp       Dan detail - dark brown loafers (5:4 landscape)
+-->
+
+<!-- BootStrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+/* Override Bootstrap's blue links: follow the surrounding text colour */
+a,
+a:hover {
+    color: inherit;
+}
+
+/* ----------------------------------------------------
+  GLOBAL RESET & BASE
+  ---------------------------------------------------- */
+  html, body {
+    overflow-x: hidden;
+    color: black;
+    height: auto;
+    margin: 0;
+    padding: 0;
+  }
+  .page.parallax {
+    padding-top: 0px !important;
+  }
+
+  /* Limit width on big screens (stop giant stretching) */
+  .page-wrapper,
+  body {
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+
+  /* Hide folder headers (SiteGenesis leftover) */
+  .folder-header,
+  .folder_post .folder-container .container {
+    display: none !important;
+  }
+
+/* ----------------------------------------------------
+  EVERY DAY WITH PEDRO
+  ---------------------------------------------------- */
+  .ewp {
+    --ewp-sans: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    --ewp-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --ewp-placeholder: #efefef;
+    --ewp-gutter: 40px;
+    --ewp-section: 100px;
+
+    font-family: var(--ewp-sans);
+    color: #000;
+    background: #fff;
+    padding-bottom: 50px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .ewp *,
+  .ewp *::before,
+  .ewp *::after {
+    box-sizing: border-box;
+  }
+  .ewp p {
+    margin: 0;
+  }
+
+  /* Images: natural ratio once loaded, placeholder ratio before */
+  .ewp img,
+  .ewp video {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    background: var(--ewp-placeholder);
+    filter: grayscale(0);
+  }
+  .ewp .r-3x4 { aspect-ratio: auto 3 / 4; }
+  .ewp .r-4x5 { aspect-ratio: auto 4 / 5; }
+  .ewp .r-9x16 { aspect-ratio: 9 / 16; }
+
+  .ewp section + section {
+    margin-top: var(--ewp-section);
+  }
+  /* Section starts directly under the previous one (no gap) */
+  .ewp section.flush-top {
+    margin-top: 0;
+  }
+
+  /* Typography */
+  .ewp .eyebrow {
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: center;
+  }
+  .ewp .title {
+    font-family: inherit;
+    font-size: 35px;
+    line-height: 1.2;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: center;
+    margin: 14px 0 48px;
+  }
+  .ewp .body {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  .ewp .body2 {
+    font-size: 20px;
+    line-height: 1.4;
+  }
+  .ewp .heading {
+    font-size: 20px;
+    line-height: 1.3;
+    margin-bottom: 18px;
+  }
+  .ewp .quote {
+    font-family: var(--ewp-serif);
+    font-size: 20px;
+    line-height: 1.4;
+    font-style: normal;
+    text-align: center;
+    padding: 0 var(--ewp-gutter);
+    margin: 100px 0 0;
+    border: 0;
+  }
+  .ewp .quote cite {
+    font-family: var(--ewp-serif);
+    display: block;
+    font-style: normal;
+  }
+  .ewp .hashtags {
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  /* Narrow centered column (left-aligned text) */
+  .ewp .narrow {
+    width: 33%;
+    min-width: 420px;
+    margin: 0 auto;
+  }
+  .ewp .narrow + .narrow {
+    margin-top: 28px;
+  }
+
+  /* Image links */
+  .ewp .img-link {
+    display: block;
+  }
+  .ewp .media-box > .img-link {
+    position: absolute;
+    inset: 0;
+  }
+  .ewp .img-link:focus {
+    outline: none;
+  }
+  .ewp .img-link:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+  }
+
+  /* ---------- 1. HERO: one full-width image ---------- */
+  .ewp .hero-media picture {
+    display: block;
+  }
+  .ewp .hero-media img {
+    aspect-ratio: auto 2 / 1;
+  }
+  .ewp .hero-text {
+    margin-top: 100px;
+  }
+
+  /* ---------- 2 / 4. INTRO: image left, text right ---------- */
+  .ewp .intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+  .ewp .intro-text {
+    padding: 0 var(--ewp-gutter) 0 21%;
+    max-width: 82%;
+  }
+
+  /* ---------- 3. CHENG: video left, image + copy right ---------- */
+  .ewp .split {
+    display: grid;
+    grid-template-columns: 8% 27% 1fr 30% 8%;
+    align-items: end;
+  }
+  .ewp .video-box {
+    position: relative;
+  }
+  .ewp .split-video {
+    grid-column: 2;
+  }
+  .ewp .split-stack {
+    grid-column: 4;
+  }
+  /* Fixed 2:3 box so the row height never depends on the image
+     loading (a missing image otherwise pushes the photo up into section 2) */
+  .ewp .media-box {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: var(--ewp-placeholder);
+  }
+  .ewp .media-box--5x4 {
+    aspect-ratio: 5 / 4;
+  }
+  .ewp .media-box img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .ewp .split-stack .body {
+    margin-top: clamp(40px, 14vw, 200px);
+  }
+  .ewp .video-mute {
+    position: absolute;
+    left: 14px;
+    bottom: 14px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    line-height: 0;
+  }
+  .ewp .video-mute:focus {
+    outline: none;
+  }
+  .ewp .video-mute:focus-visible {
+    outline: 1px solid #fff;
+    outline-offset: 4px;
+  }
+  .ewp .video-mute img {
+    width: 14px;
+    height: 14px;
+    background: none;
+  }
+  .ewp .video-mute .icon-unmute,
+  .ewp .video-mute.is-unmuted .icon-mute {
+    display: none;
+  }
+  .ewp .video-mute.is-unmuted .icon-unmute {
+    display: block;
+  }
+
+  /* ---------- 5. EDDY: copy + two photos, then video + copy/quote ---------- */
+  .ewp .eddy-top {
+    display: grid;
+    grid-template-columns: 8% 22% 1fr 51% 8%;
+    align-items: center;
+  }
+  .ewp .eddy-top-copy {
+    grid-column: 2;
+  }
+  .ewp .duo {
+    grid-column: 4;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .ewp .eddy-bottom {
+    display: grid;
+    grid-template-columns: 8% 27% 17% 30% 1fr;
+    align-items: center;
+  }
+  .ewp .eddy-video {
+    grid-column: 2;
+  }
+  .ewp .eddy-copy {
+    grid-column: 4;
+  }
+  .ewp .eddy-copy .quote {
+    width: auto;
+    text-align: left;
+    padding: 0;
+    margin: 32px 0 0;
+  }
+
+  /* ---------- 7. DAN: video left, copy + loafers right ---------- */
+  .ewp .detail-copy-above {
+    margin-bottom: 100px;
+  }
+  .ewp .dan-row {
+    display: grid;
+    grid-template-columns: 8% 27% 1fr 36% 6%;
+    align-items: end;
+  }
+  .ewp .dan-video {
+    grid-column: 2;
+  }
+  .ewp .dan-stack {
+    grid-column: 4;
+  }
+  .ewp .dan-stack .body {
+    margin-bottom: 30px;
+  }
+
+  /* ---------- 6. DAN: offset pair ---------- */
+  .ewp .pair {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .ewp .pair-small {
+    width: 31.5%;
+  }
+  .ewp .pair-large {
+    width: 50%;
+  }
+
+  /* ---------- 7. CLOSING ---------- */
+  .ewp .closing {
+    margin-top: 50px;
+  }
+  .ewp .closing .heading {
+    margin-bottom: 22px;
+  }
+  .ewp .closing .body + .body {
+    margin-top: 18px;
+  }
+
+/* ----------------------------------------------------
+  TABLET
+  ---------------------------------------------------- */
+  @media (max-width: 1023px) {
+    .ewp {
+      --ewp-gutter: 28px;
+      --ewp-section: 110px;
+    }
+    .ewp .narrow {
+      width: 56%;
+      min-width: 0;
+    }
+    .ewp .split {
+      grid-template-columns: 5% 38% 1fr 40% 5%;
+    }
+    .ewp .eddy-top {
+      grid-template-columns: 5% 30% 1fr 56% 5%;
+    }
+    .ewp .duo {
+      gap: 12px;
+    }
+    .ewp .eddy-bottom {
+      grid-template-columns: 5% 38% 1fr 40% 5%;
+    }
+    .ewp .dan-row {
+      grid-template-columns: 5% 38% 1fr 42% 5%;
+    }
+    .ewp .intro-text {
+      padding-left: 12%;
+      max-width: 100%;
+    }
+  }
+
+/* ----------------------------------------------------
+  MOBILE: everything stacks, copy follows its image
+  ---------------------------------------------------- */
+  @media (max-width: 767px) {
+    .ewp {
+      --ewp-gutter: 20px;
+      --ewp-section: 50px;
+    }
+    /* Font sizes are inherited from desktop (no mobile overrides) */
+    .ewp .title {
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 32px;
+      padding: 0;
+    }
+    .ewp .quote {
+      width: 90%;
+      margin: 50px auto 0;
+      padding: 0;
+    }
+    .ewp .quote br { display: none; }
+    .ewp .hashtags { margin-top: 50px; }
+
+    .ewp .narrow {
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0;
+    }
+
+    /* Hero: images stack one after another */
+    .ewp .hero-media img {
+      aspect-ratio: auto 4 / 5;
+    }
+    .ewp .hero-text { margin-top: 50px; }
+
+    .ewp .intro {
+      grid-template-columns: 1fr;
+    }
+    .ewp .intro-media {
+      width: 90%;
+      max-width: none;
+      margin: 0 auto;
+    }
+    /* Section 4 (Eddy) intro image runs full width */
+    .ewp .intro-media--full {
+      width: 100%;
+    }
+    .ewp .intro-text {
+      width: 90%;
+      max-width: none;
+      margin: 0 auto;
+      padding: 40px 0 0;
+    }
+
+    /* Section 3: image, then full-width video, then copy.
+       display: contents lets the image and copy (inside .split-stack)
+       be ordered around the video. */
+    .ewp section.flush-top {
+      margin-top: 50px;
+    }
+    .ewp .split {
+      display: flex;
+      flex-direction: column;
+    }
+    .ewp .split-stack {
+      display: contents;
+    }
+    .ewp .split-video {
+      order: 1;
+      width: 100%;
+      margin-top: 50px;
+    }
+    .ewp .split-stack .media-box {
+      width: 90%;
+      margin: 0 auto;
+    }
+    .ewp .split-stack .body {
+      order: 2;
+      width: 90%;
+      margin: 50px auto 0;
+    }
+
+    /* Section 5: photos, copy, video, copy + quote */
+    .ewp .eddy-top {
+      display: flex;
+      flex-direction: column;
+    }
+    .ewp .duo {
+      order: -1;
+      width: 100%;
+      gap: 8px;
+    }
+    .ewp .eddy-top-copy,
+    .ewp .eddy-copy {
+      width: 90%;
+      margin: 50px auto 0;
+    }
+    .ewp .eddy-bottom {
+      display: block;
+      margin-top: 50px;
+    }
+    .ewp .eddy-video {
+      width: 100%;
+    }
+    .ewp .eddy-copy .quote {
+      margin-top: 28px;
+      text-align: center;
+    }
+
+    /* Section 7: copy, video, copy, loafers */
+    .ewp .detail-copy-above { margin-bottom: 40px; }
+    .ewp .dan-row {
+      display: block;
+    }
+    .ewp .dan-video,
+    .ewp .dan-stack {
+      width: 100%;
+    }
+    .ewp .dan-stack .body {
+      width: 90%;
+      margin: 28px auto;
+    }
+
+    /* Section 6: lamps photo (h2) first, then corner photo (h1) */
+    .ewp .pair {
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+    }
+    .ewp .pair-small {
+      width: 90%;
+    }
+    .ewp .pair-large {
+      order: -1;
+      width: 100%;
+    }
+
+    .ewp .closing { margin-top: 50px; }
+  }
+
+/* ----------------------------------------------------
+  PUBLISH INFO (sits below .ewp)
+  ---------------------------------------------------- */
+  /* Animated underline links (left to right) */
+  .editorial-publish__link {
+    padding-bottom: 3px;
+    color: #000;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition: background-size 0.4s ease;
+  }
+
+  .editorial-publish__link:hover,
+  .editorial-publish__link:focus-visible {
+    color: #000;
+    text-decoration: none;
+    background-size: 100% 1px;
+  }
+
+  .editorial-publish__link:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 4px;
+  }
+
+  .editorial-publish {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 48px 40px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;
+    color: #000;
+  }
+
+  .editorial-publish__date {
+    margin: 0;
+  }
+
+  @media (max-width: 767.98px) {
+    .editorial-publish {
+      padding: 40px 5%;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .editorial-publish__link {
+      transition: none;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+
+<div class="ewp">
+
+  <!-- =====================================================
+    1. HERO
+    ===================================================== -->
+  <section>
+    <div class="hero-media js-vertical-slider">
+      <!-- Link: Hybrix collection / category -->
+        <picture>
+          <source media="(max-width: 767px)" srcset="images/everyday-with-pedro/tw-hybrix-a1_mobile.webp?$staticlink$">
+          <img src="images/everyday-with-pedro/tw-hybrix-a1.webp?$staticlink$" alt="Florist Cheng, hairstylist Eddy and furniture curator Dan in their everyday settings" fetchpriority="high">
+        </picture>
+    </div>
+
+    <div class="hero-text">
+      <p class="eyebrow">Every day with PEDRO</p>
+      <h1 class="title">Inside The Everyday Lives Of Style Makers</h1>
+
+      <p class="narrow body">
+        For 20 years, PEDRO has explored the relationship between design, materials, and everyday life, creating lasting style
+        through thoughtful details. To celebrate its 20th anniversary, PEDRO presents “Every day with PEDRO,” featuring florist
+        Cheng Fan-Cheng, hairstylist Eddy, and furniture curator Dan. Each brings their own perspective to the new Hybrix suede
+        loafers for Fall/Winter.
+      </p>
+      <p class="narrow body2">
+        Different professions, different rhythms of life, yet one shared belief: true style is shaped through the choices we make every day.
+      </p>
+    </div>
+  </section>
+
+  <!-- =====================================================
+    2. CHENG - INTRO
+    ===================================================== -->
+  <section class="intro">
+    <div class="intro-media">
+      <!-- Link: Suede Demi Maxi Bag - olive green -->
+      <a class="img-link js-shop-the-collection" data-pid="PW2-75210180-3_OLV.SU" href="$url('Product-Show', 'pid', 'PW2-75210180-3_OLV.SU')$">
+        <img class="r-4x5" src="images/everyday-with-pedro/tw-hybrix-b1.webp?$staticlink$" alt="Cheng among flowers with the olive green Suede Demi Maxi Bag" loading="lazy">
+      </a>
+    </div>
+    <div class="intro-text">
+      <p class="heading">Staying true to yourself in every role<br>Florist Cheng</p>
+      <p class="body">
+        A florist, fashion KOL, singer, and actor, Cheng moves effortlessly between different roles, drawing inspiration from
+        everyday life and turning subtle observations into creative expression.
+      </p>
+    </div>
+  </section>
+
+  <!-- =====================================================
+    3. CHENG - DETAIL
+    ===================================================== -->
+  <section class="flush-top">
+    <!-- Removed in the new layout - restore if the copy is still needed:
+    The olive green Suede Demi Maxi Bag features a clean, spacious silhouette that keeps everyday essentials close, while
+    its natural tone adds understated depth to his Fall/Winter look.
+    -->
+    <div class="split">
+      <div class="video-box split-video">
+        <video class="r-9x16" playsinline autoplay loop muted preload="metadata">
+          <source src="images/everyday-with-pedro/tw-hybrix-d1.mp4?$staticlink$" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <button class="video-mute" type="button" aria-label="Unmute video">
+          <img class="icon-mute" src="images/media-assets/mute.png?$staticlink$" alt="">
+          <img class="icon-unmute" src="images/media-assets/unmute.png?$staticlink$" alt="">
+        </button>
+      </div>
+
+      <div class="split-stack">
+        <div class="media-box">
+          <!-- Link: Hybrix Suede Loafers - taupe -->
+          <a class="img-link js-shop-the-collection" data-pid="PM1-56380021-2_DTA.SU" href="$url('Product-Show', 'pid', 'PM1-56380021-2_DTA.SU')$">
+            <img src="images/everyday-with-pedro/tw-hybrix-c1.webp?$staticlink$" alt="Cheng on the stairs wearing the taupe Hybrix Suede Loafers" loading="lazy">
+          </a>
+        </div>
+        <p class="body">
+          Moving between floral creations and different work settings, Cheng wears the taupe Hybrix Suede Loafers. Soft suede and
+          a comfortable platform sole strike a balance between polished and casual, reflecting his effortless lifestyle.
+        </p>
+      </div>
+    </div>
+
+    <blockquote class="quote">
+      “I don’t have to be just one version of myself. Every side of me is who I am.”
+      <cite>— Cheng</cite>
+    </blockquote>
+  </section>
+
+  <!-- =====================================================
+    4. EDDY - INTRO
+    ===================================================== -->
+  <section class="intro">
+    <div class="intro-media intro-media--full">
+      <!-- Link: Vienna Suede Tote Bag -->
+      <a class="img-link js-shop-the-collection" data-pid="PM1-56380021-2_DTA.SU,PW2-45060030_COG.SU" href="$url('Product-Show', 'pid', 'PM1-56380021-2_DTA.SU')$">
+        <img class="r-4x5" src="images/everyday-with-pedro/tw-hybrix-e1.webp?$staticlink$" alt="Eddy leaning against the counter in his salon" loading="lazy">
+      </a>
+    </div>
+    <div class="intro-text">
+      <p class="heading">The right balance lies in the smallest details<br>Hairstylist Eddy</p>
+      <p class="body">
+        For hairstylist Eddy, every detail matters—from hair flow and proportions to personal features. Finding the right
+        balance is at the heart of his work, much like PEDRO’s approach to craftsmanship.
+      </p>
+    </div>
+  </section>
+
+  <!-- =====================================================
+    5. EDDY - DETAIL
+    ===================================================== -->
+  <section>
+    <div class="eddy-top">
+      <p class="body eddy-top-copy">
+        For long days on his feet, Eddy chooses the taupe Hybrix Suede Loafers, combining vintage-inspired suede with a
+        comfortable platform sole for effortless comfort and a refined finish.
+      </p>
+      <div class="duo">
+        <div class="media-box">
+          <!-- Link: Vienna Suede Tote Bag -->
+          <a class="img-link js-shop-the-collection" data-pid="PW2-45060030_COG.SU" href="$url('Product-Show', 'pid', 'PW2-45060030_COG.SU')$">
+            <img src="images/everyday-with-pedro/tw-hybrix-f1.webp?$staticlink$" alt="Eddy seated with the Vienna Suede Tote Bag" loading="lazy">
+          </a>
+        </div>
+        <div class="media-box">
+          <!-- Link: Vienna Suede Tote Bag -->
+          <a class="img-link js-shop-the-collection" data-pid="PM1-56380021-2_DTA.SU,PW2-45060030_COG.SU" href="$url('Product-Show', 'pid', 'PM1-56380021-2_DTA.SU')$">
+            <img src="images/everyday-with-pedro/tw-hybrix-f2.webp?$staticlink$" alt="Eddy among the shelves of his salon" loading="lazy">
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="eddy-bottom">
+      <div class="video-box eddy-video">
+        <video class="r-9x16" playsinline autoplay loop muted preload="metadata">
+          <source src="images/everyday-with-pedro/tw-hybrix-g1.mp4?$staticlink$" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <button class="video-mute" type="button" aria-label="Unmute video">
+          <img class="icon-mute" src="images/media-assets/mute.png?$staticlink$" alt="">
+          <img class="icon-unmute" src="images/media-assets/unmute.png?$staticlink$" alt="">
+        </button>
+      </div>
+
+      <div class="eddy-copy">
+        <p class="body">
+          The Vienna Suede Tote Bag offers a spacious, unisex silhouette for work and everyday essentials, while its warm tone
+          adds subtle texture to his Fall/Winter style.
+        </p>
+        <blockquote class="quote">
+          “I just try to get every detail right, because a tiny change can help someone start over.”
+          <cite>— Eddy</cite>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================
+    6. DAN - IMAGE PAIR
+    ===================================================== -->
+  <section class="pair">
+    <div class="pair-small">
+      <!-- Link: Tyson Suede Duffel Bag -->
+      <a class="img-link js-shop-the-collection" data-pid="PM1-56380021-2_DBW.BX,PM2-25210266-1_ESB.SU" href="$url('Product-Show', 'pid', 'PM1-56380021-2_DBW.BX')$">
+        <img class="r-3x4" src="images/everyday-with-pedro/tw-hybrix-h1.webp?$staticlink$" alt="Dan standing in a white corner beside a chair and suede duffel bag" loading="lazy">
+      </a>
+    </div>
+    <div class="pair-large">
+      <!-- Link: Tyson Suede Duffel Bag -->
+      <a class="img-link js-shop-the-collection" data-pid="PM2-25210266-1_ESB.SU" href="$url('Product-Show', 'pid', 'PM2-25210266-1_ESB.SU')$">
+        <img class="r-4x5" src="images/everyday-with-pedro/tw-hybrix-h2.webp?$staticlink$" alt="Dan adjusting a pendant lamp in his furniture showroom" loading="lazy">
+      </a>
+    </div>
+  </section>
+
+  <!-- =====================================================
+    7. DAN - DETAIL + CLOSING
+    ===================================================== -->
+  <section>
+    <div class="narrow detail-copy-above">
+      <p class="heading">Discovering the timeless value of craftsmanship<br>Furniture curator, Dan</p>
+      <p class="body">
+        As the founder of a furniture curation business, Dan believes true taste comes from thoughtful choices in materials,
+        structure, and quality—not from following trends.
+      </p>
+    </div>
+
+    <!-- Removed in the new layout - restore if the copy is still needed:
+    The Tyson Suede Duffel Bag pairs a spacious silhouette with soft suede, while its magnetic closure and detachable strap
+    offer flexibility for every buying trip and journey.
+    -->
+    <div class="dan-row">
+      <div class="video-box dan-video">
+        <video class="r-9x16" playsinline autoplay loop muted preload="metadata">
+          <source src="images/everyday-with-pedro/tw-hybrix-i1.mp4?$staticlink$" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <button class="video-mute" type="button" aria-label="Unmute video">
+          <img class="icon-mute" src="images/media-assets/mute.png?$staticlink$" alt="">
+          <img class="icon-unmute" src="images/media-assets/unmute.png?$staticlink$" alt="">
+        </button>
+      </div>
+
+      <div class="dan-stack">
+        <p class="body">
+          Moving between showrooms and traveling in search of unique pieces, Dan wears the dark brown Hybrix Suede Loafers,
+          combining refined leather and warm suede for an understated look that works across formal and casual settings.
+        </p>
+        <div class="media-box media-box--5x4">
+          <!-- Link: Hybrix Suede Loafers - dark brown -->
+          <a class="img-link js-shop-the-collection" data-pid="PM1-56380021-2_DBW.BX" href="$url('Product-Show', 'pid', 'PM1-56380021-2_DBW.BX')$">
+            <img src="images/everyday-with-pedro/tw-hybrix-i2.webp?$staticlink$" alt="Dark brown Hybrix Suede Loafers on a white chair" loading="lazy">
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <blockquote class="quote">
+      “The traces left behind give each object its own character.<br>
+      And style, too, takes shape through the choices we make every day.”
+      <cite>— Dan</cite>
+    </blockquote>
+
+    <div class="narrow closing">
+      <p class="heading">Style, made for every day.</p>
+      <p class="body">
+        Three professions, three ways of life, and three perspectives on personal style. From creativity and work to travel,
+        PEDRO brings together materials, craftsmanship, and functionality for every part of everyday life.
+      </p>
+      <p class="body">
+        Find your own rhythm through the choices you make every day. Every day with Pedro.
+      </p>
+    </div>
+
+    <p class="hashtags">#everydaywithpedro<br>#pedroxme</p>
+  </section>
+</div>
+
+
+<!-- =====================================================
+  8. PUBLISH INFO
+  ===================================================== -->
+<section class="editorial-publish">
+  <p class="editorial-publish__date">Published on 19 October 2026</p>
+  <a class="editorial-publish__link" href="$url('Search-Show','cgid','pwnewarrivals')$">SHOP WOMEN'S NEW ARRIVALS</a>
+  <a class="editorial-publish__link" href="$url('Search-Show','cgid','pmnewarrivals')$">SHOP MEN'S NEW ARRIVALS</a>
+</section>
+
+<script>
+  /* Section 3, 5 + 7 videos: mute / unmute toggle */
+  (function () {
+    document.querySelectorAll('.ewp .video-box').forEach(function (wrap) {
+      var video = wrap.querySelector('video');
+      var btn = wrap.querySelector('.video-mute');
+      if (!video || !btn) return;
+
+      btn.addEventListener('click', function () {
+        video.muted = !video.muted;
+        btn.classList.toggle('is-unmuted', !video.muted);
+        btn.setAttribute('aria-label', video.muted ? 'Unmute video' : 'Mute video');
+      });
+    });
+  })();
+</script>
+
+</body>
+
+</html>
