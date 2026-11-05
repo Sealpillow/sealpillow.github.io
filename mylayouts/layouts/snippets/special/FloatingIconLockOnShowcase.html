@@ -70,10 +70,19 @@
     text-decoration: none;
   }
 
+  /* Underline grows in from the left on hover / focus */
+  .hero-jump-nav__text {
+    padding-bottom: 2px;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: left bottom;
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    transition: background-size 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
   .hero-jump-nav__link:hover .hero-jump-nav__text,
   .hero-jump-nav__link:focus-visible .hero-jump-nav__text {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    background-size: 100% 1px;
   }
 
   .hero-jump-nav__link:focus-visible {
@@ -81,8 +90,19 @@
     outline-offset: 2px;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .hero-jump-nav__text {
+      transition: none;
+    }
+  }
+
   .hero-jump-nav__num {
     min-width: 18px;
+  }
+
+  /* Copy of the nav for mobile, shown under the icon instead of on the video */
+  .hero-jump-nav--inline {
+    display: none;
   }
 
   /* ...DEMO ONLY up to here. */
@@ -110,22 +130,37 @@
 
   /* DEMO ONLY from here... */
   @media (max-width: 767.98px) {
-    .hero-jump-nav {
-      right: 16px;
+    /* Nav moves off the video to sit under the icon */
+    .hero-video-wrap .hero-jump-nav {
+      display: none;
+    }
+
+    .hero-jump-nav.hero-jump-nav--inline {
+      position: static;
+      display: flex;
+      justify-content: center;
+      transform: none;
     }
 
     .hero-jump-nav__link {
-      gap: 14px;
-      font-size: 12px;
+      gap: 24px;
+      font-size: 13px;
     }
 
-    /* ...DEMO ONLY paused — ★ EXTRACT: mobile override for the icon */
+    /* ...DEMO ONLY paused — ★ EXTRACT: mobile override for the icon.
+       There's no room beside the content on a phone, so the icon drops
+       into the page flow, centred, and stops floating
+       (!important beats the inline transform the script sets). */
     .hero-float-icon {
-      left: 12px;
+      position: static;
+      display: flex;
+      justify-content: center;
+      padding: 64px 0 24px;
+      transform: none !important;
     }
 
     .hero-float-icon__img {
-      width: 44px;
+      width: 64px;
     }
     /* ★ END EXTRACT — DEMO ONLY resumes below */
   }
@@ -154,15 +189,15 @@
 
   .showcase-buffer__label {
     margin: 0 0 16px;
-    font-family: baskerville, "Libre Baskerville", Georgia, serif;
-    font-size: 12px;
+    font-family: 'Source Serif 4', "Libre Baskerville", Georgia, serif;
+    font-size: 14px;
   }
 
   .showcase-buffer__text {
     margin: 0;
-    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
+    font-family: 'Inter', "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
     color: #333;
   }
 
@@ -173,16 +208,35 @@
      icon locks on and rides along with it.
      ---------------------------------------------------- */
   .showcase-collection {
-    padding: 120px 24px;
+    padding: 120px 0;
+  }
+
+  /* Heading row: label on the left, label artwork on the right */
+  .showcase-collection__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 0 24px;
+    margin-bottom: 24px;
   }
 
   .showcase-collection__label {
-    margin: 0 0 24px;
-    padding: 0 24px;
-    text-align: center;
-    font-family: baskerville, "Libre Baskerville", Georgia, serif;
-    font-size: 12px;
+    margin: 0;
+    font-family: 'Source Serif 4', "Libre Baskerville", Georgia, serif;
+    font-size: 14px;
     font-weight: 400;
+  }
+
+  .showcase-collection__art {
+    width: 130px;
+    margin: 0;
+  }
+
+  .showcase-collection__art-img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
   .center-slider {
@@ -242,6 +296,12 @@
     transition: none;
   }
 
+  .center-slider__slide-link {
+    display: block;
+    height: 100%;
+    -webkit-user-drag: none;
+  }
+
   .center-slider__slide-img {
     display: block;
     width: auto;
@@ -257,9 +317,39 @@
     }
   }
 
+  /* Mobile: label, carousel, then the artwork under it. display: contents
+     lets the label and artwork (inside the heading row) be ordered around
+     the carousel. */
   @media (max-width: 767.98px) {
+    .showcase-collection {
+      display: flex;
+      flex-direction: column;
+      padding: 56px 0;
+    }
+
+    .showcase-collection__head {
+      display: contents;
+    }
+
+    .showcase-collection__label {
+      align-self: center;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .showcase-collection .center-slider {
+      order: 1;
+    }
+
+    .showcase-collection__art {
+      order: 2;
+      align-self: center;
+      width: 110px;
+      margin-top: 32px;
+    }
+
     .center-slider {
-      --center-slider-h: 32vw;
+      --center-slider-h: 40vw;
       --center-slider-gap: 6px;
     }
   }
@@ -283,6 +373,9 @@
       <li class="hero-jump-nav__item">
         <a class="hero-jump-nav__link" href="#showcase-collection"><span class="hero-jump-nav__num">01</span><span class="hero-jump-nav__text">The Collection</span></a>
       </li>
+      <li class="hero-jump-nav__item">
+        <a class="hero-jump-nav__link" href="#showcase-buffer"><span class="hero-jump-nav__num">02</span><span class="hero-jump-nav__text">After the Collection</span></a>
+      </li>
     </ol>
   </nav>
 </div>
@@ -294,31 +387,56 @@
      the middle of the viewport. Point data-stop-at at whatever section
      you actually want it to lock onto. -->
 <div class="hero-float-icon js-hero-float-icon" data-stop-at="#showcase-collection .js-center-slider">
-  <img class="hero-float-icon__img" src="../../media/product-portrait-1.jpg" alt="">
+  <img class="hero-float-icon__img" src="../../media/logo-symbol.svg" alt="">
 </div>
 <!-- ★ END EXTRACT -->
+
+<!-- DEMO ONLY: mobile-only copy of the hero nav, under the icon -->
+<nav class="hero-jump-nav hero-jump-nav--inline" aria-label="Page sections">
+  <ol class="hero-jump-nav__list">
+    <li class="hero-jump-nav__item">
+      <a class="hero-jump-nav__link" href="#showcase-collection"><span class="hero-jump-nav__num">01</span><span class="hero-jump-nav__text">The Collection</span></a>
+    </li>
+    <li class="hero-jump-nav__item">
+      <a class="hero-jump-nav__link" href="#showcase-buffer"><span class="hero-jump-nav__num">02</span><span class="hero-jump-nav__text">After the Collection</span></a>
+    </li>
+  </ol>
+</nav>
 
 <!-- DEMO ONLY resumes: PART 2, the real target. Scroll from the hero
      straight into this — the icon stays centred on screen until this
      section's own centre reaches the middle of the viewport, then locks
      on and rides with it. -->
 <section class="showcase-collection" id="showcase-collection">
-  <h2 class="showcase-collection__label">The Collection</h2>
+  <div class="showcase-collection__head">
+    <h2 class="showcase-collection__label">The Collection</h2>
+    <div class="showcase-collection__art">
+      <img class="showcase-collection__art-img" src="../../media/logo-label-border.svg" alt="" loading="lazy">
+    </div>
+  </div>
 
   <div class="center-slider js-center-slider" tabindex="0" role="region" aria-roledescription="carousel" aria-label="The Collection">
     <div class="center-slider__probe" aria-hidden="true"></div>
     <div class="center-slider__track">
       <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
-        <img class="center-slider__slide-img" src="../../media/portrait-1.jpg" alt="">
+        <a class="center-slider__slide-link" href="#" draggable="false">
+          <img class="center-slider__slide-img" src="../../media/portrait-1.jpg" alt="">
+        </a>
       </div>
       <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
-        <img class="center-slider__slide-img" src="../../media/landscape-1.jpg" alt="">
+        <a class="center-slider__slide-link" href="#" draggable="false">
+          <img class="center-slider__slide-img" src="../../media/landscape-1.jpg" alt="">
+        </a>
       </div>
       <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
-        <img class="center-slider__slide-img" src="../../media/portrait-2.jpg" alt="">
+        <a class="center-slider__slide-link" href="#" draggable="false">
+          <img class="center-slider__slide-img" src="../../media/portrait-2.jpg" alt="">
+        </a>
       </div>
       <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
-        <img class="center-slider__slide-img" src="../../media/landscape-2.jpg" alt="">
+        <a class="center-slider__slide-link" href="#" draggable="false">
+          <img class="center-slider__slide-img" src="../../media/landscape-2.jpg" alt="">
+        </a>
       </div>
     </div>
   </div>
@@ -334,7 +452,7 @@
     <p class="showcase-buffer__label">After the Collection</p>
     <p class="showcase-buffer__text">
       Placeholder closing section. Notice the icon is gone from view down
-      here — it was only ever locked to the carousel section above, not to
+      here &mdash; it was only ever locked to the carousel section above, not to
       the page as a whole.
     </p>
   </div>
@@ -376,7 +494,8 @@
 
 <!-- DEMO ONLY: this second script only drives the carousel below (the
      real target in this demo) — it has nothing to do with the floating
-     icon and isn't needed when you extract it. -->
+     icon and isn't needed when you extract it. Same script as
+     sliders/CarouselCenterFocusDragGrow.html. -->
 <script>
 (function () {
   document.querySelectorAll('.js-center-slider').forEach(function (slider) {
@@ -461,13 +580,31 @@
     track.addEventListener('pointerup', endDrag);
     track.addEventListener('pointercancel', endDrag);
 
+    // Drag never follows a link. A side slide centres first,
+    // and only the centre slide follows its link.
     track.addEventListener('click', function (e) {
       if (dragged) {
         dragged = false;
+        e.preventDefault();
         return;
       }
       var slide = e.target.closest('.center-slider__slide');
-      if (slide) goTo(slides.indexOf(slide));
+      if (!slide) return;
+      var i = slides.indexOf(slide);
+      if (i !== index) {
+        e.preventDefault();
+        goTo(i);
+      }
+    });
+
+    // Tabbing to a slide's link brings that slide to the centre,
+    // so Enter then follows the link
+    track.addEventListener('focusin', function (e) {
+      var slide = e.target.closest('.center-slider__slide');
+      if (!slide) return;
+      var i = slides.indexOf(slide);
+      if (i !== index) goTo(i);
+      slider.scrollLeft = 0;
     });
 
     slider.addEventListener('keydown', function (e) {

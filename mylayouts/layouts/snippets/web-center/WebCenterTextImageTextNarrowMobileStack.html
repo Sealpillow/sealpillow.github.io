@@ -1,0 +1,95 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  /* A narrow paragraph, a centred 3:4 image, then another narrow paragraph.
+     The text column is wider than the image, so the copy frames it. */
+  .text-image-text {
+    margin-bottom: 100px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    color: #000;
+    background: #fff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .text-image-text *,
+  .text-image-text *::before,
+  .text-image-text *::after {
+    box-sizing: border-box;
+  }
+
+  /* Narrow centred column, left-aligned text */
+  .text-image-text__copy {
+    width: 33%;
+    min-width: 420px;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .text-image-text__copy--above {
+    margin-bottom: 72px;
+  }
+
+  .text-image-text__copy--below {
+    margin-top: 72px;
+  }
+
+  .text-image-text__media {
+    width: 30%;
+    margin: 0 auto;
+  }
+
+  /* Natural ratio once loaded, 3:4 placeholder before */
+  .text-image-text__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: auto 3 / 4;
+    object-fit: cover;
+    background: #efefef;
+  }
+
+  /* Tablet */
+  @media (max-width: 1023px) {
+    .text-image-text__copy {
+      width: 56%;
+      min-width: 0;
+    }
+
+    .text-image-text__media {
+      width: 40%;
+    }
+  }
+
+  /* Mobile: text and image both at 90% width */
+  @media (max-width: 767px) {
+    .text-image-text__copy,
+    .text-image-text__media {
+      width: 90%;
+    }
+
+    .text-image-text__copy--above {
+      margin-bottom: 40px;
+    }
+
+    .text-image-text__copy--below {
+      margin-top: 28px;
+    }
+  }
+</style>
+
+<section class="text-image-text">
+  <p class="text-image-text__copy text-image-text__copy--above">
+    A paragraph that leads into the image below, for example describing the product the person is carrying and how it
+    fits into their day.
+  </p>
+
+  <div class="text-image-text__media">
+    <img class="text-image-text__img" src="../../media/portrait-2.jpg" alt="" loading="lazy">
+  </div>
+
+  <p class="text-image-text__copy text-image-text__copy--below">
+    A follow-up paragraph after the image, picking up a second detail or product and rounding out this part of the
+    story.
+  </p>
+</section>

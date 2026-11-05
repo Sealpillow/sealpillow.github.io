@@ -1,7 +1,9 @@
 <style>
   /* The centred slide grows taller than its neighbours; drag, click a side
      slide, or use arrow keys to change focus. Each slide keeps its own
-     image aspect ratio (height is fixed, width follows naturally). */
+     image aspect ratio (height is fixed, width follows naturally).
+     Each slide can link somewhere: a side slide centres on the first
+     click, and only the centre slide follows its link. */
   .center-slider {
     --center-slider-h: clamp(120px, 20vw, 230px);
     --center-slider-h-active: calc(var(--center-slider-h) * 1.5);
@@ -60,6 +62,12 @@
     transition: none;
   }
 
+  .center-slider__slide-link {
+    display: block;
+    height: 100%;
+    -webkit-user-drag: none;
+  }
+
   .center-slider__slide-img {
     display: block;
     width: auto;
@@ -77,7 +85,7 @@
 
   @media (max-width: 767.98px) {
     .center-slider {
-      --center-slider-h: 32vw;
+      --center-slider-h: 40vw;
       --center-slider-gap: 6px;
     }
   }
@@ -87,16 +95,24 @@
   <div class="center-slider__probe" aria-hidden="true"></div>
   <div class="center-slider__track">
     <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
-      <img class="center-slider__slide-img" src="../../media/portrait-1.jpg" alt="">
+      <a class="center-slider__slide-link" href="#" draggable="false">
+        <img class="center-slider__slide-img" src="../../media/portrait-1.jpg" alt="">
+      </a>
     </div>
     <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
-      <img class="center-slider__slide-img" src="../../media/landscape-1.jpg" alt="">
+      <a class="center-slider__slide-link" href="#" draggable="false">
+        <img class="center-slider__slide-img" src="../../media/landscape-1.jpg" alt="">
+      </a>
     </div>
     <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
-      <img class="center-slider__slide-img" src="../../media/portrait-2.jpg" alt="">
+      <a class="center-slider__slide-link" href="#" draggable="false">
+        <img class="center-slider__slide-img" src="../../media/portrait-2.jpg" alt="">
+      </a>
     </div>
     <div class="center-slider__slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
-      <img class="center-slider__slide-img" src="../../media/landscape-2.jpg" alt="">
+      <a class="center-slider__slide-link" href="#" draggable="false">
+        <img class="center-slider__slide-img" src="../../media/landscape-2.jpg" alt="">
+      </a>
     </div>
   </div>
 </div>
@@ -187,14 +203,31 @@
     track.addEventListener('pointerup', endDrag);
     track.addEventListener('pointercancel', endDrag);
 
-    // Click a side slide to bring it to the centre
+    // Drag never follows a link. A side slide centres first,
+    // and only the centre slide follows its link.
     track.addEventListener('click', function (e) {
       if (dragged) {
         dragged = false;
+        e.preventDefault();
         return;
       }
       var slide = e.target.closest('.center-slider__slide');
-      if (slide) goTo(slides.indexOf(slide));
+      if (!slide) return;
+      var i = slides.indexOf(slide);
+      if (i !== index) {
+        e.preventDefault();
+        goTo(i);
+      }
+    });
+
+    // Tabbing to a slide's link brings that slide to the centre,
+    // so Enter then follows the link
+    track.addEventListener('focusin', function (e) {
+      var slide = e.target.closest('.center-slider__slide');
+      if (!slide) return;
+      var i = slides.indexOf(slide);
+      if (i !== index) goTo(i);
+      slider.scrollLeft = 0;
     });
 
     slider.addEventListener('keydown', function (e) {

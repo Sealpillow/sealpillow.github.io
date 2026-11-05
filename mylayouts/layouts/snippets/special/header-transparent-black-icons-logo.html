@@ -1,0 +1,104 @@
+<!-- ============================= -->
+<!-- Dependencies                  -->
+<!-- ============================= -->
+<!-- Assumes the site's sticky header is an element matching `.page_header`,
+     containing icon/menu elements with a `.theme_color` class, a search
+     input `.header_search-field` on the right, and a logo wrapped in
+     `.logo_static` with white and black <img> variants (`.logo-white` /
+     `.logo-black`). By default the transparent header (`.theme_light`)
+     shows white icons and a white logo for dark hero images. This snippet
+     keeps the header transparent for the whole page and turns the icons,
+     search field and logo black, for pages that open on a light background.
+     For colours that change per section, use
+     header-transparent-logo-icon-color-swap.html instead. -->
+
+<style>
+  /* Icons: black while the header is transparent */
+  .theme_light .menu-group .theme_color,
+  .theme_light .page_header-left .theme_color,
+  .theme_light .page_header-right .theme_color {
+    color: black;
+  }
+
+  /* Search field (desktop only, where it's shown inline): black text,
+     underline, caret and placeholder */
+  @media (min-width: 1024px) {
+    .header.page_header.theme_light:not(.is-sticky) .page_header-right .header_search-field,
+    body:not(.modal-open) header.page_header.theme_light:not(.is-sticky) .page_header-right input.header_search-field {
+      color: black !important;
+      border-bottom: 1px solid black !important;
+      caret-color: black !important;
+    }
+
+    .header_search-field::placeholder {
+      color: #000 !important;
+      opacity: 1;
+    }
+
+    .header_search-field::-webkit-input-placeholder {
+      color: #000 !important;
+      opacity: 1;
+    }
+
+    .header_search-field::-moz-placeholder {
+      color: #000 !important;
+      opacity: 1;
+    }
+
+    .header_search-field:-ms-input-placeholder {
+      color: #000 !important;
+    }
+  }
+
+  /* Logo: black instead of white while the header is transparent */
+  .page_header.theme_light .logo_static img.logo-white {
+    display: none !important;
+  }
+
+  .page_header.theme_light .logo_static img.logo-black {
+    display: inline-block !important;
+  }
+
+  /* ===========================================================
+     DEMO ONLY: a light opening section so the preview shows the
+     context this is for. Drop it when you use the snippet.
+     =========================================================== */
+  .demo-light-hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 48px 24px;
+    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: center;
+    color: #333;
+    background: #f2f2f2;
+  }
+</style>
+
+<div class="demo-light-hero">
+  <p>Light opening section: the transparent header above it keeps black icons, search field and logo.</p>
+</div>
+
+<!-- Force the header into its transparent (theme_light) state permanently.
+     The site's own scroll handler strips theme_light (for example when it
+     adds its sticky class), so re-add it whenever the class list changes. -->
+<script>
+(function () {
+  var header = document.querySelector('.page_header');
+  if (!header) return;
+
+  function forceThemeLight() {
+    if (!header.classList.contains('theme_light')) {
+      header.classList.add('theme_light');
+    }
+  }
+
+  forceThemeLight();
+
+  var observer = new MutationObserver(forceThemeLight);
+  observer.observe(header, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>

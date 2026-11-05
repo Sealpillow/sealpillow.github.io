@@ -1,0 +1,91 @@
+<style>
+  /* Closing block for an editorial page: publish date, then a short list of
+     shop links. Left-aligned to the page gutter. */
+  .publish-section {
+    padding: 0 24px 80px;
+    color: #000;
+    background: #fff;
+  }
+
+  .publish-section__inner {
+    max-width: none;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .publish-section__date {
+    margin: 0 0 14px;
+    font-family: 'Inter', "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.4;
+    color: #333;
+  }
+
+  .publish-section__links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .publish-section__item {
+    margin: 0 0 6px;
+  }
+
+  .publish-section__item:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Underline grows in from the left on hover / focus */
+  .publish-section__link {
+    padding-bottom: 2px;
+    font-family: 'Inter', "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.4;
+    color: #000;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: left bottom;
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    transition: background-size 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .publish-section__link:hover,
+  .publish-section__link:focus-visible {
+    text-decoration: none;
+    background-size: 100% 1px;
+  }
+
+  .publish-section__link:focus-visible {
+    outline: 1px solid #000;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .publish-section__link {
+      transition: none;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 767.98px) {
+    .publish-section {
+      padding-bottom: 56px;
+    }
+
+    .publish-section__date,
+    .publish-section__link {
+      font-size: 14px;
+    }
+  }
+</style>
+
+<section class="publish-section">
+  <div class="publish-section__inner">
+    <p class="publish-section__date">Published on <time datetime="2026-11-16">16 Nov 2026</time></p>
+    <ul class="publish-section__links">
+      <li class="publish-section__item"><a class="publish-section__link" href="#">Shop Women's New Arrivals &gt;</a></li>
+      <li class="publish-section__item"><a class="publish-section__link" href="#">Shop Men's New Arrivals &gt;</a></li>
+    </ul>
+  </div>
+</section>

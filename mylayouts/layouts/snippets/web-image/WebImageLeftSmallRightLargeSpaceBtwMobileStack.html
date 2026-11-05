@@ -1,0 +1,61 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  /* Offset pair: a small 3:4 image on the left edge and a large 4:5 image
+     on the right edge, top-aligned with open space between them. */
+  .offset-pair {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 100px;
+    background: #fff;
+  }
+
+  .offset-pair__small {
+    width: 31.5%;
+  }
+
+  .offset-pair__large {
+    width: 50%;
+  }
+
+  /* Natural ratio once loaded, placeholder ratio before */
+  .offset-pair__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    background: #efefef;
+  }
+
+  .offset-pair__small .offset-pair__img {
+    aspect-ratio: auto 3 / 4;
+  }
+
+  .offset-pair__large .offset-pair__img {
+    aspect-ratio: auto 4 / 5;
+  }
+
+  /* Mobile: both images stacked at 90% width */
+  @media (max-width: 767px) {
+    .offset-pair {
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .offset-pair__small,
+    .offset-pair__large {
+      width: 90%;
+    }
+  }
+</style>
+
+<section class="offset-pair">
+  <div class="offset-pair__small">
+    <img class="offset-pair__img" src="../../media/portrait-2.jpg" alt="" loading="lazy">
+  </div>
+  <div class="offset-pair__large">
+    <img class="offset-pair__img" src="../../media/portrait-1.jpg" alt="" loading="lazy">
+  </div>
+</section>

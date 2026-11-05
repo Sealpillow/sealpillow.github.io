@@ -1,15 +1,50 @@
-﻿<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-<section class="d-block">
-  <div class="position-relative text-center" style="margin: 100px 0px">
-    <!-- Desktop Description -->
-      <p class="mb-0 col-md-12 d-md-block d-none" style="font-family:baskerville; font-size:20px; width:80%; margin: 0 auto; text-align: center;">
-        "Flow is a big one for me. Without flow you’re pushing against what is.<br>Dress for you, nobody else.” 
-      </p>
+﻿<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400&display=swap">
 
-      <!-- Mobile Description -->
-      <p class="mb-0 col-md-12 d-block d-md-none" style="font-family:baskerville; font-size:20px; width:80%; margin: 0 auto; text-align: center;">
-        "Flow is a big one for me. Without flow you’re pushing against what is. Dress for you, nobody else.” 
-      </p>  
-  </div>
-</section>
+<style>
+  /* Centred serif quote with the speaker credited underneath.
+     A <br> sets the desktop line break; it's dropped on mobile so the
+     quote wraps naturally (no duplicate desktop/mobile copies needed). */
+  .quote-caption {
+    --qc-gutter: 40px;
+    margin: 100px 0;
+    padding: 0 var(--qc-gutter);
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-size: 22px;
+    font-style: normal;
+    line-height: 1.4;
+    text-align: center;
+    color: #000;
+    border: 0;
+  }
+
+  .quote-caption__text {
+    margin: 0;
+  }
+
+  .quote-caption__cite {
+    display: block;
+    font-style: normal;
+  }
+
+  /* Mobile */
+  @media (max-width: 767px) {
+    .quote-caption {
+      width: 90%;
+      margin: 72px auto;
+      padding: 0;
+      font-size: 19px;
+    }
+
+    .quote-caption br {
+      display: none;
+    }
+  }
+</style>
+
+<blockquote class="quote-caption">
+  <p class="quote-caption__text">&ldquo;Flow is a big one for me. Without flow you&rsquo;re pushing against what is.<br>Dress for you, nobody else.&rdquo;</p>
+  <cite class="quote-caption__cite">&mdash; Name</cite>
+</blockquote>

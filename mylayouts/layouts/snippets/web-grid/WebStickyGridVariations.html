@@ -13,12 +13,19 @@
   .sticky-grid {
     --sg-text: #000;
     --sg-muted: #333;
+    --sg-bg: #fff;
+    --sg-tint: #eeeeee;
     --sg-center: 460px;
     --sg-gap: 64px;
     --sg-sticky-top: 40px;
     padding: 40px 24px 0;
     color: var(--sg-text);
-    background: #fff;
+    background: var(--sg-bg);
+  }
+
+  /* Grey band, used here on variants 3–5 so they read as one block */
+  .sticky-grid--tinted {
+    --sg-bg: var(--sg-tint);
   }
 
   .sticky-grid__grid {
@@ -40,27 +47,22 @@
     margin-bottom: 110px;
   }
 
+  /* Logo: an SVG logotype inside the h1 (the alt text is the heading) */
   .sticky-grid__logo {
     margin: 0 0 22px;
-    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
-    font-size: 22px;
-    line-height: 1;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    line-height: 0;
   }
 
-  .sticky-grid__logo-brand {
-    font-weight: 700;
-  }
-
-  .sticky-grid__logo-name {
-    font-weight: 300;
-    margin-left: 0.35em;
+  .sticky-grid__logo-img {
+    display: block;
+    width: 220px;
+    max-width: 100%;
+    height: auto;
   }
 
   .sticky-grid__tagline {
     margin: 0;
-    font-family: baskerville, "Libre Baskerville", Georgia, serif;
+    font-family: 'Source Serif 4', "Libre Baskerville", Georgia, serif;
     font-size: 15px;
     line-height: 1.45;
     max-width: 300px;
@@ -71,8 +73,8 @@
     grid-area: label;
     justify-self: center;
     margin: 0;
-    font-family: baskerville, "Libre Baskerville", Georgia, serif;
-    font-size: 12px;
+    font-family: 'Source Serif 4', "Libre Baskerville", Georgia, serif;
+    font-size: 14px;
     font-weight: 400;
     line-height: 1.35;
   }
@@ -81,19 +83,18 @@
   .sticky-grid__heading {
     grid-area: heading;
     margin: 0 0 18px;
-    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
-    font-size: 26px;
+    font-family: 'Inter', "Helvetica Neue", Arial, sans-serif;
+    font-size: 24px;
     font-weight: 400;
     line-height: 1.15;
   }
 
-  /* Body */
+  /* Body: fills the centre column */
   .sticky-grid__body {
     grid-area: body;
-    max-width: 310px;
     margin-bottom: 70px;
-    font-family: proxima-nova, "Helvetica Neue", Arial, sans-serif;
-    font-size: 12px;
+    font-family: 'Inter', "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
     line-height: 1.4;
     color: var(--sg-muted);
   }
@@ -111,13 +112,14 @@
     margin: 70px 0 0;
   }
 
-  /* Centre image */
+  /* Centre image or video */
   .sticky-grid__media {
     grid-area: media;
     margin: 0;
   }
 
-  .sticky-grid__media-img {
+  .sticky-grid__media-img,
+  .sticky-grid__media-video {
     display: block;
     width: 100%;
     height: auto;
@@ -149,10 +151,21 @@
 
   .sticky-grid__caption {
     margin: 8px 0 0;
-    font-family: baskerville, "Libre Baskerville", Georgia, serif;
-    font-size: 8px;
+    font-family: 'Source Serif 4', "Libre Baskerville", Georgia, serif;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--sg-muted);
+  }
+
+  /* Optional link around a sticky image or tile image */
+  .sticky-grid__link {
+    display: block;
+    height: 100%;
+  }
+
+  .sticky-grid__link:focus-visible {
+    outline: 1px solid var(--sg-text);
+    outline-offset: 2px;
   }
 
   /* ----------------------------------------------------
@@ -174,8 +187,8 @@
 
   /* ----------------------------------------------------
      VARIANT 3 — Heading + sticky aside via CSS subgrid
-     Centred column, sticky aside running from the image down. Subgrid lets
-     the sticky block sit bottom-aligned to the image, then stick as you
+     Centred column, sticky aside running from the media down. Subgrid lets
+     the sticky block sit bottom-aligned to the media, then stick as you
      scroll, without needing fixed row heights.
      ---------------------------------------------------- */
   .sticky-grid--heading {
@@ -199,10 +212,6 @@
   .sticky-grid--heading .sticky-grid__sticky {
     grid-row: 1;
     align-self: end;
-  }
-
-  .sticky-grid--heading .sticky-grid__body {
-    max-width: 300px;
   }
 
   /* ----------------------------------------------------
@@ -242,8 +251,8 @@
   }
 
   /* ----------------------------------------------------
-     VARIANT 5 — Label + body, then a full-width image strip, then a
-     closing paragraph
+     VARIANT 5 — Label + body, then two linked images at the centre
+     column's width, then a closing paragraph
      ---------------------------------------------------- */
   .sticky-grid--strip {
     padding-top: 30px;
@@ -261,9 +270,9 @@
   .sticky-grid__strip {
     grid-area: strip;
     justify-self: center;
-    width: min(100%, calc(var(--sg-center) + 180px));
+    width: min(100%, var(--sg-center));
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px;
   }
 
@@ -283,7 +292,8 @@
     }
   }
 
-  /* Mobile: stack, sticky and crop off */
+  /* Mobile: single column, centred intro / labels / heading, full-bleed
+     media, sticky and crop off */
   @media (max-width: 767.98px) {
     .sticky-grid__grid {
       grid-template-columns: minmax(0, 1fr);
@@ -297,36 +307,55 @@
     }
 
     .sticky-grid__intro {
-      margin-bottom: 56px;
+      margin-bottom: 72px;
+      text-align: center;
+    }
+
+    .sticky-grid__logo-img {
+      margin: 0 auto;
+    }
+
+    .sticky-grid__tagline {
+      margin: 0 auto;
     }
 
     .sticky-grid__label {
-      justify-self: start;
-      margin-bottom: 12px;
+      justify-self: center;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .sticky-grid__label br {
+      display: none;
+    }
+
+    .sticky-grid__heading {
+      font-size: 22px;
+      text-align: center;
     }
 
     .sticky-grid__body {
-      max-width: none;
       margin-bottom: 40px;
-      font-size: 14px;
     }
 
     .sticky-grid__body--more {
       margin: 40px 0 0;
     }
 
+    /* Main image / video runs edge to edge */
+    .sticky-grid__media {
+      margin: 0 -24px;
+    }
+
+    /* Aside: full content width, no sticking */
     .sticky-grid__aside {
       margin-bottom: 40px;
     }
 
     .sticky-grid__sticky {
       position: static;
-      max-width: 60%;
-      margin-left: auto;
-    }
-
-    .sticky-grid__caption {
-      font-size: 10px;
+      max-width: none;
+      margin: 0;
     }
 
     .sticky-grid--text {
@@ -354,13 +383,14 @@
         "more";
     }
 
-    .sticky-grid--heading .sticky-grid__body {
-      max-width: none;
-    }
-
     .sticky-grid--heading .sticky-grid__aside {
       display: block;
       margin: 40px 0 0;
+    }
+
+    /* Gallery: tiles stacked, edge to edge */
+    .sticky-grid--gallery {
+      padding-top: 0;
     }
 
     .sticky-grid--gallery .sticky-grid__grid {
@@ -368,11 +398,20 @@
     }
 
     .sticky-grid__gallery {
-      gap: 6px;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      gap: 0;
+      margin: 0 -24px;
+      aspect-ratio: auto;
     }
 
+    .sticky-grid__gallery .sticky-grid__tile {
+      aspect-ratio: 3 / 4;
+    }
+
+    /* Strip: tiles stacked at content width */
     .sticky-grid--strip {
-      padding-top: 40px;
+      padding-top: 56px;
       padding-bottom: 56px;
     }
 
@@ -386,7 +425,12 @@
 
     .sticky-grid__strip {
       width: 100%;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+    }
+
+    .sticky-grid__strip .sticky-grid__tile {
+      aspect-ratio: 4 / 5;
     }
   }
 </style>
@@ -397,7 +441,7 @@
 
     <header class="sticky-grid__intro">
       <h1 class="sticky-grid__logo">
-        <span class="sticky-grid__logo-brand">Brand</span><span class="sticky-grid__logo-name">Project</span>
+        <img class="sticky-grid__logo-img" src="../../media/logo-logotype.svg" alt="Brand Project">
       </h1>
       <p class="sticky-grid__tagline">A short tagline introducing the project or research platform shown below.</p>
     </header>
@@ -405,7 +449,7 @@
     <h2 class="sticky-grid__label">Why it Exists</h2>
 
     <div class="sticky-grid__body">
-      <p>Opening paragraph setting up the idea — what problem or observation this section responds to.</p>
+      <p>Opening paragraph setting up the idea &mdash; what problem or observation this section responds to.</p>
       <p>A second paragraph developing the thought further, building toward the image below.</p>
     </div>
 
@@ -427,7 +471,7 @@
 <section class="sticky-grid sticky-grid--text">
   <div class="sticky-grid__grid">
 
-    <h2 class="sticky-grid__label">Material<br>&amp; Mindset</h2>
+    <h2 class="sticky-grid__label">Material <br>&amp; Mindset</h2>
 
     <div class="sticky-grid__body">
       <p>Rather than seeing material as something to shape around an idea, the project explores what happens when ideas begin with the material itself.</p>
@@ -438,29 +482,33 @@
   </div>
 </section>
 
-<!-- Variant 3: heading + body + image + closing paragraph, sticky aside via subgrid -->
-<section class="sticky-grid sticky-grid--heading">
+<!-- Variant 3: heading + body + video + closing paragraph, linked sticky aside via subgrid -->
+<section class="sticky-grid sticky-grid--heading sticky-grid--tinted">
   <div class="sticky-grid__grid">
 
     <h2 class="sticky-grid__heading">Beyond the Surface</h2>
 
     <div class="sticky-grid__body">
-      <p>Opening paragraph for this section — framing what's being explored before the image below.</p>
+      <p>Opening paragraph for this section &mdash; framing what's being explored before the video below.</p>
     </div>
 
     <div class="sticky-grid__media">
-      <img class="sticky-grid__media-img" src="../../media/landscape-2.jpg" alt="" loading="lazy">
+      <video class="sticky-grid__media-video" autoplay loop muted playsinline aria-label="Looping landscape video">
+        <source src="../../media/landscape_video-1.mp4" type="video/mp4">
+      </video>
     </div>
 
     <div class="sticky-grid__body sticky-grid__body--more">
-      <p>A follow-up paragraph continuing the thought after the image, developing it further.</p>
+      <p>A follow-up paragraph continuing the thought after the video, developing it further.</p>
       <p>A closing paragraph that rounds out the section.</p>
     </div>
 
     <aside class="sticky-grid__aside">
       <div class="sticky-grid__sticky">
-        <img class="sticky-grid__sticky-img" src="../../media/portrait-2.jpg" alt="" loading="lazy">
-        <p class="sticky-grid__caption">Caption for the sticky side image.</p>
+        <a class="sticky-grid__link" href="#">
+          <img class="sticky-grid__sticky-img" src="../../media/portrait-2.jpg" alt="" loading="lazy">
+        </a>
+        <p class="sticky-grid__caption">Caption for the sticky side image, which links to a product.</p>
       </div>
     </aside>
 
@@ -468,7 +516,7 @@
 </section>
 
 <!-- Variant 4: two-tile gallery -->
-<section class="sticky-grid sticky-grid--gallery">
+<section class="sticky-grid sticky-grid--gallery sticky-grid--tinted">
   <div class="sticky-grid__grid">
 
     <div class="sticky-grid__gallery">
@@ -483,28 +531,26 @@
   </div>
 </section>
 
-<!-- Variant 5: label + body, 4-tile image strip, closing paragraph -->
-<section class="sticky-grid sticky-grid--strip">
+<!-- Variant 5: label + body, two linked images at centre-column width, closing paragraph -->
+<section class="sticky-grid sticky-grid--strip sticky-grid--tinted">
   <div class="sticky-grid__grid">
 
-    <h2 class="sticky-grid__label">Research<br>Process</h2>
+    <h2 class="sticky-grid__label">Research <br>Process</h2>
 
     <div class="sticky-grid__body">
-      <p>A short paragraph introducing the process shown in the image strip below.</p>
+      <p>A short paragraph introducing the process shown in the images below.</p>
     </div>
 
     <div class="sticky-grid__strip">
       <div class="sticky-grid__tile">
-        <img class="sticky-grid__tile-img" src="../../media/product-portrait-1.jpg" alt="" loading="lazy">
+        <a class="sticky-grid__link" href="#">
+          <img class="sticky-grid__tile-img" src="../../media/product-portrait-1.jpg" alt="" loading="lazy">
+        </a>
       </div>
       <div class="sticky-grid__tile">
-        <img class="sticky-grid__tile-img" src="../../media/product-portrait-2.jpg" alt="" loading="lazy">
-      </div>
-      <div class="sticky-grid__tile">
-        <img class="sticky-grid__tile-img" src="../../media/portrait-1.jpg" alt="" loading="lazy">
-      </div>
-      <div class="sticky-grid__tile">
-        <img class="sticky-grid__tile-img" src="../../media/portrait-2.jpg" alt="" loading="lazy">
+        <a class="sticky-grid__link" href="#">
+          <img class="sticky-grid__tile-img" src="../../media/product-portrait-2.jpg" alt="" loading="lazy">
+        </a>
       </div>
     </div>
 
