@@ -5,7 +5,7 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-10-18",
+    "today": "2026-11-05",
     "frequency": "SEMI-ANNUAL",
     "frequency_display": "Semi-Annual",
     "adaptive_window_days": 152,
@@ -14,7 +14,7 @@
     "payments_per_year": 2.0,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -95.7
+    "price_growth_5yr_pct": -95.4
   },
   "parse_preflight": {
     "columns_detected": [
@@ -28,14 +28,14 @@
       "Notes"
     ],
     "date_format_detected": "%d %b %Y",
-    "total_rows": 518,
-    "price_rows": 509,
+    "total_rows": 521,
+    "price_rows": 512,
     "dividend_rows": 9,
-    "zero_volume_rows": 66,
-    "zero_volume_pct": 13.0,
+    "zero_volume_rows": 69,
+    "zero_volume_pct": 13.5,
     "issues_found": [
       "2 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (66/509, 13.0%) â€” analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (69/512, 13.5%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -991,8 +991,8 @@
     "S1": {
       "proj_exdiv_date": "2027-03-19",
       "anchor": 0.02,
-      "anchor_source": "provisional_current_price",
-      "anchor_provisional": true,
+      "anchor_source": "window_open_close",
+      "anchor_provisional": false,
       "window_open_date": "2026-10-20",
       "zone_bot": 0.0184,
       "zone_top": 0.0194,
@@ -3422,14 +3422,26 @@
     {
       "d": "2026-10-16",
       "c": 0.02
+    },
+    {
+      "d": "2026-10-23",
+      "c": 0.02
+    },
+    {
+      "d": "2026-10-30",
+      "c": 0.02
+    },
+    {
+      "d": "2026-11-06",
+      "c": 0.02
     }
   ],
   "current_price": 0.02,
   "anchor_price": 0.31,
   "anchor_date": "2022-03-15",
   "data_window_start": "2017-01-20",
-  "data_window_end": "2026-10-16",
-  "years_covered": 9.74,
+  "data_window_end": "2026-11-06",
+  "years_covered": 9.79,
   "series_adequacy": {
     "S1": {
       "n_clean": 5,

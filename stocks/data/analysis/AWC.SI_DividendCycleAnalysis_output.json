@@ -5,7 +5,7 @@
     "active": false,
     "currency": "SGD",
     "exchange": "SGX",
-    "today": "2026-10-18",
+    "today": "2026-11-05",
     "frequency": "ANNUAL",
     "frequency_display": "Annual",
     "adaptive_window_days": 182,
@@ -14,7 +14,7 @@
     "payments_per_year": 1.0,
     "vol_threshold": 100000,
     "vol_threshold_source": "default_SGX",
-    "price_growth_5yr_pct": -10.3
+    "price_growth_5yr_pct": -21.2
   },
   "parse_preflight": {
     "columns_detected": [
@@ -31,11 +31,11 @@
     "total_rows": 536,
     "price_rows": 522,
     "dividend_rows": 14,
-    "zero_volume_rows": 61,
-    "zero_volume_pct": 11.7,
+    "zero_volume_rows": 60,
+    "zero_volume_pct": 11.5,
     "issues_found": [
       "5 rows share same date as dividend rows â€” verified safe: each pair is one price row + one dividend row on same ex-div date",
-      "Zero-volume rows exceed 5% (61/522, 11.7%) â€” analysis continues, but thin trading may reduce reliability"
+      "Zero-volume rows exceed 5% (60/522, 11.5%) â€” analysis continues, but thin trading may reduce reliability"
     ],
     "halted": false
   },
@@ -542,15 +542,15 @@
   "proj_series": {
     "S1": {
       "proj_exdiv_date": "2027-05-06",
-      "anchor": 0.565,
-      "anchor_source": "provisional_current_price",
-      "anchor_provisional": true,
+      "anchor": 0.52,
+      "anchor_source": "window_open_close",
+      "anchor_provisional": false,
       "window_open_date": "2026-11-05",
-      "zone_bot": 0.5258,
-      "zone_top": 0.5539,
+      "zone_bot": 0.4839,
+      "zone_top": 0.5098,
       "zone_degradation_adjusted": false,
       "zone_degradation_widen_pct": 0.0,
-      "est_low_px": 0.5401,
+      "est_low_px": 0.4971,
       "low_timing_track_record": {
         "tested": 1,
         "window_hits": 0,
@@ -560,8 +560,8 @@
         "wide_wks_min": 4.0,
         "wide_wks_max": 25.0
       },
-      "est_exdiv_px": 0.5617,
-      "est_peak_px": 0.608,
+      "est_exdiv_px": 0.5169,
+      "est_peak_px": 0.5595,
       "est_low_date": null,
       "est_low_date_from": null,
       "est_low_date_to": null,
@@ -577,7 +577,7 @@
       "est_watch_window_note": "Cluster 1: Nov 12 – Nov 26 (best: Nov 19) · Cluster 2: Mar 5",
       "est_watch_window_primary_note": "Primary cluster: Early (2 of last 3 clean cycles)",
       "est_peak_date": null,
-      "current_price_vs_zone": 7.4553,
+      "current_price_vs_zone": 7.4602,
       "entry_status": "ABOVE",
       "entry_status_display": "Above",
       "timing_rating": "BIMODAL",
@@ -605,8 +605,8 @@
       "div_trend_display": "Stable",
       "div_amt_lo": 0.019,
       "div_amt_hi": 0.021,
-      "div_yield_lo": 3.4302,
-      "div_yield_hi": 3.9939,
+      "div_yield_lo": 3.727,
+      "div_yield_hi": 4.3397,
       "anchor_extreme_flag": "NORMAL",
       "historical_frequencies": {
         "entry_zone_hit_rate": 0.0,
@@ -620,22 +620,22 @@
       "scenarios": {
         "base": {
           "description": "Filled around the middle of the projected entry zone",
-          "entry_px": 0.5398,
-          "exit_px": 0.5617,
+          "entry_px": 0.4969,
+          "exit_px": 0.5169,
           "expected_hold_days": 96,
           "historical_frequency": "mid-zone fill"
         },
         "downside": {
           "description": "Filled near the top of the projected entry zone",
-          "entry_px": 0.5539,
-          "exit_px": 0.5617,
+          "entry_px": 0.5098,
+          "exit_px": 0.5169,
           "expected_hold_days": 136,
           "historical_frequency": "higher fill"
         },
         "upside": {
           "description": "Filled near the bottom of the projected entry zone",
-          "entry_px": 0.5258,
-          "exit_px": 0.5617,
+          "entry_px": 0.4839,
+          "exit_px": 0.5169,
           "expected_hold_days": 62,
           "historical_frequency": "lower fill"
         }
@@ -785,18 +785,6 @@
     }
   ],
   "price_data": [
-    {
-      "d": "2016-10-21",
-      "c": 0.46
-    },
-    {
-      "d": "2016-10-28",
-      "c": 0.405
-    },
-    {
-      "d": "2016-11-04",
-      "c": 0.35
-    },
     {
       "d": "2016-11-11",
       "c": 0.35
@@ -2872,13 +2860,25 @@
     {
       "d": "2026-10-16",
       "c": 0.565
+    },
+    {
+      "d": "2026-10-23",
+      "c": 0.52
+    },
+    {
+      "d": "2026-10-30",
+      "c": 0.515
+    },
+    {
+      "d": "2026-11-06",
+      "c": 0.52
     }
   ],
-  "current_price": 0.565,
+  "current_price": 0.52,
   "anchor_price": 0.62,
   "anchor_date": "2026-05-08",
-  "data_window_start": "2016-10-21",
-  "data_window_end": "2026-10-16",
+  "data_window_start": "2016-11-11",
+  "data_window_end": "2026-11-06",
   "years_covered": 9.98,
   "series_adequacy": {
     "S1": {
