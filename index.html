@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brian Lua — Frontend Developer &amp; IT Business Analyst</title>
-<meta name="description" content="Brian Lua — IT Business Analyst and frontend developer at Charles &amp; Keith, Singapore. Portfolio, about, and layout library.">
+<meta name="description" content="Brian Lua builds storefront editorials and campaign pages at Charles &amp; Keith, Singapore. Editorial work, a QA automation case study, side projects and contact.">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sealpillow.github.io/">
 <meta property="og:title" content="Brian Lua — Frontend Developer &amp; IT Business Analyst">
-<meta property="og:description" content="IT Business Analyst and frontend developer at Charles &amp; Keith, Singapore.">
+<meta property="og:description" content="Storefront editorials, a QA automation case study and side projects by Brian Lua, Singapore.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /* Site palette (identical token block in about.html) */
+  /* Site palette (same tokens as the other pages) */
   :root {
     --bg: #f6f4f0;
     --surface: #ece8e1;
@@ -33,15 +33,32 @@
     --btn-line: rgba(21, 20, 19, 0.28);
     --media-bg: #dcd7cf;
     --ok: #3f7a4a;
+    --header-bg: rgba(246, 244, 240, 0.86);
+    --band: #e5dfd5;
+    --band-edge: transparent;
+    --on-band: #151413;
+    --on-band-2: #5c5751;
+    --accent-on-band: #6f5421;
+    --app-bg: #fbfaf7;
+    --app-panel: #f3f0ea;
+    --app-line: rgba(21, 20, 19, 0.1);
+    --app-dot: rgba(21, 20, 19, 0.14);
+    --app-text: #2e2b28;
+    --app-text-2: #6b655e;
+    --app-ok: #3f7a4a;
+    --app-bad: #a23b2c;
+    --app-skip: #7a7065;
+    --app-accent: #7d5f26;
+    --paper: #fbfaf7;
     color-scheme: light;
 
     --serif: 'Cormorant Garamond', Georgia, serif;
     --sans: 'DM Sans', system-ui, sans-serif;
-    --pad: clamp(24px, 5vw, 72px);
+    --mono: 'DM Mono', ui-monospace, Consolas, monospace;
+    --pad: clamp(16px, 5vw, 72px);
     --max: 1280px;
   }
 
-  /* Dark theme: set by the toggle (data-theme), or by the system when no script has run */
   :root[data-theme="dark"] {
     --bg: #161412;
     --surface: #211e1b;
@@ -57,6 +74,23 @@
     --btn-line: rgba(243, 239, 232, 0.3);
     --media-bg: #2a2622;
     --ok: #6fb07d;
+    --header-bg: rgba(22, 20, 18, 0.86);
+    --band: #0c0b0a;
+    --band-edge: rgba(243, 239, 232, 0.09);
+    --on-band: #f3efe8;
+    --on-band-2: #a8a095;
+    --accent-on-band: #c8a96e;
+    --app-bg: #0f0e0d;
+    --app-panel: #1a1816;
+    --app-line: rgba(243, 239, 232, 0.12);
+    --app-dot: rgba(243, 239, 232, 0.16);
+    --app-text: #e8e2d8;
+    --app-text-2: #9d958a;
+    --app-ok: #79b886;
+    --app-bad: #e07a68;
+    --app-skip: #a69c8e;
+    --app-accent: #c8a96e;
+    --paper: #1c1a18;
     color-scheme: dark;
   }
 
@@ -76,9 +110,28 @@
       --btn-line: rgba(243, 239, 232, 0.3);
       --media-bg: #2a2622;
       --ok: #6fb07d;
+      --header-bg: rgba(22, 20, 18, 0.86);
+      --band: #0c0b0a;
+      --band-edge: rgba(243, 239, 232, 0.09);
+      --on-band: #f3efe8;
+      --on-band-2: #a8a095;
+      --accent-on-band: #c8a96e;
+      --app-bg: #0f0e0d;
+      --app-panel: #1a1816;
+      --app-line: rgba(243, 239, 232, 0.12);
+      --app-dot: rgba(243, 239, 232, 0.16);
+      --app-text: #e8e2d8;
+      --app-text-2: #9d958a;
+      --app-ok: #79b886;
+      --app-bad: #e07a68;
+      --app-skip: #a69c8e;
+      --app-accent: #c8a96e;
+      --paper: #1c1a18;
       color-scheme: dark;
     }
   }
+
+  html { scroll-behavior: smooth; }
 
   body {
     font-family: var(--sans);
@@ -87,31 +140,14 @@
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
+  img { display: block; max-width: 100%; }
   a { color: inherit; }
 
-  /* One screen: intro and navigation centred, contact pinned to the bottom */
-  .page {
-    min-height: 100svh;
-    max-width: var(--max);
-    margin: 0 auto;
-    padding: 0 var(--pad);
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-  }
-
-  .top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 68px;
-    font-size: 14px;
-    color: var(--text-2);
-  }
-
-  .top-right { display: flex; align-items: center; gap: 20px; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad); }
 
   .status::before {
     content: '';
@@ -124,148 +160,51 @@
     vertical-align: 1px;
   }
 
-  .hub {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    gap: clamp(40px, 7vw, 120px);
-    align-items: center;
-    padding: clamp(40px, 6vw, 72px) 0;
-  }
-
-  /* Easter egg trigger: the accent rule, with a larger invisible hit area */
-  .header-rule {
-    position: relative;
-    width: 48px;
-    height: 2px;
-    background: var(--gold);
-    margin-bottom: 28px;
-  }
-
-  .header-rule::before { content: ''; position: absolute; inset: -12px -6px; }
-
-  h1 {
-    font-family: var(--serif);
-    font-size: clamp(3.4rem, 7vw, 6.4rem);
-    font-weight: 400;
-    line-height: 0.95;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-    animation: rise 0.8s ease both;
-  }
-
-  h1 em { font-style: italic; }
-
-  .role {
-    margin-top: 24px;
-    font-size: 18px;
-    line-height: 1.55;
-    color: var(--text);
-    max-width: 30ch;
-    animation: rise 0.8s ease 0.08s both;
-  }
-
-  .role span { color: var(--text-2); }
-
-  /* Navigation list (same row language as the facts list on about) */
-  .nav-list {
-    list-style: none;
-    border-top: 2px solid var(--ink);
-    animation: rise 0.8s ease 0.16s both;
-  }
-
-  .nav-list a {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 4px 24px;
-    padding: 26px 0;
-    border-bottom: 1px solid var(--line);
+  .link {
+    font-weight: 500;
+    color: var(--accent);
     text-decoration: none;
-  }
-
-  .nav-title {
-    font-family: var(--serif);
-    font-size: clamp(2rem, 3.4vw, 2.8rem);
-    line-height: 1.1;
-    color: var(--ink);
-    transition: color 0.2s ease, transform 0.25s ease;
-  }
-
-  .nav-desc { grid-column: 1; font-size: 15px; color: var(--text-2); }
-
-  .nav-arrow {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    font-size: 22px;
-    color: var(--text-2);
-    transition: color 0.2s ease, transform 0.25s ease;
-  }
-
-  .nav-list a:hover .nav-title,
-  .nav-list a:focus-visible .nav-title { color: var(--accent); transform: translateX(6px); }
-
-  .nav-list a:hover .nav-arrow,
-  .nav-list a:focus-visible .nav-arrow { color: var(--accent); transform: translateX(4px); }
-
-  .bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px 24px;
-    padding: 22px 0 26px;
-    border-top: 1px solid var(--line);
-    font-size: 14px;
-    color: var(--text-2);
-  }
-
-  .contact { display: flex; flex-wrap: wrap; gap: 8px 28px; }
-
-  .contact a {
-    color: var(--text);
-    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    white-space: nowrap;
     transition: color 0.2s ease;
   }
 
-  .contact a:hover { color: var(--accent); }
+  .link:hover { color: var(--ink); }
 
-  /* ── Secret panel (easter egg) */
-  .secret-panel {
-    position: fixed;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    background: var(--ink);
-    color: var(--on-ink);
-    padding: 24px 36px;
-    min-width: 220px;
-    text-align: center;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
-    z-index: 500;
+  /* ── Header */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--header-bg);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
   }
 
-  .secret-panel.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translateX(-50%) translateY(0);
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s;
+  .site-header.scrolled { border-bottom-color: var(--line); }
+
+  .site-header .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 68px;
   }
 
-  .secret-eyebrow { font-size: 12px; color: var(--accent-on-ink); margin-bottom: 16px; }
-  .secret-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .secret-links a { color: var(--on-ink-2); text-decoration: none; }
-  .secret-links a:hover { color: var(--on-ink); }
-  .secret-close { margin-top: 18px; font-size: 12px; color: var(--on-ink-2); cursor: pointer; user-select: none; }
+  .wordmark { font-family: var(--serif); font-size: 24px; color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .header-right { display: flex; align-items: center; gap: 32px; }
+  .nav { display: flex; align-items: center; gap: 28px; }
+  .nav a { font-size: 15px; color: var(--text-2); text-decoration: none; transition: color 0.2s ease; }
+  .nav a:hover { color: var(--ink); }
 
-  /* Theme toggle: moon in light mode, sun in dark mode */
   .theme-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex: none;
     width: 36px;
     height: 36px;
     padding: 0;
@@ -278,44 +217,339 @@
   }
 
   .theme-toggle:hover { color: var(--ink); border-color: var(--text-2); }
-
-  .theme-toggle svg {
-    width: 16px;
-    height: 16px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .theme-toggle .icon-sun,
-  :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+  .theme-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .theme-toggle .icon-sun, :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
 
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
+  /* ── Hero: who, in one line */
+  .hero { padding: clamp(48px, 7vw, 96px) 0 clamp(40px, 5vw, 64px); }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-size: 14px;
+    color: var(--text-2);
+    animation: rise 0.8s ease both;
   }
 
+  .hero h1 {
+    margin-top: 28px;
+    font-family: var(--serif);
+    font-size: clamp(2.9rem, 7.6vw, 7rem);
+    font-weight: 400;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    animation: rise 0.8s ease 0.06s both;
+  }
+
+  .hero h1 em { font-style: italic; color: var(--accent); }
+
+  .hero-lede {
+    margin-top: clamp(28px, 3.5vw, 40px);
+    max-width: 56ch;
+    font-size: 18px;
+    line-height: 1.6;
+    animation: rise 0.8s ease 0.12s both;
+  }
+
+  /* ── Numbered directory sections */
+  .door { padding: clamp(40px, 5vw, 64px) 0; border-top: 1px solid var(--line); }
+
+  .door-head {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: 8px 24px;
+    align-items: baseline;
+  }
+
+  .door-num { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+
+  .door-title {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 4.2vw, 3.6rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .door-desc { grid-column: 2; max-width: 56ch; font-size: 16px; color: var(--text-2); }
+  .door-head .link { grid-column: 3; grid-row: 1; }
+
+  /* 02 Work: the reel of editorial pages. It drifts on its own and can be dragged (script below) */
+  .reel {
+    margin-top: clamp(28px, 4vw, 44px);
+    overflow: hidden;
+    cursor: grab;
+    touch-action: pan-y; /* vertical swipes still scroll the page; horizontal ones drag the reel */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .reel.is-dragging { cursor: grabbing; }
+  .reel.is-dragging .tile { pointer-events: none; }
+
+  .reel-track {
+    display: flex;
+    gap: 16px;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .reel-set { display: flex; gap: 16px; }
+  .reel img { -webkit-user-drag: none; }
+
+  .tile {
+    position: relative;
+    flex: none;
+    height: clamp(240px, 32vw, 400px);
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--media-bg);
+    text-decoration: none;
+  }
+
+  .tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; }
+
+  .tile::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15, 14, 13, 0.62), rgba(15, 14, 13, 0) 45%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .tile > span {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+    z-index: 1;
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.15;
+    color: #f6f4f0;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .tile:hover img, .tile:focus-visible img { transform: scale(1.04); }
+  .tile:hover::after, .tile:focus-visible::after { opacity: 1; }
+  .tile:hover > span, .tile:focus-visible > span { opacity: 1; transform: translateY(0); }
+
+  /* About and QA: one wide card each, text on the left and its picture on the right */
+  .card-door {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 32px clamp(32px, 5vw, 80px);
+    align-items: center;
+    padding: clamp(24px, 3.5vw, 48px);
+    text-decoration: none;
+    transition: transform 0.35s ease;
+  }
+
+  .card-door:hover { transform: translateY(-4px); }
+
+  .card-door .door-num { display: block; }
+  .card-door h2 { margin-top: 14px; font-family: var(--serif); font-size: clamp(2.2rem, 3.6vw, 3.2rem); font-weight: 400; line-height: 1; letter-spacing: -0.01em; }
+  .card-door p { margin-top: 12px; max-width: 46ch; font-size: 16px; }
+  .card-door .go { margin-top: 20px; font-weight: 500; font-size: 15px; }
+  .card-door .go span { display: inline-block; transition: transform 0.25s ease; }
+  .card-door:hover .go span { transform: translateX(5px); }
+
+  .qa-door { background: var(--band); color: var(--on-band); border: 1px solid var(--band-edge); }
+  .qa-door .door-num, .qa-door .go { color: var(--accent-on-band); }
+  .qa-door p { color: var(--on-band-2); }
+
+  /* A small, looping version of the runner's progress view */
+  .mini {
+    background: var(--app-bg);
+    color: var(--app-text);
+    border: 1px solid var(--app-line);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .mini-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 12px; color: var(--app-text-2); }
+  .mini-top > * { white-space: nowrap; }
+  .mini-top b { font-weight: 400; color: var(--app-text); }
+  .mini-bar { height: 3px; margin: 10px 0 12px; background: var(--app-line); border-radius: 2px; overflow: hidden; }
+  .mini-bar i { display: block; height: 100%; width: 100%; background: var(--app-accent); transform-origin: left; animation: fill 9s linear infinite; }
+  .mini ul { list-style: none; }
+  .mini li { display: flex; gap: 10px; opacity: 0; animation: line 9s ease infinite; }
+  .mini li span:last-child { margin-left: auto; color: var(--app-text-2); }
+  .mini .ok { color: var(--app-ok); }
+  .mini .bad { color: var(--app-bad); }
+  .mini li:nth-child(2) { animation-delay: 1.2s; }
+  .mini li:nth-child(3) { animation-delay: 2.4s; }
+  .mini li:nth-child(4) { animation-delay: 3.6s; }
+  .mini li:nth-child(5) { animation-delay: 4.8s; }
+
+  .about-door { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  .about-door .door-num, .about-door .go { color: var(--accent); }
+  .about-door h2 { color: var(--ink); }
+
+  /* Path from polytechnic to now */
+  .path { list-style: none; position: relative; display: grid; gap: 14px; }
+  .path::before { content: ''; position: absolute; left: 4px; top: 8px; bottom: 8px; width: 1px; background: var(--btn-line); }
+
+  .path li { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; padding-left: 22px; font-size: 15px; line-height: 1.4; }
+  .path li::before { content: ''; position: absolute; left: 0; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--surface); border: 1px solid var(--text-2); }
+  .path li:last-child::before { background: var(--gold); border-color: var(--gold); }
+  .path b { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .path span { color: var(--text-2); }
+
+  /* 04 Playground: live previews */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: clamp(28px, 4vw, 44px);
+  }
+
+  .card { display: block; text-decoration: none; }
+
+  .card-media {
+    display: block;
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  /* A screenshot of the project, with a short screen recording that plays over it on hover */
+  .card-media img,
+  .card-media video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .card-media img { transition: transform 0.6s ease; }
+  .card:hover .card-media img { transform: scale(1.03); }
+  .card-media video { opacity: 0; transition: opacity 0.35s ease; }
+  .card.is-playing .card-media video { opacity: 1; }
+
+  .card-play {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 4px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 99px;
+    background: rgba(21, 20, 19, 0.72);
+    color: #f6f4f0;
+    transition: opacity 0.3s ease;
+  }
+
+  .card-play svg { width: 10px; height: 10px; fill: currentColor; }
+  .card.is-playing .card-play { opacity: 0; }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .card-play { display: inline-flex; }
+  }
+
+  .card-title { display: block; margin-top: 16px; font-family: var(--serif); font-size: 1.6rem; line-height: 1.1; color: var(--ink); transition: color 0.2s ease; }
+  .card:hover .card-title { color: var(--accent); }
+  .card-desc { display: block; margin-top: 6px; font-size: 14.5px; color: var(--text-2); }
+
+  /* ── Footer: contact */
+  .site-footer { margin-top: clamp(40px, 5vw, 64px); background: var(--band); color: var(--on-band); border-top: 1px solid var(--band-edge); }
+
+  .foot-main {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    gap: 40px;
+    align-items: end;
+    padding-top: clamp(56px, 7vw, 96px);
+    padding-bottom: clamp(40px, 5vw, 64px);
+  }
+
+  .foot-main h2 { font-family: var(--serif); font-size: clamp(2.4rem, 5vw, 4.4rem); font-weight: 400; line-height: 1; }
+  .foot-main h2 em { color: var(--accent-on-band); }
+
+  .foot-links { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; }
+
+  .foot-links a {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .foot-links a span { color: var(--on-band-2); }
+  .foot-links a:hover { color: var(--accent-on-band); }
+
+  .foot-base {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 20px;
+    padding-bottom: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    color: var(--on-band-2);
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fill { from { transform: scaleX(0); } 85%, to { transform: scaleX(1); } }
+  @keyframes line { 0% { opacity: 0; transform: translateY(4px); } 6%, 88% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
   @keyframes pgFadeIn { from { opacity: 0; } to { opacity: 1; } }
   body { animation: pgFadeIn 0.25s ease both; }
 
-  @media (max-width: 900px) {
-    .hub { grid-template-columns: 1fr; align-items: start; }
-    .nav-list a { padding: 22px 0; }
+  @media (max-width: 860px) {
+    .card-door { grid-template-columns: 1fr; }
+    .door-head { grid-template-columns: 44px minmax(0, 1fr); }
+    .door-head .link { grid-column: 2; grid-row: auto; justify-self: start; margin-top: 8px; }
+    .foot-main { grid-template-columns: 1fr; }
   }
 
-  @media (max-width: 600px) {
-    .bottom { flex-direction: column; align-items: flex-start; }
+  @media (max-width: 700px) {
+    .site-header .wrap { height: auto; flex-wrap: wrap; row-gap: 4px; padding-top: 14px; padding-bottom: 10px; }
+    .header-right { display: contents; }
+    .theme-toggle { order: 2; }
+    .nav { order: 3; width: 100%; gap: 20px; }
+    .nav a { font-size: 14px; }
+    .hero-lede { font-size: 17px; }
+    .door-head { grid-template-columns: 1fr; }
+    .door-head > * { grid-column: 1 !important; }
+    .cards { grid-template-columns: 1fr; }
+    .foot-links { grid-template-columns: 1fr; }
+    .foot-base { flex-direction: column; }
   }
 
+  @media (max-width: 400px) {
+    .nav { gap: 14px; }
+    .nav a { font-size: 13.5px; }
+  }
+
+  /* Without motion the reel stays still until dragged, and the runner sits finished */
   @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    .mini li { animation: none; opacity: 1; }
+    .mini-bar i { animation: none; }
   }
 </style>
 <script>
-  // Apply the saved theme, or the system one, before first paint
   (function () {
     var t = null;
     try { t = localStorage.getItem('theme'); } catch (e) {}
@@ -326,117 +560,351 @@
 </head>
 <body>
 
-<div class="page">
-  <header class="top">
-    <span>Singapore</span>
-    <div class="top-right">
-      <span class="status">Open to new roles</span>
+<header class="site-header" id="siteHeader">
+  <div class="wrap">
+    <a href="index.html" class="wordmark">Brian Lua</a>
+    <div class="header-right">
+      <nav class="nav" aria-label="Main">
+        <a href="about.html">About</a>
+        <a href="myportfolio/">Work</a>
+        <a href="qa-automation.html">QA Runner</a>
+        <a href="#playground">Playground</a>
+      </nav>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme">
-      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
-      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-    </button>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
     </div>
-  </header>
+  </div>
+</header>
 
-  <main class="hub">
-    <div>
-      <div class="header-rule"></div>
-      <h1>Brian <em>Lua</em></h1>
-      <p class="role">IT Business Analyst &amp; Frontend Developer <span>at Charles &amp; Keith</span></p>
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <p class="hero-meta">
+        <span>IT Business Analyst &amp; Frontend Developer, Charles &amp; Keith</span>
+        <span>Singapore</span>
+        <span class="status">Open to new roles</span>
+      </p>
+      <h1 id="hero-title">I work out what's <em>needed</em>,<br>then I build it.</h1>
+      <p class="hero-lede">An IT Business Analyst who also writes the frontend: requirements, change requests and platform setup on one side, storefront editorials and campaign pages on the other, across 20+ international sites.</p>
+    </div>
+  </section>
+
+  <section class="door" aria-label="About">
+    <div class="wrap">
+      <a class="card-door about-door" href="about.html">
+        <div class="card-text">
+          <span class="door-num">01 &middot; About</span>
+          <h2>From drones to storefronts</h2>
+          <p>Aerospace electronics, then computer science, then e-commerce: the path that got me here.</p>
+          <span class="go">More about me <span>&rarr;</span></span>
+        </div>
+        <div class="card-visual">
+          <ol class="path">
+            <li><b>2016</b><span>Aerospace Electronics at Ngee Ann Poly</span></li>
+            <li><b>2019</b><span>Multi-drone sync, shown live</span></li>
+            <li><b>2021</b><span>Computer Science at NTU</span></li>
+            <li><b>2023</b><span>SAP intern at NCS</span></li>
+            <li><b>2025</b><span>IT Business Analyst, Charles &amp; Keith</span></li>
+          </ol>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="door" id="work" aria-labelledby="work-title">
+    <div class="wrap">
+      <div class="door-head">
+        <span class="door-num">02</span>
+        <h2 class="door-title" id="work-title">Work</h2>
+        <p class="door-desc">Editorial and campaign pages I've built for the PEDRO storefront. Drag to browse, click one to open it.</p>
+        <a href="myportfolio/" class="link">All 37 pages &rarr;</a>
+      </div>
     </div>
 
-    <nav aria-label="Main">
-      <ul class="nav-list">
-        <li>
-          <a href="about.html">
-            <span class="nav-title">About</span>
-            <span class="nav-desc">Background, experience and how I work</span>
-            <span class="nav-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-        </li>
-        <li>
-          <a href="myportfolio/">
-            <span class="nav-title">Work</span>
-            <span class="nav-desc">Editorial pages, campaign layouts and interactive builds</span>
-            <span class="nav-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-        </li>
-        <li>
-          <a href="mylayouts/">
-            <span class="nav-title">Layouts</span>
-            <span class="nav-desc">Reusable HTML snippets and layout patterns</span>
-            <span class="nav-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </main>
-
-  <footer class="bottom">
-    <div class="contact">
-      <a href="mailto:luatan68@hotmail.com">luatan68@hotmail.com</a>
-      <a href="https://linkedin.com/in/brian-lua-40237a134" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://github.com/Sealpillow" target="_blank" rel="noopener">GitHub</a>
-      <a href="brianlua-resume.pdf" download>Résumé</a>
+    <div class="reel" aria-label="Editorial pages I've built">
+      <div class="reel-track">
+        <div class="reel-set">
+          <a class="tile" href="myportfolio/editorials/in-dialogue-with-ana-kras.html"><img src="myportfolio/editorials/images/in-dialogue-with-ana-kras/dialogue-ana-kras-a1.webp" alt="" width="1366" height="1788" decoding="async"><span>In Dialogue With Ana Kra<span class="sr">š</span><span class="caron" aria-hidden="true">s</span></span></a>
+          <a class="tile" href="myportfolio/editorials/design-philosophy-demi.html"><img src="myportfolio/editorials/images/design-philosophy/dp-landing-demi-b3.webp" alt="" width="1038" height="1372" decoding="async"><span>Design Philosophy: Demi</span></a>
+          <a class="tile" href="myportfolio/editorials/spring-26-the-new-cult-classic.html"><img src="myportfolio/editorials/images/spring-26-the-new-cult-classic/spring-26-a1.webp" alt="" width="1366" height="1672" decoding="async"><span>Spring '26: The New Cult Classic</span></a>
+          <a class="tile" href="myportfolio/editorials/echoes-of-glamour.html"><img src="myportfolio/editorials/images/echoes-of-glamour/echoes-of-glamour-a1.webp" alt="" width="1366" height="1672" decoding="async"><span>Echoes of Glamour</span></a>
+          <a class="tile" href="myportfolio/editorials/of-myth-and-memory-lny-26.html"><img src="myportfolio/editorials/images/of-myth-and-memory-lny-26/lny-editorial_01.webp" alt="" width="1366" height="2050" decoding="async"><span>Of Myth and Memory</span></a>
+          <a class="tile" href="myportfolio/editorials/tom-butterworth-on-materiality.html"><img src="myportfolio/editorials/images/tom-butterworth-on-materiality/tom-butterworth-a1.webp" alt="" width="1366" height="1672" decoding="async"><span>Tom Butterworth on Materiality</span></a>
+          <a class="tile" href="myportfolio/editorials/versatility-in-one-v1.html"><img src="myportfolio/editorials/images/versatility-in-one/main-banner.webp" alt="" width="1366" height="1700" decoding="async"><span>Versatility in One</span></a>
+          <a class="tile" href="myportfolio/editorials/homecoming-fall-2026.html"><img src="myportfolio/editorials/images/homecoming-fall-2026/homecoming-fall-editorial_03.webp" alt="" width="1366" height="1788" decoding="async"><span>Homecoming</span></a>
+          <a class="tile" href="myportfolio/editorials/winter-textures-of-thought.html"><img src="myportfolio/editorials/images/winter-textures-of-thought/winter-tier-1-a1.webp" alt="" width="1366" height="1672" decoding="async"><span>Winter Textures of Thought</span></a>
+          <a class="tile" href="myportfolio/editorials/design-philosophy-novo.html"><img src="myportfolio/editorials/images/design-philosophy/dp-main-novo-4.webp" alt="" width="1038" height="1366" decoding="async"><span>Design Philosophy: Novo</span></a>
+          <a class="tile" href="myportfolio/editorials/the-splash-summer26.html"><img src="myportfolio/editorials/images/the-splash-summer26/summer-tier-1-editorial_05.webp" alt="" width="1366" height="1786" decoding="async"><span>The Splash: Summer '26</span></a>
+          <a class="tile" href="myportfolio/editorials/in-conversation-with-carlotta-scholz.html"><img src="myportfolio/editorials/images/in-conversation-with-carlotta-scholz/kol-carlotta-editorial_04.webp" alt="" width="1118" height="1468" decoding="async"><span>In Conversation: Carlotta Scholz</span></a>
+        </div>
+        <!-- Second copy makes the loop seamless; filled in by script, hidden from assistive tech -->
+        <div class="reel-set" aria-hidden="true"></div>
+      </div>
     </div>
+  </section>
+
+  <section class="door" aria-label="QA test runner">
+    <div class="wrap">
+      <a class="card-door qa-door" href="qa-automation.html">
+        <div class="card-text">
+          <span class="door-num">03 &middot; Personal project</span>
+          <h2>QA test runner</h2>
+          <p>A Playwright runner I built that walks the shopper's path on 25 storefronts, screenshots every step and writes a sign-off report.</p>
+          <span class="go">Read the case study <span>&rarr;</span></span>
+        </div>
+        <div class="card-visual" aria-hidden="true">
+          <div class="mini">
+            <div class="mini-top"><b>UAT Journey</b><span>6 markets · 3 browsers</span></div>
+            <div class="mini-bar"><i></i></div>
+            <ul>
+              <li><span class="ok">&#10003;</span><span>Bag totals · SG</span><span>38 s</span></li>
+              <li><span class="ok">&#10003;</span><span>Delivery options · MY</span><span>44 s</span></li>
+              <li><span class="bad">&#10007;</span><span>Promo code · TW</span><span>31 s</span></li>
+              <li><span class="ok">&#10003;</span><span>Member checkout · HK</span><span>1 min 12 s</span></li>
+              <li><span class="ok">&#10003;</span><span>Payment methods · AU</span><span>47 s</span></li>
+            </ul>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="door" id="playground" aria-labelledby="playground-title">
+    <div class="wrap">
+      <div class="door-head">
+        <span class="door-num">04</span>
+        <h2 class="door-title" id="playground-title">Playground</h2>
+        <p class="door-desc">Side projects outside work, where I try out data, games and interface ideas. Hover a card to see it in use.</p>
+      </div>
+
+      <div class="cards">
+        <a class="card" href="stocks/">
+          <span class="card-media">
+            <img src="assets/playground/stocks.webp" alt="The dashboard's watchlist: a map of SGX stocks plotted against their projected entry zone" width="960" height="720" loading="lazy" decoding="async">
+            <video src="assets/playground/stocks.webm" muted loop playsinline preload="none" aria-hidden="true"></video>
+            <span class="card-play" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z"/></svg>Preview</span>
+          </span>
+          <span class="card-title">Dividend Cycle Dashboard</span>
+          <span class="card-desc">Dividend cycles for 139 SGX counters, with a prediction log that scores its own calls.</span>
+        </a>
+        <a class="card" href="puzzlegame/puzzlecollection/">
+          <span class="card-media">
+            <img src="assets/playground/puzzles.webp" alt="The puzzle collection's cabinet screen, listing Memory Sequence, Chimpanzee Test, Number Trace and The Witness" width="960" height="720" loading="lazy" decoding="async">
+            <video src="assets/playground/puzzles.webm" muted loop playsinline preload="none" aria-hidden="true"></video>
+            <span class="card-play" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z"/></svg>Preview</span>
+          </span>
+          <span class="card-title">Puzzle Collection</span>
+          <span class="card-desc">Six puzzle families and 300 levels in one static app.</span>
+        </a>
+        <a class="card" href="catguide/">
+          <span class="card-media">
+            <img src="assets/playground/catguide.webp" alt="The Feline Index care guide, with illustrated emergency cards" width="960" height="720" loading="lazy" decoding="async">
+            <video src="assets/playground/catguide.webm" muted loop playsinline preload="none" aria-hidden="true"></video>
+            <span class="card-play" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z"/></svg>Preview</span>
+          </span>
+          <span class="card-title">The Feline Index</span>
+          <span class="card-desc">Cat breeds, a care planner, a readiness check and a quiz.</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap foot-main">
+    <h2>Let's work <em>together</em>.</h2>
+    <ul class="foot-links">
+      <li><a href="mailto:luatan68@hotmail.com">Email <span>&rarr;</span></a></li>
+      <li><a href="brianlua-resume.pdf" download>Résumé <span>PDF</span></a></li>
+      <li><a href="https://linkedin.com/in/brian-lua-40237a134" target="_blank" rel="noopener">LinkedIn <span>&nearr;</span></a></li>
+      <li><a href="https://github.com/Sealpillow" target="_blank" rel="noopener">GitHub <span>&nearr;</span></a></li>
+    </ul>
+  </div>
+  <div class="wrap foot-base">
     <span>&copy; 2026 Brian Lua</span>
-  </footer>
-</div>
+    <span>Built by hand in HTML, CSS and JavaScript</span>
+  </div>
+</footer>
 
-<div class="secret-panel" id="secretPanel">
-  <p class="secret-eyebrow">You found something.</p>
-  <ul class="secret-links">
-    <li><a href="catguide/">Cat Guide</a></li>
-    <li><a href="stocks/">Stocks</a></li>
-    <li><a href="puzzlegame/puzzlecollection/">Puzzle Game</a></li>
-  </ul>
-  <div class="secret-close" id="secretClose">&#215; close</div>
-</div>
+<style>
+  /* Cormorant's own š puts the caron off to the right, so it is drawn here instead */
+  .caron { position: relative; display: inline-block; }
+  .caron::after {
+    content: '\02C7';
+    position: absolute;
+    left: 50%;
+    top: 0.1em;
+    transform: translateX(-50%);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.62em;
+    line-height: 1;
+  }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
 
 <script>
-  // Fade-out page transition for internal navigation links (skips anchors, mailto, external, _blank, downloads, modifier clicks)
+  // Fade-out page transition for internal links (skips anchors, mailto, external, _blank, downloads, modifier clicks)
   var fadeOut = null;
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function (e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var link = e.target.closest('a');
     if (!link) return;
     var href = link.getAttribute('href');
     if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank' || link.hasAttribute('download')) return;
     e.preventDefault();
-    // Web Animations API: an inline opacity would lose to the pgFadeIn fill, which pins opacity at 1
     fadeOut = document.body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease', fill: 'forwards' });
-    setTimeout(function() { window.location.href = href; }, 200);
+    setTimeout(function () { window.location.href = href; }, 200);
   });
+  window.addEventListener('pageshow', function (e) { if (e.persisted && fadeOut) { fadeOut.cancel(); fadeOut = null; } });
 
-  // Undo the fade when the page is restored from the back/forward cache
-  window.addEventListener('pageshow', function(e) {
-    if (e.persisted && fadeOut) { fadeOut.cancel(); fadeOut = null; }
-  });
+  var header = document.getElementById('siteHeader');
+  function onScroll() { header.classList.toggle('scrolled', window.scrollY > 8); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-  // Easter egg: click the accent rule to reveal hidden links
-  var rule = document.querySelector('.header-rule');
-  var panel = document.getElementById('secretPanel');
+  // Reel: drifts slowly on its own, pauses on hover, and can be dragged with a mouse or a finger.
+  // A second copy of the tiles makes the loop seamless; the copy is unreachable by keyboard.
+  (function () {
+    var reel = document.querySelector('.reel');
+    var track = reel.querySelector('.reel-track');
+    var sets = reel.querySelectorAll('.reel-set');
+    sets[1].innerHTML = sets[0].innerHTML;
+    sets[1].querySelectorAll('a').forEach(function (a) { a.tabIndex = -1; });
+    reel.querySelectorAll('img').forEach(function (img) { img.draggable = false; });
 
-  rule.addEventListener('click', function(e) {
-    e.stopPropagation();
-    panel.classList.toggle('active');
-  });
+    var DRIFT = reduceMotion() ? 0 : 36;  // px per second when left alone
+    var x = 0, vel = 0, loopW = 0;
+    var hovering = false, visible = true;
+    var drag = null, moved = false, last = performance.now();
 
-  document.getElementById('secretClose').addEventListener('click', function() {
-    panel.classList.remove('active');
-  });
+    function reduceMotion() { return matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    function measure() { loopW = sets[1].offsetLeft - sets[0].offsetLeft; }
+    // Keep x within one copy's width so the two copies always fill the row
+    function wrap() { if (loopW) { x = x % loopW; if (x > 0) x -= loopW; } }
+    function paint() { track.style.transform = 'translate3d(' + x + 'px,0,0)'; }
 
-  document.addEventListener('click', function(e) {
-    if (!panel.contains(e.target)) panel.classList.remove('active');
-  });
+    function tick(now) {
+      var dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      if (!drag && visible) {
+        if (Math.abs(vel) > 4) {
+          x += vel * dt;
+          vel *= Math.pow(0.04, dt);  // momentum after a fling fades out in about a second
+        } else {
+          vel = 0;
+          if (!hovering) x -= DRIFT * dt;
+        }
+        wrap();
+        paint();
+      }
+      requestAnimationFrame(tick);
+    }
+
+    reel.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      drag = { id: e.pointerId, startX: e.clientX, startPos: x, lastX: e.clientX, lastT: performance.now() };
+      moved = false;
+      vel = 0;
+    });
+
+    reel.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.startX;
+      if (!moved && Math.abs(dx) > 6) {
+        moved = true;
+        reel.classList.add('is-dragging');
+        try { reel.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+      if (!moved) return;
+      var now = performance.now(), dt = (now - drag.lastT) / 1000;
+      if (dt > 0) vel = vel * 0.6 + ((e.clientX - drag.lastX) / dt) * 0.4;
+      drag.lastX = e.clientX;
+      drag.lastT = now;
+      x = drag.startPos + dx;
+      wrap();
+      paint();
+    });
+
+    function endDrag(e) {
+      if (!drag || (e && e.pointerId !== drag.id)) return;
+      if (performance.now() - drag.lastT > 80) vel = 0;  // held still before letting go: no fling
+      vel = Math.max(-2500, Math.min(2500, vel));
+      drag = null;
+      reel.classList.remove('is-dragging');
+    }
+
+    // Listen on the window so a release outside the reel still ends the drag.
+    // (Not on lostpointercapture: touch browsers fire it as the drag starts.)
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+
+    // A drag that ends over a tile must not open it
+    reel.addEventListener('click', function (e) {
+      if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; }
+    }, true);
+
+    reel.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') hovering = true; });
+    reel.addEventListener('pointerleave', function () { hovering = false; });
+
+    // Tabbing to a tile brings it into view (keyboard focus only: a mouse press also focuses the link,
+    // and moving the reel under the pointer then would turn the click into a miss)
+    reel.addEventListener('focusin', function (e) {
+      var tile = e.target.closest('.tile');
+      if (!tile || !tile.matches(':focus-visible')) return;
+      hovering = true;
+      x = -(tile.offsetLeft - 16);
+      wrap();
+      paint();
+    });
+    reel.addEventListener('focusout', function () { hovering = false; });
+
+    // Don't spend frames on the reel while it's off screen
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) { visible = entries[0].isIntersecting; }).observe(reel);
+    }
+
+    window.addEventListener('resize', function () { measure(); wrap(); paint(); });
+    window.addEventListener('load', measure);
+    measure();
+    requestAnimationFrame(tick);
+  })();
+
+  // Playground: on devices with a mouse, hovering (or focusing) a card plays its screen recording over the screenshot.
+  // Touch devices and reduced motion keep the screenshot, so no video is downloaded.
+  (function () {
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('.card').forEach(function (card) {
+      var video = card.querySelector('video');
+      if (!video) return;
+      var wanted = false;
+      function start() {
+        wanted = true;
+        var p = video.play();
+        // The clip may finish loading after the pointer has already left
+        function show() { if (wanted) card.classList.add('is-playing'); else video.pause(); }
+        if (p && p.then) p.then(show).catch(function () {});
+        else show();
+      }
+      function stop() {
+        wanted = false;
+        card.classList.remove('is-playing');
+        video.pause();
+        video.currentTime = 0;
+      }
+      card.addEventListener('mouseenter', start);
+      card.addEventListener('mouseleave', stop);
+      card.addEventListener('focus', start);
+      card.addEventListener('blur', stop);
+    });
+  })();
 
   // Theme toggle: an explicit choice is remembered; otherwise the page follows the system setting
   (function () {
     var root = document.documentElement;
     var btn = document.getElementById('themeToggle');
-    function label() {
-      btn.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
-    }
+    function label() { btn.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'); }
     btn.addEventListener('click', function () {
       var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
       root.dataset.theme = next;

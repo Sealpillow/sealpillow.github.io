@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Test Runner — Brian Lua</title>
+<meta name="description" content="Case study: a Playwright test runner that walks the shopper's path on 25 storefronts, screenshots every step and writes the release sign-off report.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://sealpillow.github.io/qa-automation.html">
+<meta property="og:title" content="QA Test Runner — Brian Lua">
+<meta property="og:description" content="A Playwright test runner for 25 storefronts, with release sign-off reports and staging vs live comparison.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* Site palette (same tokens as the other pages) */
+  :root {
+    --bg: #f6f4f0;
+    --surface: #ece8e1;
+    --ink: #151413;
+    --text: #2e2b28;
+    --text-2: #5c5751;
+    --line: rgba(21, 20, 19, 0.12);
+    --accent: #7d5f26;
+    --gold: #b08d55; /* decorative only (rules, bullets): too light for text */
+    --on-ink: #f6f4f0;
+    --on-ink-2: #b4ada4;
+    --accent-on-ink: #c8a96e;
+    --btn-line: rgba(21, 20, 19, 0.28);
+    --media-bg: #dcd7cf;
+    --ok: #3f7a4a;
+    --bad: #a23b2c;
+    --skip: #8a7f70;
+    --header-bg: rgba(246, 244, 240, 0.86);
+    --band: #e5dfd5;
+    --band-edge: transparent;
+    --on-band: #151413;
+    --on-band-2: #5c5751;
+    --accent-on-band: #6f5421;
+    --app-bg: #fbfaf7;
+    --app-panel: #f3f0ea;
+    --app-line: rgba(21, 20, 19, 0.1);
+    --app-dot: rgba(21, 20, 19, 0.14);
+    --app-text: #2e2b28;
+    --app-text-2: #6b655e;
+    --app-ok: #3f7a4a;
+    --app-bad: #a23b2c;
+    --app-skip: #7a7065;
+    --app-accent: #7d5f26;
+    --paper: #fbfaf7;
+    color-scheme: light;
+
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --mono: 'DM Mono', ui-monospace, Consolas, monospace;
+    --pad: clamp(16px, 5vw, 72px);
+    --max: 1280px;
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #161412;
+    --surface: #211e1b;
+    --ink: #f3efe8;
+    --text: #dcd6cd;
+    --text-2: #a8a095;
+    --line: rgba(243, 239, 232, 0.14);
+    --accent: #c8a96e;
+    --gold: #c8a96e;
+    --on-ink: #161412;
+    --on-ink-2: #5c5751;
+    --accent-on-ink: #7d5f26;
+    --btn-line: rgba(243, 239, 232, 0.3);
+    --media-bg: #2a2622;
+    --ok: #6fb07d;
+    --bad: #e07a68;
+    --skip: #a69c8e;
+    --header-bg: rgba(22, 20, 18, 0.86);
+    --band: #0c0b0a;
+    --band-edge: rgba(243, 239, 232, 0.09);
+    --on-band: #f3efe8;
+    --on-band-2: #a8a095;
+    --accent-on-band: #c8a96e;
+    --app-bg: #0f0e0d;
+    --app-panel: #1a1816;
+    --app-line: rgba(243, 239, 232, 0.12);
+    --app-dot: rgba(243, 239, 232, 0.16);
+    --app-text: #e8e2d8;
+    --app-text-2: #9d958a;
+    --app-ok: #79b886;
+    --app-bad: #e07a68;
+    --app-skip: #a69c8e;
+    --app-accent: #c8a96e;
+    --paper: #1c1a18;
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg: #161412;
+      --surface: #211e1b;
+      --ink: #f3efe8;
+      --text: #dcd6cd;
+      --text-2: #a8a095;
+      --line: rgba(243, 239, 232, 0.14);
+      --accent: #c8a96e;
+      --gold: #c8a96e;
+      --on-ink: #161412;
+      --on-ink-2: #5c5751;
+      --accent-on-ink: #7d5f26;
+      --btn-line: rgba(243, 239, 232, 0.3);
+      --media-bg: #2a2622;
+      --ok: #6fb07d;
+      --bad: #e07a68;
+      --skip: #a69c8e;
+      --header-bg: rgba(22, 20, 18, 0.86);
+      --band: #0c0b0a;
+      --band-edge: rgba(243, 239, 232, 0.09);
+      --on-band: #f3efe8;
+      --on-band-2: #a8a095;
+      --accent-on-band: #c8a96e;
+      --app-bg: #0f0e0d;
+      --app-panel: #1a1816;
+      --app-line: rgba(243, 239, 232, 0.12);
+      --app-dot: rgba(243, 239, 232, 0.16);
+      --app-text: #e8e2d8;
+      --app-text-2: #9d958a;
+      --app-ok: #79b886;
+      --app-bad: #e07a68;
+      --app-skip: #a69c8e;
+      --app-accent: #c8a96e;
+      --paper: #1c1a18;
+      color-scheme: dark;
+    }
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  a { color: inherit; }
+  button { font: inherit; color: inherit; }
+
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad); }
+
+  .label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .h2 {
+    margin-top: 14px;
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .lede { margin-top: 18px; max-width: 58ch; font-size: 17px; color: var(--text); }
+  .note { font-size: 13px; color: var(--text-2); }
+
+  .link {
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    transition: color 0.2s ease;
+  }
+
+  .link:hover { color: var(--ink); }
+
+  section { padding: clamp(72px, 9vw, 120px) 0; }
+  section[id] { scroll-margin-top: 32px; }
+
+  /* ── Header */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--header-bg);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+  }
+
+  .site-header.scrolled { border-bottom-color: var(--line); }
+
+  .site-header .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 68px;
+  }
+
+  .wordmark { font-family: var(--serif); font-size: 24px; color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .header-right { display: flex; align-items: center; gap: 32px; }
+  .nav { display: flex; align-items: center; gap: 28px; }
+  .nav a { font-size: 15px; color: var(--text-2); text-decoration: none; transition: color 0.2s ease; }
+  .nav a:hover, .nav a[aria-current="page"] { color: var(--ink); }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .theme-toggle:hover { color: var(--ink); border-color: var(--text-2); }
+  .theme-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .theme-toggle .icon-sun, :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+
+  /* ── Intro */
+  .intro { padding-top: clamp(48px, 7vw, 96px); padding-bottom: clamp(48px, 6vw, 72px); }
+
+  .crumb { font-size: 14px; color: var(--text-2); }
+  .crumb a { text-decoration: none; }
+  .crumb a:hover { color: var(--ink); }
+
+  .intro h1 {
+    margin-top: 28px;
+    max-width: 14ch;
+    font-family: var(--serif);
+    font-size: clamp(3rem, 7.4vw, 6.8rem);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    animation: rise 0.8s ease both;
+  }
+
+  .intro h1 em { font-style: italic; color: var(--accent); }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(40px, 6vw, 96px);
+    margin-top: clamp(32px, 4vw, 48px);
+    align-items: start;
+    animation: rise 0.8s ease 0.08s both;
+  }
+
+  .intro-grid p + p { margin-top: 16px; }
+  .intro-copy { font-size: 18px; line-height: 1.6; }
+
+  .facts { border-top: 2px solid var(--ink); }
+
+  .facts div {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .facts dt { font-size: 14px; color: var(--text-2); }
+  .facts dd { font-size: 15px; color: var(--text); }
+
+  /* ── Numbers band */
+  .numbers { background: var(--band); color: var(--on-band); padding: clamp(48px, 6vw, 80px) 0; border-block: 1px solid var(--band-edge); }
+  .numbers .wrap { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px; }
+
+  .stat strong {
+    display: block;
+    font-family: var(--serif);
+    font-size: clamp(2.8rem, 4.6vw, 4.2rem);
+    font-weight: 400;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat span { display: block; margin-top: 12px; font-size: 14px; line-height: 1.55; color: var(--on-band-2); max-width: 26ch; }
+  .stat:first-child strong { color: var(--accent-on-band); }
+
+  /* ── Shared runner mock-up chrome */
+  .app {
+    background: var(--app-bg);
+    color: var(--app-text);
+    border: 1px solid var(--app-line);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -30px rgba(21, 20, 19, 0.35);
+    font-size: 13px;
+  }
+
+  .app-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--app-line);
+    color: var(--app-text-2);
+  }
+
+  .app-dots { display: flex; gap: 6px; }
+  .app-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--app-dot); }
+  .app-title { font-weight: 500; color: var(--app-text); }
+  .app-tabs { display: flex; gap: 4px; margin-left: auto; }
+  .app-tabs span { padding: 3px 10px; border-radius: 99px; }
+  .app-tabs span.on { background: rgba(200, 169, 110, 0.18); color: var(--app-accent); }
+
+  /* ── Replay */
+  .replay-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    background: var(--ink);
+    color: var(--on-ink);
+    border: 1px solid var(--ink);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .btn:hover { background: var(--accent); border-color: var(--accent); }
+  .btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+  .replay { margin-top: 40px; }
+
+  .run-body {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    min-height: 420px;
+  }
+
+  .run-side { padding: 20px; border-right: 1px solid var(--app-line); }
+  .run-main { display: flex; flex-direction: column; min-width: 0; }
+
+  .side-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--app-text-2); }
+  .side-label + * { margin-top: 10px; }
+  .side-block + .side-block { margin-top: 22px; }
+
+  .suite {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 12px;
+    border: 1px solid var(--app-line);
+    border-radius: 6px;
+  }
+
+  .suite b { font-weight: 500; color: var(--app-accent); }
+
+  .test-list { list-style: none; display: grid; gap: 6px; }
+  .test-list li { display: flex; align-items: center; gap: 10px; }
+
+  .tick {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--app-accent);
+    position: relative;
+  }
+
+  .tick::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--app-bg);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .markets { display: grid; gap: 10px; }
+  .region { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; align-items: start; }
+  .region small { font-size: 12px; color: var(--app-text-2); padding-top: 3px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .chip {
+    padding: 2px 8px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    border: 1px solid var(--app-line);
+    border-radius: 4px;
+    color: var(--app-text-2);
+  }
+
+  .chip.sel { border-color: rgba(200, 169, 110, 0.6); color: var(--app-accent); }
+
+  .progress { padding: 18px 20px 16px; border-bottom: 1px solid var(--app-line); }
+
+  .progress-top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 16px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress-top b { font-weight: 500; }
+  .counts { display: flex; gap: 14px; }
+  .c-ok { color: var(--app-ok); }
+  .c-bad { color: var(--app-bad); }
+  .c-skip { color: var(--app-skip); }
+
+  .bar { height: 4px; margin-top: 12px; background: var(--app-line); border-radius: 2px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--app-accent); transition: width 0.25s linear; }
+
+  .busy { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; min-height: 24px; }
+
+  .busy span {
+    padding: 2px 9px;
+    font-size: 12px;
+    border-radius: 99px;
+    background: rgba(200, 169, 110, 0.14);
+    color: var(--app-accent);
+    white-space: nowrap;
+  }
+
+  .busy span::before { content: '\25CF\00a0'; font-size: 9px; vertical-align: 1px; animation: blink 1s ease infinite; }
+
+  .log {
+    flex: 1;
+    list-style: none;
+    padding: 14px 20px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    max-height: 300px;
+  }
+
+  .log li { display: flex; gap: 10px; white-space: nowrap; animation: logIn 0.25s ease both; }
+  .log li span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; }
+  .log li .t { margin-left: auto; padding-left: 12px; color: var(--app-text-2); }
+  .log li.why { color: var(--app-text-2); padding-left: 22px; }
+  .log .idle { color: var(--app-text-2); }
+
+  .replay-note { margin-top: 14px; }
+
+  /* ── Journey */
+  .journey-head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(32px, 6vw, 96px); align-items: end; }
+
+  .switch {
+    display: inline-flex;
+    padding: 4px;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    justify-self: end;
+  }
+
+  .switch button {
+    padding: 8px 18px;
+    font-size: 14px;
+    background: none;
+    border: 0;
+    border-radius: 99px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .switch button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
+
+  .phases {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) minmax(0, 3fr);
+    gap: 24px;
+    margin-top: 48px;
+  }
+
+  .phase { border-top: 2px solid var(--ink); padding-top: 18px; }
+  .phase h3 { font-family: var(--serif); font-size: 1.7rem; font-weight: 400; line-height: 1.1; color: var(--ink); }
+  .phase h3 small { display: block; margin-top: 6px; font-family: var(--sans); font-size: 13px; color: var(--text-2); }
+
+  .steps { list-style: none; margin-top: 18px; display: grid; gap: 2px; }
+
+  .steps li {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 14.5px;
+    line-height: 1.45;
+    border-bottom: 1px solid var(--line);
+    transition: color 0.3s ease;
+  }
+
+  .steps li span { font-family: var(--mono); font-size: 12px; color: var(--text-2); padding-top: 2px; }
+  .steps li.lit { color: var(--accent); }
+  .steps li.lit span { color: var(--accent); }
+
+  .journey-foot { margin-top: 28px; max-width: 70ch; }
+
+  /* ── Outputs */
+  .outputs { background: var(--surface); }
+
+  .out {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: center;
+    margin-top: clamp(48px, 6vw, 80px);
+  }
+
+  .out:nth-of-type(even) .out-copy { order: 2; }
+
+  .out-copy h3 { font-family: var(--serif); font-size: clamp(1.9rem, 2.8vw, 2.5rem); font-weight: 400; line-height: 1.1; color: var(--ink); }
+  .out-copy p { margin-top: 14px; color: var(--text); }
+  .out-copy ul { list-style: none; margin-top: 16px; display: grid; gap: 8px; }
+
+  .out-copy li { position: relative; padding-left: 20px; font-size: 15px; color: var(--text-2); }
+  .out-copy li::before { content: ''; position: absolute; left: 0; top: 11px; width: 8px; height: 2px; background: var(--gold); }
+
+  .doc {
+    background: var(--paper);
+    color: var(--text);
+    border: 1px solid var(--line);
+    box-shadow: 0 30px 60px -34px rgba(21, 20, 19, 0.45);
+    padding: clamp(18px, 2.4vw, 28px);
+    font-size: 13px;
+    overflow-x: auto;
+  }
+
+  .doc-title { font-family: var(--serif); font-size: 22px; color: var(--ink); }
+  .doc-sub { margin-top: 2px; font-size: 12px; color: var(--text-2); }
+
+  .doc-totals { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 14px 0 16px; font-size: 13px; }
+  .doc-totals .ok { color: var(--ok); }
+  .doc-totals .bad { color: var(--bad); }
+  .doc-totals .skip { color: var(--skip); }
+
+  .doc table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .doc th, .doc td { padding: 7px 8px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .doc th { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2); }
+  .doc td.c, .doc th.c { text-align: center; }
+  .doc .y { color: var(--ok); }
+  .doc .n { color: var(--bad); font-weight: 500; }
+  .doc .s { color: var(--skip); }
+  .doc .diff td { background: rgba(176, 141, 85, 0.12); }
+
+  .doc-fail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 92px;
+    gap: 14px;
+    margin-top: 16px;
+    padding: 12px;
+    border: 1px solid rgba(162, 59, 44, 0.25);
+    background: rgba(162, 59, 44, 0.04);
+  }
+
+  .doc-fail b { font-weight: 500; color: var(--ink); }
+  .doc-fail p { margin-top: 4px; color: var(--text-2); font-size: 12.5px; }
+  .doc-fail em { font-style: normal; display: inline-block; margin-top: 6px; padding: 1px 8px; border-radius: 99px; font-size: 11.5px; background: rgba(176, 141, 85, 0.18); color: var(--accent); }
+
+  .shot {
+    aspect-ratio: 3 / 4;
+    background:
+      linear-gradient(var(--media-bg) 0 14%, transparent 14%),
+      linear-gradient(90deg, transparent 12%, var(--media-bg) 12% 88%, transparent 88%) 0 30% / 100% 10% no-repeat,
+      linear-gradient(90deg, transparent 12%, var(--surface) 12% 70%, transparent 70%) 0 48% / 100% 6% no-repeat,
+      linear-gradient(90deg, transparent 12%, var(--bad) 12% 54%, transparent 54%) 0 64% / 100% 4% no-repeat,
+      var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  .doc-sign { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 18px; font-size: 12px; color: var(--text-2); }
+  .doc-sign span { display: block; border-bottom: 1px solid var(--line); height: 26px; }
+
+  /* ── Engineering notes */
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px 32px;
+    margin-top: 48px;
+  }
+
+  .notes-grid div { border-top: 2px solid var(--ink); padding-top: 18px; }
+  .notes-grid h3 { font-size: 17px; font-weight: 500; color: var(--ink); }
+  .notes-grid p { margin-top: 8px; font-size: 15px; color: var(--text-2); }
+
+  /* ── Evolution */
+  .evolution { background: var(--band); color: var(--on-band); border-block: 1px solid var(--band-edge); }
+  .evolution .label { color: var(--accent-on-band); }
+  .evolution .h2 { color: var(--on-band); }
+  .evolution .lede { color: var(--on-band-2); }
+
+  .versions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 32px;
+    align-items: stretch;
+    margin-top: 48px;
+  }
+
+  .version { border-top: 1px solid var(--btn-line); padding-top: 18px; }
+  .version small { font-size: 13px; color: var(--accent-on-band); }
+  .version h3 { margin-top: 6px; font-family: var(--serif); font-size: 2rem; font-weight: 400; line-height: 1.1; }
+  .version ul { list-style: none; margin-top: 14px; display: grid; gap: 8px; }
+  .version li { font-size: 15px; color: var(--on-band-2); padding-left: 20px; position: relative; }
+  .version li::before { content: ''; position: absolute; left: 0; top: 11px; width: 8px; height: 2px; background: var(--accent-on-band); }
+  .arrow { align-self: center; font-family: var(--serif); font-size: 3rem; color: var(--accent-on-band); }
+
+  /* ── Closing */
+  .closing .wrap { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(40px, 6vw, 96px); align-items: end; }
+
+  .next { list-style: none; }
+
+  .next a {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    line-height: 1.2;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s ease, padding 0.25s ease;
+  }
+
+  .next li:first-child a { border-top: 2px solid var(--ink); }
+  .next a span { font-family: var(--sans); font-size: 18px; color: var(--text-2); }
+  .next a:hover { color: var(--accent); padding-left: 6px; }
+
+  .site-footer { border-top: 1px solid var(--line); color: var(--text-2); font-size: 14px; }
+  .site-footer .wrap { display: flex; justify-content: space-between; gap: 16px; padding-top: 24px; padding-bottom: 24px; }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes logIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @keyframes blink { 50% { opacity: 0.25; } }
+  @keyframes pgFadeIn { from { opacity: 0; } to { opacity: 1; } }
+  body { animation: pgFadeIn 0.25s ease both; }
+
+  @media (max-width: 960px) {
+    .intro-grid, .journey-head, .closing .wrap { grid-template-columns: 1fr; }
+    .numbers .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 24px; }
+    .run-body { grid-template-columns: 1fr; }
+    .run-side { border-right: 0; border-bottom: 1px solid var(--app-line); }
+    .phases { grid-template-columns: 1fr; gap: 40px; }
+    .switch { justify-self: start; }
+    .out { grid-template-columns: 1fr; }
+    .out:nth-of-type(even) .out-copy { order: 0; }
+    .notes-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .versions { grid-template-columns: 1fr; gap: 24px; }
+    .arrow { transform: rotate(90deg); justify-self: start; line-height: 1; }
+  }
+
+  @media (max-width: 700px) {
+    .site-header .wrap { height: auto; flex-wrap: wrap; row-gap: 4px; padding-top: 14px; padding-bottom: 10px; }
+    .header-right { display: contents; }
+    .theme-toggle { order: 2; }
+    .nav { order: 3; width: 100%; gap: 22px; }
+    .nav a { font-size: 14px; }
+    .notes-grid { grid-template-columns: 1fr; }
+    .region { grid-template-columns: 1fr; gap: 4px; }
+    .app-tabs { display: none; }
+    .log { font-size: 11.5px; padding: 12px 14px; }
+    .doc th, .doc td { padding: 7px 5px; white-space: normal; }
+    .site-footer .wrap { flex-direction: column; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap">
+    <a href="index.html" class="wordmark">Brian Lua</a>
+    <div class="header-right">
+      <nav class="nav" aria-label="Main">
+        <a href="about.html">About</a>
+        <a href="myportfolio/">Work</a>
+        <a href="qa-automation.html" aria-current="page">QA Runner</a>
+        <a href="index.html#playground">Playground</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme">
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="intro" aria-labelledby="title">
+    <div class="wrap">
+      <p class="crumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Personal project</p>
+      <h1 id="title">A test runner for <em>25</em> storefronts</h1>
+
+      <div class="intro-grid">
+        <div class="intro-copy">
+          <p>Before every release, someone had to click through sign-in, the bag, checkout, payments and the account pages on each storefront, market by market, and write down what they saw.</p>
+          <p>So, as a personal project, I built a test runner that does that walk instead. It opens a browser per market, follows the shopper's path step by step, screenshots every step, and turns the run into a sign-off report.</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Project</dt><dd>Personal project, not a company product</dd></div>
+          <div><dt>Role</dt><dd>Sole developer, from idea to daily use</dd></div>
+          <div><dt>Since</dt><dd>November 2025, still in active development</dd></div>
+          <div><dt>Built with</dt><dd>Python, Playwright, pytest, NiceGUI</dd></div>
+          <div><dt>Used for</dt><dd>Release UAT, regression checks and campaign content checks</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <div class="numbers" aria-label="At a glance">
+    <div class="wrap">
+      <p class="stat"><strong data-count="38">38</strong><span>automated tests in six groups, from login to payment hand-off</span></p>
+      <p class="stat"><strong data-count="25">25</strong><span>storefront markets across six regions</span></p>
+      <p class="stat"><strong data-count="51">51</strong><span>shopper journey steps, on desktop and at phone size</span></p>
+      <p class="stat"><strong data-count="124">124</strong><span>commits since the first version</span></p>
+    </div>
+  </div>
+
+  <section class="replay-section" id="replay" aria-labelledby="replay-title">
+    <div class="wrap">
+      <div class="replay-head">
+        <div>
+          <p class="label">Watch a run</p>
+          <h2 class="h2" id="replay-title">Pick tests, pick markets, press run</h2>
+          <p class="lede">The runner works in the browser. You tick the tests and markets, and it streams the run live: how far it's got, what passed or failed, and which browsers are busy.</p>
+        </div>
+        <button class="btn" id="replayBtn" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2l11 6-11 6z"/></svg><span>Play the run</span></button>
+      </div>
+
+      <div class="replay">
+        <div class="app" role="img" aria-label="A recreation of the runner's Tests page: 7 tests selected across 6 markets, with a progress bar, pass and fail counts and a live log.">
+          <div class="app-bar">
+            <span class="app-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="app-title">QA Runner</span>
+            <span class="app-tabs"><span class="on">Tests</span><span>Results</span><span>Settings</span></span>
+          </div>
+          <div class="run-body">
+            <div class="run-side">
+              <div class="side-block">
+                <p class="side-label">Suite</p>
+                <span class="suite">Quick Check <b>7 tests</b></span>
+              </div>
+              <div class="side-block">
+                <p class="side-label">Tests</p>
+                <ul class="test-list" id="testList"></ul>
+              </div>
+              <div class="side-block">
+                <p class="side-label">Markets</p>
+                <div class="markets" id="markets"></div>
+              </div>
+            </div>
+            <div class="run-main">
+              <div class="progress">
+                <div class="progress-top">
+                  <span><b id="pDone">0 of 42 done</b> · <span id="pPct">0%</span></span>
+                  <span class="counts"><span class="c-ok">&#10003; <span id="cOk">0</span></span><span class="c-bad">&#10007; <span id="cBad">0</span></span><span class="c-skip">&ndash; <span id="cSkip">0</span></span></span>
+                  <span id="pTime">0 min 00 s</span>
+                </div>
+                <div class="bar"><i id="pBar"></i></div>
+                <div class="busy" id="busy"></div>
+              </div>
+              <ul class="log" id="log" aria-live="off"><li class="idle">Ready. 7 tests &times; 6 markets, 3 browsers in parallel.</li></ul>
+            </div>
+          </div>
+        </div>
+        <p class="note replay-note">A replay with sample data and sped-up time. The real runner needs staging access and test accounts, so it isn't public.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="journey" id="journey" aria-labelledby="journey-title">
+    <div class="wrap">
+      <div class="journey-head">
+        <div>
+          <p class="label">The UAT journey</p>
+          <h2 class="h2" id="journey-title">One shopper, start to finish</h2>
+          <p class="lede">For release testing, one browser per market walks the whole path in order, so the bag and the sign-in carry over just as they do for a real customer. A failed step is recorded with its screenshot and the journey carries on.</p>
+        </div>
+        <div class="switch" role="group" aria-label="Journey layout">
+          <button type="button" aria-pressed="true" data-journey="desktop">Desktop · 33 steps</button>
+          <button type="button" aria-pressed="false" data-journey="phone">Phone · 18 steps</button>
+        </div>
+      </div>
+
+      <div class="phases" id="phases"></div>
+      <p class="note journey-foot" id="journeyNote"></p>
+    </div>
+  </section>
+
+  <section class="outputs" aria-labelledby="outputs-title">
+    <div class="wrap">
+      <p class="label">What a run leaves behind</p>
+      <h2 class="h2" id="outputs-title">Evidence people can sign off on</h2>
+
+      <div class="out">
+        <div class="out-copy">
+          <h3>The UAT report</h3>
+          <p>One page, made from any saved run, that prints to PDF for sign-off.</p>
+          <ul>
+            <li>Every test against every market: passed, failed or skipped, with why</li>
+            <li>Failures grouped by problem, so one site issue across five markets reads as one row</li>
+            <li>Flags a failure that also failed in earlier runs as likely a known issue</li>
+            <li>Manual checks for what automation can't see, and Tested by / Approved by lines</li>
+          </ul>
+        </div>
+        <div class="doc" role="img" aria-label="A recreation of the UAT report with sample results: a grid of steps against five markets, and one failure with its screenshot.">
+          <p class="doc-title">Release 2026-11 UAT</p>
+          <p class="doc-sub">Staging · 5 markets · sample data</p>
+          <p class="doc-totals"><span class="ok">&#10003; 27 passed</span><span class="bad">&#10007; 2 failed</span><span class="skip">&ndash; 1 skipped</span></p>
+          <table>
+            <thead><tr><th>Step</th><th class="c">SG</th><th class="c">MY</th><th class="c">HK</th><th class="c">AU</th><th class="c">GB</th></tr></thead>
+            <tbody>
+              <tr><td>Homepage</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td></tr>
+              <tr><td>Bag totals</td><td class="c n">&#10007;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c n">&#10007;</td><td class="c y">&#10003;</td></tr>
+              <tr><td>Delivery options</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td></tr>
+              <tr><td>Promo code</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c s">&ndash;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td></tr>
+              <tr><td>Member checkout</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td></tr>
+              <tr><td>Cancel the order</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td></tr>
+            </tbody>
+          </table>
+          <div class="doc-fail">
+            <div>
+              <b>Bag totals · SG, AU</b>
+              <p><strong>Expected:</strong> the total updates when the quantity changes.<br><strong>Got:</strong> the total stayed at one item's price.</p>
+              <em>Also failed in 2 earlier runs: likely a known issue</em>
+            </div>
+            <div class="shot" aria-hidden="true"></div>
+          </div>
+          <div class="doc-sign"><p>Tested by<span></span></p><p>Approved by<span></span></p></div>
+        </div>
+      </div>
+
+      <div class="out">
+        <div class="out-copy">
+          <h3>Staging vs Live</h3>
+          <p>Run the same tests on both sites, press Compare, and get one report of what differs, saved as a PDF with every screenshot inside.</p>
+          <ul>
+            <li>Steps that differ between the two sites come first</li>
+            <li>Steps failing on both usually point to the site's code, not its setup</li>
+            <li>On Live the journey runs only read-only steps: no orders, sign-ins or forms</li>
+          </ul>
+        </div>
+        <div class="doc" role="img" aria-label="A recreation of the staging versus live comparison with sample results.">
+          <p class="doc-title">Staging vs Live</p>
+          <p class="doc-sub">SG · sample data</p>
+          <table style="margin-top: 16px;">
+            <thead><tr><th>Step</th><th class="c">Staging</th><th class="c">Live</th></tr></thead>
+            <tbody>
+              <tr><td>Homepage</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td></tr>
+              <tr><td>Menu and search</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td></tr>
+              <tr class="diff"><td>Promo code</td><td class="c n">&#10007; refused</td><td class="c y">&#10003;</td></tr>
+              <tr><td>Delivery options</td><td class="c y">&#10003;</td><td class="c y">&#10003;</td></tr>
+              <tr class="diff"><td>Payment methods offered</td><td class="c y">&#10003; 5</td><td class="c n">&#10007; 4</td></tr>
+              <tr><td>Member checkout</td><td class="c y">&#10003;</td><td class="c s">not on Live</td></tr>
+              <tr><td>Cancel the order</td><td class="c y">&#10003;</td><td class="c s">not on Live</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="notes" aria-labelledby="notes-title">
+    <div class="wrap">
+      <p class="label">Under the hood</p>
+      <h2 class="h2" id="notes-title">Built to keep going</h2>
+      <p class="lede">Staging sites are slow and flaky, so most of the work went into making a run finish and say clearly what happened.</p>
+
+      <div class="notes-grid">
+        <div><h3>Recovers from a stuck page</h3><p>When a page stops responding, the journey closes that tab and carries on in a fresh one, still signed in with the same bag, so one hang doesn't fail every step after it.</p></div>
+        <div><h3>Runs in parallel</h3><p>Each test gets its own browser. With separate test accounts, the desktop and phone journeys run side by side, so a UAT run takes about as long as one journey.</p></div>
+        <div><h3>Says what it expected</h3><p>Every step records what it should see and what it got, with a screenshot. A timeout says how long it waited and for what.</p></div>
+        <div><h3>Explains slow runs</h3><p>A wait log per journey shows how long each step took and where the time went: page loads, waiting for elements, clicks.</p></div>
+        <div><h3>Configured, not coded</h3><p>Markets, products, promo codes, campaign content and payment methods live in settings, edited in the UI, so a new campaign needs no code change.</p></div>
+        <div><h3>Explains itself</h3><p>Each test has an info card: what it checks, what it does to the site, the settings it uses, when it fails, and its last result.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="evolution" aria-labelledby="evolution-title">
+    <div class="wrap">
+      <p class="label">How it grew</p>
+      <h2 class="h2" id="evolution-title">From a desktop window to a browser app</h2>
+      <p class="lede">The first version answered "does checkout still work?". As more of the team leaned on it, it needed history, reports and a way to set it up without editing files.</p>
+
+      <div class="versions">
+        <div class="version">
+          <small>Version 1</small>
+          <h3>Tkinter window</h3>
+          <ul>
+            <li>Checkout, assets, content and navigation checks</li>
+            <li>Market presets and retry logic</li>
+            <li>Text summaries per run</li>
+          </ul>
+        </div>
+        <span class="arrow" aria-hidden="true">&rarr;</span>
+        <div class="version">
+          <small>Version 2, now</small>
+          <h3>Browser app (NiceGUI)</h3>
+          <ul>
+            <li>Tests, Results and Settings pages with live progress and a run queue</li>
+            <li>UAT journeys on desktop and phone, with a sign-off report</li>
+            <li>Staging vs Live comparison and saved test suites</li>
+            <li>Run history with screenshots, search and safe delete</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing" aria-labelledby="closing-title">
+    <div class="wrap">
+      <div>
+        <p class="label" id="closing-title">Want to see the real thing?</p>
+        <h2 class="h2">I'm happy to demo it</h2>
+        <p class="lede">The runner needs staging access and test accounts, so this page uses sample data. I can walk through a live run in an interview.</p>
+        <p style="margin-top: 24px;"><a class="link" href="mailto:luatan68@hotmail.com">luatan68@hotmail.com</a></p>
+      </div>
+      <ul class="next">
+        <li><a href="myportfolio/">Editorial work <span>&rarr;</span></a></li>
+        <li><a href="about.html">About me <span>&rarr;</span></a></li>
+        <li><a href="index.html">Home <span>&rarr;</span></a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>&copy; 2026 Brian Lua</span>
+    <span>Built by hand in HTML, CSS and JavaScript</span>
+  </div>
+</footer>
+
+<script>
+  var reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Fade-out page transition for internal links
+  var fadeOut = null;
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var link = e.target.closest('a');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank' || link.hasAttribute('download')) return;
+    e.preventDefault();
+    fadeOut = document.body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease', fill: 'forwards' });
+    setTimeout(function () { window.location.href = href; }, 200);
+  });
+  window.addEventListener('pageshow', function (e) { if (e.persisted && fadeOut) { fadeOut.cancel(); fadeOut = null; } });
+
+  var header = document.getElementById('siteHeader');
+  function onScroll() { header.classList.toggle('scrolled', window.scrollY > 8); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Numbers count up once
+  (function () {
+    var nums = document.querySelectorAll('[data-count]');
+    if (reduceMotion || !('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        io.unobserve(en.target);
+        var el = en.target, end = +el.dataset.count, start = null;
+        (function step(t) {
+          if (start === null) start = t;
+          var p = Math.min((t - start) / 1400, 1);
+          el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) requestAnimationFrame(step);
+        })(performance.now());
+      });
+    }, { threshold: 0.6 });
+    nums.forEach(function (n) { io.observe(n); });
+  })();
+
+  // ── Run replay (sample data)
+  (function () {
+    var TESTS = ['URL Check', 'Login', 'Navigation Pass', 'Cart Totals Pass', 'Delivery Methods Pass', 'Payment Methods Check', 'Promo Code'];
+    var REGIONS = [
+      ['East Asia', ['HK', 'HK-EN', 'MO', 'KR', 'TW', 'TW-EN']],
+      ['Southeast Asia', ['SG', 'MY', 'PH', 'TH', 'BN']],
+      ['Oceania', ['AU', 'NZ']],
+      ['Europe', ['GB', 'EU', 'CH', 'AT']],
+      ['Middle East', ['AE', 'KW', 'QA', 'OM']],
+      ['Americas', ['US', 'CA']]
+    ];
+    var PICKED = ['SG', 'MY', 'HK', 'TW', 'AU', 'GB'];
+    // Seconds each test usually takes (sample), and the few results that aren't passes
+    var BASE = [9, 22, 41, 37, 48, 44, 33];
+    var OUTCOME = {
+      'Promo Code|TW': ['bad', 'Promo Code "WELCOME10" is not valid'],
+      'Cart Totals Pass|AU': ['bad', 'Total stayed at one item after quantity 2'],
+      'Payment Methods Check|GB': ['skip', 'All products out of stock in this market']
+    };
+
+    var list = document.getElementById('testList');
+    TESTS.forEach(function (t) { list.insertAdjacentHTML('beforeend', '<li><span class="tick"></span>' + t + '</li>'); });
+
+    var mk = document.getElementById('markets');
+    REGIONS.forEach(function (r) {
+      var chips = r[1].map(function (m) { return '<span class="chip' + (PICKED.indexOf(m) > -1 ? ' sel' : '') + '">' + m + '</span>'; }).join('');
+      mk.insertAdjacentHTML('beforeend', '<div class="region"><small>' + r[0] + '</small><div class="chips">' + chips + '</div></div>');
+    });
+
+    // Jobs run test by test, every market, three browsers at a time
+    var jobs = [];
+    TESTS.forEach(function (t, ti) {
+      PICKED.forEach(function (m, mi) {
+        var dur = BASE[ti] + ((ti * 7 + mi * 11) % 13);
+        jobs.push({ test: t, market: m, dur: dur, out: OUTCOME[t + '|' + m] || ['ok'] });
+      });
+    });
+
+    var el = {
+      done: document.getElementById('pDone'), pct: document.getElementById('pPct'), time: document.getElementById('pTime'),
+      bar: document.getElementById('pBar'), busy: document.getElementById('busy'), log: document.getElementById('log'),
+      ok: document.getElementById('cOk'), bad: document.getElementById('cBad'), skip: document.getElementById('cSkip'),
+      btn: document.getElementById('replayBtn')
+    };
+    var WORKERS = 3, SPEED = 50, timer = null; // SPEED: simulated seconds per real second
+
+    function fmt(s) { s = Math.round(s); return Math.floor(s / 60) + ' min ' + String(s % 60).padStart(2, '0') + ' s'; }
+
+    function logLine(j) {
+      var mark = j.out[0] === 'ok' ? '<span class="c-ok">&#10003;</span>' : j.out[0] === 'bad' ? '<span class="c-bad">&#10007;</span>' : '<span class="c-skip">&ndash;</span>';
+      var html = '<li>' + mark + '<span>' + j.test + ' · ' + j.market + '</span><span class="t">took ' + j.dur + ' s</span></li>';
+      if (j.out[1]) html += '<li class="why">' + j.out[1] + '</li>';
+      el.log.insertAdjacentHTML('beforeend', html);
+      while (el.log.children.length > 14) el.log.removeChild(el.log.firstChild);
+    }
+
+    function render(state) {
+      var n = state.finished, total = jobs.length, p = Math.round(n / total * 100);
+      el.done.textContent = n + ' of ' + total + ' done';
+      el.pct.textContent = p + '%';
+      el.bar.style.width = p + '%';
+      el.time.textContent = fmt(state.t);
+      el.ok.textContent = state.counts.ok;
+      el.bad.textContent = state.counts.bad;
+      el.skip.textContent = state.counts.skip;
+      el.busy.innerHTML = state.running.map(function (j) { return '<span>' + j.test + ' · ' + j.market + '</span>'; }).join('');
+    }
+
+    function fresh() { return { t: 0, next: 0, finished: 0, running: [], counts: { ok: 0, bad: 0, skip: 0 } }; }
+
+    // Advances the simulated clock by dt seconds
+    function advance(state, dt) {
+      state.t += dt;
+      while (state.running.length < WORKERS && state.next < jobs.length) {
+        var j = jobs[state.next++];
+        j.end = state.t + j.dur;
+        state.running.push(j);
+      }
+      state.running = state.running.filter(function (j) {
+        if (j.end > state.t) return true;
+        state.finished++;
+        state.counts[j.out[0]]++;
+        logLine(j);
+        return false;
+      });
+      while (state.running.length < WORKERS && state.next < jobs.length) {
+        var k = jobs[state.next++];
+        k.end = state.t + k.dur;
+        state.running.push(k);
+      }
+    }
+
+    function finish(state) {
+      el.log.insertAdjacentHTML('beforeend', '<li class="idle">Run finished: ' + state.counts.ok + ' passed, ' + state.counts.bad + ' failed, ' + state.counts.skip + ' skipped. Saved to Results.</li>');
+      el.btn.querySelector('span').textContent = 'Play again';
+      el.btn.disabled = false;
+    }
+
+    function play() {
+      clearInterval(timer);
+      el.log.innerHTML = '';
+      var state = fresh();
+      if (reduceMotion) {
+        while (state.finished < jobs.length) advance(state, 1);
+        render(state);
+        finish(state);
+        return;
+      }
+      el.btn.querySelector('span').textContent = 'Running…';
+      el.btn.disabled = true;
+      timer = setInterval(function () {
+        advance(state, SPEED * 0.1);
+        render(state);
+        if (state.finished >= jobs.length) { clearInterval(timer); finish(state); }
+      }, 100);
+    }
+
+    el.btn.addEventListener('click', play);
+
+    // Starts on its own the first time the runner scrolls into view
+    if ('IntersectionObserver' in window && !reduceMotion) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) { io.disconnect(); play(); }
+      }, { threshold: 0.45 });
+      io.observe(document.querySelector('.replay .app'));
+    }
+  })();
+
+  // ── Journey steps (from the runner's step list)
+  (function () {
+    var J = {
+      desktop: {
+        phases: [
+          ['Signed out', 'Browsing, bag, forms and guest checkout', ['Homepage', 'Customer photos (UGC)', 'Recommender', 'Menu and search', 'Listing and product page', 'Listing filter', 'Notify me when back in stock', 'Bag: add, quantity, remove', 'Bag totals', 'Sign-in and registration form errors', 'Newsletter sign-up', 'Contact Us form', 'Checkout form errors', 'Delivery options', 'Payment methods offered', 'Promo code', 'Payment method panels', 'Payment window: PayPal', 'Payment window: each other method', 'Guest order, order status and return form']],
+          ['Signed in', 'Member checkout and the account', ['Member checkout with a saved address', 'Cancel the order in My Account', 'Account overview', 'My Profile', 'Order history', 'Wishlist: add, remove', 'Address book', 'My Preferences', 'Membership']],
+          ['Signed out again', 'Leaving and coming back', ['Sign out', 'Account pages need sign-in', 'Log in and log out from the header', 'Account registration']]
+        ],
+        note: 'Payment windows are opened and screenshotted, never paid. The order the member checkout places is cancelled in the same run.'
+      },
+      phone: {
+        phases: [
+          ['Signed out', 'Where the phone layout differs', ['Homepage', 'Customer photos (UGC)', 'Menu and search from the bottom bar', 'Listing sort: price low to high', 'Listing filter pop-up', 'Notify me on the product page', 'Product page and bag', 'Delivery options', 'Payment methods offered', 'Payment method panels']],
+          ['Signed in', 'Checkout with a typed-in address', ['Member checkout, address typed in', 'Cancel the order in My Account', 'Account overview', 'Order history', 'Wishlist: add, remove']],
+          ['Signed out again', 'Leaving and coming back', ['Sign out from My Account', 'Account pages need sign-in', 'Log in on the login page, then log out']]
+        ],
+        note: 'Runs as an iPhone-sized browser with touch. The site A/B tests two bottom bars, and the journey works with either and records which one it got.'
+      }
+    };
+
+    var wrap = document.getElementById('phases');
+    var note = document.getElementById('journeyNote');
+    var buttons = document.querySelectorAll('.switch button');
+    var walk = null;
+
+    function show(key) {
+      var n = 0;
+      wrap.innerHTML = J[key].phases.map(function (ph) {
+        var items = ph[2].map(function (s) { n++; return '<li><span>' + String(n).padStart(2, '0') + '</span>' + s + '</li>'; }).join('');
+        return '<div class="phase"><h3>' + ph[0] + '<small>' + ph[1] + '</small></h3><ol class="steps">' + items + '</ol></div>';
+      }).join('');
+      note.textContent = J[key].note;
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.journey === key)); });
+      sweep();
+    }
+
+    // A light passes down the steps once, in run order
+    function sweep() {
+      clearInterval(walk);
+      if (reduceMotion) return;
+      var lis = wrap.querySelectorAll('.steps li'), i = 0;
+      walk = setInterval(function () {
+        if (i > 0) lis[i - 1].classList.remove('lit');
+        if (i >= lis.length) { clearInterval(walk); return; }
+        lis[i++].classList.add('lit');
+      }, 140);
+    }
+
+    buttons.forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.journey); }); });
+
+    show('desktop');
+    clearInterval(walk);
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) { io.disconnect(); sweep(); }
+      }, { threshold: 0.3 });
+      io.observe(wrap);
+    }
+  })();
+
+  // Theme toggle
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    function label() { btn.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'); }
+    btn.addEventListener('click', function () {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      label();
+    });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (err) {}
+      if (saved !== 'light' && saved !== 'dark') { root.dataset.theme = e.matches ? 'dark' : 'light'; label(); }
+    });
+    label();
+  })();
+</script>
+</body>
+</html>
